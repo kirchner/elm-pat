@@ -1,6 +1,19 @@
 module Main exposing (..)
 
+-- external
+
+import Dict
 import Html exposing (Html)
+import Task
+import Window
+
+
+-- internal
+
+import Events
+import Model exposing (..)
+import Point exposing (..)
+import View exposing (..)
 
 
 -- MAIN
@@ -17,33 +30,23 @@ main =
 
 
 
--- MODEL
-
-
-type alias Model =
-    {}
-
-
-defaultModel : Model
-defaultModel =
-    {}
-
-
-
--- MSG
-
-
-type Msg
-    = NoOp
-
-
-
 -- INIT
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( defaultModel, Cmd.none )
+    ( defaultModel, Task.perform UpdateWindowSize Window.size )
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Window.resizes UpdateWindowSize
+        ]
 
 
 
@@ -56,20 +59,30 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
+        UpdateWindowSize newSize ->
+            { model
+                | windowSize = newSize
+            }
+                ! []
 
+        AddOrigin info ->
+            { model
+                | points = Dict.insert model.pointId (Origin info) model.points
+                , pointId = nextId model.pointId
+            }
+                ! []
 
--- SUBSCRIPTIONS
+        FocusPoint id ->
+            { model
+                | focusedPointId = Just id
+            }
+                ! []
 
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
-
-
-
--- VIEW
-
-
-view : Model -> Html Msg
-view model =
-    Html.div [] []
+        UnFocusPoint id ->
+            if model.focusedPointId == (Just id) then
+                { model
+                    | focusedPointId = Nothing
+                }
+                    ! []
+            else
+                model ! []
