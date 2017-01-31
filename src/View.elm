@@ -22,7 +22,27 @@ view model =
     Html.div
         []
         [ viewPattern model
+        , viewInfoBox model
         ]
+
+
+viewInfoBox : Model -> Html Msg
+viewInfoBox model =
+    case Maybe.andThen (\id -> Dict.get id model.points) model.focusedPointId of
+        Just point ->
+            case point of
+                Origin info ->
+                    Html.div
+                        []
+                        [ Html.text "Origin: "
+                        , Html.text <| toString info
+                        ]
+
+                _ ->
+                    Html.div [] []
+
+        Nothing ->
+            Html.div [] []
 
 
 viewPattern : Model -> Html Msg
