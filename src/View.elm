@@ -118,6 +118,7 @@ viewPattern model =
             , Svg.viewBox viewBoxString
             ]
             [ drawFocus model
+            , drawSelection model
             , drawPoints model
             , Svg.line
                 [ Svg.x1 "-10"
@@ -291,6 +292,34 @@ drawFocus model =
 
                 Nothing ->
                     Svg.g [] []
+
+        Nothing ->
+            Svg.g [] []
+
+
+drawSelection : Model -> Svg Msg
+drawSelection model =
+    Svg.g [] <|
+        List.map (drawSelectionCircle model.points) model.selectedPoints
+
+
+drawSelectionCircle : Dict PointId Point -> PointId -> Svg Msg
+drawSelectionCircle points id =
+    case Dict.get id points of
+        Just point ->
+            let
+                ( x, y ) =
+                    toTuple <| position points point
+            in
+                Svg.circle
+                    [ Svg.cx <| toString x
+                    , Svg.cy <| toString y
+                    , Svg.r "8"
+                    , Svg.fill "none"
+                    , Svg.stroke "red"
+                    , Svg.strokeWidth "1"
+                    ]
+                    []
 
         Nothing ->
             Svg.g [] []

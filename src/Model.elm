@@ -36,6 +36,7 @@ type alias Model =
     , points : Dict PointId Point
     , pointId : PointId
     , focusedPointId : Maybe PointId
+    , selectedPoints : List PointId
     , selectedTool : Maybe Tool
     , agenda : Agenda
     , result : Agenda
@@ -58,6 +59,7 @@ defaultModel =
             ]
     , pointId = 1
     , focusedPointId = Nothing
+    , selectedPoints = []
     , selectedTool = Nothing
     , agenda = []
     , result = []
@@ -76,6 +78,7 @@ finishTool model =
                 { model
                     | points = Dict.insert model.pointId point model.points
                     , pointId = model.pointId + 1
+                    , selectedPoints = []
                     , selectedTool = Nothing
                     , agenda = []
                     , result = []
@@ -138,10 +141,20 @@ update msg model =
 
                 newResult =
                     model.result ++ [ step ]
+
+                newSelectedPoints =
+                    case step of
+                        SelectPoint (Just id) ->
+                            id :: model.selectedPoints
+
+                        _ ->
+                            model.selectedPoints
             in
                 finishTool
                     { model
                         | agenda = newAgenda
                         , result = newResult
+                        , selectedPoints = newSelectedPoints
+                        , focusedPointId = Nothing
                     }
                     ! []
