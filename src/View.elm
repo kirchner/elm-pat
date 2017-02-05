@@ -292,8 +292,17 @@ drawGuideLine points id =
             Nothing
 
         Just (ADPoint info) ->
-            -- TODO
-            Nothing
+            let
+                pointPosition =
+                    position points id
+
+                anchorPosition =
+                    position points info.anchor
+            in
+                Maybe.map2
+                    drawADGuideLines
+                    anchorPosition
+                    pointPosition
 
         Just (DDPoint info) ->
             let
@@ -356,6 +365,29 @@ drawDDGuideLines anchor point =
                 , Svg.textAnchor "start"
                 ]
                 [ Svg.text <| toString (y - ay) ]
+            ]
+
+
+drawADGuideLines : Vec2 -> Vec2 -> Svg Msg
+drawADGuideLines anchor point =
+    let
+        ( ax, ay ) =
+            toTuple anchor
+
+        ( x, y ) =
+            toTuple point
+    in
+        Svg.g []
+            [ Svg.line
+                [ Svg.x1 <| toString ax
+                , Svg.y1 <| toString ay
+                , Svg.x2 <| toString x
+                , Svg.y2 <| toString y
+                , Svg.strokeDasharray "5, 10"
+                , Svg.strokeWidth "1"
+                , Svg.stroke "black"
+                ]
+                []
             ]
 
 
