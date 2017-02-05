@@ -19,8 +19,15 @@ position points id =
             Just info.position
 
         Just (ADPoint info) ->
-            -- TODO
-            Just (vec2 0 0)
+            let
+                anchorPosition =
+                    position points info.anchor
+
+                delta =
+                    scale (-1 * info.distance) <|
+                        vec2 (cos info.angle) (sin info.angle)
+            in
+                Maybe.map (add delta) anchorPosition
 
         Just (DDPoint info) ->
             let

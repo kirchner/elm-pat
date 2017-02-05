@@ -46,11 +46,12 @@ stepInfoText step =
 type Tool
     = AddOriginTool
     | AddDDPointTool
+    | AddADPointTool
 
 
 allTools : List Tool
 allTools =
-    [ AddOriginTool, AddDDPointTool ]
+    [ AddOriginTool, AddDDPointTool, AddADPointTool ]
 
 
 toolInfoText : Tool -> String
@@ -61,6 +62,9 @@ toolInfoText tool =
 
         AddDDPointTool ->
             "add dd point"
+
+        AddADPointTool ->
+            "add ad point"
 
 
 type alias Agenda =
@@ -76,6 +80,9 @@ agenda tool =
         AddDDPointTool ->
             [ SelectPoint Nothing, Position Nothing ]
 
+        AddADPointTool ->
+            [ SelectPoint Nothing, Position Nothing ]
+
 
 pointFrom : Dict PointId Point -> Agenda -> Tool -> Maybe Point
 pointFrom points agenda tool =
@@ -85,6 +92,9 @@ pointFrom points agenda tool =
 
         AddDDPointTool ->
             pointFromDDPoint points agenda
+
+        AddADPointTool ->
+            pointFromADPoint points agenda
 
 
 pointFromOrigin : Agenda -> Maybe Point
@@ -109,6 +119,29 @@ pointFromDDPoint points agenda =
                             (getX v) - (getX anchorPosition)
                         , verticalDistance =
                             (getY v) - (getY anchorPosition)
+                        }
+                    )
+                )
+            <|
+                position points anchorId
+
+        _ ->
+            Nothing
+
+
+pointFromADPoint : Dict PointId Point -> Agenda -> Maybe Point
+pointFromADPoint points agenda =
+    case agenda of
+        (SelectPoint (Just anchorId)) :: (Position (Just v)) :: [] ->
+            Maybe.map
+                (\anchorPosition ->
+                    (ADPoint
+                        { anchor = anchorId
+                        , angle =
+                            atan2
+                                (getY <| sub anchorPosition v)
+                                (getX <| sub anchorPosition v)
+                        , distance = length (sub anchorPosition v)
                         }
                     )
                 )
