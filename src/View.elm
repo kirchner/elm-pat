@@ -120,6 +120,7 @@ viewPattern model =
             [ drawFocus model
             , drawSelection model
             , drawPoints model
+            , drawGuideLines model
             , Svg.line
                 [ Svg.x1 "-10"
                 , Svg.y1 "0"
@@ -196,96 +197,35 @@ patternEvents offset step =
                 Nothing
 
 
+
+-- draw points
+
+
 drawPoints : Model -> Svg Msg
 drawPoints model =
+    Svg.g [] <|
+        List.filterMap
+            (drawPoint model.points (List.head model.agenda))
+            (Dict.keys model.points)
+
+
+drawPoint : Dict PointId Point -> Maybe Step -> PointId -> Maybe (Svg Msg)
+drawPoint points step id =
     let
-        draw ( id, point ) =
-            Svg.g []
-                [ drawPoint
-                    model.points
-                    (List.head model.agenda)
-                    ( id, point )
-                , drawGuideLine
-                    model.points
-                    ( id, point )
-                ]
-    in
-        Svg.g [] <|
-            List.map draw <|
-                Dict.toList model.points
-
-
-drawPoint : Dict PointId Point -> Maybe Step -> ( PointId, Point ) -> Svg Msg
-drawPoint points step ( id, point ) =
-    let
-        position =
-            Point.position points point
-
-        ( x, y ) =
-            toTuple <| position
-    in
-        Svg.g
-            []
-            [ Svg.circle
-                [ Svg.cx <| toString x
-                , Svg.cy <| toString y
-                , Svg.r "2"
-                , Svg.fill "black"
-                ]
+        draw v =
+            Svg.g
                 []
-            , eventCircle step position id
-            ]
-
-
-drawGuideLine : Dict PointId Point -> ( PointId, Point ) -> Svg Msg
-drawGuideLine points ( id, point ) =
-    let
-        position =
-            Point.position points point
-
-        ( x, y ) =
-            toTuple <| position
+                [ Svg.circle
+                    [ Svg.cx <| toString <| getX v
+                    , Svg.cy <| toString <| getY v
+                    , Svg.r "2"
+                    , Svg.fill "black"
+                    ]
+                    []
+                , eventCircle step v id
+                ]
     in
-        case point of
-            Origin _ ->
-                Svg.g [] []
-
-            ADPoint info ->
-                -- TODO
-                Svg.g [] []
-
-            DDPoint info ->
-                let
-                    anchorPosition =
-                        Maybe.withDefault (vec2 0 0) <|
-                            Maybe.map (Point.position points) <|
-                                Dict.get info.anchor points
-
-                    ( ax, ay ) =
-                        toTuple <| anchorPosition
-                in
-                    Svg.g []
-                        [ Svg.line
-                            [ Svg.x1 <| toString x
-                            , Svg.y1 <| toString y
-                            , Svg.x2 <| toString x
-                            , Svg.y2 <| toString ay
-                            , Svg.strokeDasharray "5, 10"
-                            , Svg.strokeWidth "1"
-                            , Svg.stroke "black"
-                            ]
-                            []
-                        , Svg.line
-                            [ Svg.x1 <| toString x
-                            , Svg.y1 <| toString ay
-                            , Svg.x2 <| toString ax
-                            , Svg.y2 <| toString ay
-                            , Svg.strokeDasharray "5, 10"
-                            , Svg.strokeWidth "1"
-                            , Svg.stroke "black"
-                            ]
-                            []
-                        ]
+        Maybe.map draw <| position points id
 
 
 eventCircle : Maybe Step -> Vec2 -> PointId -> Svg Msg
@@ -333,31 +273,102 @@ pointEvents id step =
                 ]
 
 
+
+-- draw guide lines
+
+
+drawGuideLines : Model -> Svg Msg
+drawGuideLines model =
+    Svg.g [] <|
+        List.filterMap
+            (drawGuideLine model.points)
+            (Dict.keys model.points)
+
+
+drawGuideLine : Dict PointId Point -> PointId -> Maybe (Svg Msg)
+drawGuideLine points id =
+    case Dict.get id points of
+        Just (Origin _) ->
+            Nothing
+
+        Just (ADPoint info) ->
+            -- TODO
+            Nothing
+
+        Just (DDPoint info) ->
+            let
+                pointPosition =
+                    position points id
+
+                anchorPosition =
+                    position points info.anchor
+            in
+                Maybe.map2
+                    drawDDGuideLines
+                    anchorPosition
+                    pointPosition
+
+        _ ->
+            Nothing
+
+
+drawDDGuideLines : Vec2 -> Vec2 -> Svg Msg
+drawDDGuideLines anchor point =
+    let
+        ( x, y ) =
+            toTuple point
+
+        ( ax, ay ) =
+            toTuple anchor
+    in
+        Svg.g []
+            [ Svg.line
+                [ Svg.x1 <| toString x
+                , Svg.y1 <| toString y
+                , Svg.x2 <| toString x
+                , Svg.y2 <| toString ay
+                , Svg.strokeDasharray "5, 10"
+                , Svg.strokeWidth "1"
+                , Svg.stroke "black"
+                ]
+                []
+            , Svg.line
+                [ Svg.x1 <| toString x
+                , Svg.y1 <| toString ay
+                , Svg.x2 <| toString ax
+                , Svg.y2 <| toString ay
+                , Svg.strokeDasharray "5, 10"
+                , Svg.strokeWidth "1"
+                , Svg.stroke "black"
+                ]
+                []
+            ]
+
+
+
+-- draw focus
+
+
 drawFocus : Model -> Svg Msg
 drawFocus model =
-    case model.focusedPointId of
-        Just id ->
-            case Dict.get id model.points of
-                Just point ->
-                    let
-                        ( x, y ) =
-                            toTuple <| position model.points point
-                    in
-                        Svg.circle
-                            [ Svg.cx <| toString x
-                            , Svg.cy <| toString y
-                            , Svg.r "8"
-                            , Svg.fill "none"
-                            , Svg.stroke "green"
-                            , Svg.strokeWidth "1"
-                            ]
-                            []
-
-                Nothing ->
-                    Svg.g [] []
+    case model.focusedPointId |> Maybe.andThen (position model.points) of
+        Just v ->
+            Svg.circle
+                [ Svg.cx <| toString <| getX v
+                , Svg.cy <| toString <| getY v
+                , Svg.r "8"
+                , Svg.fill "none"
+                , Svg.stroke "green"
+                , Svg.strokeWidth "1"
+                ]
+                []
 
         Nothing ->
             Svg.g [] []
+
+
+
+-- draw selection
 
 
 drawSelection : Model -> Svg Msg
@@ -368,21 +379,17 @@ drawSelection model =
 
 drawSelectionCircle : Dict PointId Point -> PointId -> Svg Msg
 drawSelectionCircle points id =
-    case Dict.get id points of
-        Just point ->
-            let
-                ( x, y ) =
-                    toTuple <| position points point
-            in
-                Svg.circle
-                    [ Svg.cx <| toString x
-                    , Svg.cy <| toString y
-                    , Svg.r "8"
-                    , Svg.fill "none"
-                    , Svg.stroke "red"
-                    , Svg.strokeWidth "1"
-                    ]
-                    []
+    case position points id of
+        Just v ->
+            Svg.circle
+                [ Svg.cx <| toString <| getX v
+                , Svg.cy <| toString <| getY v
+                , Svg.r "8"
+                , Svg.fill "none"
+                , Svg.stroke "red"
+                , Svg.strokeWidth "1"
+                ]
+                []
 
         Nothing ->
             Svg.g [] []

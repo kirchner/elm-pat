@@ -12,26 +12,30 @@ type Point
     | DDPoint DDPointInfo
 
 
-position : Dict PointId Point -> Point -> Vec2
-position points point =
-    case point of
-        Origin info ->
-            info.position
+position : Dict PointId Point -> PointId -> Maybe Vec2
+position points id =
+    case Dict.get id points of
+        Just (Origin info) ->
+            Just info.position
 
-        ADPoint info ->
-            vec2 0 0
+        Just (ADPoint info) ->
+            -- TODO
+            Just (vec2 0 0)
 
-        DDPoint info ->
+        Just (DDPoint info) ->
             let
                 anchorPosition =
-                    Maybe.withDefault (vec2 0 0) <|
-                        Maybe.map (position points) <|
-                            Dict.get info.anchor points
-            in
-                add anchorPosition <|
+                    position points info.anchor
+
+                delta =
                     vec2
                         info.horizontalDistance
                         info.verticalDistance
+            in
+                Maybe.map (add delta) anchorPosition
+
+        Nothing ->
+            Nothing
 
 
 type alias PointId =

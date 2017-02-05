@@ -100,22 +100,20 @@ pointFromOrigin agenda =
 pointFromDDPoint : Dict PointId Point -> Agenda -> Maybe Point
 pointFromDDPoint points agenda =
     case agenda of
-        (SelectPoint (Just id)) :: (Position (Just v)) :: [] ->
-            let
-                anchorPosition =
-                    Maybe.withDefault (vec2 0 0) <|
-                        Maybe.map (position points) <|
-                            Dict.get id points
-            in
-                Just
+        (SelectPoint (Just anchorId)) :: (Position (Just v)) :: [] ->
+            Maybe.map
+                (\anchorPosition ->
                     (DDPoint
-                        { anchor = id
+                        { anchor = anchorId
                         , horizontalDistance =
                             (getX v) - (getX anchorPosition)
                         , verticalDistance =
                             (getY v) - (getY anchorPosition)
                         }
                     )
+                )
+            <|
+                position points anchorId
 
         _ ->
             Nothing
