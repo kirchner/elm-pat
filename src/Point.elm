@@ -2,6 +2,7 @@ module Point exposing (..)
 
 -- external
 
+import Dict exposing (Dict)
 import Math.Vector2 exposing (..)
 
 
@@ -11,8 +12,8 @@ type Point
     | DDPoint DDPointInfo
 
 
-position : Point -> Vec2
-position point =
+position : Dict PointId Point -> Point -> Vec2
+position points point =
     case point of
         Origin info ->
             info.position
@@ -21,7 +22,16 @@ position point =
             vec2 0 0
 
         DDPoint info ->
-            vec2 0 0
+            let
+                anchorPosition =
+                    Maybe.withDefault (vec2 0 0) <|
+                        Maybe.map (position points) <|
+                            Dict.get info.anchor points
+            in
+                add anchorPosition <|
+                    vec2
+                        info.horizontalDistance
+                        info.verticalDistance
 
 
 type alias PointId =
