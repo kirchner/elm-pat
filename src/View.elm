@@ -49,15 +49,15 @@ viewInfoBox model =
                         ]
 
                 ADPoint info ->
-                    -- TODO
                     Html.div []
                         [ Html.text "ad point: "
+                        , Html.text <| toString info
                         ]
 
                 DDPoint info ->
-                    -- TODO
                     Html.div []
                         [ Html.text "dd point: "
+                        , Html.text <| toString info
                         ]
 
         Nothing ->
@@ -198,9 +198,21 @@ patternEvents offset step =
 
 drawPoints : Model -> Svg Msg
 drawPoints model =
-    Svg.g [] <|
-        List.map (drawPoint model.points <| List.head model.agenda) <|
-            Dict.toList model.points
+    let
+        draw ( id, point ) =
+            Svg.g []
+                [ drawPoint
+                    model.points
+                    (List.head model.agenda)
+                    ( id, point )
+                , drawGuideLine
+                    model.points
+                    ( id, point )
+                ]
+    in
+        Svg.g [] <|
+            List.map draw <|
+                Dict.toList model.points
 
 
 drawPoint : Dict PointId Point -> Maybe Step -> ( PointId, Point ) -> Svg Msg
@@ -223,6 +235,57 @@ drawPoint points step ( id, point ) =
                 []
             , eventCircle step position id
             ]
+
+
+drawGuideLine : Dict PointId Point -> ( PointId, Point ) -> Svg Msg
+drawGuideLine points ( id, point ) =
+    let
+        position =
+            Point.position points point
+
+        ( x, y ) =
+            toTuple <| position
+    in
+        case point of
+            Origin _ ->
+                Svg.g [] []
+
+            ADPoint info ->
+                -- TODO
+                Svg.g [] []
+
+            DDPoint info ->
+                let
+                    anchorPosition =
+                        Maybe.withDefault (vec2 0 0) <|
+                            Maybe.map (Point.position points) <|
+                                Dict.get info.anchor points
+
+                    ( ax, ay ) =
+                        toTuple <| anchorPosition
+                in
+                    Svg.g []
+                        [ Svg.line
+                            [ Svg.x1 <| toString x
+                            , Svg.y1 <| toString y
+                            , Svg.x2 <| toString x
+                            , Svg.y2 <| toString ay
+                            , Svg.strokeDasharray "5, 10"
+                            , Svg.strokeWidth "1"
+                            , Svg.stroke "black"
+                            ]
+                            []
+                        , Svg.line
+                            [ Svg.x1 <| toString x
+                            , Svg.y1 <| toString ay
+                            , Svg.x2 <| toString ax
+                            , Svg.y2 <| toString ay
+                            , Svg.strokeDasharray "5, 10"
+                            , Svg.strokeWidth "1"
+                            , Svg.stroke "black"
+                            ]
+                            []
+                        ]
 
 
 eventCircle : Maybe Step -> Vec2 -> PointId -> Svg Msg
