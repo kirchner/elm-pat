@@ -315,16 +315,16 @@ drawGuideLine points id =
 drawDDGuideLines : Vec2 -> Vec2 -> Svg Msg
 drawDDGuideLines anchor point =
     let
-        ( x, y ) =
-            toTuple point
-
         ( ax, ay ) =
             toTuple anchor
+
+        ( x, y ) =
+            toTuple point
     in
         Svg.g []
             [ Svg.line
-                [ Svg.x1 <| toString x
-                , Svg.y1 <| toString y
+                [ Svg.x1 <| toString ax
+                , Svg.y1 <| toString ay
                 , Svg.x2 <| toString x
                 , Svg.y2 <| toString ay
                 , Svg.strokeDasharray "5, 10"
@@ -332,16 +332,30 @@ drawDDGuideLines anchor point =
                 , Svg.stroke "black"
                 ]
                 []
+            , Svg.text_
+                [ Svg.x <| toString (0.5 * (x + ax))
+                , Svg.y <| toString (ay + 11)
+                , Svg.fontSize "10"
+                , Svg.textAnchor "middle"
+                ]
+                [ Svg.text <| toString (x - ax) ]
             , Svg.line
                 [ Svg.x1 <| toString x
                 , Svg.y1 <| toString ay
-                , Svg.x2 <| toString ax
-                , Svg.y2 <| toString ay
+                , Svg.x2 <| toString x
+                , Svg.y2 <| toString y
                 , Svg.strokeDasharray "5, 10"
                 , Svg.strokeWidth "1"
                 , Svg.stroke "black"
                 ]
                 []
+            , Svg.text_
+                [ Svg.x <| toString (x + 3)
+                , Svg.y <| toString (0.5 * (y + ay))
+                , Svg.fontSize "10"
+                , Svg.textAnchor "start"
+                ]
+                [ Svg.text <| toString (y - ay) ]
             ]
 
 
