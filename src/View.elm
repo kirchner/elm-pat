@@ -83,6 +83,9 @@ viewToolBox model =
                 , Html.button
                     [ Events.onClick <| InitTool <| Tool.pointFromDDPointTool model.points ]
                     [ Html.text "add dd point" ]
+                , Html.button
+                    [ Events.onClick <| InitTool <| Tool.pointFromADPointTool model.points ]
+                    [ Html.text "add ad point" ]
                 ]
 
 
