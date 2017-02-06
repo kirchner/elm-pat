@@ -13,7 +13,6 @@ import Window
 import Events
 import Model exposing (..)
 import Point exposing (..)
-import Tool exposing (..)
 import View exposing (..)
 
 

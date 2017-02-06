@@ -17,7 +17,7 @@ import Svg.Events as Svg
 
 import Model exposing (..)
 import Point exposing (..)
-import Tool exposing (..)
+import Tool exposing (Tool, Step)
 
 
 view : Model -> Html Msg
@@ -70,28 +70,20 @@ viewInfoBox model =
 
 viewToolBox : Model -> Html Msg
 viewToolBox model =
-    if List.isEmpty model.agenda then
-        Html.div [] <|
-            List.map viewToolButton allTools
-    else
-        Html.div [] <|
-            List.map viewStepInfo model.agenda
+    case model.selectedTool of
+        Just tool ->
+            -- TODO view tool info
+            Html.div [] []
 
-
-viewToolButton : Tool -> Html Msg
-viewToolButton tool =
-    Html.button
-        [ Events.onClick <| InitTool tool ]
-        [ Html.text <| toolInfoText tool ]
-
-
-viewStepInfo : Step -> Html Msg
-viewStepInfo step =
-    Html.text <| stepInfoText step
-
-
-
--- pattern
+        Nothing ->
+            Html.div []
+                [ Html.button
+                    [ Events.onClick <| InitTool Tool.pointFromOriginTool ]
+                    [ Html.text "add origin" ]
+                , Html.button
+                    [ Events.onClick <| InitTool <| Tool.pointFromDDPointTool model.points ]
+                    [ Html.text "add dd point" ]
+                ]
 
 
 viewPattern : Model -> Html Msg
@@ -119,7 +111,6 @@ viewPattern model =
             ]
             [ drawFocus model
             , drawSelection model
-            , drawPoints model
             , drawGuideLines model
             , Svg.line
                 [ Svg.x1 "-10"
@@ -140,6 +131,7 @@ viewPattern model =
                 ]
                 []
             , eventRect model
+            , drawPoints model
             ]
 
 
@@ -151,50 +143,31 @@ eventRect model =
 
         heightString =
             toString (model.windowSize.height - 50)
-    in
-        case List.head model.agenda |> Maybe.andThen (patternEvents model.offset) of
-            Just events ->
-                Svg.g
-                    []
-                    [ Svg.rect
-                        ([ Svg.x "-320"
-                         , Svg.y "-200"
-                         , Svg.width widthString
-                         , Svg.height heightString
-                         , Svg.fill "transparent"
-                         ]
-                            ++ events
-                        )
-                        []
-                    ]
 
-            Nothing ->
-                Svg.g [] []
-
-
-patternEvents : Vec2 -> Step -> Maybe (List (Svg.Attribute Msg))
-patternEvents offset step =
-    let
         offsetPosition =
             Json.map2 positionToVec
                 (Json.field "offsetX" Json.int)
                 (Json.field "offsetY" Json.int)
 
         positionToVec x y =
-            add offset <| vec2 (toFloat x) (toFloat y)
+            add model.offset <| vec2 (toFloat x) (toFloat y)
     in
-        case step of
-            Position _ ->
-                Just
-                    [ Svg.on "click"
-                        (Json.map
-                            (\pos -> DoStep (Position (Just pos)))
-                            offsetPosition
-                        )
-                    ]
-
-            _ ->
-                Nothing
+        Svg.g
+            []
+            [ Svg.rect
+                [ Svg.x "-320"
+                , Svg.y "-200"
+                , Svg.width widthString
+                , Svg.height heightString
+                , Svg.fill "transparent"
+                , Svg.on "click"
+                    (Json.map
+                        (\pos -> DoStep (Tool.InputPosition pos))
+                        offsetPosition
+                    )
+                ]
+                []
+            ]
 
 
 
@@ -205,12 +178,12 @@ drawPoints : Model -> Svg Msg
 drawPoints model =
     Svg.g [] <|
         List.filterMap
-            (drawPoint model.points (List.head model.agenda))
+            (drawPoint model.points)
             (Dict.keys model.points)
 
 
-drawPoint : Dict PointId Point -> Maybe Step -> PointId -> Maybe (Svg Msg)
-drawPoint points step id =
+drawPoint : Dict PointId Point -> PointId -> Maybe (Svg Msg)
+drawPoint points id =
     let
         draw v =
             Svg.g
@@ -222,55 +195,31 @@ drawPoint points step id =
                     , Svg.fill "black"
                     ]
                     []
-                , eventCircle step v id
+                , eventCircle v id
                 ]
     in
         Maybe.map draw <| position points id
 
 
-eventCircle : Maybe Step -> Vec2 -> PointId -> Svg Msg
-eventCircle step position id =
+eventCircle : Vec2 -> PointId -> Svg Msg
+eventCircle position id =
     let
         ( x, y ) =
             toTuple <| position
     in
-        case pointEvents id step of
-            Just events ->
-                Svg.g
-                    []
-                    [ Svg.circle
-                        ([ Svg.cx <| toString x
-                         , Svg.cy <| toString y
-                         , Svg.r "8"
-                         , Svg.fill "transparent"
-                         ]
-                            ++ events
-                        )
-                        []
-                    ]
-
-            Nothing ->
-                Svg.g [] []
-
-
-pointEvents : PointId -> Maybe Step -> Maybe (List (Svg.Attribute Msg))
-pointEvents id step =
-    case step of
-        Just (Position _) ->
-            Nothing
-
-        Just (SelectPoint _) ->
-            Just
-                [ Svg.onMouseOver (FocusPoint id)
+        Svg.g
+            []
+            [ Svg.circle
+                [ Svg.cx <| toString x
+                , Svg.cy <| toString y
+                , Svg.r "8"
+                , Svg.fill "transparent"
+                , Svg.onMouseOver (FocusPoint id)
                 , Svg.onMouseOut (UnFocusPoint id)
-                , Svg.onClick (DoStep (SelectPoint (Just id)))
+                , Svg.onClick (DoStep (Tool.SelectPoint id))
                 ]
-
-        _ ->
-            Just
-                [ Svg.onMouseOver (FocusPoint id)
-                , Svg.onMouseOut (UnFocusPoint id)
-                ]
+                []
+            ]
 
 
 

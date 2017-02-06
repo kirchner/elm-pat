@@ -22,8 +22,8 @@ type Msg
     | AddOrigin OriginInfo
     | FocusPoint PointId
     | UnFocusPoint PointId
-    | InitTool Tool
-    | DoStep Step
+    | InitTool (Tool Tool.Msg Point)
+    | DoStep Tool.Msg
 
 
 
@@ -37,9 +37,7 @@ type alias Model =
     , pointId : PointId
     , focusedPointId : Maybe PointId
     , selectedPoints : List PointId
-    , selectedTool : Maybe Tool
-    , agenda : Agenda
-    , result : Agenda
+    , selectedTool : Maybe (Tool Tool.Msg Point)
     }
 
 
@@ -61,34 +59,30 @@ defaultModel =
     , focusedPointId = Nothing
     , selectedPoints = []
     , selectedTool = Nothing
-    , agenda = []
-    , result = []
     }
 
 
-finishTool : Model -> Model
-finishTool model =
-    let
-        newPoint =
-            model.selectedTool
-                |> Maybe.andThen (pointFrom model.points model.result)
-    in
-        case newPoint of
-            Just point ->
-                { model
-                    | points = Dict.insert model.pointId point model.points
-                    , pointId = model.pointId + 1
-                    , selectedPoints = []
-                    , selectedTool = Nothing
-                    , agenda = []
-                    , result = []
-                }
 
-            Nothing ->
-                model
-
-
-
+--finishTool : Model -> Model
+--finishTool model =
+--    let
+--        newPoint =
+--            model.selectedTool
+--                |> Maybe.andThen (pointFrom model.points model.result)
+--    in
+--        case newPoint of
+--            Just point ->
+--                { model
+--                    | points = Dict.insert model.pointId point model.points
+--                    , pointId = model.pointId + 1
+--                    , selectedPoints = []
+--                    , selectedTool = Nothing
+--                    , agenda = []
+--                    , result = []
+--                }
+--
+--            Nothing ->
+--                model
 -- UPDATE
 
 
@@ -130,31 +124,30 @@ update msg model =
         InitTool tool ->
             { model
                 | selectedTool = Just tool
-                , agenda = agenda tool
             }
                 ! []
 
-        DoStep step ->
-            let
-                newAgenda =
-                    Maybe.withDefault [] <| List.tail model.agenda
+        DoStep toolMsg ->
+            case model.selectedTool of
+                Just tool ->
+                    let
+                        result =
+                            step toolMsg tool
+                    in
+                        case result of
+                            Ok point ->
+                                { model
+                                    | points = Dict.insert model.pointId point model.points
+                                    , pointId = model.pointId + 1
+                                    , selectedTool = Nothing
+                                }
+                                    ! []
 
-                newResult =
-                    model.result ++ [ step ]
+                            Err nextTool ->
+                                { model
+                                    | selectedTool = Just nextTool
+                                }
+                                    ! []
 
-                newSelectedPoints =
-                    case step of
-                        SelectPoint (Just id) ->
-                            id :: model.selectedPoints
-
-                        _ ->
-                            model.selectedPoints
-            in
-                finishTool
-                    { model
-                        | agenda = newAgenda
-                        , result = newResult
-                        , selectedPoints = newSelectedPoints
-                        , focusedPointId = Nothing
-                    }
-                    ! []
+                Nothing ->
+                    model ! []
