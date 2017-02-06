@@ -16,6 +16,7 @@ import Point exposing (..)
 
 type Tool msg result
     = Tool (msg -> Maybe (Step msg result))
+    | Succeed result
 
 
 type Step msg result
@@ -24,51 +25,66 @@ type Step msg result
 
 
 step : msg -> Tool msg result -> Result (Tool msg result) result
-step msg (Tool tool) =
-    case tool msg of
-        Just (Done result) ->
+step msg tool =
+    case tool of
+        Tool action ->
+            case action msg of
+                Just (Done result) ->
+                    Ok result
+
+                Just (Cont nextTool) ->
+                    Err nextTool
+
+                Nothing ->
+                    Err (Tool action)
+
+        Succeed result ->
             Ok result
-
-        Just (Cont nextTool) ->
-            Err nextTool
-
-        Nothing ->
-            Err (Tool tool)
 
 
 succeed : result -> Tool msg result
 succeed result =
-    Tool (\_ -> Just (Done result))
+    Succeed result
 
 
 map : (a -> b) -> Tool msg a -> Tool msg b
-map func (Tool tool) =
-    Tool <|
-        \msg ->
-            case tool msg of
-                Just (Done result) ->
-                    Just (Done (func result))
+map func tool =
+    case tool of
+        Tool action ->
+            Tool <|
+                \msg ->
+                    case action msg of
+                        Just (Done result) ->
+                            Just (Done (func result))
 
-                Just (Cont nextTool) ->
-                    Just (Cont (map func nextTool))
+                        Just (Cont nextTool) ->
+                            Just (Cont (map func nextTool))
 
-                Nothing ->
-                    Nothing
+                        Nothing ->
+                            Nothing
+
+        Succeed result ->
+            Succeed (func result)
 
 
 map2 : (a -> b -> c) -> Tool msg a -> Tool msg b -> Tool msg c
-map2 func (Tool toolA) (Tool toolB) =
-    Tool <|
-        \msg ->
-            case toolA msg of
-                Just (Done resultA) ->
-                    Just (Cont (map (func resultA) (Tool toolB)))
+map2 func toolA toolB =
+    case toolA of
+        Tool actionA ->
+            Tool <|
+                \msg ->
+                    case actionA msg of
+                        Just (Done resultA) ->
+                            Just (Cont (map (func resultA) toolB))
 
-                Just (Cont nextToolA) ->
-                    Just (Cont (map2 func nextToolA (Tool toolB)))
+                        Just (Cont nextToolA) ->
+                            Just (Cont (map2 func nextToolA toolB))
 
-                Nothing ->
-                    Nothing
+                        Nothing ->
+                            Nothing
+
+        Succeed result ->
+            map (func result) toolB
 
 
 (|=) : Tool msg (a -> b) -> Tool msg a -> Tool msg b
