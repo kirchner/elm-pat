@@ -5,6 +5,7 @@ module ToolCombiner
         , step
         , succeed
         , (|=)
+        , zeroOrMore
         )
 
 
@@ -93,3 +94,34 @@ map2 func toolA toolB =
 apply : (a -> b) -> a -> b
 apply f a =
     f a
+
+
+{-| This Tool will be Done if the handling of the msg by the provided
+Tool gives Nothing.
+-}
+zeroOrMore : Tool msg a -> Tool msg (List a)
+zeroOrMore =
+    zeroOrMoreIterator []
+
+
+zeroOrMoreIterator : List a -> Tool msg a -> Tool msg (List a)
+zeroOrMoreIterator list tool =
+    Tool <| zeroOrMoreStep list tool
+
+
+zeroOrMoreStep : List a -> Tool msg a -> msg -> Maybe (Step msg (List a))
+zeroOrMoreStep list tool msg =
+    case tool of
+        Tool action ->
+            case action msg of
+                Just (Done result) ->
+                    Just (Cont (zeroOrMoreIterator (result :: list) tool))
+
+                Just (Cont tool) ->
+                    Just (Cont (zeroOrMoreIterator list tool))
+
+                Nothing ->
+                    Just (Done list)
+
+        Succeed result ->
+            Just (Done [ result ])

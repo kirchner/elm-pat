@@ -16,6 +16,7 @@ import Svg.Events as Svg
 -- internal
 
 import Model exposing (..)
+import Boundary exposing (..)
 import Cut exposing (..)
 import Point exposing (..)
 import Tools
@@ -74,7 +75,14 @@ viewToolBox model =
     case model.selectedTool of
         Just tool ->
             -- TODO view tool info
-            Html.div [] []
+            Html.div []
+                [ Html.button
+                    [ Events.onClick <| AbortTool ]
+                    [ Html.text "abort" ]
+                , Html.button
+                    [ Events.onClick <| DoStep Tools.NoOp ]
+                    [ Html.text "no step" ]
+                ]
 
         Nothing ->
             Html.div []
@@ -88,8 +96,11 @@ viewToolBox model =
                     [ Events.onClick <| InitTool <| Tools.pointFromADPointTool model.points ]
                     [ Html.text "add ad point" ]
                 , Html.button
-                    [ Events.onClick <| InitTool <| Tools.cutFromPointPointTool model.points ]
+                    [ Events.onClick <| InitTool Tools.cutFromPointPointTool ]
                     [ Html.text "add cut" ]
+                , Html.button
+                    [ Events.onClick <| InitTool Tools.boundaryFromPointsTool ]
+                    [ Html.text "add boundary" ]
                 ]
 
 
@@ -140,6 +151,7 @@ viewPattern model =
             , eventRect model
             , drawPoints model
             , drawCuts model
+            , drawBoundaries model
             ]
 
 
@@ -432,3 +444,55 @@ drawCut points cuts id =
                 ]
     in
         Dict.get id cuts |> Maybe.andThen draw
+
+
+
+-- draw boundaries
+
+
+drawBoundaries : Model -> Svg Msg
+drawBoundaries model =
+    Svg.g [] <|
+        List.filterMap
+            (drawBoundary model.points model.boundaries)
+            (Dict.keys model.boundaries)
+
+
+drawBoundary : Dict PointId Point -> Dict BoundaryId Boundary -> BoundaryId -> Maybe (Svg Msg)
+drawBoundary points boundaries id =
+    let
+        draw boundary =
+            Svg.g [] <|
+                Tuple.second <|
+                    List.foldl appendLine ( Nothing, [] ) (Boundary.toList boundary)
+
+        appendLine nextId ( previousId, svgs ) =
+            case previousId of
+                Just id ->
+                    let
+                        newLine =
+                            Maybe.withDefault (Svg.g [] []) <|
+                                Maybe.map2
+                                    drawLine
+                                    (position points id)
+                                    (position points nextId)
+                    in
+                        ( Just nextId, newLine :: svgs )
+
+                Nothing ->
+                    ( Just nextId, svgs )
+
+        drawLine v w =
+            Svg.g []
+                [ Svg.line
+                    [ Svg.x1 <| toString <| getX v
+                    , Svg.y1 <| toString <| getY v
+                    , Svg.x2 <| toString <| getX w
+                    , Svg.y2 <| toString <| getY w
+                    , Svg.stroke "black"
+                    , Svg.strokeWidth "1"
+                    ]
+                    []
+                ]
+    in
+        Maybe.map draw <| Dict.get id boundaries

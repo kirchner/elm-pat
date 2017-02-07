@@ -8,6 +8,7 @@ import Math.Vector2 exposing (..)
 
 -- internal
 
+import Boundary exposing (Boundary)
 import Cut exposing (..)
 import Point exposing (..)
 import ToolCombiner exposing (..)
@@ -19,6 +20,7 @@ import ToolCombiner exposing (..)
 type Tool
     = PointTool (ToolCombiner.Tool Msg Point)
     | CutTool (ToolCombiner.Tool Msg Cut)
+    | BoundaryTool (ToolCombiner.Tool Msg Boundary)
 
 
 stepPointTool : Msg -> ToolCombiner.Tool Msg Point -> Result Tool Point
@@ -33,6 +35,12 @@ stepCutTool msg tool =
         ToolCombiner.step msg tool
 
 
+stepBoundaryTool : Msg -> ToolCombiner.Tool Msg Boundary -> Result Tool Boundary
+stepBoundaryTool msg tool =
+    Result.mapError BoundaryTool <|
+        ToolCombiner.step msg tool
+
+
 
 -- msg
 
@@ -40,6 +48,7 @@ stepCutTool msg tool =
 type Msg
     = InputPosition Vec2
     | SelectPoint PointId
+    | NoOp
 
 
 
@@ -153,16 +162,34 @@ pointFromADPoint points anchorId v =
 -- cut tool
 
 
-cutFromPointPointTool : Dict PointId Point -> Tool
-cutFromPointPointTool points =
+cutFromPointPointTool : Tool
+cutFromPointPointTool =
     CutTool <|
-        succeed (cutFromPointPoint points)
+        succeed cutFromPointPoint
             |= selectPointTool
             |= selectPointTool
 
 
-cutFromPointPoint : Dict PointId Point -> PointId -> PointId -> Cut
-cutFromPointPoint points anchorA anchorB =
+cutFromPointPoint : PointId -> PointId -> Cut
+cutFromPointPoint anchorA anchorB =
     { anchorA = anchorA
     , anchorB = anchorB
     }
+
+
+
+-- boundary tool
+
+
+boundaryFromPointsTool : Tool
+boundaryFromPointsTool =
+    BoundaryTool <|
+        succeed boundaryFromPoints
+            |= selectPointTool
+            |= selectPointTool
+            |= (zeroOrMore selectPointTool)
+
+
+boundaryFromPoints : PointId -> PointId -> List PointId -> Boundary
+boundaryFromPoints =
+    Boundary.boundary

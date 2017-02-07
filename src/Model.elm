@@ -9,6 +9,7 @@ import Window
 
 -- internal
 
+import Boundary exposing (..)
 import Cut exposing (..)
 import Point exposing (..)
 import Tools exposing (..)
@@ -24,6 +25,7 @@ type Msg
     | FocusPoint PointId
     | UnFocusPoint PointId
     | InitTool Tool
+    | AbortTool
     | DoStep Tools.Msg
 
 
@@ -38,6 +40,8 @@ type alias Model =
     , pointId : PointId
     , cuts : Dict CutId Cut
     , cutId : CutId
+    , boundaries : Dict BoundaryId Boundary
+    , boundaryId : BoundaryId
     , focusedPointId : Maybe PointId
     , selectedPoints : List PointId
     , selectedTool : Maybe Tool
@@ -61,6 +65,8 @@ defaultModel =
     , pointId = 1
     , cuts = Dict.empty
     , cutId = 0
+    , boundaries = Dict.empty
+    , boundaryId = 0
     , focusedPointId = Nothing
     , selectedPoints = []
     , selectedTool = Nothing
@@ -108,6 +114,12 @@ update msg model =
             }
                 ! []
 
+        AbortTool ->
+            { model
+                | selectedTool = Nothing
+            }
+                ! []
+
         DoStep toolMsg ->
             case model.selectedTool of
                 Just (PointTool tool) ->
@@ -140,6 +152,26 @@ update msg model =
                                 { model
                                     | cuts = Dict.insert model.cutId cut model.cuts
                                     , cutId = model.cutId + 1
+                                    , selectedTool = Nothing
+                                }
+                                    ! []
+
+                            Err nextTool ->
+                                { model
+                                    | selectedTool = Just nextTool
+                                }
+                                    ! []
+
+                Just (BoundaryTool tool) ->
+                    let
+                        result =
+                            stepBoundaryTool toolMsg tool
+                    in
+                        case result of
+                            Ok boundary ->
+                                { model
+                                    | boundaries = Dict.insert model.boundaryId boundary model.boundaries
+                                    , boundaryId = model.boundaryId + 1
                                     , selectedTool = Nothing
                                 }
                                     ! []
