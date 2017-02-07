@@ -9,6 +9,7 @@ import Window
 
 -- internal
 
+import Cut exposing (..)
 import Point exposing (..)
 import Tools exposing (..)
 
@@ -22,7 +23,7 @@ type Msg
     | AddOrigin OriginInfo
     | FocusPoint PointId
     | UnFocusPoint PointId
-    | InitTool PointTool
+    | InitTool Tool
     | DoStep Tools.Msg
 
 
@@ -35,9 +36,11 @@ type alias Model =
     , offset : Vec2
     , points : Dict PointId Point
     , pointId : PointId
+    , cuts : Dict CutId Cut
+    , cutId : CutId
     , focusedPointId : Maybe PointId
     , selectedPoints : List PointId
-    , selectedTool : Maybe PointTool
+    , selectedTool : Maybe Tool
     }
 
 
@@ -56,6 +59,8 @@ defaultModel =
             [ ( 0, Origin { position = vec2 40 40 } )
             ]
     , pointId = 1
+    , cuts = Dict.empty
+    , cutId = 0
     , focusedPointId = Nothing
     , selectedPoints = []
     , selectedTool = Nothing
@@ -105,16 +110,36 @@ update msg model =
 
         DoStep toolMsg ->
             case model.selectedTool of
-                Just tool ->
+                Just (PointTool tool) ->
                     let
                         result =
-                            step toolMsg tool
+                            stepPointTool toolMsg tool
                     in
                         case result of
                             Ok point ->
                                 { model
                                     | points = Dict.insert model.pointId point model.points
                                     , pointId = model.pointId + 1
+                                    , selectedTool = Nothing
+                                }
+                                    ! []
+
+                            Err nextTool ->
+                                { model
+                                    | selectedTool = Just nextTool
+                                }
+                                    ! []
+
+                Just (CutTool tool) ->
+                    let
+                        result =
+                            stepCutTool toolMsg tool
+                    in
+                        case result of
+                            Ok cut ->
+                                { model
+                                    | cuts = Dict.insert model.cutId cut model.cuts
+                                    , cutId = model.cutId + 1
                                     , selectedTool = Nothing
                                 }
                                     ! []

@@ -16,6 +16,7 @@ import Svg.Events as Svg
 -- internal
 
 import Model exposing (..)
+import Cut exposing (..)
 import Point exposing (..)
 import Tools
 
@@ -86,6 +87,9 @@ viewToolBox model =
                 , Html.button
                     [ Events.onClick <| InitTool <| Tools.pointFromADPointTool model.points ]
                     [ Html.text "add ad point" ]
+                , Html.button
+                    [ Events.onClick <| InitTool <| Tools.cutFromPointPointTool model.points ]
+                    [ Html.text "add cut" ]
                 ]
 
 
@@ -135,6 +139,7 @@ viewPattern model =
                 []
             , eventRect model
             , drawPoints model
+            , drawCuts model
             ]
 
 
@@ -391,3 +396,39 @@ drawSelectionCircle points id =
 
         Nothing ->
             Svg.g [] []
+
+
+
+-- draw cuts
+
+
+drawCuts : Model -> Svg Msg
+drawCuts model =
+    Svg.g [] <|
+        List.filterMap
+            (drawCut model.points model.cuts)
+            (Dict.keys model.cuts)
+
+
+drawCut : Dict PointId Point -> Dict CutId Cut -> CutId -> Maybe (Svg Msg)
+drawCut points cuts id =
+    let
+        draw cut =
+            Maybe.map2 drawLine
+                (position points cut.anchorA)
+                (position points cut.anchorB)
+
+        drawLine v w =
+            Svg.g []
+                [ Svg.line
+                    [ Svg.x1 <| toString <| getX v
+                    , Svg.y1 <| toString <| getY v
+                    , Svg.x2 <| toString <| getX w
+                    , Svg.y2 <| toString <| getY w
+                    , Svg.stroke "black"
+                    , Svg.strokeWidth "1"
+                    ]
+                    []
+                ]
+    in
+        Dict.get id cuts |> Maybe.andThen draw

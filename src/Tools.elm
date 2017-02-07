@@ -8,6 +8,7 @@ import Math.Vector2 exposing (..)
 
 -- internal
 
+import Cut exposing (..)
 import Point exposing (..)
 import ToolCombiner exposing (..)
 
@@ -15,13 +16,21 @@ import ToolCombiner exposing (..)
 -- point tool
 
 
-type alias PointTool =
-    Tool Msg Point
+type Tool
+    = PointTool (ToolCombiner.Tool Msg Point)
+    | CutTool (ToolCombiner.Tool Msg Cut)
 
 
-step : Msg -> PointTool -> Result PointTool Point
-step msg tool =
-    ToolCombiner.step msg tool
+stepPointTool : Msg -> ToolCombiner.Tool Msg Point -> Result Tool Point
+stepPointTool msg tool =
+    Result.mapError PointTool <|
+        ToolCombiner.step msg tool
+
+
+stepCutTool : Msg -> ToolCombiner.Tool Msg Cut -> Result Tool Cut
+stepCutTool msg tool =
+    Result.mapError CutTool <|
+        ToolCombiner.step msg tool
 
 
 
@@ -37,7 +46,7 @@ type Msg
 -- steps
 
 
-positionTool : Tool Msg Vec2
+positionTool : ToolCombiner.Tool Msg Vec2
 positionTool =
     Tool positionStep
 
@@ -52,7 +61,7 @@ positionStep msg =
             Nothing
 
 
-selectPointTool : Tool Msg PointId
+selectPointTool : ToolCombiner.Tool Msg PointId
 selectPointTool =
     Tool selectPointStep
 
@@ -71,10 +80,11 @@ selectPointStep msg =
 -- origin tool
 
 
-pointFromOriginTool : PointTool
+pointFromOriginTool : Tool
 pointFromOriginTool =
-    succeed pointFromOrigin
-        |= positionTool
+    PointTool <|
+        succeed pointFromOrigin
+            |= positionTool
 
 
 pointFromOrigin : Vec2 -> Point
@@ -86,11 +96,12 @@ pointFromOrigin v =
 -- dd point tool
 
 
-pointFromDDPointTool : Dict PointId Point -> PointTool
+pointFromDDPointTool : Dict PointId Point -> Tool
 pointFromDDPointTool points =
-    succeed (pointFromDDPoint points)
-        |= selectPointTool
-        |= positionTool
+    PointTool <|
+        succeed (pointFromDDPoint points)
+            |= selectPointTool
+            |= positionTool
 
 
 pointFromDDPoint : Dict PointId Point -> PointId -> Vec2 -> Point
@@ -113,11 +124,12 @@ pointFromDDPoint points anchorId v =
 -- ad point tool
 
 
-pointFromADPointTool : Dict PointId Point -> PointTool
+pointFromADPointTool : Dict PointId Point -> Tool
 pointFromADPointTool points =
-    succeed (pointFromADPoint points)
-        |= selectPointTool
-        |= positionTool
+    PointTool <|
+        succeed (pointFromADPoint points)
+            |= selectPointTool
+            |= positionTool
 
 
 pointFromADPoint : Dict PointId Point -> PointId -> Vec2 -> Point
@@ -135,3 +147,22 @@ pointFromADPoint points anchorId v =
                     (getX <| sub anchorPosition v)
             , distance = length (sub anchorPosition v)
             }
+
+
+
+-- cut tool
+
+
+cutFromPointPointTool : Dict PointId Point -> Tool
+cutFromPointPointTool points =
+    CutTool <|
+        succeed (cutFromPointPoint points)
+            |= selectPointTool
+            |= selectPointTool
+
+
+cutFromPointPoint : Dict PointId Point -> PointId -> PointId -> Cut
+cutFromPointPoint points anchorA anchorB =
+    { anchorA = anchorA
+    , anchorB = anchorB
+    }
