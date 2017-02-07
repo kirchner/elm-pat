@@ -10,7 +10,7 @@ import Window
 -- internal
 
 import Point exposing (..)
-import Tool exposing (..)
+import Tools exposing (..)
 
 
 -- MSG
@@ -22,8 +22,8 @@ type Msg
     | AddOrigin OriginInfo
     | FocusPoint PointId
     | UnFocusPoint PointId
-    | InitTool (Tool Tool.Msg Point)
-    | DoStep Tool.Msg
+    | InitTool PointTool
+    | DoStep Tools.Msg
 
 
 
@@ -37,7 +37,7 @@ type alias Model =
     , pointId : PointId
     , focusedPointId : Maybe PointId
     , selectedPoints : List PointId
-    , selectedTool : Maybe (Tool Tool.Msg Point)
+    , selectedTool : Maybe PointTool
     }
 
 
@@ -60,30 +60,6 @@ defaultModel =
     , selectedPoints = []
     , selectedTool = Nothing
     }
-
-
-
---finishTool : Model -> Model
---finishTool model =
---    let
---        newPoint =
---            model.selectedTool
---                |> Maybe.andThen (pointFrom model.points model.result)
---    in
---        case newPoint of
---            Just point ->
---                { model
---                    | points = Dict.insert model.pointId point model.points
---                    , pointId = model.pointId + 1
---                    , selectedPoints = []
---                    , selectedTool = Nothing
---                    , agenda = []
---                    , result = []
---                }
---
---            Nothing ->
---                model
--- UPDATE
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

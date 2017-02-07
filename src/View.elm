@@ -17,7 +17,7 @@ import Svg.Events as Svg
 
 import Model exposing (..)
 import Point exposing (..)
-import Tool exposing (Tool, Step)
+import Tools
 
 
 view : Model -> Html Msg
@@ -78,13 +78,13 @@ viewToolBox model =
         Nothing ->
             Html.div []
                 [ Html.button
-                    [ Events.onClick <| InitTool Tool.pointFromOriginTool ]
+                    [ Events.onClick <| InitTool Tools.pointFromOriginTool ]
                     [ Html.text "add origin" ]
                 , Html.button
-                    [ Events.onClick <| InitTool <| Tool.pointFromDDPointTool model.points ]
+                    [ Events.onClick <| InitTool <| Tools.pointFromDDPointTool model.points ]
                     [ Html.text "add dd point" ]
                 , Html.button
-                    [ Events.onClick <| InitTool <| Tool.pointFromADPointTool model.points ]
+                    [ Events.onClick <| InitTool <| Tools.pointFromADPointTool model.points ]
                     [ Html.text "add ad point" ]
                 ]
 
@@ -165,7 +165,7 @@ eventRect model =
                 , Svg.fill "transparent"
                 , Svg.on "click"
                     (Json.map
-                        (\pos -> DoStep (Tool.InputPosition pos))
+                        (\pos -> DoStep (Tools.InputPosition pos))
                         offsetPosition
                     )
                 ]
@@ -219,7 +219,7 @@ eventCircle position id =
                 , Svg.fill "transparent"
                 , Svg.onMouseOver (FocusPoint id)
                 , Svg.onMouseOut (UnFocusPoint id)
-                , Svg.onClick (DoStep (Tool.SelectPoint id))
+                , Svg.onClick (DoStep (Tools.SelectPoint id))
                 ]
                 []
             ]
