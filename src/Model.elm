@@ -13,6 +13,7 @@ import Boundary exposing (..)
 import Cut exposing (..)
 import Point exposing (..)
 import Tools exposing (..)
+import ToolCombiner exposing (Next(..))
 
 
 -- MSG
@@ -125,20 +126,24 @@ update msg model =
                 Just (PointTool tool) ->
                     let
                         result =
-                            stepPointTool toolMsg tool
+                            Debug.log "result" <|
+                                stepPointTool toolMsg tool
                     in
                         case result of
-                            Ok point ->
+                            Repeat ->
+                                model ! []
+
+                            Continue nextTool ->
+                                { model
+                                    | selectedTool = Just (PointTool nextTool)
+                                }
+                                    ! []
+
+                            Finish point ->
                                 { model
                                     | points = Dict.insert model.pointId point model.points
                                     , pointId = model.pointId + 1
                                     , selectedTool = Nothing
-                                }
-                                    ! []
-
-                            Err nextTool ->
-                                { model
-                                    | selectedTool = Just nextTool
                                 }
                                     ! []
 
@@ -148,17 +153,20 @@ update msg model =
                             stepCutTool toolMsg tool
                     in
                         case result of
-                            Ok cut ->
+                            Repeat ->
+                                model ! []
+
+                            Continue nextTool ->
+                                { model
+                                    | selectedTool = Just (CutTool nextTool)
+                                }
+                                    ! []
+
+                            Finish cut ->
                                 { model
                                     | cuts = Dict.insert model.cutId cut model.cuts
                                     , cutId = model.cutId + 1
                                     , selectedTool = Nothing
-                                }
-                                    ! []
-
-                            Err nextTool ->
-                                { model
-                                    | selectedTool = Just nextTool
                                 }
                                     ! []
 
@@ -168,17 +176,20 @@ update msg model =
                             stepBoundaryTool toolMsg tool
                     in
                         case result of
-                            Ok boundary ->
+                            Repeat ->
+                                model ! []
+
+                            Continue nextTool ->
+                                { model
+                                    | selectedTool = Just (BoundaryTool nextTool)
+                                }
+                                    ! []
+
+                            Finish boundary ->
                                 { model
                                     | boundaries = Dict.insert model.boundaryId boundary model.boundaries
                                     , boundaryId = model.boundaryId + 1
                                     , selectedTool = Nothing
-                                }
-                                    ! []
-
-                            Err nextTool ->
-                                { model
-                                    | selectedTool = Just nextTool
                                 }
                                     ! []
 

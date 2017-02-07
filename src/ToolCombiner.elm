@@ -2,6 +2,7 @@ module ToolCombiner
     exposing
         ( Tool(..)
           --, Step(..)
+        , Next(..)
         , step
         , succeed
         , (|=)
@@ -10,7 +11,13 @@ module ToolCombiner
 
 
 type Tool msg result
-    = Tool (msg -> Result (Tool msg result) result)
+    = Tool (msg -> Next msg result)
+
+
+type Next msg result
+    = Repeat
+    | Continue (Tool msg result)
+    | Finish result
 
 
 
@@ -20,14 +27,14 @@ type Tool msg result
 --    | Done result
 
 
-step : msg -> Tool msg result -> Result (Tool msg result) result
+step : msg -> Tool msg result -> Next msg result
 step msg (Tool action) =
     action msg
 
 
 succeed : result -> Tool msg result
 succeed result =
-    Tool <| \m -> Ok result
+    Tool <| \m -> Finish result
 
 
 map : (a -> b) -> Tool msg a -> Tool msg b
@@ -35,11 +42,14 @@ map func (Tool action) =
     let
         newAction msg =
             case action msg of
-                Err nextTool ->
+                Repeat ->
+                    Repeat
+
+                Continue nextTool ->
                     step msg (map func nextTool)
 
-                Ok result ->
-                    Ok (func result)
+                Finish result ->
+                    Finish (func result)
     in
         Tool newAction
 
@@ -49,10 +59,13 @@ map2 func (Tool actionA) toolB =
     let
         newAction msg =
             case actionA msg of
-                Err nextToolA ->
+                Repeat ->
+                    Repeat
+
+                Continue nextToolA ->
                     step msg (map2 func nextToolA toolB)
 
-                Ok result ->
+                Finish result ->
                     step msg (map (func result) toolB)
     in
         Tool newAction

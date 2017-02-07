@@ -23,22 +23,19 @@ type Tool
     | BoundaryTool (ToolCombiner.Tool Msg Boundary)
 
 
-stepPointTool : Msg -> ToolCombiner.Tool Msg Point -> Result Tool Point
+stepPointTool : Msg -> ToolCombiner.Tool Msg Point -> Next Msg Point
 stepPointTool msg tool =
-    Result.mapError PointTool <|
-        ToolCombiner.step msg tool
+    ToolCombiner.step msg tool
 
 
-stepCutTool : Msg -> ToolCombiner.Tool Msg Cut -> Result Tool Cut
+stepCutTool : Msg -> ToolCombiner.Tool Msg Cut -> Next Msg Cut
 stepCutTool msg tool =
-    Result.mapError CutTool <|
-        ToolCombiner.step msg tool
+    ToolCombiner.step msg tool
 
 
-stepBoundaryTool : Msg -> ToolCombiner.Tool Msg Boundary -> Result Tool Boundary
+stepBoundaryTool : Msg -> ToolCombiner.Tool Msg Boundary -> Next Msg Boundary
 stepBoundaryTool msg tool =
-    Result.mapError BoundaryTool <|
-        ToolCombiner.step msg tool
+    ToolCombiner.step msg tool
 
 
 
@@ -60,14 +57,14 @@ positionTool =
     Tool positionAction
 
 
-positionAction : Msg -> Result (ToolCombiner.Tool Msg Vec2) Vec2
+positionAction : Msg -> Next Msg Vec2
 positionAction msg =
     case msg of
         InputPosition v ->
-            Ok v
+            Finish v
 
         _ ->
-            Err positionTool
+            Repeat
 
 
 
@@ -86,14 +83,14 @@ selectPointTool =
     Tool selectPointAction
 
 
-selectPointAction : Msg -> Result (ToolCombiner.Tool Msg PointId) PointId
+selectPointAction : Msg -> Next Msg PointId
 selectPointAction msg =
     case msg of
         SelectPoint id ->
-            Ok id
+            Finish id
 
         _ ->
-            Err selectPointTool
+            Repeat
 
 
 
