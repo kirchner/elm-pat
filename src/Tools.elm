@@ -57,35 +57,54 @@ type Msg
 
 positionTool : ToolCombiner.Tool Msg Vec2
 positionTool =
-    Tool positionStep
+    Tool positionAction
 
 
-positionStep : Msg -> Maybe (Step Msg Vec2)
-positionStep msg =
+positionAction : Msg -> Result (ToolCombiner.Tool Msg Vec2) Vec2
+positionAction msg =
     case msg of
         InputPosition v ->
-            Just (Done v)
+            Ok v
 
         _ ->
-            Nothing
+            Err positionTool
+
+
+
+--positionStep : Msg -> Maybe (Step Msg Vec2)
+--positionStep msg =
+--    case msg of
+--        InputPosition v ->
+--            Just (Done v)
+--
+--        _ ->
+--            Nothing
 
 
 selectPointTool : ToolCombiner.Tool Msg PointId
 selectPointTool =
-    Tool selectPointStep
+    Tool selectPointAction
 
 
-selectPointStep : Msg -> Maybe (Step Msg PointId)
-selectPointStep msg =
+selectPointAction : Msg -> Result (ToolCombiner.Tool Msg PointId) PointId
+selectPointAction msg =
     case msg of
         SelectPoint id ->
-            Just (Done id)
+            Ok id
 
         _ ->
-            Nothing
+            Err selectPointTool
 
 
 
+--selectPointStep : Msg -> Maybe (Step Msg PointId)
+--selectPointStep msg =
+--    case msg of
+--        SelectPoint id ->
+--            Just (Done id)
+--
+--        _ ->
+--            Nothing
 -- origin tool
 
 
@@ -187,9 +206,18 @@ boundaryFromPointsTool =
         succeed boundaryFromPoints
             |= selectPointTool
             |= selectPointTool
-            |= (zeroOrMore selectPointTool)
 
 
-boundaryFromPoints : PointId -> PointId -> List PointId -> Boundary
-boundaryFromPoints =
-    Boundary.boundary
+
+--|= (zeroOrMore selectPointTool)
+
+
+boundaryFromPoints : PointId -> PointId -> Boundary
+boundaryFromPoints first second =
+    Boundary.boundary first second []
+
+
+
+--boundaryFromPoints : PointId -> PointId -> List PointId -> Boundary
+--boundaryFromPoints =
+--    Boundary.boundary
