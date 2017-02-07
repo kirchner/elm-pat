@@ -125,3 +125,38 @@ zeroOrMoreStep list tool msg =
 
         Succeed result ->
             Just (Done [ result ])
+
+
+{-| Try all given Tools and move on with the first one that does
+succeed. TODO: untested!
+-}
+oneOf : List (Tool msg a) -> Tool msg a
+oneOf tools =
+    Tool <| oneOfStep tools
+
+
+oneOfStep : List (Tool msg a) -> msg -> Maybe (Step msg a)
+oneOfStep tools msg =
+    let
+        try tool previousResult =
+            case previousResult of
+                Nothing ->
+                    case tool of
+                        Tool action ->
+                            action msg
+
+                        Succeed result ->
+                            Just (Done result)
+
+                _ ->
+                    previousResult
+    in
+        case List.foldl try Nothing tools of
+            Just (Done result) ->
+                Just (Done result)
+
+            Just (Cont tool) ->
+                Just (Cont tool)
+
+            Nothing ->
+                Just (Cont (oneOf tools))
