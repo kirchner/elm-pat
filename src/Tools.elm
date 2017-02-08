@@ -23,17 +23,17 @@ type Tool
     | BoundaryTool (ToolCombiner.Tool Msg Boundary)
 
 
-stepPointTool : Msg -> ToolCombiner.Tool Msg Point -> Next Msg Point
+stepPointTool : Msg -> ToolCombiner.Tool Msg Point -> ToolCombiner.Tool Msg Point
 stepPointTool msg tool =
     ToolCombiner.step msg tool
 
 
-stepCutTool : Msg -> ToolCombiner.Tool Msg Cut -> Next Msg Cut
+stepCutTool : Msg -> ToolCombiner.Tool Msg Cut -> ToolCombiner.Tool Msg Cut
 stepCutTool msg tool =
     ToolCombiner.step msg tool
 
 
-stepBoundaryTool : Msg -> ToolCombiner.Tool Msg Boundary -> Next Msg Boundary
+stepBoundaryTool : Msg -> ToolCombiner.Tool Msg Boundary -> ToolCombiner.Tool Msg Boundary
 stepBoundaryTool msg tool =
     ToolCombiner.step msg tool
 
@@ -57,14 +57,14 @@ positionTool =
     Tool positionAction
 
 
-positionAction : Msg -> Next Msg Vec2
+positionAction : Msg -> Maybe (ToolCombiner.Tool Msg Vec2)
 positionAction msg =
     case msg of
         InputPosition v ->
-            Finish v
+            Just (Succeed v)
 
         _ ->
-            Repeat
+            Nothing
 
 
 
@@ -83,14 +83,14 @@ selectPointTool =
     Tool selectPointAction
 
 
-selectPointAction : Msg -> Next Msg PointId
+selectPointAction : Msg -> Maybe (ToolCombiner.Tool Msg PointId)
 selectPointAction msg =
     case msg of
         SelectPoint id ->
-            Finish id
+            Just (Succeed id)
 
         _ ->
-            Repeat
+            Nothing
 
 
 
@@ -203,18 +203,9 @@ boundaryFromPointsTool =
         succeed boundaryFromPoints
             |= selectPointTool
             |= selectPointTool
+            |= (zeroOrMore selectPointTool)
 
 
-
---|= (zeroOrMore selectPointTool)
-
-
-boundaryFromPoints : PointId -> PointId -> Boundary
-boundaryFromPoints first second =
-    Boundary.boundary first second []
-
-
-
---boundaryFromPoints : PointId -> PointId -> List PointId -> Boundary
---boundaryFromPoints =
---    Boundary.boundary
+boundaryFromPoints : PointId -> PointId -> List PointId -> Boundary
+boundaryFromPoints =
+    Boundary.boundary
