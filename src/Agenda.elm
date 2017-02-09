@@ -99,7 +99,7 @@ zeroOrMore =
 
 zeroOrMoreIterator : List a -> Agenda msg a -> Agenda msg (List a)
 zeroOrMoreIterator list agenda =
-    Agenda <| Err <| zeroOrMoreUpdate list agenda
+    try <| zeroOrMoreUpdate list agenda
 
 
 zeroOrMoreUpdate : List a -> Agenda msg a -> msg -> Maybe (Agenda msg (List a))
@@ -108,13 +108,18 @@ zeroOrMoreUpdate list (Agenda agenda) msg =
         Err update ->
             case update msg of
                 Just nextAgenda ->
-                    Just <| zeroOrMoreIterator list nextAgenda
+                    case nextAgenda of
+                        Agenda (Ok result) ->
+                            Just <| zeroOrMoreIterator (list ++ [ result ]) (Agenda agenda)
+
+                        _ ->
+                            Just <| zeroOrMoreIterator list nextAgenda
 
                 Nothing ->
                     Just <| succeed list
 
         Ok result ->
-            Just <| zeroOrMoreIterator (result :: list) (Agenda agenda)
+            Just <| zeroOrMoreIterator (list ++ [ result ]) (Agenda agenda)
 
 
 {-| Try all given Tools and move on with the first one that does
