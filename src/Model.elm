@@ -125,17 +125,17 @@ update msg model =
             case model.selectedTool of
                 Just (PointTool tool) ->
                     let
-                        nextTool =
-                            stepPointTool toolMsg tool
+                        result =
+                            ToolCombiner.run tool toolMsg
                     in
-                        case nextTool of
-                            ToolCombiner.Tool _ ->
+                        case result of
+                            Err nextTool ->
                                 { model
                                     | selectedTool = Just (PointTool nextTool)
                                 }
                                     ! []
 
-                            ToolCombiner.Succeed point ->
+                            Ok point ->
                                 { model
                                     | points = Dict.insert model.pointId point model.points
                                     , pointId = model.pointId + 1
@@ -145,17 +145,17 @@ update msg model =
 
                 Just (CutTool tool) ->
                     let
-                        nextTool =
-                            stepCutTool toolMsg tool
+                        result =
+                            ToolCombiner.run tool toolMsg
                     in
-                        case nextTool of
-                            ToolCombiner.Tool _ ->
+                        case result of
+                            Err nextTool ->
                                 { model
                                     | selectedTool = Just (CutTool nextTool)
                                 }
                                     ! []
 
-                            ToolCombiner.Succeed cut ->
+                            Ok cut ->
                                 { model
                                     | cuts = Dict.insert model.cutId cut model.cuts
                                     , cutId = model.cutId + 1
@@ -165,17 +165,17 @@ update msg model =
 
                 Just (BoundaryTool tool) ->
                     let
-                        nextTool =
-                            stepBoundaryTool toolMsg tool
+                        result =
+                            ToolCombiner.run tool toolMsg
                     in
-                        case nextTool of
-                            ToolCombiner.Tool _ ->
+                        case result of
+                            Err nextTool ->
                                 { model
                                     | selectedTool = Just (BoundaryTool nextTool)
                                 }
                                     ! []
 
-                            ToolCombiner.Succeed boundary ->
+                            Ok boundary ->
                                 { model
                                     | boundaries = Dict.insert model.boundaryId boundary model.boundaries
                                     , boundaryId = model.boundaryId + 1

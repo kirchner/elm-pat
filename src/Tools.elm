@@ -18,24 +18,9 @@ import ToolCombiner exposing (..)
 
 
 type Tool
-    = PointTool (ToolCombiner.Tool Msg Point)
-    | CutTool (ToolCombiner.Tool Msg Cut)
-    | BoundaryTool (ToolCombiner.Tool Msg Boundary)
-
-
-stepPointTool : Msg -> ToolCombiner.Tool Msg Point -> ToolCombiner.Tool Msg Point
-stepPointTool msg tool =
-    ToolCombiner.step msg tool
-
-
-stepCutTool : Msg -> ToolCombiner.Tool Msg Cut -> ToolCombiner.Tool Msg Cut
-stepCutTool msg tool =
-    ToolCombiner.step msg tool
-
-
-stepBoundaryTool : Msg -> ToolCombiner.Tool Msg Boundary -> ToolCombiner.Tool Msg Boundary
-stepBoundaryTool msg tool =
-    ToolCombiner.step msg tool
+    = PointTool (Agenda Msg Point)
+    | CutTool (Agenda Msg Cut)
+    | BoundaryTool (Agenda Msg Boundary)
 
 
 
@@ -52,56 +37,37 @@ type Msg
 -- steps
 
 
-positionTool : ToolCombiner.Tool Msg Vec2
-positionTool =
-    Tool positionAction
+inputPosition : Agenda Msg Vec2
+inputPosition =
+    try updateInputPosition
 
 
-positionAction : Msg -> Maybe (ToolCombiner.Tool Msg Vec2)
-positionAction msg =
+updateInputPosition : Msg -> Maybe (Agenda Msg Vec2)
+updateInputPosition msg =
     case msg of
         InputPosition v ->
-            Just (Succeed v)
+            Just <| succeed v
 
         _ ->
             Nothing
 
 
-
---positionStep : Msg -> Maybe (Step Msg Vec2)
---positionStep msg =
---    case msg of
---        InputPosition v ->
---            Just (Done v)
---
---        _ ->
---            Nothing
+selectPoint : Agenda Msg PointId
+selectPoint =
+    try updateSelectPoint
 
 
-selectPointTool : ToolCombiner.Tool Msg PointId
-selectPointTool =
-    Tool selectPointAction
-
-
-selectPointAction : Msg -> Maybe (ToolCombiner.Tool Msg PointId)
-selectPointAction msg =
+updateSelectPoint : Msg -> Maybe (Agenda Msg PointId)
+updateSelectPoint msg =
     case msg of
         SelectPoint id ->
-            Just (Succeed id)
+            Just <| succeed id
 
         _ ->
             Nothing
 
 
 
---selectPointStep : Msg -> Maybe (Step Msg PointId)
---selectPointStep msg =
---    case msg of
---        SelectPoint id ->
---            Just (Done id)
---
---        _ ->
---            Nothing
 -- origin tool
 
 
@@ -109,7 +75,7 @@ pointFromOriginTool : Tool
 pointFromOriginTool =
     PointTool <|
         succeed pointFromOrigin
-            |= positionTool
+            |= inputPosition
 
 
 pointFromOrigin : Vec2 -> Point
@@ -125,8 +91,8 @@ pointFromDDPointTool : Dict PointId Point -> Tool
 pointFromDDPointTool points =
     PointTool <|
         succeed (pointFromDDPoint points)
-            |= selectPointTool
-            |= positionTool
+            |= selectPoint
+            |= inputPosition
 
 
 pointFromDDPoint : Dict PointId Point -> PointId -> Vec2 -> Point
@@ -153,8 +119,8 @@ pointFromADPointTool : Dict PointId Point -> Tool
 pointFromADPointTool points =
     PointTool <|
         succeed (pointFromADPoint points)
-            |= selectPointTool
-            |= positionTool
+            |= selectPoint
+            |= inputPosition
 
 
 pointFromADPoint : Dict PointId Point -> PointId -> Vec2 -> Point
@@ -182,8 +148,8 @@ cutFromPointPointTool : Tool
 cutFromPointPointTool =
     CutTool <|
         succeed cutFromPointPoint
-            |= selectPointTool
-            |= selectPointTool
+            |= selectPoint
+            |= selectPoint
 
 
 cutFromPointPoint : PointId -> PointId -> Cut
@@ -201,9 +167,9 @@ boundaryFromPointsTool : Tool
 boundaryFromPointsTool =
     BoundaryTool <|
         succeed boundaryFromPoints
-            |= selectPointTool
-            |= selectPointTool
-            |= (zeroOrMore selectPointTool)
+            |= selectPoint
+            |= selectPoint
+            |= (zeroOrMore selectPoint)
 
 
 boundaryFromPoints : PointId -> PointId -> List PointId -> Boundary

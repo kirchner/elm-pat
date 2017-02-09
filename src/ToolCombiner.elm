@@ -1,79 +1,87 @@
 module ToolCombiner
     exposing
-        ( Tool(..)
-        , step
+        ( Agenda
+        , run
         , succeed
+        , try
         , (|=)
         , zeroOrMore
         )
 
 
-type Tool msg result
-    = Tool (msg -> Maybe (Tool msg result))
-    | Succeed result
+type Agenda msg a
+    = Agenda (Result (msg -> Maybe (Agenda msg a)) a)
 
 
-step : msg -> Tool msg result -> Tool msg result
-step msg tool =
-    case tool of
-        Tool action ->
+run : Agenda msg a -> msg -> Result (Agenda msg a) a
+run (Agenda agenda) msg =
+    case agenda of
+        Err action ->
             case action msg of
-                Just nextTool ->
-                    nextTool
+                Just (Agenda (Ok result)) ->
+                    Ok result
+
+                Just nextAgenda ->
+                    Err nextAgenda
 
                 Nothing ->
-                    tool
+                    Err <| Agenda agenda
 
-        Succeed result ->
-            Succeed result
-
-
-succeed : result -> Tool msg result
-succeed result =
-    Succeed result
+        Ok a ->
+            Ok a
 
 
-map : (a -> b) -> Tool msg a -> Tool msg b
-map func tool =
-    case tool of
-        Tool action ->
+succeed : a -> Agenda msg a
+succeed a =
+    Agenda <| Ok a
+
+
+try : (msg -> Maybe (Agenda msg a)) -> Agenda msg a
+try update =
+    Agenda <| Err update
+
+
+map : (a -> b) -> Agenda msg a -> Agenda msg b
+map func (Agenda agenda) =
+    case agenda of
+        Err update ->
             let
-                funcAction msg =
-                    case action msg of
-                        Just nextTool ->
-                            Just (map func nextTool)
+                funcUpdate msg =
+                    case update msg of
+                        Just nextAgenda ->
+                            Just (map func nextAgenda)
 
                         Nothing ->
                             Nothing
             in
-                Tool funcAction
+                try funcUpdate
 
-        Succeed result ->
-            Succeed (func result)
+        Ok a ->
+            succeed <| func a
 
 
-map2 : (a -> b -> c) -> Tool msg a -> Tool msg b -> Tool msg c
-map2 func toolA toolB =
-    case toolA of
-        Tool actionA ->
+map2 : (a -> b -> c) -> Agenda msg a -> Agenda msg b -> Agenda msg c
+map2 func (Agenda agendaA) agendaB =
+    case agendaA of
+        Err updateA ->
             let
-                funcAction msg =
-                    case actionA msg of
-                        Just nextToolA ->
-                            Just (map2 func nextToolA toolB)
+                funcUpdate msg =
+                    case updateA msg of
+                        Just nextAgendaA ->
+                            Just (map2 func nextAgendaA agendaB)
 
                         Nothing ->
                             Nothing
             in
-                Tool funcAction
+                try funcUpdate
 
-        Succeed resultA ->
-            map (func resultA) toolB
+        Ok a ->
+            map (func a) agendaB
 
 
-(|=) : Tool msg (a -> b) -> Tool msg a -> Tool msg b
-(|=) toolFunc toolArg =
-    map2 apply toolFunc toolArg
+(|=) : Agenda msg (a -> b) -> Agenda msg a -> Agenda msg b
+(|=) agendaFunc agendaArg =
+    map2 apply agendaFunc agendaArg
 
 
 apply : (a -> b) -> a -> b
@@ -81,56 +89,56 @@ apply f a =
     f a
 
 
-{-| This Tool will be Done if the handling of the msg by the provided
-Tool gives Nothing.
+{-| This Agenda will be Done if the handling of the msg by the provided
+Agenda gives Nothing.
 -}
-zeroOrMore : Tool msg a -> Tool msg (List a)
+zeroOrMore : Agenda msg a -> Agenda msg (List a)
 zeroOrMore =
     zeroOrMoreIterator []
 
 
-zeroOrMoreIterator : List a -> Tool msg a -> Tool msg (List a)
-zeroOrMoreIterator list tool =
-    Tool <| zeroOrMoreAction list tool
+zeroOrMoreIterator : List a -> Agenda msg a -> Agenda msg (List a)
+zeroOrMoreIterator list agenda =
+    Agenda <| Err <| zeroOrMoreUpdate list agenda
 
 
-zeroOrMoreAction : List a -> Tool msg a -> msg -> Maybe (Tool msg (List a))
-zeroOrMoreAction list tool msg =
-    case tool of
-        Tool action ->
-            case action msg of
-                Just nextTool ->
-                    Just <| zeroOrMoreIterator list nextTool
+zeroOrMoreUpdate : List a -> Agenda msg a -> msg -> Maybe (Agenda msg (List a))
+zeroOrMoreUpdate list (Agenda agenda) msg =
+    case agenda of
+        Err update ->
+            case update msg of
+                Just nextAgenda ->
+                    Just <| zeroOrMoreIterator list nextAgenda
 
                 Nothing ->
-                    Just <| Succeed list
+                    Just <| succeed list
 
-        Succeed result ->
-            Just <| zeroOrMoreIterator (result :: list) tool
+        Ok result ->
+            Just <| zeroOrMoreIterator (result :: list) (Agenda agenda)
 
 
 {-| Try all given Tools and move on with the first one that does
 succeed. TODO: untested!
 -}
-oneOf : List (Tool msg a) -> Tool msg a
-oneOf tools =
-    Tool <| oneOfAction tools
+oneOf : List (Agenda msg a) -> Agenda msg a
+oneOf agendas =
+    Agenda <| Err <| oneOfUpdate agendas
 
 
-oneOfAction : List (Tool msg a) -> msg -> Maybe (Tool msg a)
-oneOfAction tools msg =
+oneOfUpdate : List (Agenda msg a) -> msg -> Maybe (Agenda msg a)
+oneOfUpdate agendas msg =
     let
-        try tool previousResult =
+        try (Agenda agenda) previousResult =
             case previousResult of
                 Nothing ->
-                    case tool of
-                        Tool action ->
-                            action msg
+                    case agenda of
+                        Err update ->
+                            update msg
 
-                        Succeed result ->
-                            Just (Succeed result)
+                        Ok a ->
+                            Just <| succeed a
 
                 _ ->
                     previousResult
     in
-        List.foldl try Nothing tools
+        List.foldl try Nothing agendas
