@@ -38,31 +38,55 @@ view model =
 
 viewInfoBox : Model -> Html Msg
 viewInfoBox model =
-    case
-        model.focusedPointId
-            |> Maybe.andThen (flip Dict.get model.points)
-    of
-        Just point ->
-            case point of
-                Origin info ->
+    case model.focus of
+        Just (FPoint id) ->
+            case Dict.get id model.points of
+                Just point ->
+                    case point of
+                        Origin info ->
+                            Html.div []
+                                [ Html.text "origin: "
+                                , Html.text <| toString info
+                                ]
+
+                        ADPoint info ->
+                            Html.div []
+                                [ Html.text "ad point: "
+                                , Html.text <| toString info
+                                ]
+
+                        DDPoint info ->
+                            Html.div []
+                                [ Html.text "dd point: "
+                                , Html.text <| toString info
+                                ]
+
+                Nothing ->
+                    Html.div [] []
+
+        Just (FCut id) ->
+            case Dict.get id model.cuts of
+                Just cut ->
                     Html.div []
-                        [ Html.text "origin: "
-                        , Html.text <| toString info
+                        [ Html.text "cut: "
+                        , Html.text <| toString cut
                         ]
 
-                ADPoint info ->
+                Nothing ->
+                    Html.div [] []
+
+        Just (FBoundary id) ->
+            case Dict.get id model.boundaries of
+                Just boundary ->
                     Html.div []
-                        [ Html.text "ad point: "
-                        , Html.text <| toString info
+                        [ Html.text "boundary: "
+                        , Html.text <| toString boundary
                         ]
 
-                DDPoint info ->
-                    Html.div []
-                        [ Html.text "dd point: "
-                        , Html.text <| toString info
-                        ]
+                Nothing ->
+                    Html.div [] []
 
-        Nothing ->
+        _ ->
             Html.div [] []
 
 
@@ -127,32 +151,38 @@ viewPattern model =
             , Svg.height <| toString height
             , Svg.viewBox viewBoxString
             ]
-            [ drawFocus model
+            [ drawOrigin
             , drawSelection model
             , drawGuideLines model
-            , Svg.line
-                [ Svg.x1 "-10"
-                , Svg.y1 "0"
-                , Svg.x2 "10"
-                , Svg.y2 "0"
-                , Svg.stroke "green"
-                , Svg.strokeWidth "1"
-                ]
-                []
-            , Svg.line
-                [ Svg.x1 "0"
-                , Svg.y1 "-10"
-                , Svg.x2 "0"
-                , Svg.y2 "10"
-                , Svg.stroke "green"
-                , Svg.strokeWidth "1"
-                ]
-                []
             , eventRect model
-            , drawPoints model
             , drawCuts model
             , drawBoundaries model
+            , drawPoints model
             ]
+
+
+drawOrigin : Svg Msg
+drawOrigin =
+    Svg.g []
+        [ Svg.line
+            [ Svg.x1 "-10"
+            , Svg.y1 "0"
+            , Svg.x2 "10"
+            , Svg.y2 "0"
+            , Svg.stroke "green"
+            , Svg.strokeWidth "1"
+            ]
+            []
+        , Svg.line
+            [ Svg.x1 "0"
+            , Svg.y1 "-10"
+            , Svg.x2 "0"
+            , Svg.y2 "10"
+            , Svg.stroke "green"
+            , Svg.strokeWidth "1"
+            ]
+            []
+        ]
 
 
 eventRect : Model -> Svg Msg
@@ -198,13 +228,24 @@ drawPoints : Model -> Svg Msg
 drawPoints model =
     Svg.g [] <|
         List.filterMap
-            (drawPoint model.points)
+            (drawPoint model.points model.focus)
             (Dict.keys model.points)
 
 
-drawPoint : Dict PointId Point -> PointId -> Maybe (Svg Msg)
-drawPoint points id =
+drawPoint : Dict PointId Point -> Maybe Focus -> PointId -> Maybe (Svg Msg)
+drawPoint points focus id =
     let
+        color =
+            case focus of
+                Just (FPoint focusId) ->
+                    if id == focusId then
+                        "green"
+                    else
+                        "black"
+
+                _ ->
+                    "black"
+
         draw v =
             Svg.g
                 []
@@ -212,7 +253,7 @@ drawPoint points id =
                     [ Svg.cx <| toString <| getX v
                     , Svg.cy <| toString <| getY v
                     , Svg.r "2"
-                    , Svg.fill "black"
+                    , Svg.fill color
                     ]
                     []
                 , eventCircle v id
@@ -234,8 +275,8 @@ eventCircle position id =
                 , Svg.cy <| toString y
                 , Svg.r "8"
                 , Svg.fill "transparent"
-                , Svg.onMouseOver (FocusPoint id)
-                , Svg.onMouseOut (UnFocusPoint id)
+                , Svg.onMouseOver (SetFocus <| FPoint id)
+                , Svg.onMouseOut UnFocus
                 , Svg.onClick (DoStep (Tools.SelectPoint id))
                 ]
                 []
@@ -250,48 +291,60 @@ drawGuideLines : Model -> Svg Msg
 drawGuideLines model =
     Svg.g [] <|
         List.filterMap
-            (drawGuideLine model.points)
+            (drawGuideLine model.points model.focus)
             (Dict.keys model.points)
 
 
-drawGuideLine : Dict PointId Point -> PointId -> Maybe (Svg Msg)
-drawGuideLine points id =
-    case Dict.get id points of
-        Just (Origin _) ->
-            Nothing
+drawGuideLine : Dict PointId Point -> Maybe Focus -> PointId -> Maybe (Svg Msg)
+drawGuideLine points focus id =
+    let
+        color =
+            case focus of
+                Just (FPoint focusId) ->
+                    if id == focusId then
+                        "green"
+                    else
+                        "black"
 
-        Just (ADPoint info) ->
-            let
-                pointPosition =
-                    position points id
+                _ ->
+                    "black"
+    in
+        case Dict.get id points of
+            Just (Origin _) ->
+                Nothing
 
-                anchorPosition =
-                    position points info.anchor
-            in
-                Maybe.map2
-                    drawADGuideLines
-                    anchorPosition
-                    pointPosition
+            Just (ADPoint info) ->
+                let
+                    pointPosition =
+                        position points id
 
-        Just (DDPoint info) ->
-            let
-                pointPosition =
-                    position points id
+                    anchorPosition =
+                        position points info.anchor
+                in
+                    Maybe.map2
+                        (drawADGuideLines color)
+                        anchorPosition
+                        pointPosition
 
-                anchorPosition =
-                    position points info.anchor
-            in
-                Maybe.map2
-                    drawDDGuideLines
-                    anchorPosition
-                    pointPosition
+            Just (DDPoint info) ->
+                let
+                    pointPosition =
+                        position points id
 
-        _ ->
-            Nothing
+                    anchorPosition =
+                        position points info.anchor
+                in
+                    Maybe.map2
+                        (drawDDGuideLines color)
+                        anchorPosition
+                        pointPosition
+
+            _ ->
+                Nothing
 
 
-drawDDGuideLines : Vec2 -> Vec2 -> Svg Msg
-drawDDGuideLines anchor point =
+drawDDGuideLines : String -> Vec2 -> Vec2 -> Svg Msg
+drawDDGuideLines color anchor point =
     let
         ( ax, ay ) =
             toTuple anchor
@@ -307,7 +360,7 @@ drawDDGuideLines anchor point =
                 , Svg.y2 <| toString ay
                 , Svg.strokeDasharray "5, 10"
                 , Svg.strokeWidth "1"
-                , Svg.stroke "black"
+                , Svg.stroke color
                 ]
                 []
             , Svg.text_
@@ -324,7 +377,7 @@ drawDDGuideLines anchor point =
                 , Svg.y2 <| toString y
                 , Svg.strokeDasharray "5, 10"
                 , Svg.strokeWidth "1"
-                , Svg.stroke "black"
+                , Svg.stroke color
                 ]
                 []
             , Svg.text_
@@ -337,8 +390,8 @@ drawDDGuideLines anchor point =
             ]
 
 
-drawADGuideLines : Vec2 -> Vec2 -> Svg Msg
-drawADGuideLines anchor point =
+drawADGuideLines : String -> Vec2 -> Vec2 -> Svg Msg
+drawADGuideLines color anchor point =
     let
         ( ax, ay ) =
             toTuple anchor
@@ -354,32 +407,10 @@ drawADGuideLines anchor point =
                 , Svg.y2 <| toString y
                 , Svg.strokeDasharray "5, 10"
                 , Svg.strokeWidth "1"
-                , Svg.stroke "black"
+                , Svg.stroke color
                 ]
                 []
             ]
-
-
-
--- draw focus
-
-
-drawFocus : Model -> Svg Msg
-drawFocus model =
-    case model.focusedPointId |> Maybe.andThen (position model.points) of
-        Just v ->
-            Svg.circle
-                [ Svg.cx <| toString <| getX v
-                , Svg.cy <| toString <| getY v
-                , Svg.r "8"
-                , Svg.fill "none"
-                , Svg.stroke "green"
-                , Svg.strokeWidth "1"
-                ]
-                []
-
-        Nothing ->
-            Svg.g [] []
 
 
 
@@ -418,17 +449,28 @@ drawCuts : Model -> Svg Msg
 drawCuts model =
     Svg.g [] <|
         List.filterMap
-            (drawCut model.points model.cuts)
+            (drawCut model.points model.cuts model.focus)
             (Dict.keys model.cuts)
 
 
-drawCut : Dict PointId Point -> Dict CutId Cut -> CutId -> Maybe (Svg Msg)
-drawCut points cuts id =
+drawCut : Dict PointId Point -> Dict CutId Cut -> Maybe Focus -> CutId -> Maybe (Svg Msg)
+drawCut points cuts focus id =
     let
         draw cut =
             Maybe.map2 drawLine
                 (position points cut.anchorA)
                 (position points cut.anchorB)
+
+        color =
+            case focus of
+                Just (FCut focusId) ->
+                    if id == focusId then
+                        "green"
+                    else
+                        "black"
+
+                _ ->
+                    "black"
 
         drawLine v w =
             Svg.g []
@@ -437,8 +479,19 @@ drawCut points cuts id =
                     , Svg.y1 <| toString <| getY v
                     , Svg.x2 <| toString <| getX w
                     , Svg.y2 <| toString <| getY w
-                    , Svg.stroke "black"
+                    , Svg.stroke color
                     , Svg.strokeWidth "1"
+                    ]
+                    []
+                , Svg.line
+                    [ Svg.x1 <| toString <| getX v
+                    , Svg.y1 <| toString <| getY v
+                    , Svg.x2 <| toString <| getX w
+                    , Svg.y2 <| toString <| getY w
+                    , Svg.stroke "transparent"
+                    , Svg.strokeWidth "8"
+                    , Svg.onMouseOver (SetFocus <| FCut id)
+                    , Svg.onMouseOut UnFocus
                     ]
                     []
                 ]
@@ -454,17 +507,25 @@ drawBoundaries : Model -> Svg Msg
 drawBoundaries model =
     Svg.g [] <|
         List.filterMap
-            (drawBoundary model.points model.boundaries)
+            (drawBoundary model.points model.boundaries model.focus)
             (Dict.keys model.boundaries)
 
 
-drawBoundary : Dict PointId Point -> Dict BoundaryId Boundary -> BoundaryId -> Maybe (Svg Msg)
-drawBoundary points boundaries id =
+drawBoundary : Dict PointId Point -> Dict BoundaryId Boundary -> Maybe Focus -> BoundaryId -> Maybe (Svg Msg)
+drawBoundary points boundaries focus id =
     let
         draw boundary =
             Svg.g [] <|
                 Tuple.second <|
                     List.foldl appendLine ( Nothing, [] ) (Boundary.toList boundary)
+
+        color =
+            case focus of
+                Just (FBoundary id) ->
+                    "green"
+
+                _ ->
+                    "black"
 
         appendLine nextId ( previousId, svgs ) =
             case previousId of
@@ -489,8 +550,19 @@ drawBoundary points boundaries id =
                     , Svg.y1 <| toString <| getY v
                     , Svg.x2 <| toString <| getX w
                     , Svg.y2 <| toString <| getY w
-                    , Svg.stroke "black"
+                    , Svg.stroke color
                     , Svg.strokeWidth "1"
+                    ]
+                    []
+                , Svg.line
+                    [ Svg.x1 <| toString <| getX v
+                    , Svg.y1 <| toString <| getY v
+                    , Svg.x2 <| toString <| getX w
+                    , Svg.y2 <| toString <| getY w
+                    , Svg.stroke "transparent"
+                    , Svg.strokeWidth "8"
+                    , Svg.onMouseOver (SetFocus <| FBoundary id)
+                    , Svg.onMouseOut UnFocus
                     ]
                     []
                 ]

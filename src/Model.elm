@@ -23,8 +23,8 @@ type Msg
     = NoOp
     | UpdateWindowSize Window.Size
     | AddOrigin OriginInfo
-    | FocusPoint PointId
-    | UnFocusPoint PointId
+    | SetFocus Focus
+    | UnFocus
     | InitTool Tool
     | AbortTool
     | DoStep Tools.Msg
@@ -43,7 +43,7 @@ type alias Model =
     , cutId : CutId
     , boundaries : Dict BoundaryId Boundary
     , boundaryId : BoundaryId
-    , focusedPointId : Maybe PointId
+    , focus : Maybe Focus
     , selectedPoints : List PointId
     , selectedTool : Maybe Tool
     }
@@ -68,10 +68,16 @@ defaultModel =
     , cutId = 0
     , boundaries = Dict.empty
     , boundaryId = 0
-    , focusedPointId = Nothing
+    , focus = Nothing
     , selectedPoints = []
     , selectedTool = Nothing
     }
+
+
+type Focus
+    = FPoint PointId
+    | FCut CutId
+    | FBoundary BoundaryId
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -94,20 +100,17 @@ update msg model =
             }
                 ! []
 
-        FocusPoint id ->
+        SetFocus focus ->
             { model
-                | focusedPointId = Just id
+                | focus = Just focus
             }
                 ! []
 
-        UnFocusPoint id ->
-            if model.focusedPointId == (Just id) then
-                { model
-                    | focusedPointId = Nothing
-                }
-                    ! []
-            else
-                model ! []
+        UnFocus ->
+            { model
+                | focus = Nothing
+            }
+                ! []
 
         InitTool tool ->
             { model
