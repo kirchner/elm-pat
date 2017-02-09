@@ -1,10 +1,11 @@
 module Boundary
     exposing
         ( Boundary
-        , BoundaryId
         , boundary
         , fromList
         , toList
+        , BoundaryId
+        , defaultId
         )
 
 -- internal
@@ -18,10 +19,6 @@ type Boundary
         , second : PointId
         , rest : List PointId
         }
-
-
-type alias BoundaryId =
-    Int
 
 
 boundary : PointId -> PointId -> List PointId -> Boundary
@@ -51,3 +48,12 @@ fromList points =
 toList : Boundary -> List PointId
 toList (Boundary info) =
     info.first :: info.second :: info.rest
+
+
+type alias BoundaryId =
+    Int
+
+
+defaultId : BoundaryId
+defaultId =
+    0

@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (main)
 
 -- external
 
@@ -10,10 +10,14 @@ import Window
 
 -- internal
 
-import Events
-import Model exposing (..)
-import Point exposing (..)
-import View exposing (..)
+import Model
+    exposing
+        ( Msg(UpdateWindowSize)
+        , Model
+        , defaultModel
+        )
+import Update exposing (update)
+import View exposing (view)
 
 
 -- MAIN

@@ -1,4 +1,15 @@
-module Point exposing (..)
+module Point
+    exposing
+        ( Point
+            ( Origin
+            , ADPoint
+            , DDPoint
+            )
+        , position
+        , PointId
+        , defaultId
+        , nextId
+        )
 
 -- external
 
@@ -10,6 +21,25 @@ type Point
     = Origin OriginInfo
     | ADPoint ADPointInfo
     | DDPoint DDPointInfo
+
+
+type alias OriginInfo =
+    { position : Vec2
+    }
+
+
+type alias ADPointInfo =
+    { anchor : PointId
+    , angle : Float
+    , distance : Float
+    }
+
+
+type alias DDPointInfo =
+    { anchor : PointId
+    , horizontalDistance : Float
+    , verticalDistance : Float
+    }
 
 
 position : Dict PointId Point -> PointId -> Maybe Vec2
@@ -57,22 +87,3 @@ defaultId =
 nextId : PointId -> PointId
 nextId =
     (+) 1
-
-
-type alias OriginInfo =
-    { position : Vec2
-    }
-
-
-type alias ADPointInfo =
-    { anchor : PointId
-    , angle : Float
-    , distance : Float
-    }
-
-
-type alias DDPointInfo =
-    { anchor : PointId
-    , horizontalDistance : Float
-    , verticalDistance : Float
-    }

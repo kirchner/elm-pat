@@ -15,11 +15,44 @@ import Svg.Events as Svg
 
 -- internal
 
-import Model exposing (..)
-import Boundary exposing (..)
-import Cut exposing (..)
-import Point exposing (..)
+import Model
+    exposing
+        ( Msg(..)
+        , Model
+        , Focus
+            ( FPoint
+            , FCut
+            , FBoundary
+            )
+        )
+import Boundary
+    exposing
+        ( Boundary
+        , BoundaryId
+        )
+import Cut
+    exposing
+        ( Cut
+        , CutId
+        )
+import Point
+    exposing
+        ( Point
+            ( Origin
+            , ADPoint
+            , DDPoint
+            )
+        , position
+        , PointId
+        )
 import Tools
+    exposing
+        ( pointFromOriginTool
+        , pointFromADPointTool
+        , pointFromDDPointTool
+        , cutFromPointPointTool
+        , boundaryFromPointsTool
+        )
 
 
 view : Model -> Html Msg
@@ -111,19 +144,19 @@ viewToolBox model =
         Nothing ->
             Html.div []
                 [ Html.button
-                    [ Events.onClick <| InitTool Tools.pointFromOriginTool ]
+                    [ Events.onClick <| InitTool pointFromOriginTool ]
                     [ Html.text "add origin" ]
                 , Html.button
-                    [ Events.onClick <| InitTool <| Tools.pointFromDDPointTool model.points ]
+                    [ Events.onClick <| InitTool <| pointFromDDPointTool model.points ]
                     [ Html.text "add dd point" ]
                 , Html.button
-                    [ Events.onClick <| InitTool <| Tools.pointFromADPointTool model.points ]
+                    [ Events.onClick <| InitTool <| pointFromADPointTool model.points ]
                     [ Html.text "add ad point" ]
                 , Html.button
-                    [ Events.onClick <| InitTool Tools.cutFromPointPointTool ]
+                    [ Events.onClick <| InitTool cutFromPointPointTool ]
                     [ Html.text "add cut" ]
                 , Html.button
-                    [ Events.onClick <| InitTool Tools.boundaryFromPointsTool ]
+                    [ Events.onClick <| InitTool boundaryFromPointsTool ]
                     [ Html.text "add boundary" ]
                 ]
 

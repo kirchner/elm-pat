@@ -1,8 +1,13 @@
-module Cut exposing (..)
+module Cut
+    exposing
+        ( Cut
+        , CutId
+        , defaultId
+        )
 
 -- internal
 
-import Point exposing (..)
+import Point exposing (PointId)
 
 
 type alias Cut =
@@ -13,3 +18,8 @@ type alias Cut =
 
 type alias CutId =
     Int
+
+
+defaultId : CutId
+defaultId =
+    0
