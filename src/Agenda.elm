@@ -4,6 +4,8 @@ module Agenda
         , run
         , succeed
         , try
+        , map
+        , map2
         , (|=)
         , zeroOrMore
         )
