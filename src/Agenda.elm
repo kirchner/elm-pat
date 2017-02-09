@@ -1,4 +1,4 @@
-module ToolCombiner
+module Agenda
     exposing
         ( Agenda
         , run

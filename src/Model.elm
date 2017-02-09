@@ -9,11 +9,11 @@ import Window
 
 -- internal
 
+import Agenda exposing (run)
 import Boundary exposing (..)
 import Cut exposing (..)
 import Point exposing (..)
 import Tools exposing (..)
-import ToolCombiner
 
 
 -- MSG
@@ -126,7 +126,7 @@ update msg model =
                 Just (PointTool tool) ->
                     let
                         result =
-                            ToolCombiner.run tool toolMsg
+                            run tool toolMsg
                     in
                         case result of
                             Err nextTool ->
@@ -146,7 +146,7 @@ update msg model =
                 Just (CutTool tool) ->
                     let
                         result =
-                            ToolCombiner.run tool toolMsg
+                            run tool toolMsg
                     in
                         case result of
                             Err nextTool ->
@@ -166,7 +166,7 @@ update msg model =
                 Just (BoundaryTool tool) ->
                     let
                         result =
-                            ToolCombiner.run tool toolMsg
+                            run tool toolMsg
                     in
                         case result of
                             Err nextTool ->
