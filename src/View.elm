@@ -11,6 +11,7 @@ import Material
 import Material.Button as Button
 import Material.Elevation as Elevation
 import Material.Grid as Grid
+import Material.Icon as Icon
 import Material.Layout as Layout
 import Material.Options as Options
 import Material.Typography as Typography
@@ -91,11 +92,11 @@ view model =
                     [ viewPattern model
                     , viewInfoBox model
                     ]
-                  --, Grid.cell
-                  --    [ Grid.size Grid.All 12
-                  --    , Elevation.e2
-                  --    ]
-                  --    [ viewInfoBox model ]
+                , Grid.cell
+                    [ Grid.size Grid.All 4
+                    , Elevation.e2
+                    ]
+                    [ viewNavigation model ]
                 ]
             ]
         }
@@ -190,6 +191,32 @@ viewToolBox model =
                 ]
 
 
+
+-- view navigation
+
+
+viewNavigation : Model -> Html Msg
+viewNavigation model =
+    Html.div [] <|
+        List.map
+            (\icon ->
+                (Button.render Mdl [ 2, 0 ] model.mdl)
+                    [ Button.icon ]
+                    [ Icon.i icon ]
+            )
+            [ "keyboard_arrow_left"
+            , "keyboard_arrow_right"
+            , "keyboard_arrow_up"
+            , "keyboard_arrow_down"
+            , "zoom_in"
+            , "zoom_out"
+            ]
+
+
+
+-- view pattern
+
+
 viewPattern : Model -> Html Msg
 viewPattern model =
     let
@@ -213,7 +240,7 @@ viewPattern model =
             , Html.style
                 [ ( "width", "100%" )
                 , ( "height", "auto" )
-                , ( "background-color", "#e6e6e6" )
+                , ( "background-color", "#ffffe0" )
                 ]
             ]
             [ drawOrigin
