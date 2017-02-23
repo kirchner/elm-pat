@@ -3,6 +3,7 @@ module Update exposing (update)
 -- external
 
 import Dict
+import Material
 
 
 -- internal
@@ -28,6 +29,9 @@ update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
+
+        Mdl mdlMsg ->
+            Material.update Mdl mdlMsg model
 
         UpdateWindowSize newSize ->
             { model

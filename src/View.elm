@@ -7,6 +7,13 @@ import Json.Decode as Json
 import Html exposing (Html)
 import Html.Events as Events
 import Html.Attributes as Html
+import Material
+import Material.Button as Button
+import Material.Elevation as Elevation
+import Material.Grid as Grid
+import Material.Layout as Layout
+import Material.Options as Options
+import Material.Typography as Typography
 import Math.Vector2 exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
@@ -57,12 +64,41 @@ import Tools
 
 view : Model -> Html Msg
 view model =
-    Html.div
-        []
-        [ viewPattern model
-        , viewInfoBox model
-        , viewToolBox model
-        ]
+    Layout.render Mdl
+        model.mdl
+        [ Layout.fixedHeader ]
+        { header =
+            [ Options.styled Html.p
+                [ Typography.headline
+                , Typography.center
+                ]
+                [ Html.text "sewing pattern editor" ]
+            ]
+        , drawer = []
+        , tabs = ( [], [] )
+        , main =
+            [ Grid.grid
+                []
+                [ Grid.cell
+                    [ Grid.size Grid.All 12
+                    , Elevation.e2
+                    ]
+                    [ viewToolBox model ]
+                , Grid.cell
+                    [ Grid.size Grid.All 12
+                    , Elevation.e2
+                    ]
+                    [ viewPattern model
+                    , viewInfoBox model
+                    ]
+                  --, Grid.cell
+                  --    [ Grid.size Grid.All 12
+                  --    , Elevation.e2
+                  --    ]
+                  --    [ viewInfoBox model ]
+                ]
+            ]
+        }
 
 
 
@@ -71,56 +107,49 @@ view model =
 
 viewInfoBox : Model -> Html Msg
 viewInfoBox model =
-    case model.focus of
-        Just (FPoint id) ->
-            case Dict.get id model.points of
-                Just point ->
-                    case point of
-                        Origin info ->
-                            Html.div []
-                                [ Html.text "origin: "
-                                , Html.text <| toString info
-                                ]
+    let
+        infoText =
+            case model.focus of
+                Just (FPoint id) ->
+                    case Dict.get id model.points of
+                        Just point ->
+                            case point of
+                                Origin info ->
+                                    "origin: " ++ (toString info)
 
-                        ADPoint info ->
-                            Html.div []
-                                [ Html.text "ad point: "
-                                , Html.text <| toString info
-                                ]
+                                ADPoint info ->
+                                    "ad point: " ++ (toString info)
 
-                        DDPoint info ->
-                            Html.div []
-                                [ Html.text "dd point: "
-                                , Html.text <| toString info
-                                ]
+                                DDPoint info ->
+                                    "dd point: " ++ (toString info)
 
-                Nothing ->
-                    Html.div [] []
+                        Nothing ->
+                            ""
 
-        Just (FCut id) ->
-            case Dict.get id model.cuts of
-                Just cut ->
-                    Html.div []
-                        [ Html.text "cut: "
-                        , Html.text <| toString cut
-                        ]
+                Just (FCut id) ->
+                    case Dict.get id model.cuts of
+                        Just cut ->
+                            "cut: " ++ (toString cut)
 
-                Nothing ->
-                    Html.div [] []
+                        Nothing ->
+                            ""
 
-        Just (FBoundary id) ->
-            case Dict.get id model.boundaries of
-                Just boundary ->
-                    Html.div []
-                        [ Html.text "boundary: "
-                        , Html.text <| toString boundary
-                        ]
+                Just (FBoundary id) ->
+                    case Dict.get id model.boundaries of
+                        Just boundary ->
+                            "boundary: " ++ (toString boundary)
 
-                Nothing ->
-                    Html.div [] []
+                        Nothing ->
+                            ""
 
-        _ ->
-            Html.div [] []
+                _ ->
+                    ""
+    in
+        Options.styled Html.p
+            [ Typography.body1
+            , Options.css "height" "8px"
+            ]
+            [ Html.text infoText ]
 
 
 
@@ -133,30 +162,30 @@ viewToolBox model =
         Just tool ->
             -- TODO view tool info
             Html.div []
-                [ Html.button
-                    [ Events.onClick <| AbortTool ]
+                [ (Button.render Mdl [ 0, 0 ] model.mdl)
+                    [ Options.onClick <| AbortTool ]
                     [ Html.text "abort" ]
-                , Html.button
-                    [ Events.onClick <| DoStep Tools.NoOp ]
+                , (Button.render Mdl [ 0, 1 ] model.mdl)
+                    [ Options.onClick <| DoStep Tools.NoOp ]
                     [ Html.text "no step" ]
                 ]
 
         Nothing ->
             Html.div []
-                [ Html.button
-                    [ Events.onClick <| InitTool pointFromOriginTool ]
+                [ (Button.render Mdl [ 1, 0 ] model.mdl)
+                    [ Options.onClick <| InitTool pointFromOriginTool ]
                     [ Html.text "add origin" ]
-                , Html.button
-                    [ Events.onClick <| InitTool <| pointFromDDPointTool model.points ]
+                , (Button.render Mdl [ 1, 1 ] model.mdl)
+                    [ Options.onClick <| InitTool <| pointFromDDPointTool model.points ]
                     [ Html.text "add dd point" ]
-                , Html.button
-                    [ Events.onClick <| InitTool <| pointFromADPointTool model.points ]
+                , (Button.render Mdl [ 1, 2 ] model.mdl)
+                    [ Options.onClick <| InitTool <| pointFromADPointTool model.points ]
                     [ Html.text "add ad point" ]
-                , Html.button
-                    [ Events.onClick <| InitTool cutFromPointPointTool ]
+                , (Button.render Mdl [ 1, 3 ] model.mdl)
+                    [ Options.onClick <| InitTool cutFromPointPointTool ]
                     [ Html.text "add cut" ]
-                , Html.button
-                    [ Events.onClick <| InitTool boundaryFromPointsTool ]
+                , (Button.render Mdl [ 1, 4 ] model.mdl)
+                    [ Options.onClick <| InitTool boundaryFromPointsTool ]
                     [ Html.text "add boundary" ]
                 ]
 
@@ -165,10 +194,10 @@ viewPattern : Model -> Html Msg
 viewPattern model =
     let
         width =
-            toFloat <| model.windowSize.width - 50
+            toFloat <| model.windowSize.width
 
         height =
-            toFloat <| model.windowSize.height - 50
+            toFloat <| model.windowSize.height - 200
 
         viewBoxString =
             List.foldl (\x str -> str ++ " " ++ toString x)
@@ -180,9 +209,12 @@ viewPattern model =
                 ]
     in
         Svg.svg
-            [ Svg.width <| toString width
-            , Svg.height <| toString height
-            , Svg.viewBox viewBoxString
+            [ Svg.viewBox viewBoxString
+            , Html.style
+                [ ( "width", "100%" )
+                , ( "height", "auto" )
+                , ( "background-color", "#e6e6e6" )
+                ]
             ]
             [ drawOrigin
             , drawSelection model

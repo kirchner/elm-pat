@@ -4,6 +4,7 @@ module Main exposing (main)
 
 import Dict
 import Html exposing (Html)
+import Material
 import Task
 import Window
 
@@ -12,7 +13,7 @@ import Window
 
 import Model
     exposing
-        ( Msg(UpdateWindowSize)
+        ( Msg(Mdl, UpdateWindowSize)
         , Model
         , defaultModel
         )
@@ -39,7 +40,14 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    ( defaultModel, Task.perform UpdateWindowSize Window.size )
+    let
+        windowSizeInit =
+            Task.perform UpdateWindowSize Window.size
+
+        mdlInit =
+            Material.init Mdl
+    in
+        ( defaultModel, Cmd.batch [ windowSizeInit, mdlInit ] )
 
 
 
@@ -50,4 +58,5 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Window.resizes UpdateWindowSize
+        , Material.subscriptions Mdl model
         ]

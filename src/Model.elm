@@ -9,6 +9,7 @@ module Model
 -- external
 
 import Dict exposing (Dict)
+import Material
 import Math.Vector2 exposing (..)
 import Window
 
@@ -41,6 +42,7 @@ import Tools
 
 type Msg
     = NoOp
+    | Mdl (Material.Msg Msg)
     | UpdateWindowSize Window.Size
     | SetFocus Focus
     | UnFocus
@@ -65,6 +67,7 @@ type alias Model =
     , focus : Maybe Focus
     , selectedPoints : List PointId
     , selectedTool : Maybe Tool
+    , mdl : Material.Model
     }
 
 
@@ -84,6 +87,7 @@ defaultModel =
     , focus = Nothing
     , selectedPoints = []
     , selectedTool = Nothing
+    , mdl = Material.model
     }
 
 
