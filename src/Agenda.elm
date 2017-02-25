@@ -16,6 +16,64 @@ module Agenda
 
 {-|
 
+Convenient way of implementing chains of user actions inspired by
+elm-tools/parser.
+
+Suppose you are writing a vector graphic program.  You want the user to
+be able to add a line segment
+
+
+    type alias Line =
+        { start : Vec2
+        , end : Vec2
+        }
+
+
+by clicking two times into the canvas in order to give the position of
+its start and end point.  We can implement such a tool as the
+following `Agenda`:
+
+
+    lineTool : Agenda Msg Line
+    lineTool =
+        succeed Line
+            |= inputPosition
+            |= inputPosition
+
+
+    inputPosition  : Agenda Msg Vec2
+    inputPosition =
+        try "input position" <|
+            \msg ->
+                case msg of
+                    InputPosition v ->
+                        Just <| succeed v
+
+                    _ ->
+                        Nothing
+
+
+    type Msg
+        = NoOp
+        | InputPosition Vec2
+
+
+The model is given by
+
+
+    type alias Model =
+        { selectedTool : Maybe (Agenda Msg Line)
+        , ...
+        }
+
+
+When the user chooses to select the line tool, we update `selectedTool
+= Just lineTool`.  Then the selectedTool is updated with the user
+messages via `run tool msg`, which either returns a new Agenda we have
+to save to be ready for more user input, or it returns `Ok Line`, which
+we then can add to the set of our lines.
+
+
 # Agendas
 @docs Agenda, run, Description, getDescription
 
