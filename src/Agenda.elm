@@ -58,7 +58,7 @@ following `Agenda`:
         | InputPosition Vec2
 
 
-The model is given by
+Then the model is given by
 
 
     type alias Model =
@@ -67,11 +67,11 @@ The model is given by
         }
 
 
-When the user chooses to select the line tool, we update `selectedTool
-= Just lineTool`.  Then the selectedTool is updated with the user
-messages via `run tool msg`, which either returns a new Agenda we have
-to save to be ready for more user input, or it returns `Ok Line`, which
-we then can add to the set of our lines.
+When the user chooses to add a line, we set `selectedTool = Just
+lineTool`.  Then each time the user triggers a message the selectedTool
+value is updated via `run tool msg`, which either returns a new Agenda
+we have to save to be ready for more user input, or it returns `Ok
+Line`, which we then can add to the set of our lines.
 
 
 # Agendas
