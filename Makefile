@@ -10,7 +10,7 @@ dist-web: build
 dist: dist-web
 
 clean:
-	rm - rf build
+	rm -rf build
 
 dist-clean: clean
 	rm -rf elm-stuff

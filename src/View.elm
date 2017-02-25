@@ -60,6 +60,7 @@ import Tools
         , pointFromDDPointTool
         , cutFromPointPointTool
         , boundaryFromPointsTool
+        , getDescription
         )
 
 
@@ -161,7 +162,6 @@ viewToolBox : Model -> Html Msg
 viewToolBox model =
     case model.selectedTool of
         Just tool ->
-            -- TODO view tool info
             Html.div []
                 [ (Button.render Mdl [ 0, 0 ] model.mdl)
                     [ Options.onClick <| AbortTool ]
@@ -169,6 +169,7 @@ viewToolBox model =
                 , (Button.render Mdl [ 0, 1 ] model.mdl)
                     [ Options.onClick <| DoStep Tools.NoOp ]
                     [ Html.text "no step" ]
+                , Html.text <| getDescription tool
                 ]
 
         Nothing ->

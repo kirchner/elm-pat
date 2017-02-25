@@ -5,6 +5,7 @@ module Tools
             , CutTool
             , BoundaryTool
             )
+        , getDescription
         , Msg
             ( InputPosition
             , SelectPoint
@@ -30,6 +31,7 @@ import Math.Vector2 exposing (..)
 import Agenda
     exposing
         ( Agenda
+        , Description
         , succeed
         , try
         , (|=)
@@ -58,6 +60,19 @@ type Tool
     | BoundaryTool (Agenda Msg Boundary)
 
 
+getDescription : Tool -> Description
+getDescription tool =
+    case tool of
+        PointTool agenda ->
+            Agenda.getDescription agenda
+
+        CutTool agenda ->
+            Agenda.getDescription agenda
+
+        BoundaryTool agenda ->
+            Agenda.getDescription agenda
+
+
 
 -- msg
 
@@ -74,7 +89,7 @@ type Msg
 
 inputPosition : Agenda Msg Vec2
 inputPosition =
-    try updateInputPosition
+    try "input position" updateInputPosition
 
 
 updateInputPosition : Msg -> Maybe (Agenda Msg Vec2)
@@ -89,7 +104,7 @@ updateInputPosition msg =
 
 selectPoint : Agenda Msg PointId
 selectPoint =
-    try updateSelectPoint
+    try "select point" updateSelectPoint
 
 
 updateSelectPoint : Msg -> Maybe (Agenda Msg PointId)
