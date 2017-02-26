@@ -18,6 +18,7 @@ module Tools
         , pointFromADPointTool
         , cutFromPointPointTool
         , boundaryFromPointsTool
+        , sucIdSucTool
         )
 
 -- external
@@ -115,6 +116,17 @@ updateSelectPoint msg =
 
         _ ->
             Nothing
+
+
+
+-- sucIdSucTool
+
+
+sucIdSucTool : Tool
+sucIdSucTool =
+    PointTool <|
+        succeed identity
+            |= succeed (Origin { position = vec2 0 0 })
 
 
 

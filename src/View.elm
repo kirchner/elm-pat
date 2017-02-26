@@ -61,6 +61,7 @@ import Tools
         , cutFromPointPointTool
         , boundaryFromPointsTool
         , getDescription
+        , sucIdSucTool
         )
 
 
@@ -189,6 +190,9 @@ viewToolBox model =
                 , (Button.render Mdl [ 1, 4 ] model.mdl)
                     [ Options.onClick <| InitTool boundaryFromPointsTool ]
                     [ Html.text "add boundary" ]
+                , (Button.render Mdl [ 1, 5 ] model.mdl)
+                    [ Options.onClick <| InitTool sucIdSucTool ]
+                    [ Html.text "succeed identity |= succeed Origin" ]
                 ]
 
 
