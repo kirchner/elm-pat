@@ -4,13 +4,14 @@ module Agenda
         , Description
         , getDescription
         , run
+        , runs
         , succeed
         , try
         , map
         , map2
         , (|=)
         , (|.)
-        , zeroOrMore
+          --, zeroOrMore
         , oneOf
         )
 
@@ -88,11 +89,20 @@ Line`, which we then can add to the set of our lines.
 {-| An `Agenda msg a` can generate `a`'s from a given message `msg`.
 -}
 type Agenda msg a
-    = Agenda (Result (Step msg a) a)
+    = Agenda (Result (Step msg a) (Maybe a))
 
 
 type Step msg a
     = Step Description (msg -> Maybe (Agenda msg a))
+
+
+
+{-
+   type Step description msg a
+       = Step (Maybe description) (msg -> Maybe (Agenda msg a))
+
+   describe : Agenda msg a -> (List description -> description) -> Agenda msg a
+-}
 
 
 {-| Describe what the user should do, if she wants to successfully do
@@ -114,11 +124,26 @@ getDescription (Agenda agenda) =
             "nothing to do"
 
 
+runs : Agenda msg a -> List msg -> Result (Agenda msg a) (Maybe a)
+runs ((Agenda agenda) as oldAgenda) msgs =
+    case msgs of
+        [] ->
+            Err oldAgenda
+
+        msg :: rest ->
+            case run oldAgenda msg of
+                Ok result ->
+                    Ok result
+
+                Err nextAgenda ->
+                    runs nextAgenda rest
+
+
 {-| Given a message `msg` try to run the agenda.  This can either result
 in another agenda.  (Either the original agenda, if the message was not
 successfull, or with a new agenda, if we need more `msg`'s.)
 -}
-run : Agenda msg a -> msg -> Result (Agenda msg a) a
+run : Agenda msg a -> msg -> Result (Agenda msg a) (Maybe a)
 run ((Agenda agenda) as oldAgenda) msg =
     case agenda of
         Err (Step _ action) ->
@@ -130,7 +155,7 @@ run ((Agenda agenda) as oldAgenda) msg =
                     Err nextAgenda
 
                 Nothing ->
-                    Err oldAgenda
+                    Ok Nothing
 
         Ok a ->
             Ok a
@@ -140,7 +165,7 @@ run ((Agenda agenda) as oldAgenda) msg =
 -}
 succeed : a -> Agenda msg a
 succeed a =
-    Agenda <| Ok a
+    Agenda <| Ok <| Just a
 
 
 {-| An agenda that generates an `a` from the given update function.
@@ -167,8 +192,16 @@ map func (Agenda agenda) =
             in
                 try description funcUpdate
 
-        Ok a ->
+        Ok (Just a) ->
             succeed <| func a
+
+        Ok Nothing ->
+            fail
+
+
+fail : Agenda msg a
+fail =
+    Agenda <| Ok Nothing
 
 
 map2 : (a -> b -> c) -> Agenda msg a -> Agenda msg b -> Agenda msg c
@@ -186,8 +219,11 @@ map2 func (Agenda agendaA) agendaB =
             in
                 try descriptionA funcUpdate
 
-        Ok a ->
+        Ok (Just a) ->
             map (func a) agendaB
+
+        Ok Nothing ->
+            fail
 
 
 {-| Used to chain agendas together, similarly to **[pp][parser pipelines]**.  This operator keeps the value.
@@ -215,41 +251,51 @@ apply f a =
 infixl 5 |.
 
 
-{-| This agenda will succeed if the handling of the msg by the provided
-agenda gives Nothing.
+
+{- This agenda will succeed if the handling of the msg by the provided
+   agenda gives Nothing.
 -}
-zeroOrMore : Agenda msg a -> Agenda msg (List a)
-zeroOrMore =
-    zeroOrMoreIterator []
+{-
+   zeroOrMore : Agenda msg a -> Agenda msg (List a)
+   zeroOrMore =
+       zeroOrMoreIterator []
 
 
-zeroOrMoreIterator : List a -> Agenda msg a -> Agenda msg (List a)
-zeroOrMoreIterator list agenda =
-    let
-        description =
-            "zero or more of " ++ (getDescription agenda)
-    in
-        try description <| zeroOrMoreUpdate list agenda
+   zeroOrMoreIterator : List a -> Agenda msg a -> Agenda msg (List a)
+   zeroOrMoreIterator list agenda =
+       let
+           description =
+               "zero or more of " ++ (getDescription agenda)
+       in
+           try description <| zeroOrMoreUpdate list agenda
 
 
-zeroOrMoreUpdate : List a -> Agenda msg a -> msg -> Maybe (Agenda msg (List a))
-zeroOrMoreUpdate list ((Agenda agenda) as oldAgenda) msg =
-    case agenda of
-        Err (Step _ update) ->
-            case update msg of
-                Just nextAgenda ->
-                    case nextAgenda of
-                        Agenda (Ok result) ->
-                            Just <| zeroOrMoreIterator (list ++ [ result ]) oldAgenda
+   zeroOrMoreUpdate : List a -> Agenda msg a -> msg -> Maybe (Agenda msg (List a))
+   zeroOrMoreUpdate list ((Agenda agenda) as oldAgenda) msg =
+       case agenda of
+           Err (Step _ update) ->
+               case update msg of
+                   Just nextAgenda ->
+                       case nextAgenda of
+                           Agenda (Ok (Just result)) ->
+                               Just <| zeroOrMoreIterator (list ++ [ result ]) oldAgenda
 
-                        _ ->
-                            Just <| zeroOrMoreIterator list nextAgenda
+                           Agenda (Ok Nothing) ->
+                               Nothing
 
-                Nothing ->
-                    Just <| succeed list
+                           _ ->
+                               Just <| zeroOrMoreIterator list nextAgenda
 
-        Ok result ->
-            Just <| zeroOrMoreIterator (list ++ [ result ]) oldAgenda
+                   Nothing ->
+                       Just <| succeed list
+
+           Ok (Just result) ->
+               Just <| zeroOrMoreIterator (list ++ [ result ]) oldAgenda
+
+           Ok Nothing ->
+               Nothing
+
+-}
 
 
 {-| Try all given agendas and move on with the first one that does
@@ -265,23 +311,95 @@ oneOf agendas =
         description =
             "do one of: " ++ descriptions
     in
-        Agenda <| Err <| Step description <| oneOfUpdate agendas
+        Agenda <|
+            Err <|
+                Step description (f agendas)
 
 
-oneOfUpdate : List (Agenda msg a) -> msg -> Maybe (Agenda msg a)
-oneOfUpdate agendas msg =
+f : List (Agenda msg a) -> msg -> Maybe (Agenda msg a)
+f agendas msg =
     let
-        try (Agenda agenda) previousResult =
-            case previousResult of
+        run : msg -> Agenda msg a -> Maybe (Agenda msg a)
+        run msg (Agenda agenda) =
+            case agenda of
+                Err (Step _ action) ->
+                    action msg
+
+                Ok _ ->
+                    Nothing
+
+        collect :
+            Result (Agenda msg a) (Maybe a)
+            -> { successfulAgenda : Maybe a
+               , liveAgendas : List (Agenda msg a)
+               }
+            -> { successfulAgenda : Maybe a
+               , liveAgendas : List (Agenda msg a)
+               }
+        collect nextResult rec =
+            case rec.successfulAgenda of
+                Just result ->
+                    rec
+
                 Nothing ->
-                    case agenda of
-                        Err (Step _ update) ->
-                            update msg
+                    case nextResult of
+                        Ok (Just result) ->
+                            { rec | successfulAgenda = Just result }
 
-                        Ok a ->
-                            Just <| succeed a
+                        Ok Nothing ->
+                            rec
 
-                _ ->
-                    previousResult
+                        Err nextAgenda ->
+                            { rec | liveAgendas = rec.liveAgendas ++ [ nextAgenda ] }
     in
-        List.foldl try Nothing agendas
+        agendas
+            |> List.map (run msg)
+            |> List.foldl collect { successfulAgenda = Nothing, liveAgendas = [] }
+            |> \result ->
+                case result.successfulAgenda of
+                    Nothing ->
+                        case result.liveAgendas of
+                            [] ->
+                                Debug.crash "just fail"
+
+                            --Just fail
+                            _ ->
+                                Just <| oneOf result.liveAgendas
+
+                    Just firstSuccess ->
+                        Just <| succeed firstSuccess
+
+
+
+--        Agenda <|
+--            Err <|
+--                Step description <|
+--                    \msg ->
+--                        case oneOfUpdate agendas msg of
+--                            [] ->
+--                                -- all failed
+--                                Just fail
+--
+--                            liveAgendas ->
+--                                Just <| oneOf liveAgendas
+--
+--        Agenda <| Err <| Step description oneOfUpdate
+--
+--
+----oneOfUpdate : List (Agenda msg a) -> msg -> List (Agenda msg a)
+--oneOfUpdate : List (Agenda msg a) -> msg -> Maybe (Agenda msg a)
+--oneOfUpdate agendas msg =
+--    let
+--        try : Agenda msg a -> Maybe (Agenda msg a)
+--        try agenda =
+--            case run agenda msg of
+--                Err nextAgenda ->
+--                    Just nextAgenda
+--
+--                Ok (Just a) ->
+--                    Just (succeed a)
+--
+--                Ok Nothing ->
+--                    Nothing
+--    in
+--        List.filterMap try agendas

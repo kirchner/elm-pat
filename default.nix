@@ -9,12 +9,13 @@ let
   elm-make     = pkgs.elmPackages.elm-make;
   elm-package  = pkgs.elmPackages.elm-package;
   elm-format   = pkgs.elmPackages.elm-format;
+  elm-repl     = pkgs.elmPackages.elm-repl;
 
 in rec {
 
   env = pkgs.buildEnv rec {
     name = "elm-pat";
-    paths = [ stdenv git elm-compiler elm-make elm-package elm-format ];
+    paths = [ stdenv git elm-compiler elm-make elm-package elm-format elm-repl ];
     buildInputs = paths;
   };
 
