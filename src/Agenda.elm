@@ -226,7 +226,8 @@ map2 func (Agenda agendaA) agendaB =
             fail
 
 
-{-| Used to chain agendas together, similarly to **[pp][parser pipelines]**.  This operator keeps the value.
+{-| Used to chain agendas together, similarly to **[pp][parser
+pipelines]**.  This operator keeps the value.
 
 [here]: https://github.com/elm-tools/parser/blob/master/README.md#parser-pipeline
 -}
@@ -241,7 +242,8 @@ apply f a =
     f a
 
 
-{-| Used to chain agendas together, similarly to **[pp][parser pipelines]**.  This operator ignores the value.
+{-| Used to chain agendas together, similarly to **[pp][parser
+pipelines]**.  This operator ignores the value.
 
 [here]: https://github.com/elm-tools/parser/blob/master/README.md#parser-pipeline
 -}
@@ -298,14 +300,15 @@ infixl 5 |.
 -}
 
 
-{-| Try all given agendas and move on with the first one that does
-succeed. TODO: untested!
+{-| Try all given agendas simultaniously.  Succeeds if one of them
+succeeds.  May be resource hungry since we do not exclusivly switch to
+the first Agenda which succeeds in the first run iteration.
 -}
 oneOf : List (Agenda msg a) -> Agenda msg a
 oneOf agendas =
     let
         descriptions =
-            List.foldl (\a s -> s ++ ", " ++ a) "" <|
+            List.foldl (\a s -> s ++ " " ++ a) "" <|
                 List.map getDescription agendas
 
         description =
@@ -319,6 +322,27 @@ oneOf agendas =
 oneOfUpdate : List (Agenda msg a) -> msg -> Maybe (Agenda msg a)
 oneOfUpdate agendas msg =
     let
+        newAgendas =
+            agendas |> List.map action
+
+        action : Agenda msg a -> msg -> Maybe (Agenda msg a)
+        action (Agenda agenda) msg =
+            case agenda of
+                Err (Step _ update) ->
+                    update msg
+
+                Ok (Just result) ->
+                    Just (succeed result)
+
+                Ok Nothing ->
+                    Nothing
+
+        liveAgendas =
+            newAgendas |> List.filterMap ((|>) msg)
+
+        result msg =
+            newAgendas |> List.foldl (collect msg) Nothing
+
         collect : msg -> (msg -> Maybe (Agenda msg a)) -> Maybe a -> Maybe a
         collect msg nextAction result =
             case result of
@@ -332,63 +356,10 @@ oneOfUpdate agendas msg =
 
                 _ ->
                     result
-
-        f : Agenda msg a -> msg -> Maybe (Agenda msg a)
-        f (Agenda agenda) msg =
-            case agenda of
-                Err (Step _ update) ->
-                    update msg
-
-                Ok (Just result) ->
-                    Just (succeed result)
-
-                Ok Nothing ->
-                    Nothing
-
-        newAgendas =
-            agendas |> List.map f
-
-        liveAgendas =
-            newAgendas |> List.filterMap (\update -> update msg)
     in
-        case newAgendas |> List.foldl (collect msg) Nothing of
+        case result msg of
             Just result ->
                 Just (succeed result)
 
             _ ->
                 Just <| oneOf liveAgendas
-
-
-
---        Agenda <|
---            Err <|
---                Step description <|
---                    \msg ->
---                        case oneOfUpdate agendas msg of
---                            [] ->
---                                -- all failed
---                                Just fail
---
---                            liveAgendas ->
---                                Just <| oneOf liveAgendas
---
---        Agenda <| Err <| Step description oneOfUpdate
---
---
-----oneOfUpdate : List (Agenda msg a) -> msg -> List (Agenda msg a)
---oneOfUpdate : List (Agenda msg a) -> msg -> Maybe (Agenda msg a)
---oneOfUpdate agendas msg =
---    let
---        try : Agenda msg a -> Maybe (Agenda msg a)
---        try agenda =
---            case run agenda msg of
---                Err nextAgenda ->
---                    Just nextAgenda
---
---                Ok (Just a) ->
---                    Just (succeed a)
---
---                Ok Nothing ->
---                    Nothing
---    in
---        List.filterMap try agendas

@@ -21,81 +21,41 @@ type Action
     | WriteAll
 
 
+everyTool : Agenda Char Action
+everyTool =
+    oneOf [ qTool, wqTool, wallTool ]
+
+
+
+{- tools -}
+
+
 qTool : Agenda Char Action
 qTool =
     cmd <|
-        try "q" <|
-            (\c ->
-                if c == 'q' then
-                    Just (succeed Quit)
-                else
-                    Nothing
-            )
-
-
-q : Agenda Char Action
-q =
-    try "q" <|
-        (\c ->
-            if c == 'q' then
-                Just (succeed Quit)
-            else
-                Nothing
-        )
+        tryChar 'q' Quit
 
 
 wqTool : Agenda Char Action
 wqTool =
-    cmd <| wq
-
-
-wq : Agenda Char Action
-wq =
-    succeed (\_ result -> result)
-        |= try "w"
-            (\c ->
-                if c == 'w' then
-                    Just (succeed NoOp)
-                else
-                    Nothing
-            )
-        |= try "q"
-            (\c ->
-                if c == 'q' then
-                    Just (succeed WriteQuit)
-                else
-                    Nothing
-            )
+    cmd <|
+        succeed (\_ result -> result)
+            |= tryChar 'w' NoOp
+            |= tryChar 'q' WriteQuit
 
 
 wallTool : Agenda Char Action
 wallTool =
-    cmd <| wall
+    cmd <|
+        succeed (\_ _ _ result -> result)
+            |= tryChar 'w' NoOp
+            |= tryChar 'a' NoOp
+            |= tryChar 'l' NoOp
+            |= tryChar 'l' WriteAll
 
 
-wall : Agenda Char Action
-wall =
-    succeed (\_ _ _ result -> result)
-        |= tryChar 'w' NoOp
-        |= tryChar 'a' NoOp
-        |= tryChar 'l' NoOp
-        |= tryChar 'l' WriteAll
 
-
-tryChar : Char -> Action -> Agenda Char Action
-tryChar char action =
-    try (toString char)
-        (\c ->
-            if c == char then
-                Just (succeed action)
-            else
-                Nothing
-        )
-
-
-everyTool : Agenda Char Action
-everyTool =
-    oneOf [ qTool, wqTool, wallTool ]
+{- helpers -}
 
 
 cmd : Agenda Char Action -> Agenda Char Action
@@ -107,10 +67,15 @@ cmd agenda =
 
 colon : Agenda Char Action
 colon =
-    try ":"
+    tryChar ':' NoOp
+
+
+tryChar : Char -> Action -> Agenda Char Action
+tryChar char action =
+    try (toString char)
         (\c ->
-            if c == ':' then
-                Just (succeed NoOp)
+            if c == char then
+                Just (succeed action)
             else
                 Nothing
         )
