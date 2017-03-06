@@ -7,21 +7,26 @@ module Agenda
         , runs
         , succeed
         , try
+        , fail
         , map
         , map2
         , (|=)
         , (|.)
         , zeroOrMore
-        , FailureHandling(..)
+        , FailureHandling
+            ( Fail
+            , Succeed
+            , Retry
+            )
         , oneOf
         )
 
-{-|
+{-| Convenient way of implementing the handling of chains of user
+actions.  This is inspired **[this parser][parser]**.
 
-Convenient way of implementing chains of user actions inspired by
-elm-tools/parser.
+[parser]: http://package.elm-lang.org/packages/elm-tools/parser/1.0.2/
 
-Suppose you are writing a vector graphic program.  You want the user to
+Suppose you are writing a vector graphics program.  You want the user to
 be able to add a line segment
 
 
@@ -32,7 +37,7 @@ be able to add a line segment
 
 
 by clicking two times into the canvas in order to give the position of
-its start and end point.  We can implement such a tool as the
+its start and its end point.  We can implement such a tool as the
 following `Agenda`:
 
 
@@ -70,24 +75,24 @@ Then the model is given by
 
 
 When the user chooses to add a line, we set `selectedTool = Just
-lineTool`.  Then each time the user triggers a message the selectedTool
-value is updated via `run tool msg`, which either returns a new Agenda
-we have to save to be ready for more user input, or it returns `Ok
-Line`, which we then can add to the set of our lines.
+lineTool`.  Then each time the user triggers a message our update
+function has to update `selectedTool` via `run tool msg`, which either
+returns a new Agenda `newAgenda` which we store by setting `selectedTool
+= Just newAgenda` in order to be ready for more user input, or it
+returns `Ok Line`, which we then can add to the set of lines and we
+set `selectedTool = Nothing`.
 
 
 # Agendas
-@docs Agenda, run, Description, getDescription
+@docs Agenda, run, runs, Description, getDescription
 
 
 # Combining Agendas
-@docs succeed, try, map, (|=), zeroOrMore, oneOf, map2
-
-
+@docs succeed, fail, try, map, map2, (|=), (|.), zeroOrMore, FailureHandling, oneOf
 -}
 
 
-{-| An `Agenda msg a` can generate `a`'s from a given message `msg`.
+{-| An `Agenda msg a` can generate `a`'s if fed with the correct `msg`'s.
 -}
 type Agenda msg a
     = Agenda (Result (Step msg a) (Maybe a))
@@ -125,24 +130,9 @@ getDescription (Agenda agenda) =
             "nothing to do"
 
 
-runs : Agenda msg a -> List msg -> Result (Agenda msg a) (Maybe a)
-runs ((Agenda agenda) as oldAgenda) msgs =
-    case msgs of
-        [] ->
-            Err oldAgenda
-
-        msg :: rest ->
-            case run oldAgenda msg of
-                Ok result ->
-                    Ok result
-
-                Err nextAgenda ->
-                    runs nextAgenda rest
-
-
-{-| Given a message `msg` try to run the agenda.  This can either result
-in another agenda.  (Either the original agenda, if the message was not
-successfull, or with a new agenda, if we need more `msg`'s.)
+{-| Given a `msg` try to run the agenda.  This can either give
+another agenda (`Err newAgenda`), the final result (`Ok (Just a)`) or
+terminate, when the given `msg` was not suitable (`Ok Nothing`).
 -}
 run : Agenda msg a -> msg -> Result (Agenda msg a) (Maybe a)
 run ((Agenda agenda) as oldAgenda) msg =
@@ -162,11 +152,35 @@ run ((Agenda agenda) as oldAgenda) msg =
             Ok a
 
 
+{-| Run all `msg`'s in the list.
+-}
+runs : Agenda msg a -> List msg -> Result (Agenda msg a) (Maybe a)
+runs ((Agenda agenda) as oldAgenda) msgs =
+    case msgs of
+        [] ->
+            Err oldAgenda
+
+        msg :: rest ->
+            case run oldAgenda msg of
+                Ok result ->
+                    Ok result
+
+                Err nextAgenda ->
+                    runs nextAgenda rest
+
+
 {-| An agenda that always generates an `a`.
 -}
 succeed : a -> Agenda msg a
 succeed a =
     Agenda <| Ok <| Just a
+
+
+{-| An Agenda that always fails.
+-}
+fail : Agenda msg a
+fail =
+    Agenda <| Ok Nothing
 
 
 {-| An agenda that generates an `a` from the given update function.
@@ -200,11 +214,7 @@ map func (Agenda agenda) =
             fail
 
 
-fail : Agenda msg a
-fail =
-    Agenda <| Ok Nothing
-
-
+{-| -}
 map2 : (a -> b -> c) -> Agenda msg a -> Agenda msg b -> Agenda msg c
 map2 func (Agenda agendaA) agendaB =
     case agendaA of
@@ -227,10 +237,10 @@ map2 func (Agenda agendaA) agendaB =
             fail
 
 
-{-| Used to chain agendas together, similarly to **[pp][parser
-pipelines]**.  This operator keeps the value.
+{-| Used to chain agendas together, similarly to **[parser
+pipelines][pp]**.  This operator keeps the value.
 
-[here]: https://github.com/elm-tools/parser/blob/master/README.md#parser-pipeline
+[pp]: https://github.com/elm-tools/parser/blob/master/README.md#parser-pipeline
 -}
 (|=) : Agenda msg (a -> b) -> Agenda msg a -> Agenda msg b
 (|=) agendaFunc agendaArg =
@@ -243,10 +253,10 @@ apply f a =
     f a
 
 
-{-| Used to chain agendas together, similarly to **[pp][parser
-pipelines]**.  This operator ignores the value.
+{-| Used to chain agendas together, similarly to **[parser
+pipelines][pp]**.  This operator ignores the value.
 
-[here]: https://github.com/elm-tools/parser/blob/master/README.md#parser-pipeline
+[pp]: https://github.com/elm-tools/parser/blob/master/README.md#parser-pipeline
 -}
 (|.) : Agenda msg keep -> Agenda msg ignore -> Agenda msg keep
 (|.) agendaKeep agendaIgnore =
@@ -254,18 +264,19 @@ pipelines]**.  This operator ignores the value.
 infixl 5 |.
 
 
-{-| Keep on repeating the given Agenda until the given exit msg
-is send.  C.f. the documentation of FailureHandling for the meaning the
-second argument.
+{-| Keep on repeating the given Agenda until the given exit `msg`
+is sent, collecting all results.  See the documentation of
+FailureHandling for the meaning the second argument.
 -}
 zeroOrMore : msg -> FailureHandling -> Agenda msg a -> Agenda msg (List a)
 zeroOrMore exitMsg failureHandling =
     zeroOrMoreIterator exitMsg failureHandling []
 
 
-{-| If one Agenda fails, do we let the whole Agenda fail (and possibly
-loose the previous results), or do we succeed with the list of results
-collected so far, or do we return the last agenda so the user can retry?
+{-| If one Agenda fails, do we let the whole Agenda `Fail` (and possibly
+loose the previous results), or do we `Succeed` with the list of results
+collected so far, or do we return the last agenda so the user can
+`Retry`?
 -}
 type FailureHandling
     = Fail
@@ -342,9 +353,10 @@ zeroOrMoreUpdate exitMsg failureHandling list ((Agenda agenda) as oldAgenda) msg
                 Nothing
 
 
-{-| Try all given agendas simultaniously.  Succeeds if one of them
-succeeds.  May be resource hungry since we do not exclusivly switch to
-the first Agenda which succeeds in the first run iteration.
+{-| Try all given agendas simultaniously.  Succeeds as soon as one of
+them succeeds.  Fails if all agendas have failed.  Could be resource
+hungry since we do not exclusively switch to the first Agenda which
+succeeds after the first `run` iteration.
 -}
 oneOf : List (Agenda msg a) -> Agenda msg a
 oneOf agendas =
@@ -403,5 +415,8 @@ oneOfUpdate agendas msg =
             Just result ->
                 Just (succeed result)
 
-            _ ->
-                Just <| oneOf liveAgendas
+            Nothing ->
+                if List.isEmpty liveAgendas then
+                    Nothing
+                else
+                    Just <| oneOf liveAgendas

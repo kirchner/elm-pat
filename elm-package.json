@@ -6,7 +6,9 @@
     "source-directories": [
         "src"
     ],
-    "exposed-modules": [],
+    "exposed-modules": [
+        "Agenda"
+    ],
     "dependencies": {
         "debois/elm-mdl": "8.1.0 <= v < 9.0.0",
         "elm-community/linear-algebra": "1.1.0 <= v < 2.0.0",
