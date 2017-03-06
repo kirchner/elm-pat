@@ -313,61 +313,50 @@ oneOf agendas =
     in
         Agenda <|
             Err <|
-                Step description (f agendas)
+                Step description (oneOfUpdate agendas)
 
 
-f : List (Agenda msg a) -> msg -> Maybe (Agenda msg a)
-f agendas msg =
+oneOfUpdate : List (Agenda msg a) -> msg -> Maybe (Agenda msg a)
+oneOfUpdate agendas msg =
     let
-        run : msg -> Agenda msg a -> Maybe (Agenda msg a)
-        run msg (Agenda agenda) =
-            case agenda of
-                Err (Step _ action) ->
-                    action msg
+        collect : msg -> (msg -> Maybe (Agenda msg a)) -> Maybe a -> Maybe a
+        collect msg nextAction result =
+            case result of
+                Nothing ->
+                    case nextAction msg of
+                        Just (Agenda (Ok newResult)) ->
+                            newResult
 
-                Ok _ ->
+                        _ ->
+                            Nothing
+
+                _ ->
+                    result
+
+        f : Agenda msg a -> msg -> Maybe (Agenda msg a)
+        f (Agenda agenda) msg =
+            case agenda of
+                Err (Step _ update) ->
+                    update msg
+
+                Ok (Just result) ->
+                    Just (succeed result)
+
+                Ok Nothing ->
                     Nothing
 
-        collect :
-            Result (Agenda msg a) (Maybe a)
-            -> { successfulAgenda : Maybe a
-               , liveAgendas : List (Agenda msg a)
-               }
-            -> { successfulAgenda : Maybe a
-               , liveAgendas : List (Agenda msg a)
-               }
-        collect nextResult rec =
-            case rec.successfulAgenda of
-                Just result ->
-                    rec
+        newAgendas =
+            agendas |> List.map f
 
-                Nothing ->
-                    case nextResult of
-                        Ok (Just result) ->
-                            { rec | successfulAgenda = Just result }
-
-                        Ok Nothing ->
-                            rec
-
-                        Err nextAgenda ->
-                            { rec | liveAgendas = rec.liveAgendas ++ [ nextAgenda ] }
+        liveAgendas =
+            newAgendas |> List.filterMap (\update -> update msg)
     in
-        agendas
-            |> List.map (run msg)
-            |> List.foldl collect { successfulAgenda = Nothing, liveAgendas = [] }
-            |> \result ->
-                case result.successfulAgenda of
-                    Nothing ->
-                        case result.liveAgendas of
-                            [] ->
-                                Debug.crash "just fail"
+        case newAgendas |> List.foldl (collect msg) Nothing of
+            Just result ->
+                Just (succeed result)
 
-                            --Just fail
-                            _ ->
-                                Just <| oneOf result.liveAgendas
-
-                    Just firstSuccess ->
-                        Just <| succeed firstSuccess
+            _ ->
+                Just <| oneOf liveAgendas
 
 
 

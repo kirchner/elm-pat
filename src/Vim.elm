@@ -44,6 +44,11 @@ q =
         )
 
 
+wqTool : Agenda Char Action
+wqTool =
+    cmd <| wq
+
+
 wq : Agenda Char Action
 wq =
     succeed (\_ result -> result)
@@ -63,15 +68,9 @@ wq =
             )
 
 
-tryChar : Char -> Action -> Agenda Char Action
-tryChar char action =
-    try (toString char)
-        (\c ->
-            if c == char then
-                Just (succeed action)
-            else
-                Nothing
-        )
+wallTool : Agenda Char Action
+wallTool =
+    cmd <| wall
 
 
 wall : Agenda Char Action
@@ -83,14 +82,20 @@ wall =
         |= tryChar 'l' WriteAll
 
 
-all : Agenda Char Action
-all =
-    oneOf [ q, wq, q, wall ]
+tryChar : Char -> Action -> Agenda Char Action
+tryChar char action =
+    try (toString char)
+        (\c ->
+            if c == char then
+                Just (succeed action)
+            else
+                Nothing
+        )
 
 
-wqTool : Agenda Char Action
-wqTool =
-    cmd <| wq
+everyTool : Agenda Char Action
+everyTool =
+    oneOf [ qTool, wqTool, wallTool ]
 
 
 cmd : Agenda Char Action -> Agenda Char Action
