@@ -11,7 +11,8 @@ module Agenda
         , map2
         , (|=)
         , (|.)
-          --, zeroOrMore
+        , zeroOrMore
+        , FailureHandling(..)
         , oneOf
         )
 
@@ -253,51 +254,92 @@ pipelines]**.  This operator ignores the value.
 infixl 5 |.
 
 
-
-{- This agenda will succeed if the handling of the msg by the provided
-   agenda gives Nothing.
+{-| Keep on repeating the given Agenda until the given exit msg
+is send.  C.f. the documentation of FailureHandling for the meaning the
+second argument.
 -}
-{-
-   zeroOrMore : Agenda msg a -> Agenda msg (List a)
-   zeroOrMore =
-       zeroOrMoreIterator []
+zeroOrMore : msg -> FailureHandling -> Agenda msg a -> Agenda msg (List a)
+zeroOrMore exitMsg failureHandling =
+    zeroOrMoreIterator exitMsg failureHandling []
 
 
-   zeroOrMoreIterator : List a -> Agenda msg a -> Agenda msg (List a)
-   zeroOrMoreIterator list agenda =
-       let
-           description =
-               "zero or more of " ++ (getDescription agenda)
-       in
-           try description <| zeroOrMoreUpdate list agenda
-
-
-   zeroOrMoreUpdate : List a -> Agenda msg a -> msg -> Maybe (Agenda msg (List a))
-   zeroOrMoreUpdate list ((Agenda agenda) as oldAgenda) msg =
-       case agenda of
-           Err (Step _ update) ->
-               case update msg of
-                   Just nextAgenda ->
-                       case nextAgenda of
-                           Agenda (Ok (Just result)) ->
-                               Just <| zeroOrMoreIterator (list ++ [ result ]) oldAgenda
-
-                           Agenda (Ok Nothing) ->
-                               Nothing
-
-                           _ ->
-                               Just <| zeroOrMoreIterator list nextAgenda
-
-                   Nothing ->
-                       Just <| succeed list
-
-           Ok (Just result) ->
-               Just <| zeroOrMoreIterator (list ++ [ result ]) oldAgenda
-
-           Ok Nothing ->
-               Nothing
-
+{-| If one Agenda fails, do we let the whole Agenda fail (and possibly
+loose the previous results), or do we succeed with the list of results
+collected so far, or do we return the last agenda so the user can retry?
 -}
+type FailureHandling
+    = Fail
+    | Succeed
+    | Retry
+
+
+zeroOrMoreIterator :
+    msg
+    -> FailureHandling
+    -> List a
+    -> Agenda msg a
+    -> Agenda msg (List a)
+zeroOrMoreIterator exitMsg failureHandling list agenda =
+    let
+        description =
+            "zero or more of " ++ (getDescription agenda)
+    in
+        try description <| zeroOrMoreUpdate exitMsg failureHandling list agenda
+
+
+zeroOrMoreUpdate :
+    msg
+    -> FailureHandling
+    -> List a
+    -> Agenda msg a
+    -> msg
+    -> Maybe (Agenda msg (List a))
+zeroOrMoreUpdate exitMsg failureHandling list ((Agenda agenda) as oldAgenda) msg =
+    if exitMsg == msg then
+        Just <| succeed list
+    else
+        case agenda of
+            Err (Step _ update) ->
+                case update msg of
+                    Just nextAgenda ->
+                        case nextAgenda of
+                            Agenda (Ok (Just result)) ->
+                                Just <|
+                                    (zeroOrMoreIterator exitMsg failureHandling)
+                                        (list ++ [ result ])
+                                        oldAgenda
+
+                            Agenda (Ok Nothing) ->
+                                Nothing
+
+                            _ ->
+                                Just <|
+                                    (zeroOrMoreIterator exitMsg failureHandling)
+                                        list
+                                        nextAgenda
+
+                    Nothing ->
+                        case failureHandling of
+                            Fail ->
+                                Just <| fail
+
+                            Succeed ->
+                                Just <| succeed list
+
+                            Retry ->
+                                Just <|
+                                    (zeroOrMoreIterator exitMsg failureHandling)
+                                        list
+                                        oldAgenda
+
+            Ok (Just result) ->
+                Just <|
+                    (zeroOrMoreIterator exitMsg failureHandling)
+                        (list ++ [ result ])
+                        oldAgenda
+
+            Ok Nothing ->
+                Nothing
 
 
 {-| Try all given agendas simultaniously.  Succeeds if one of them

@@ -26,6 +26,13 @@ everyTool =
     oneOf [ qTool, wqTool, wallTool ]
 
 
+{-| test for zeroOrMore
+-}
+listTool : FailureHandling -> Agenda Char (List Action)
+listTool failureHandling =
+    zeroOrMore '^' failureHandling (tryChar 't' NoOp)
+
+
 
 {- tools -}
 
