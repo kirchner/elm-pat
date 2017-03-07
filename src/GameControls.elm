@@ -40,8 +40,8 @@ subscriptions model =
 type alias Model =
     { currentTime : Time
     , controlTime : Maybe Time
-    , combo : Agenda Action String
-    , status : Maybe String
+    , combo : Agenda Step String
+    , successfullCombos : List String
     }
 
 
@@ -49,7 +49,7 @@ defaultModel =
     { currentTime = 0 * Time.millisecond
     , controlTime = Nothing
     , combo = allCombos
-    , status = Nothing
+    , successfullCombos = []
     }
 
 
@@ -60,55 +60,74 @@ type Control
     | D
 
 
-type Action
-    = Action Control Time
+type Step
+    = Action Control
+    | CoolDown Time
 
 
-untimedAction : Control -> Agenda Action ()
-untimedAction control =
-    try ("press " ++ (toString control))
-        (\(Action c _) ->
-            if c == control then
-                Just (succeed ())
-            else
-                Nothing
-        )
+action : Control -> Agenda Step ()
+action control =
+    let
+        update action =
+            case action of
+                Action c ->
+                    if (c == control) then
+                        Just (succeed ())
+                    else
+                        Nothing
+
+                _ ->
+                    Nothing
+    in
+        try
+            ("press " ++ (toString control))
+            update
 
 
-timedAction : Control -> Time -> Time -> Agenda Action ()
-timedAction control coolDownTime duration =
-    try
-        ("wait "
-            ++ (toString coolDownTime)
-            ++ " milliseconds, then press "
-            ++ (toString control)
-            ++ " within "
-            ++ (toString duration)
-            ++ " milliseconds"
-        )
-        (\(Action c time) ->
-            if (c == control) && (time >= coolDownTime) && (time <= coolDownTime + duration) then
-                Just (succeed ())
-            else
-                Nothing
-        )
+coolDown : Time -> Time -> Agenda Step ()
+coolDown coolDownTime duration =
+    let
+        update action =
+            case action of
+                CoolDown time ->
+                    if
+                        (time >= coolDownTime)
+                            && (time <= coolDownTime + duration)
+                    then
+                        Just (succeed ())
+                    else
+                        Nothing
+
+                _ ->
+                    Nothing
+    in
+        try
+            ("wait "
+                ++ (toString coolDownTime)
+                ++ " milliseconds and press the next control within "
+                ++ (toString duration)
+                ++ " milliseconds"
+            )
+            update
 
 
-combo1 : Agenda Action String
+combo1 : Agenda Step String
 combo1 =
     succeed "combo1"
-        |. untimedAction A
-        |. timedAction B 1000 2000
-        |. timedAction C 2000 1000
+        |. action A
+        |. coolDown 1000 2000
+        |. action B
+        |. coolDown 2000 1000
+        |. action C
 
 
-combo2 : Agenda Action String
+combo2 : Agenda Step String
 combo2 =
     succeed "combo2"
-        |. untimedAction B
+        |. action B
 
 
-allCombos : Agenda Action String
+allCombos : Agenda Step String
 allCombos =
     oneOf
         [ combo1
@@ -140,65 +159,45 @@ update msg model =
             { model | currentTime = currentTime } ! []
 
         Press control ->
-            case model.controlTime of
-                Nothing ->
-                    let
-                        result =
-                            run model.combo (Action control 0)
-                    in
-                        case result of
-                            Err nextCombo ->
-                                { model
-                                    | controlTime = Just model.currentTime
-                                    , combo = nextCombo
-                                }
-                                    ! []
+            let
+                result =
+                    case model.controlTime of
+                        Nothing ->
+                            run model.combo (Action control)
 
-                            Ok (Just string) ->
-                                { model
-                                    | controlTime = Nothing
-                                    , combo = allCombos
-                                    , status = Just string
-                                }
-                                    ! []
+                        Just controlTime ->
+                            let
+                                timeDifference =
+                                    model.currentTime - controlTime
+                            in
+                                runs model.combo
+                                    [ (CoolDown timeDifference)
+                                    , (Action control)
+                                    ]
+            in
+                case result of
+                    Err nextCombo ->
+                        { model
+                            | controlTime = Just model.currentTime
+                            , combo = nextCombo
+                        }
+                            ! []
 
-                            Ok Nothing ->
-                                { model
-                                    | controlTime = Nothing
-                                    , combo = allCombos
-                                }
-                                    ! []
+                    Ok (Just string) ->
+                        { model
+                            | controlTime = Nothing
+                            , combo = allCombos
+                            , successfullCombos =
+                                string :: model.successfullCombos
+                        }
+                            ! []
 
-                Just controlTime ->
-                    let
-                        timeDifference =
-                            model.currentTime - controlTime
-
-                        result =
-                            run model.combo (Action control timeDifference)
-                    in
-                        case result of
-                            Err nextCombo ->
-                                { model
-                                    | controlTime = Just model.currentTime
-                                    , combo = nextCombo
-                                }
-                                    ! []
-
-                            Ok (Just string) ->
-                                { model
-                                    | controlTime = Nothing
-                                    , combo = allCombos
-                                    , status = Just string
-                                }
-                                    ! []
-
-                            Ok Nothing ->
-                                { model
-                                    | controlTime = Nothing
-                                    , combo = allCombos
-                                }
-                                    ! []
+                    Ok Nothing ->
+                        { model
+                            | controlTime = Nothing
+                            , combo = allCombos
+                        }
+                            ! []
 
 
 
@@ -230,7 +229,7 @@ view model =
                 ]
             , Html.p []
                 [ Html.text <|
-                    "status: "
-                        ++ Maybe.withDefault "..." model.status
+                    "successfull combos: "
+                        ++ (toString model.successfullCombos)
                 ]
             ]
