@@ -1,6 +1,9 @@
 module Cut
     exposing
         ( Cut
+        , cut
+        , anchorA
+        , anchorB
         , CutId
         , defaultId
         )
@@ -10,10 +13,32 @@ module Cut
 import Point exposing (PointId)
 
 
-type alias Cut =
+type Cut
+    = Cut CutInfo
+
+
+type alias CutInfo =
     { anchorA : PointId
     , anchorB : PointId
     }
+
+
+cut : PointId -> PointId -> Cut
+cut idA idB =
+    Cut
+        { anchorA = idA
+        , anchorB = idB
+        }
+
+
+anchorA : Cut -> PointId
+anchorA (Cut cut) =
+    cut.anchorA
+
+
+anchorB : Cut -> PointId
+anchorB (Cut cut) =
+    cut.anchorB
 
 
 type alias CutId =

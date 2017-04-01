@@ -5,7 +5,11 @@ module Point
             , ADPoint
             , DDPoint
             )
+        , origin
+        , adPoint
+        , ddPoint
         , position
+        , unsafePosition
         , PointId
         , defaultId
         , nextId
@@ -42,6 +46,43 @@ type alias DDPointInfo =
     }
 
 
+origin : Vec2 -> Point
+origin p =
+    Origin
+        { position = p }
+
+
+adPoint : Dict PointId Point -> PointId -> Vec2 -> Point
+adPoint points id q =
+    let
+        p =
+            unsafePosition points id
+    in
+        ADPoint
+            { anchor = id
+            , angle =
+                atan2
+                    (getY <| sub p q)
+                    (getX <| sub p q)
+            , distance = length (sub p q)
+            }
+
+
+ddPoint : Dict PointId Point -> PointId -> Vec2 -> Point
+ddPoint points id q =
+    let
+        p =
+            unsafePosition points id
+    in
+        DDPoint
+            { anchor = id
+            , horizontalDistance =
+                (getX q) - (getX p)
+            , verticalDistance =
+                (getY q) - (getY p)
+            }
+
+
 position : Dict PointId Point -> PointId -> Maybe Vec2
 position points id =
     case Dict.get id points of
@@ -73,6 +114,16 @@ position points id =
 
         Nothing ->
             Nothing
+
+
+unsafePosition : Dict PointId Point -> PointId -> Vec2
+unsafePosition points id =
+    case position points id of
+        Just p ->
+            p
+
+        Nothing ->
+            Debug.crash "unknown point id"
 
 
 type alias PointId =

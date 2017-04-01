@@ -5,25 +5,21 @@ module Tools
             , CutTool
             , BoundaryTool
             )
-        , getDescription
         , Msg
             ( InputPosition
             , SelectPoint
-            , NoOp
+            , Finish
             )
-        , inputPosition
-        , selectPoint
-        , pointFromOriginTool
-        , pointFromDDPointTool
-        , pointFromADPointTool
-        , cutFromPointPointTool
-        , boundaryFromPointsTool
-        , sucIdSucTool
+        , origin
+        , adPoint
+        , ddPoint
+        , cut
+        , boundary
         )
 
 -- external
 
-import Dict exposing (..)
+import Dict exposing (Dict)
 import Math.Vector2 exposing (..)
 
 
@@ -32,9 +28,12 @@ import Math.Vector2 exposing (..)
 import Agenda
     exposing
         ( Agenda
-        , Description
-        , succeed
         , try
+        , fail
+        , succeed
+        , tell
+        , (>>=)
+        , (>>>)
         , (|=)
         , zeroOrMore
         )
@@ -43,197 +42,115 @@ import Cut exposing (Cut)
 import Point
     exposing
         ( Point
-            ( Origin
-            , ADPoint
-            , DDPoint
-            )
+        , unsafePosition
         , PointId
-        , position
         )
 
 
--- point tool
-
-
 type Tool
-    = PointTool (Agenda Msg Point)
-    | CutTool (Agenda Msg Cut)
-    | BoundaryTool (Agenda Msg Boundary)
-
-
-getDescription : Tool -> Description
-getDescription tool =
-    case tool of
-        PointTool agenda ->
-            Agenda.getDescription agenda
-
-        CutTool agenda ->
-            Agenda.getDescription agenda
-
-        BoundaryTool agenda ->
-            Agenda.getDescription agenda
-
-
-
--- msg
+    = PointTool (Agenda State Msg Point)
+    | CutTool (Agenda State Msg Cut)
+    | BoundaryTool (Agenda State Msg Boundary)
 
 
 type Msg
     = InputPosition Vec2
     | SelectPoint PointId
-    | NoOp
+    | Finish
+
+
+type State
+    = Select (List PointId)
 
 
 
--- steps
+{- steps -}
 
 
-inputPosition : Agenda Msg Vec2
+inputPosition : Agenda s Msg Vec2
 inputPosition =
-    try "input position" updateInputPosition
+    try <|
+        \msg ->
+            case msg of
+                InputPosition v ->
+                    succeed v
+
+                _ ->
+                    fail
 
 
-updateInputPosition : Msg -> Maybe (Agenda Msg Vec2)
-updateInputPosition msg =
-    case msg of
-        InputPosition v ->
-            Just <| succeed v
-
-        _ ->
-            Nothing
-
-
-selectPoint : Agenda Msg PointId
+selectPoint : Agenda s Msg PointId
 selectPoint =
-    try "select point" updateSelectPoint
+    try <|
+        \msg ->
+            case msg of
+                SelectPoint id ->
+                    succeed id
 
-
-updateSelectPoint : Msg -> Maybe (Agenda Msg PointId)
-updateSelectPoint msg =
-    case msg of
-        SelectPoint id ->
-            Just <| succeed id
-
-        _ ->
-            Nothing
+                _ ->
+                    fail
 
 
 
--- sucIdSucTool
+{- point tools -}
 
 
-sucIdSucTool : Tool
-sucIdSucTool =
-    PointTool <|
-        succeed identity
-            |= succeed (Origin { position = vec2 0 0 })
+origin : Agenda State Msg Point
+origin =
+    inputPosition
+        >>= \p ->
+                succeed (Point.origin p)
 
 
-
--- origin tool
-
-
-pointFromOriginTool : Tool
-pointFromOriginTool =
-    PointTool <|
-        succeed pointFromOrigin
-            |= inputPosition
-
-
-pointFromOrigin : Vec2 -> Point
-pointFromOrigin v =
-    Origin { position = v }
+adPoint : Dict PointId Point -> Agenda State Msg Point
+adPoint points =
+    selectPoint
+        >>= \id ->
+                let
+                    p =
+                        unsafePosition points id
+                in
+                    tell (Select [ id ])
+                        >>> inputPosition
+                        >>= \q ->
+                                succeed (Point.adPoint points id q)
 
 
-
--- dd point tool
-
-
-pointFromDDPointTool : Dict PointId Point -> Tool
-pointFromDDPointTool points =
-    PointTool <|
-        succeed (pointFromDDPoint points)
-            |= selectPoint
-            |= inputPosition
-
-
-pointFromDDPoint : Dict PointId Point -> PointId -> Vec2 -> Point
-pointFromDDPoint points anchorId v =
-    let
-        anchorPosition =
-            Maybe.withDefault (vec2 0 0) <|
-                position points anchorId
-    in
-        DDPoint
-            { anchor = anchorId
-            , horizontalDistance =
-                (getX v) - (getX anchorPosition)
-            , verticalDistance =
-                (getY v) - (getY anchorPosition)
-            }
+ddPoint : Dict PointId Point -> Agenda State Msg Point
+ddPoint points =
+    selectPoint
+        >>= \id ->
+                let
+                    p =
+                        unsafePosition points id
+                in
+                    tell (Select [ id ])
+                        >>> inputPosition
+                        >>= \q ->
+                                succeed (Point.ddPoint points id q)
 
 
 
--- ad point tool
+{- cut tools -}
 
 
-pointFromADPointTool : Dict PointId Point -> Tool
-pointFromADPointTool points =
-    PointTool <|
-        succeed (pointFromADPoint points)
-            |= selectPoint
-            |= inputPosition
-
-
-pointFromADPoint : Dict PointId Point -> PointId -> Vec2 -> Point
-pointFromADPoint points anchorId v =
-    let
-        anchorPosition =
-            Maybe.withDefault (vec2 0 0) <|
-                position points anchorId
-    in
-        ADPoint
-            { anchor = anchorId
-            , angle =
-                atan2
-                    (getY <| sub anchorPosition v)
-                    (getX <| sub anchorPosition v)
-            , distance = length (sub anchorPosition v)
-            }
+cut : Agenda State Msg Cut
+cut =
+    selectPoint
+        >>= \id1 ->
+                tell (Select [ id1 ])
+                    >>> selectPoint
+                    >>= \id2 ->
+                            succeed (Cut.cut id1 id2)
 
 
 
--- cut tool
+{- boundary tools -}
 
 
-cutFromPointPointTool : Tool
-cutFromPointPointTool =
-    CutTool <|
-        succeed cutFromPointPoint
-            |= selectPoint
-            |= selectPoint
-
-
-cutFromPointPoint : PointId -> PointId -> Cut
-cutFromPointPoint anchorA anchorB =
-    { anchorA = anchorA
-    , anchorB = anchorB
-    }
-
-
-
--- boundary tool
-
-
-boundaryFromPointsTool : Tool
-boundaryFromPointsTool =
-    BoundaryTool <|
-        succeed boundaryFromPoints
-            |= selectPoint
-            |= selectPoint
-            |= (zeroOrMore selectPoint)
-
-
-boundaryFromPoints : PointId -> PointId -> List PointId -> Boundary
-boundaryFromPoints =
-    Boundary.boundary
+boundary : Agenda s Msg Boundary
+boundary =
+    succeed Boundary.boundary
+        |= selectPoint
+        |= selectPoint
+        |= (zeroOrMore Finish selectPoint)

@@ -1,13 +1,13 @@
 {
     "version": "1.0.0",
-    "summary": "helpful summary of your project, less than 80 characters",
-    "repository": "https://github.com/user/project.git",
-    "license": "BSD3",
+    "summary": "Sewing pattern editor",
+    "repository": "https://github.com/kirchner/elm-pat.git",
+    "license": "GPL3",
     "source-directories": [
-        "src"
+        "src",
+        "elm-agenda/src"
     ],
     "exposed-modules": [
-        "Agenda"
     ],
     "dependencies": {
         "debois/elm-mdl": "8.1.0 <= v < 9.0.0",

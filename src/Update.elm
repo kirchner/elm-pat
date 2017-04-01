@@ -8,7 +8,12 @@ import Material
 
 -- internal
 
-import Agenda exposing (run)
+import Agenda
+    exposing
+        ( run
+        , result
+        , error
+        )
 import Model
     exposing
         ( Msg(..)
@@ -67,17 +72,11 @@ update msg model =
             case model.selectedTool of
                 Just (PointTool tool) ->
                     let
-                        result =
+                        nextTool =
                             run tool toolMsg
                     in
-                        case result of
-                            Err nextTool ->
-                                { model
-                                    | selectedTool = Just (PointTool nextTool)
-                                }
-                                    ! []
-
-                            Ok point ->
+                        case result nextTool of
+                            Just point ->
                                 { model
                                     | points = Dict.insert model.pointId point model.points
                                     , pointId = model.pointId + 1
@@ -85,19 +84,19 @@ update msg model =
                                 }
                                     ! []
 
+                            Nothing ->
+                                if error nextTool then
+                                    { model | selectedTool = Nothing } ! []
+                                else
+                                    { model | selectedTool = Just (PointTool nextTool) } ! []
+
                 Just (CutTool tool) ->
                     let
-                        result =
+                        nextTool =
                             run tool toolMsg
                     in
-                        case result of
-                            Err nextTool ->
-                                { model
-                                    | selectedTool = Just (CutTool nextTool)
-                                }
-                                    ! []
-
-                            Ok cut ->
+                        case result nextTool of
+                            Just cut ->
                                 { model
                                     | cuts = Dict.insert model.cutId cut model.cuts
                                     , cutId = model.cutId + 1
@@ -105,25 +104,31 @@ update msg model =
                                 }
                                     ! []
 
+                            Nothing ->
+                                if error nextTool then
+                                    { model | selectedTool = Nothing } ! []
+                                else
+                                    { model | selectedTool = Just (CutTool nextTool) } ! []
+
                 Just (BoundaryTool tool) ->
                     let
-                        result =
+                        nextTool =
                             run tool toolMsg
                     in
-                        case result of
-                            Err nextTool ->
-                                { model
-                                    | selectedTool = Just (BoundaryTool nextTool)
-                                }
-                                    ! []
-
-                            Ok boundary ->
+                        case result nextTool of
+                            Just boundary ->
                                 { model
                                     | boundaries = Dict.insert model.boundaryId boundary model.boundaries
                                     , boundaryId = model.boundaryId + 1
                                     , selectedTool = Nothing
                                 }
                                     ! []
+
+                            Nothing ->
+                                if error nextTool then
+                                    { model | selectedTool = Nothing } ! []
+                                else
+                                    { model | selectedTool = Just (BoundaryTool nextTool) } ! []
 
                 Nothing ->
                     model ! []

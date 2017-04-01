@@ -41,6 +41,8 @@ import Boundary
 import Cut
     exposing
         ( Cut
+        , anchorA
+        , anchorB
         , CutId
         )
 import Point
@@ -55,13 +57,16 @@ import Point
         )
 import Tools
     exposing
-        ( pointFromOriginTool
-        , pointFromADPointTool
-        , pointFromDDPointTool
-        , cutFromPointPointTool
-        , boundaryFromPointsTool
-        , getDescription
-        , sucIdSucTool
+        ( Tool
+            ( PointTool
+            , CutTool
+            , BoundaryTool
+            )
+        , origin
+        , adPoint
+        , ddPoint
+        , cut
+        , boundary
         )
 
 
@@ -165,34 +170,27 @@ viewToolBox model =
         Just tool ->
             Html.div []
                 [ (Button.render Mdl [ 0, 0 ] model.mdl)
-                    [ Options.onClick <| AbortTool ]
+                    [ Options.onClick AbortTool ]
                     [ Html.text "abort" ]
-                , (Button.render Mdl [ 0, 1 ] model.mdl)
-                    [ Options.onClick <| DoStep Tools.NoOp ]
-                    [ Html.text "no step" ]
-                , Html.text <| getDescription tool
                 ]
 
         Nothing ->
             Html.div []
                 [ (Button.render Mdl [ 1, 0 ] model.mdl)
-                    [ Options.onClick <| InitTool pointFromOriginTool ]
+                    [ Options.onClick (InitTool (PointTool origin)) ]
                     [ Html.text "add origin" ]
-                , (Button.render Mdl [ 1, 1 ] model.mdl)
-                    [ Options.onClick <| InitTool <| pointFromDDPointTool model.points ]
-                    [ Html.text "add dd point" ]
                 , (Button.render Mdl [ 1, 2 ] model.mdl)
-                    [ Options.onClick <| InitTool <| pointFromADPointTool model.points ]
+                    [ Options.onClick (InitTool (PointTool (adPoint model.points))) ]
                     [ Html.text "add ad point" ]
+                , (Button.render Mdl [ 1, 1 ] model.mdl)
+                    [ Options.onClick (InitTool (PointTool (ddPoint model.points))) ]
+                    [ Html.text "add dd point" ]
                 , (Button.render Mdl [ 1, 3 ] model.mdl)
-                    [ Options.onClick <| InitTool cutFromPointPointTool ]
+                    [ Options.onClick (InitTool (CutTool cut)) ]
                     [ Html.text "add cut" ]
                 , (Button.render Mdl [ 1, 4 ] model.mdl)
-                    [ Options.onClick <| InitTool boundaryFromPointsTool ]
+                    [ Options.onClick (InitTool (BoundaryTool boundary)) ]
                     [ Html.text "add boundary" ]
-                , (Button.render Mdl [ 1, 5 ] model.mdl)
-                    [ Options.onClick <| InitTool sucIdSucTool ]
-                    [ Html.text "succeed identity |= succeed Origin" ]
                 ]
 
 
@@ -555,8 +553,8 @@ drawCut points cuts focus id =
     let
         draw cut =
             Maybe.map2 drawLine
-                (position points cut.anchorA)
-                (position points cut.anchorB)
+                (position points (anchorA cut))
+                (position points (anchorB cut))
 
         color =
             case focus of
