@@ -1,0 +1,3 @@
+[submodule "elm-agenda"]
+	path = elm-agenda
+	url = https://github.com/kirchner/elm-agenda
