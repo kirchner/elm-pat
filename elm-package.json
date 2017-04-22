@@ -7,9 +7,9 @@
         "src",
         "elm-agenda/src"
     ],
-    "exposed-modules": [
-    ],
+    "exposed-modules": [],
     "dependencies": {
+        "abadi199/elm-input-extra": "5.2.0 <= v < 6.0.0",
         "debois/elm-mdl": "8.1.0 <= v < 9.0.0",
         "elm-community/linear-algebra": "1.1.0 <= v < 2.0.0",
         "elm-lang/animation-frame": "1.0.1 <= v < 2.0.0",

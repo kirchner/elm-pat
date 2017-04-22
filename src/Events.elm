@@ -1,20 +1,30 @@
 module Events
     exposing
-        ( onMoveWithCoords
+        ( onClick
+        , onMove
         )
 
-import Json.Decode as Json
-import Mouse
-import VirtualDom
+import Json.Decode exposing (..)
+import VirtualDom exposing (on)
 
 
-onMoveWithCoords : (Mouse.Position -> msg) -> VirtualDom.Property msg
-onMoveWithCoords tagger =
-    VirtualDom.on "mousemove" (Json.map tagger offsetPosition)
+{- internal -}
+
+import Types exposing (Position)
 
 
-offsetPosition : Json.Decoder Mouse.Position
-offsetPosition =
-    Json.map2 Mouse.Position
-        (Json.field "offsetX" Json.int)
-        (Json.field "offsetY" Json.int)
+onClick : (Position -> msg) -> VirtualDom.Property msg
+onClick tagger =
+    on "click" (map tagger positionDecoder)
+
+
+onMove : (Position -> msg) -> VirtualDom.Property msg
+onMove tagger =
+    on "mousemove" (map tagger positionDecoder)
+
+
+positionDecoder : Decoder Position
+positionDecoder =
+    map2 Position
+        (field "offsetX" int)
+        (field "offsetY" int)
