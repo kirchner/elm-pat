@@ -6,6 +6,7 @@ import Html.Attributes as Html
 import Math.Vector2 exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
+import Svg.Events as Svg
 
 
 {- internal -}
@@ -16,8 +17,8 @@ import Svg.Extra as Svg
 import Types exposing (..)
 
 
-view : (Position -> msg) -> (Position -> msg) -> Svg msg -> Position -> PointStore -> Html msg
-view clickCallback moveCallback tool center store =
+view : (Position -> msg) -> (Position -> msg) -> msg -> Svg msg -> Position -> PointStore -> Html msg
+view clickCallback moveCallback leaveCallback tool center store =
     let
         viewBoxString =
             String.concat
@@ -47,6 +48,7 @@ view clickCallback moveCallback tool center store =
                 , Svg.strokeWidth "0"
                 , Events.onClick clickCallback
                 , Events.onMove moveCallback
+                , Svg.onMouseOut leaveCallback
                 ]
                 []
             ]
@@ -84,5 +86,5 @@ points store =
 
 point : PointStore -> Point -> Maybe (Svg msg)
 point store point =
-        position store point
-            |> Maybe.map Svg.drawPoint
+    position store point
+        |> Maybe.map Svg.drawPoint

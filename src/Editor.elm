@@ -24,7 +24,7 @@ import Tools.AddRelative as AddRelative
 
 
 type alias Model =
-    { mousePosition : Position
+    { mouse : Maybe Position
     , store : PointStore
     , nextId : Id
     , center : Position
@@ -65,6 +65,7 @@ toolName tool =
 
 type Msg
     = UpdateMouse Position
+    | LeaveCanvas
     | SelectTool Tool
     | Handle (Maybe Callback)
     | AddAbsoluteMsg AddAbsolute.Msg
@@ -73,7 +74,7 @@ type Msg
 
 init : ( Model, Cmd Msg )
 init =
-    { mousePosition = { x = 0, y = 0 } -- FIXME: get actual coordinates
+    { mouse = Nothing
     , store = emptyStore
     , nextId = firstId
     , center = { x = -320, y = -320 }
@@ -88,7 +89,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         UpdateMouse p ->
-            { model | mousePosition = p } ! []
+            { model | mouse = Just p } ! []
+
+        LeaveCanvas ->
+            { model | mouse = Nothing } ! []
 
         SelectTool tool ->
             { model | selectedTool = Just tool } ! []
@@ -104,7 +108,11 @@ update msg model =
                 (handle callback { model | addAbsolute = newAddAbsolute }) ! []
 
         AddRelativeMsg msg ->
-            { model | addRelative = AddRelative.update msg model.addRelative } ! []
+            let
+                ( newAddRelative, callback ) =
+                    AddRelative.update msg model.addRelative
+            in
+                (handle callback { model | addRelative = newAddRelative }) ! []
 
 
 handle : Maybe Callback -> Model -> Model
@@ -114,6 +122,9 @@ handle callback model =
             { model
                 | store = Dict.insert model.nextId point model.store
                 , nextId = model.nextId + 1
+                , addAbsolute = AddAbsolute.init
+                , addRelative = AddRelative.init
+                , selectedTool = Nothing
             }
 
         _ ->

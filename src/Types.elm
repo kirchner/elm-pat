@@ -5,6 +5,7 @@ module Types
         , Point
         , Ratio
         , absolute
+        , relative
         , PointStore
         , Id
         , emptyStore
@@ -45,6 +46,10 @@ absolute : Vec2 -> Point
 absolute =
     Absolute
 
+
+relative : Id -> Vec2 -> Point
+relative =
+    Relative
 
 
 {- point store -}

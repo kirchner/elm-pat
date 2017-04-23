@@ -2,6 +2,7 @@ module Svg.Extra
     exposing
         ( drawPoint
         , drawSelector
+        , drawArrow
         , drawVerticalLine
         , drawHorizontalLine
         )
@@ -37,6 +38,20 @@ drawSelector v =
         , Svg.strokeWidth "1"
         , Svg.stroke Colors.base1
         , Svg.fill "none"
+        ]
+        []
+
+
+drawArrow : Vec2 -> Vec2 -> Svg msg
+drawArrow v w =
+    Svg.line
+        [ Svg.x1 (toString (getX v))
+        , Svg.y1 (toString (getY v))
+        , Svg.x2 (toString (getX w))
+        , Svg.y2 (toString (getY w))
+        , Svg.strokeWidth "1"
+        , Svg.stroke Colors.base1
+        , Svg.strokeDasharray "5, 5"
         ]
         []
 

@@ -60,34 +60,55 @@ callback model p =
             Just (AddPoint (absolute (vec2 (toFloat p.x) (toFloat p.y))))
 
 
-draw : Model -> Position -> Svg msg
-draw model position =
-    case ( model.x, model.y ) of
-        ( Just x, Just y ) ->
-            Svg.g []
-                [ Svg.drawPoint (vec2 (toFloat x) (toFloat y))
-                , Svg.drawSelector (vec2 (toFloat x) (toFloat y))
-                ]
+draw : Model -> Maybe Position -> Svg msg
+draw model maybeP =
+    case maybeP of
+        Just p ->
+            case ( model.x, model.y ) of
+                ( Just x, Just y ) ->
+                    Svg.g []
+                        [ Svg.drawPoint (vec2 (toFloat x) (toFloat y))
+                        , Svg.drawSelector (vec2 (toFloat x) (toFloat y))
+                        ]
 
-        ( Just x, Nothing ) ->
-            Svg.g []
-                [ Svg.drawVerticalLine (toFloat x)
-                , Svg.drawPoint (vec2 (toFloat x) (toFloat position.y))
-                , Svg.drawSelector (vec2 (toFloat x) (toFloat position.y))
-                ]
+                ( Just x, Nothing ) ->
+                    Svg.g []
+                        [ Svg.drawVerticalLine (toFloat x)
+                        , Svg.drawPoint (vec2 (toFloat x) (toFloat p.y))
+                        , Svg.drawSelector (vec2 (toFloat x) (toFloat p.y))
+                        ]
 
-        ( Nothing, Just y ) ->
-            Svg.g []
-                [ Svg.drawHorizontalLine (toFloat y)
-                , Svg.drawPoint (vec2 (toFloat position.x) (toFloat y))
-                , Svg.drawSelector (vec2 (toFloat position.x) (toFloat y))
-                ]
+                ( Nothing, Just y ) ->
+                    Svg.g []
+                        [ Svg.drawHorizontalLine (toFloat y)
+                        , Svg.drawPoint (vec2 (toFloat p.x) (toFloat y))
+                        , Svg.drawSelector (vec2 (toFloat p.x) (toFloat y))
+                        ]
 
-        ( Nothing, Nothing ) ->
-            Svg.g []
-                [ Svg.drawPoint (vec2 (toFloat position.x) (toFloat position.y))
-                , Svg.drawSelector (vec2 (toFloat position.x) (toFloat position.y))
-                ]
+                ( Nothing, Nothing ) ->
+                    Svg.g []
+                        [ Svg.drawPoint (vec2 (toFloat p.x) (toFloat p.y))
+                        , Svg.drawSelector (vec2 (toFloat p.x) (toFloat p.y))
+                        ]
+
+        Nothing ->
+            case ( model.x, model.y ) of
+                ( Just x, Just y ) ->
+                    Svg.g []
+                        [ Svg.drawPoint (vec2 (toFloat x) (toFloat y))
+                        , Svg.drawSelector (vec2 (toFloat x) (toFloat y))
+                        ]
+
+                ( Just x, Nothing ) ->
+                    Svg.g []
+                        [ Svg.drawVerticalLine (toFloat x) ]
+
+                ( Nothing, Just y ) ->
+                    Svg.g []
+                        [ Svg.drawHorizontalLine (toFloat y) ]
+
+                ( Nothing, Nothing ) ->
+                    Svg.g [] []
 
 
 
@@ -118,12 +139,7 @@ update msg model =
                 point =
                     absolute (vec2 (toFloat x) (toFloat y))
             in
-                ( { model
-                    | x = Nothing
-                    , y = Nothing
-                  }
-                , Just (AddPoint point)
-                )
+                ( model, Just (AddPoint point) )
 
 
 

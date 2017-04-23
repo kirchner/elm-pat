@@ -65,10 +65,14 @@ viewCanvas model =
     let
         moveCallback p =
             UpdateMouse p
+
+        leaveCallback =
+            LeaveCanvas
     in
         Canvas.view
             (clickCallback model)
             moveCallback
+            leaveCallback
             (drawTool model)
             model.center
             model.store
@@ -84,7 +88,11 @@ clickCallback model p =
                     (svgToCanvas model p)
 
         Just TAddRelative ->
-            Handle Nothing
+            Handle <|
+                AddRelative.callback
+                    model.addRelative
+                    model.store
+                    (svgToCanvas model p)
 
         Nothing ->
             Handle Nothing
@@ -96,13 +104,13 @@ drawTool model =
         Just TAddAbsolute ->
             AddAbsolute.draw
                 model.addAbsolute
-                (svgToCanvas model model.mousePosition)
+                (Maybe.map (svgToCanvas model) model.mouse)
 
         Just TAddRelative ->
             AddRelative.draw
                 model.addRelative
                 model.store
-                (svgToCanvas model model.mousePosition)
+                (Maybe.map (svgToCanvas model) model.mouse)
 
         Nothing ->
             Svg.g [] []
