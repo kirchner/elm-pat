@@ -65,6 +65,7 @@ type Msg
     = UpdateTool Tool
     | AddPoint Point
     | SelectPoint Id
+    | UpdatePoint Id Point
 
 
 init : ( Model, Cmd Msg )
@@ -99,10 +100,21 @@ update msg model =
         SelectPoint id ->
             case Dict.get id model.store of
                 Just (Absolute v) ->
-                    { model | tool = AddAbsolute (AddAbsolute.fromVec v) } ! []
+                    { model
+                        | tool =
+                            AddAbsolute (AddAbsolute.fromStore model.store id)
+                    }
+                        ! []
 
                 _ ->
                     { model | tool = None } ! []
+
+        UpdatePoint id point ->
+            { model
+                | store = Dict.update id (\_ -> Just point) model.store
+                , tool = None
+            }
+                ! []
 
 
 subscriptions : Model -> Sub Msg

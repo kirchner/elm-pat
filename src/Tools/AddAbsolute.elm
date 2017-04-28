@@ -3,11 +3,12 @@ module Tools.AddAbsolute
         ( State
         , Config
         , init
-        , fromVec
+        , fromStore
         , svg
         , view
         )
 
+import Dict
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.Events as Html
@@ -33,6 +34,7 @@ type alias State =
     WithMouse
         { x : Maybe Float
         , y : Maybe Float
+        , id : Maybe Id
         }
 
 
@@ -40,16 +42,27 @@ init : State
 init =
     { x = Nothing
     , y = Nothing
+    , id = Nothing
     , mouse = Nothing
     }
 
 
-fromVec : Vec2 -> State
-fromVec v =
-    { init
-        | x = Just (getX v)
-        , y = Just (getY v)
-    }
+fromStore : PointStore -> Id -> State
+fromStore store id =
+    let
+        ( x, y ) =
+            case Dict.get id store |> Maybe.andThen (position store) of
+                Just v ->
+                    ( Just (getX v), Just (getY v) )
+
+                Nothing ->
+                    ( Nothing, Nothing )
+    in
+        { init
+            | x = x
+            , y = y
+            , id = Just id
+        }
 
 
 
@@ -58,6 +71,7 @@ fromVec v =
 
 type alias Config msg =
     { addPoint : Point -> msg
+    , updatePoint : Id -> Point -> msg
     , stateUpdated : State -> msg
     , viewPort : ViewPort
     }
@@ -147,7 +161,12 @@ eventRect config state =
         , Svg.height (toString config.viewPort.height)
         , Svg.fill "transparent"
         , Svg.strokeWidth "0"
-        , Events.onClick (addPoint config state)
+        , case state.id of
+            Just id ->
+                Events.onClick (updatePoint config state id)
+
+            Nothing ->
+                Events.onClick (addPoint config state)
         , Events.onMove
             (updateMouse config.stateUpdated state config.viewPort << Just)
         , Svg.onMouseOut
@@ -162,8 +181,34 @@ eventRect config state =
 
 view : Config msg -> State -> Html msg
 view config state =
+    Html.div []
+        [ Html.div []
+            [ Html.text "x:"
+            , inputX config state []
+            , Html.button
+                [ Html.onClick (updateX config.stateUpdated state Nothing) ]
+                [ Html.text "clear" ]
+            ]
+        , Html.div []
+            [ Html.text "y:"
+            , inputY config state []
+            , Html.button
+                [ Html.onClick (updateY config.stateUpdated state Nothing) ]
+                [ Html.text "clear" ]
+            ]
+        , case state.id of
+            Just id ->
+                updateButton config state id
+
+            Nothing ->
+                addButton config state
+        ]
+
+
+addButton : Config msg -> State -> Html msg
+addButton config state =
     let
-        buttonAttributes =
+        attrs =
             case ( state.x, state.y ) of
                 ( Just x, Just y ) ->
                     let
@@ -177,25 +222,27 @@ view config state =
                 _ ->
                     [ Html.disabled True ]
     in
-        Html.div []
-            [ Html.div []
-                [ Html.text "x:"
-                , inputX config state []
-                , Html.button
-                    [ Html.onClick (updateX config.stateUpdated state Nothing) ]
-                    [ Html.text "clear" ]
-                ]
-            , Html.div []
-                [ Html.text "y:"
-                , inputY config state []
-                , Html.button
-                    [ Html.onClick (updateY config.stateUpdated state Nothing) ]
-                    [ Html.text "clear" ]
-                ]
-            , Html.button
-                buttonAttributes
-                [ Html.text "add" ]
-            ]
+        Html.button attrs [ Html.text "add" ]
+
+
+updateButton : Config msg -> State -> Id -> Html msg
+updateButton config state id =
+    let
+        attrs =
+            case ( state.x, state.y ) of
+                ( Just x, Just y ) ->
+                    let
+                        point =
+                            absolute (vec2 x y)
+                    in
+                        [ Html.onClick (config.updatePoint id point)
+                        , Html.disabled False
+                        ]
+
+                _ ->
+                    [ Html.disabled True ]
+    in
+        Html.button attrs [ Html.text "update" ]
 
 
 inputX : Config msg -> State -> List (Html.Attribute msg) -> Html msg
@@ -222,22 +269,30 @@ inputY config state attrs =
 
 addPoint : Config msg -> State -> Position -> msg
 addPoint config state position =
-    let
-        p =
-            svgToCanvas config.viewPort position
-    in
-        case ( state.x, state.y ) of
-            ( Just x, Just y ) ->
-                config.addPoint (absolute (vec2 x y))
+    point state.x state.y (svgToCanvas config.viewPort position)
+        |> config.addPoint
 
-            ( Just x, Nothing ) ->
-                config.addPoint (absolute (vec2 x (toFloat p.y)))
 
-            ( Nothing, Just y ) ->
-                config.addPoint (absolute (vec2 (toFloat p.x) y))
+updatePoint : Config msg -> State -> Id -> Position -> msg
+updatePoint config state id position =
+    point state.x state.y (svgToCanvas config.viewPort position)
+        |> config.updatePoint id
 
-            ( Nothing, Nothing ) ->
-                config.addPoint (absolute (vec p.x p.y))
+
+point : Maybe Float -> Maybe Float -> Position -> Point
+point maybeX maybeY p =
+    case ( maybeX, maybeY ) of
+        ( Just x, Just y ) ->
+            absolute (vec2 x y)
+
+        ( Just x, Nothing ) ->
+            absolute (vec2 x (toFloat p.y))
+
+        ( Nothing, Just y ) ->
+            absolute (vec2 (toFloat p.x) y)
+
+        ( Nothing, Nothing ) ->
+            absolute (vec p.x p.y)
 
 
 updateX : (State -> msg) -> State -> Maybe Float -> msg

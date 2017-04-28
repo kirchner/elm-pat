@@ -100,6 +100,7 @@ drawTool viewPort store tool =
 addAbsoluteConfig : ViewPort -> AddAbsolute.Config Msg
 addAbsoluteConfig viewPort =
     { addPoint = AddPoint
+    , updatePoint = UpdatePoint
     , stateUpdated = UpdateTool << AddAbsolute
     , viewPort = viewPort
     }
