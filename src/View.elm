@@ -15,10 +15,14 @@ import Editor
         , allTools
         , Msg(..)
         )
-import Tools.AddAbsolute as AddAbsolute
-import Tools.AddRelative as AddRelative
+import Tools.Absolute as Absolute
+import Tools.Relative as Relative
 import Tools.Select as Select
-import Types exposing (..)
+import Types
+    exposing
+        ( ViewPort
+        , PointStore
+        )
 import View.Canvas as Canvas
 
 
@@ -52,11 +56,11 @@ viewToolBox =
 viewToolInfo : ViewPort -> PointStore -> Tool -> Html Msg
 viewToolInfo viewPort store tool =
     case tool of
-        AddAbsolute state ->
-            AddAbsolute.view (addAbsoluteConfig viewPort) state
+        Absolute state ->
+            Absolute.view (addAbsoluteConfig viewPort) state
 
-        AddRelative state ->
-            AddRelative.view (addRelativeConfig viewPort) state store
+        Relative state ->
+            Relative.view (addRelativeConfig viewPort) state store
 
         Select _ ->
             Html.div [] []
@@ -80,11 +84,11 @@ viewCanvas model =
 drawTool : ViewPort -> PointStore -> Tool -> Svg Msg
 drawTool viewPort store tool =
     case tool of
-        AddAbsolute state ->
-            AddAbsolute.svg (addAbsoluteConfig viewPort) state
+        Absolute state ->
+            Absolute.svg (addAbsoluteConfig viewPort) state
 
-        AddRelative state ->
-            AddRelative.svg (addRelativeConfig viewPort) state store
+        Relative state ->
+            Relative.svg (addRelativeConfig viewPort) state store
 
         Select state ->
             Select.svg (selectConfig viewPort) state store
@@ -97,19 +101,19 @@ drawTool viewPort store tool =
 {- tool configurations -}
 
 
-addAbsoluteConfig : ViewPort -> AddAbsolute.Config Msg
+addAbsoluteConfig : ViewPort -> Absolute.Config Msg
 addAbsoluteConfig viewPort =
     { addPoint = AddPoint
     , updatePoint = UpdatePoint
-    , stateUpdated = UpdateTool << AddAbsolute
+    , stateUpdated = UpdateTool << Absolute
     , viewPort = viewPort
     }
 
 
-addRelativeConfig : ViewPort -> AddRelative.Config Msg
+addRelativeConfig : ViewPort -> Relative.Config Msg
 addRelativeConfig viewPort =
     { addPoint = AddPoint
-    , stateUpdated = UpdateTool << AddRelative
+    , stateUpdated = UpdateTool << Relative
     , viewPort = viewPort
     }
 

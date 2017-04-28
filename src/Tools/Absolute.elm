@@ -1,4 +1,4 @@
-module Tools.AddAbsolute
+module Tools.Absolute
     exposing
         ( State
         , Config

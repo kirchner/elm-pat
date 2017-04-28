@@ -1,4 +1,4 @@
-module Tools.AddRelative
+module Tools.Relative
     exposing
         ( State
         , Config
