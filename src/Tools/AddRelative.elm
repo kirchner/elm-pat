@@ -95,7 +95,7 @@ drawCursor config state v p =
             Svg.g []
                 [ Svg.drawPoint (vec2 x y)
                 , Svg.drawSelector (vec2 x y)
-                , Svg.drawArrow v (vec2 x y)
+                , Svg.drawRectArrow v (vec2 x y)
                 ]
     in
         case ( state.x, state.y ) of
@@ -149,7 +149,7 @@ drawNewPoint config state v =
                 Svg.g []
                     [ Svg.drawPoint w
                     , Svg.drawSelector w
-                    , Svg.drawArrow v w
+                    , Svg.drawRectArrow v w
                     ]
 
         _ ->

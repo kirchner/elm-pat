@@ -2,7 +2,7 @@ module Types
     exposing
         ( Position
         , toVec
-        , Point
+        , Point(..)
         , Ratio
         , absolute
         , relative
@@ -11,6 +11,7 @@ module Types
         , emptyStore
         , firstId
         , position
+        , positionById
         , ViewPort
         , canvasToSvg
         , svgToCanvas
@@ -81,6 +82,12 @@ firstId =
 
 
 {- helpers -}
+
+
+positionById : PointStore -> Id -> Maybe Vec2
+positionById store id =
+    Dict.get id store
+        |> Maybe.andThen (position store)
 
 
 position : PointStore -> Point -> Maybe Vec2

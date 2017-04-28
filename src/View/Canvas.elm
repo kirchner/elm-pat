@@ -44,26 +44,26 @@ view tool viewPort store =
 
 origin : Svg msg
 origin =
-        Svg.g []
-            [ Svg.line
-                [ Svg.x1 "-10"
-                , Svg.y1 "0"
-                , Svg.x2 "10"
-                , Svg.y2 "0"
-                , Svg.stroke Colors.green
-                , Svg.strokeWidth "1"
-                ]
-                []
-            , Svg.line
-                [ Svg.x1 "0"
-                , Svg.y1 "-10"
-                , Svg.x2 "0"
-                , Svg.y2 "10"
-                , Svg.stroke Colors.green
-                , Svg.strokeWidth "1"
-                ]
-                []
+    Svg.g []
+        [ Svg.line
+            [ Svg.x1 "-10"
+            , Svg.y1 "0"
+            , Svg.x2 "10"
+            , Svg.y2 "0"
+            , Svg.stroke Colors.green
+            , Svg.strokeWidth "1"
             ]
+            []
+        , Svg.line
+            [ Svg.x1 "0"
+            , Svg.y1 "-10"
+            , Svg.x2 "0"
+            , Svg.y2 "10"
+            , Svg.stroke Colors.green
+            , Svg.strokeWidth "1"
+            ]
+            []
+        ]
 
 
 points : PointStore -> List (Svg msg)
@@ -74,5 +74,23 @@ points store =
 
 point : PointStore -> Point -> Maybe (Svg msg)
 point store point =
-    position store point
-        |> Maybe.map Svg.drawPoint
+    case point of
+        Absolute _ ->
+            position store point
+                |> Maybe.map Svg.drawPoint
+
+        Relative id _ ->
+            let
+                draw v w =
+                    Svg.g []
+                        [ Svg.drawPoint w
+                        , Svg.drawRectArrow v w 
+                        ]
+            in
+                Maybe.map2
+                    draw
+                    (positionById store id)
+                    (position store point)
+
+        Between idA idB _ ->
+            Just (Svg.g [] [])

@@ -3,6 +3,7 @@ module Svg.Extra
         ( drawPoint
         , drawSelector
         , drawArrow
+        , drawRectArrow
         , drawVerticalLine
         , drawHorizontalLine
         )
@@ -56,6 +57,14 @@ drawArrow v w =
         []
 
 
+drawRectArrow : Vec2 -> Vec2 -> Svg msg
+drawRectArrow v w =
+    Svg.g []
+        [ drawArrow v (vec2 (getX w) (getY v))
+        , drawArrow (vec2 (getX w) (getY v)) w
+        ]
+
+
 drawHorizontalLine : Float -> Svg msg
 drawHorizontalLine y =
     Svg.line
@@ -68,6 +77,7 @@ drawHorizontalLine y =
         , Svg.strokeDasharray "5, 5"
         ]
         []
+
 
 drawVerticalLine : Float -> Svg msg
 drawVerticalLine x =
