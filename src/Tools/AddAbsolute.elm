@@ -21,6 +21,7 @@ import Svg.Events as Svg
 
 import Events
 import Svg.Extra as Svg
+import Tools.Common exposing (..)
 import Types exposing (..)
 
 
@@ -28,10 +29,10 @@ import Types exposing (..)
 
 
 type alias State =
-    { x : Maybe Int
-    , y : Maybe Int
-    , mouse : Maybe Position
-    }
+    WithMouse
+        { x : Maybe Int
+        , y : Maybe Int
+        }
 
 
 init : State
@@ -61,54 +62,71 @@ svg : Config msg -> State -> Svg msg
 svg config state =
     Svg.g []
         [ case state.mouse of
-            Just p ->
-                case ( state.x, state.y ) of
-                    ( Just x, Just y ) ->
-                        Svg.g []
-                            [ Svg.drawPoint (vec2 (toFloat x) (toFloat y))
-                            , Svg.drawSelector (vec2 (toFloat x) (toFloat y))
-                            ]
-
-                    ( Just x, Nothing ) ->
-                        Svg.g []
-                            [ Svg.drawVerticalLine (toFloat x)
-                            , Svg.drawPoint (vec2 (toFloat x) (toFloat p.y))
-                            , Svg.drawSelector (vec2 (toFloat x) (toFloat p.y))
-                            ]
-
-                    ( Nothing, Just y ) ->
-                        Svg.g []
-                            [ Svg.drawHorizontalLine (toFloat y)
-                            , Svg.drawPoint (vec2 (toFloat p.x) (toFloat y))
-                            , Svg.drawSelector (vec2 (toFloat p.x) (toFloat y))
-                            ]
-
-                    ( Nothing, Nothing ) ->
-                        Svg.g []
-                            [ Svg.drawPoint (vec2 (toFloat p.x) (toFloat p.y))
-                            , Svg.drawSelector (vec2 (toFloat p.x) (toFloat p.y))
-                            ]
+            Just position ->
+                drawCursor config state position
 
             Nothing ->
-                case ( state.x, state.y ) of
-                    ( Just x, Just y ) ->
-                        Svg.g []
-                            [ Svg.drawPoint (vec2 (toFloat x) (toFloat y))
-                            , Svg.drawSelector (vec2 (toFloat x) (toFloat y))
-                            ]
-
-                    ( Just x, Nothing ) ->
-                        Svg.g []
-                            [ Svg.drawVerticalLine (toFloat x) ]
-
-                    ( Nothing, Just y ) ->
-                        Svg.g []
-                            [ Svg.drawHorizontalLine (toFloat y) ]
-
-                    ( Nothing, Nothing ) ->
-                        Svg.g [] []
+                Svg.g [] []
+        , drawLines config state
+        , drawNewPoint config state
         , eventRect config state
         ]
+
+
+drawCursor : Config msg -> State -> Position -> Svg msg
+drawCursor config state p =
+    case ( state.x, state.y ) of
+        ( Just x, Just y ) ->
+            Svg.g [] []
+
+        ( Just x, Nothing ) ->
+            Svg.g []
+                [ Svg.drawPoint (vec x p.y)
+                , Svg.drawSelector (vec x p.y)
+                ]
+
+        ( Nothing, Just y ) ->
+            Svg.g []
+                [ Svg.drawPoint (vec p.x y)
+                , Svg.drawSelector (vec p.x y)
+                ]
+
+        ( Nothing, Nothing ) ->
+            Svg.g []
+                [ Svg.drawPoint (vec p.x p.y)
+                , Svg.drawSelector (vec p.x p.y)
+                ]
+
+
+drawLines : Config msg -> State -> Svg msg
+drawLines config state =
+    case ( state.x, state.y ) of
+        ( Just x, Just y ) ->
+            Svg.g [] []
+
+        ( Just x, Nothing ) ->
+            Svg.g []
+                [ Svg.drawVerticalLine (toFloat x) ]
+
+        ( Nothing, Just y ) ->
+            Svg.g []
+                [ Svg.drawHorizontalLine (toFloat y) ]
+
+        ( Nothing, Nothing ) ->
+            Svg.g [] []
+
+
+drawNewPoint : Config msg -> State -> Svg msg
+drawNewPoint config state =
+    case ( state.x, state.y ) of
+        ( Just x, Just y ) ->
+            Svg.g []
+                [ Svg.drawPoint (vec x y)
+                , Svg.drawSelector (vec x y)
+                ]
+
+        _ ->
+            Svg.g [] []
 
 
 eventRect : Config msg -> State -> Svg msg
@@ -121,8 +139,10 @@ eventRect config state =
         , Svg.fill "transparent"
         , Svg.strokeWidth "0"
         , Events.onClick (addPoint config state)
-        , Events.onMove (updateMouse config.stateUpdated state config.viewPort << Just)
-        , Svg.onMouseOut (updateMouse config.stateUpdated state config.viewPort Nothing)
+        , Events.onMove
+            (updateMouse config.stateUpdated state config.viewPort << Just)
+        , Svg.onMouseOut
+            (updateMouse config.stateUpdated state config.viewPort Nothing)
         ]
         []
 
@@ -151,20 +171,14 @@ view config state =
         Html.div []
             [ Html.div []
                 [ Html.text "x:"
-                , Input.Number.input
-                    (Input.Number.defaultOptions (updateX config.stateUpdated state))
-                    []
-                    state.x
+                , inputX config state []
                 , Html.button
                     [ Html.onClick (updateX config.stateUpdated state Nothing) ]
                     [ Html.text "clear" ]
                 ]
             , Html.div []
                 [ Html.text "y:"
-                , Input.Number.input
-                    (Input.Number.defaultOptions (updateY config.stateUpdated state))
-                    []
-                    state.y
+                , inputY config state []
                 , Html.button
                     [ Html.onClick (updateY config.stateUpdated state Nothing) ]
                     [ Html.text "clear" ]
@@ -173,6 +187,24 @@ view config state =
                 buttonAttributes
                 [ Html.text "add" ]
             ]
+
+
+inputX : Config msg -> State -> List (Html.Attribute msg) -> Html msg
+inputX config state attrs =
+    let
+        options =
+            Input.Number.defaultOptions (updateX config.stateUpdated state)
+    in
+        Input.Number.input options attrs state.x
+
+
+inputY : Config msg -> State -> List (Html.Attribute msg) -> Html msg
+inputY config state attrs =
+    let
+        options =
+            Input.Number.defaultOptions (updateY config.stateUpdated state)
+    in
+        Input.Number.input options attrs state.y
 
 
 
@@ -187,16 +219,16 @@ addPoint config state position =
     in
         case ( state.x, state.y ) of
             ( Just x, Just y ) ->
-                config.addPoint (absolute (vec2 (toFloat x) (toFloat y)))
+                config.addPoint (absolute (vec x y))
 
             ( Just x, Nothing ) ->
-                config.addPoint (absolute (vec2 (toFloat x) (toFloat p.y)))
+                config.addPoint (absolute (vec x p.y))
 
             ( Nothing, Just y ) ->
-                config.addPoint (absolute (vec2 (toFloat p.x) (toFloat y)))
+                config.addPoint (absolute (vec p.x y))
 
             ( Nothing, Nothing ) ->
-                config.addPoint (absolute (vec2 (toFloat p.x) (toFloat p.y)))
+                config.addPoint (absolute (vec p.x p.y))
 
 
 updateX : (State -> msg) -> State -> Maybe Int -> msg
@@ -207,8 +239,3 @@ updateX callback state newX =
 updateY : (State -> msg) -> State -> Maybe Int -> msg
 updateY callback state newY =
     callback { state | y = newY }
-
-
-updateMouse : (State -> msg) -> State -> ViewPort -> Maybe Position -> msg
-updateMouse callback state viewPort newMouse =
-    callback { state | mouse = Maybe.map (svgToCanvas viewPort) newMouse }

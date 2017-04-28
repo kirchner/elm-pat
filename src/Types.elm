@@ -14,6 +14,7 @@ module Types
         , ViewPort
         , canvasToSvg
         , svgToCanvas
+        , vec
         )
 
 import Dict exposing (Dict)
@@ -124,3 +125,8 @@ svgToCanvas viewPort p =
     { x = p.x + viewPort.x
     , y = p.y + viewPort.y
     }
+
+
+vec : Int -> Int -> Vec2
+vec x y =
+    vec2 (toFloat x) (toFloat y)
