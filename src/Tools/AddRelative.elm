@@ -12,7 +12,7 @@ import Dropdown
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.Events as Html
-import Input.Number
+import Input.Float
 import Math.Vector2 exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
@@ -33,8 +33,8 @@ import Types exposing (..)
 type alias State =
     WithMouse
         { id : Maybe String
-        , x : Maybe Int
-        , y : Maybe Int
+        , x : Maybe Float
+        , y : Maybe Float
         , focused : Maybe Id
         }
 
@@ -103,10 +103,10 @@ drawCursor config state v p =
                 Svg.g [] []
 
             ( Just x, Nothing ) ->
-                draw (getX v + toFloat x) (toFloat p.y)
+                draw (getX v + x) (toFloat p.y)
 
             ( Nothing, Just y ) ->
-                draw (toFloat p.x) (getY v + toFloat y)
+                draw (toFloat p.x) (getY v + y)
 
             ( Nothing, Nothing ) ->
                 draw (toFloat p.x) (toFloat p.y)
@@ -121,7 +121,7 @@ drawLines config state v =
         ( Just x, Nothing ) ->
             let
                 deltaX =
-                    toFloat x + getX v
+                    x + getX v
             in
                 Svg.g []
                     [ Svg.drawVerticalLine deltaX ]
@@ -129,7 +129,7 @@ drawLines config state v =
         ( Nothing, Just y ) ->
             let
                 deltaY =
-                    toFloat y + getY v
+                    y + getY v
             in
                 Svg.g []
                     [ Svg.drawHorizontalLine deltaY ]
@@ -144,7 +144,7 @@ drawNewPoint config state v =
         ( Just x, Just y ) ->
             let
                 w =
-                    (vec2 (getX v + toFloat x) (getY v + toFloat y))
+                    (vec2 (getX v + x) (getY v + y))
             in
                 Svg.g []
                     [ Svg.drawPoint w
@@ -238,7 +238,7 @@ view config state store =
                 ( Just id, Just x, Just y ) ->
                     let
                         point =
-                            relative id (vec2 (toFloat x) (toFloat y))
+                            relative id (vec2 x y)
                     in
                         [ Html.onClick (config.addPoint point)
                         , Html.disabled False
@@ -290,18 +290,18 @@ inputX : Config msg -> State -> List (Html.Attribute msg) -> Html msg
 inputX config state attrs =
     let
         options =
-            Input.Number.defaultOptions (updateX config.stateUpdated state)
+            Input.Float.defaultOptions (updateX config.stateUpdated state)
     in
-        Input.Number.input options attrs state.x
+        Input.Float.input options attrs state.x
 
 
 inputY : Config msg -> State -> List (Html.Attribute msg) -> Html msg
 inputY config state attrs =
     let
         options =
-            Input.Number.defaultOptions (updateY config.stateUpdated state)
+            Input.Float.defaultOptions (updateY config.stateUpdated state)
     in
-        Input.Number.input options attrs state.y
+        Input.Float.input options attrs state.y
 
 
 
@@ -330,11 +330,11 @@ addPoint config state store =
                                 svgToCanvas config.viewPort pos
 
                             x =
-                                Maybe.map toFloat state.x
+                                state.x
                                     |> Maybe.withDefault (toFloat p.x - getX v)
 
                             y =
-                                Maybe.map toFloat state.y
+                                state.y
                                     |> Maybe.withDefault (toFloat p.y - getY v)
 
                             w =
@@ -355,12 +355,12 @@ updateId callback state newId =
         }
 
 
-updateX : (State -> msg) -> State -> Maybe Int -> msg
+updateX : (State -> msg) -> State -> Maybe Float -> msg
 updateX callback state newX =
     callback { state | x = newX }
 
 
-updateY : (State -> msg) -> State -> Maybe Int -> msg
+updateY : (State -> msg) -> State -> Maybe Float -> msg
 updateY callback state newY =
     callback { state | y = newY }
 

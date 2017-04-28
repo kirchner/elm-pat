@@ -17,6 +17,7 @@ import Editor
         )
 import Tools.AddAbsolute as AddAbsolute
 import Tools.AddRelative as AddRelative
+import Tools.Select as Select
 import Types exposing (..)
 import View.Canvas as Canvas
 
@@ -57,6 +58,9 @@ viewToolInfo viewPort store tool =
         AddRelative state ->
             AddRelative.view (addRelativeConfig viewPort) state store
 
+        Select _ ->
+            Html.div [] []
+
         None ->
             Html.div [] []
 
@@ -82,6 +86,9 @@ drawTool viewPort store tool =
         AddRelative state ->
             AddRelative.svg (addRelativeConfig viewPort) state store
 
+        Select state ->
+            Select.svg (selectConfig viewPort) state store
+
         None ->
             Svg.g [] []
 
@@ -102,5 +109,13 @@ addRelativeConfig : ViewPort -> AddRelative.Config Msg
 addRelativeConfig viewPort =
     { addPoint = AddPoint
     , stateUpdated = UpdateTool << AddRelative
+    , viewPort = viewPort
+    }
+
+
+selectConfig : ViewPort -> Select.Config Msg
+selectConfig viewPort =
+    { selectPoint = SelectPoint
+    , stateUpdated = UpdateTool << Select
     , viewPort = viewPort
     }

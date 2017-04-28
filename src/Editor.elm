@@ -19,6 +19,7 @@ import Math.Vector2 exposing (..)
 import Types exposing (..)
 import Tools.AddAbsolute as AddAbsolute
 import Tools.AddRelative as AddRelative
+import Tools.Select as Select
 
 
 type alias Model =
@@ -32,6 +33,7 @@ type alias Model =
 type Tool
     = AddAbsolute AddAbsolute.State
     | AddRelative AddRelative.State
+    | Select Select.State
     | None
 
 
@@ -44,6 +46,9 @@ toolName tool =
         AddRelative _ ->
             "relative"
 
+        Select _ ->
+            "select"
+
         None ->
             "none"
 
@@ -52,12 +57,14 @@ allTools : List Tool
 allTools =
     [ AddAbsolute AddAbsolute.init
     , AddRelative AddRelative.init
+    , Select Select.init
     ]
 
 
 type Msg
     = UpdateTool Tool
     | AddPoint Point
+    | SelectPoint Id
 
 
 init : ( Model, Cmd Msg )
@@ -88,6 +95,14 @@ update msg model =
                 , tool = None
             }
                 ! []
+
+        SelectPoint id ->
+            case Dict.get id model.store of
+                Just (Absolute v) ->
+                    { model | tool = AddAbsolute (AddAbsolute.fromVec v) } ! []
+
+                _ ->
+                    { model | tool = None } ! []
 
 
 subscriptions : Model -> Sub Msg

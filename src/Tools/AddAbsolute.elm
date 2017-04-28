@@ -3,6 +3,7 @@ module Tools.AddAbsolute
         ( State
         , Config
         , init
+        , fromVec
         , svg
         , view
         )
@@ -10,7 +11,7 @@ module Tools.AddAbsolute
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.Events as Html
-import Input.Number
+import Input.Float
 import Math.Vector2 exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
@@ -30,8 +31,8 @@ import Types exposing (..)
 
 type alias State =
     WithMouse
-        { x : Maybe Int
-        , y : Maybe Int
+        { x : Maybe Float
+        , y : Maybe Float
         }
 
 
@@ -40,6 +41,14 @@ init =
     { x = Nothing
     , y = Nothing
     , mouse = Nothing
+    }
+
+
+fromVec : Vec2 -> State
+fromVec v =
+    { init
+        | x = Just (getX v)
+        , y = Just (getY v)
     }
 
 
@@ -81,14 +90,14 @@ drawCursor config state p =
 
         ( Just x, Nothing ) ->
             Svg.g []
-                [ Svg.drawPoint (vec x p.y)
-                , Svg.drawSelector (vec x p.y)
+                [ Svg.drawPoint (vec2 x (toFloat p.y))
+                , Svg.drawSelector (vec2 x (toFloat p.y))
                 ]
 
         ( Nothing, Just y ) ->
             Svg.g []
-                [ Svg.drawPoint (vec p.x y)
-                , Svg.drawSelector (vec p.x y)
+                [ Svg.drawPoint (vec2 (toFloat p.x) y)
+                , Svg.drawSelector (vec2 (toFloat p.x) y)
                 ]
 
         ( Nothing, Nothing ) ->
@@ -106,11 +115,11 @@ drawLines config state =
 
         ( Just x, Nothing ) ->
             Svg.g []
-                [ Svg.drawVerticalLine (toFloat x) ]
+                [ Svg.drawVerticalLine x ]
 
         ( Nothing, Just y ) ->
             Svg.g []
-                [ Svg.drawHorizontalLine (toFloat y) ]
+                [ Svg.drawHorizontalLine y ]
 
         ( Nothing, Nothing ) ->
             Svg.g [] []
@@ -121,8 +130,8 @@ drawNewPoint config state =
     case ( state.x, state.y ) of
         ( Just x, Just y ) ->
             Svg.g []
-                [ Svg.drawPoint (vec x y)
-                , Svg.drawSelector (vec x y)
+                [ Svg.drawPoint (vec2 x y)
+                , Svg.drawSelector (vec2 x y)
                 ]
 
         _ ->
@@ -159,7 +168,7 @@ view config state =
                 ( Just x, Just y ) ->
                     let
                         point =
-                            absolute (vec2 (toFloat x) (toFloat y))
+                            absolute (vec2 x y)
                     in
                         [ Html.onClick (config.addPoint point)
                         , Html.disabled False
@@ -193,18 +202,18 @@ inputX : Config msg -> State -> List (Html.Attribute msg) -> Html msg
 inputX config state attrs =
     let
         options =
-            Input.Number.defaultOptions (updateX config.stateUpdated state)
+            Input.Float.defaultOptions (updateX config.stateUpdated state)
     in
-        Input.Number.input options attrs state.x
+        Input.Float.input options attrs state.x
 
 
 inputY : Config msg -> State -> List (Html.Attribute msg) -> Html msg
 inputY config state attrs =
     let
         options =
-            Input.Number.defaultOptions (updateY config.stateUpdated state)
+            Input.Float.defaultOptions (updateY config.stateUpdated state)
     in
-        Input.Number.input options attrs state.y
+        Input.Float.input options attrs state.y
 
 
 
@@ -219,23 +228,23 @@ addPoint config state position =
     in
         case ( state.x, state.y ) of
             ( Just x, Just y ) ->
-                config.addPoint (absolute (vec x y))
+                config.addPoint (absolute (vec2 x y))
 
             ( Just x, Nothing ) ->
-                config.addPoint (absolute (vec x p.y))
+                config.addPoint (absolute (vec2 x (toFloat p.y)))
 
             ( Nothing, Just y ) ->
-                config.addPoint (absolute (vec p.x y))
+                config.addPoint (absolute (vec2 (toFloat p.x) y))
 
             ( Nothing, Nothing ) ->
                 config.addPoint (absolute (vec p.x p.y))
 
 
-updateX : (State -> msg) -> State -> Maybe Int -> msg
+updateX : (State -> msg) -> State -> Maybe Float -> msg
 updateX callback state newX =
     callback { state | x = newX }
 
 
-updateY : (State -> msg) -> State -> Maybe Int -> msg
+updateY : (State -> msg) -> State -> Maybe Float -> msg
 updateY callback state newY =
     callback { state | y = newY }
