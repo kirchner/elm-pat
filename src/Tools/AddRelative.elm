@@ -35,6 +35,7 @@ type alias State =
         { id : Maybe String
         , x : Maybe Int
         , y : Maybe Int
+        , focused : Maybe Id
         }
 
 
@@ -43,6 +44,7 @@ init =
     { id = Nothing
     , x = Nothing
     , y = Nothing
+    , focused = Nothing
     , mouse = Nothing
     }
 
@@ -82,7 +84,8 @@ svg config state store =
                     ]
 
             Nothing ->
-                Svg.g [] []
+                Svg.g []
+                    [ eventCircles config state store ]
 
 
 drawCursor : Config msg -> State -> Vec2 -> Position -> Svg msg
@@ -176,6 +179,41 @@ eventRect config state store =
             Svg.g [] []
 
 
+eventCircles : Config msg -> State -> PointStore -> Svg msg
+eventCircles config state store =
+    Svg.g []
+        (List.filterMap (eventCircle config state store) (Dict.toList store))
+
+
+eventCircle : Config msg -> State -> PointStore -> ( Id, Point ) -> Maybe (Svg msg)
+eventCircle config state store ( id, point ) =
+    let
+        draw v =
+            Svg.g []
+                [ Svg.circle
+                    [ Svg.cx (toString (getX v))
+                    , Svg.cy (toString (getY v))
+                    , Svg.r "5"
+                    , Svg.fill "transparent"
+                    , Svg.strokeWidth "0"
+                    , Svg.onClick
+                        (updateId config.stateUpdated state (Just (toString id)))
+                    , Svg.onMouseOver
+                        (updateFocused config.stateUpdated state (Just id))
+                    , Svg.onMouseOut
+                        (updateFocused config.stateUpdated state Nothing)
+                    ]
+                    []
+                , if id |> equals state.focused then
+                    Svg.drawSelector v
+                  else
+                    Svg.g [] []
+                ]
+    in
+        position store point
+            |> Maybe.map draw
+
+
 view : Config msg -> State -> PointStore -> Html msg
 view config state store =
     let
@@ -224,6 +262,9 @@ view config state store =
                     }
                     []
                     state.id
+                , Html.button
+                    [ Html.onClick (updateId config.stateUpdated state Nothing) ]
+                    [ Html.text "clear" ]
                 ]
             , Html.div []
                 [ Html.text "x:"
@@ -307,7 +348,11 @@ addPoint config state store =
 
 updateId : (State -> msg) -> State -> Maybe String -> msg
 updateId callback state newId =
-    callback { state | id = newId }
+    callback
+        { state
+            | id = newId
+            , focused = Nothing
+        }
 
 
 updateX : (State -> msg) -> State -> Maybe Int -> msg
@@ -318,3 +363,8 @@ updateX callback state newX =
 updateY : (State -> msg) -> State -> Maybe Int -> msg
 updateY callback state newY =
     callback { state | y = newY }
+
+
+updateFocused : (State -> msg) -> State -> Maybe Id -> msg
+updateFocused callback state newFocused =
+    callback { state | focused = newFocused }

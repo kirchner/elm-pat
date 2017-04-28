@@ -15,6 +15,7 @@ module Types
         , canvasToSvg
         , svgToCanvas
         , vec
+        , equals
         )
 
 import Dict exposing (Dict)
@@ -130,3 +131,16 @@ svgToCanvas viewPort p =
 vec : Int -> Int -> Vec2
 vec x y =
     vec2 (toFloat x) (toFloat y)
+
+
+equals : Maybe a -> a -> Bool
+equals maybe a =
+    case maybe of
+        Just b ->
+            if a == b then
+                True
+            else
+                False
+
+        _ ->
+            False
