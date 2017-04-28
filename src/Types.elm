@@ -11,6 +11,9 @@ module Types
         , emptyStore
         , firstId
         , position
+        , ViewPort
+        , canvasToSvg
+        , svgToCanvas
         )
 
 import Dict exposing (Dict)
@@ -50,6 +53,7 @@ absolute =
 relative : Id -> Vec2 -> Point
 relative =
     Relative
+
 
 
 {- point store -}
@@ -98,3 +102,25 @@ position store point =
                     (\v w -> sub w v |> scale ratio |> add w)
                     (lookUp idA)
                     (lookUp idB)
+
+
+type alias ViewPort =
+    { x : Int
+    , y : Int
+    , width : Int
+    , height : Int
+    }
+
+
+canvasToSvg : ViewPort -> Position -> Position
+canvasToSvg viewPort p =
+    { x = p.x - viewPort.x
+    , y = p.y - viewPort.y
+    }
+
+
+svgToCanvas : ViewPort -> Position -> Position
+svgToCanvas viewPort p =
+    { x = p.x + viewPort.x
+    , y = p.y + viewPort.y
+    }

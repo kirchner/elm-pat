@@ -10,7 +10,6 @@ import Svg exposing (Svg)
 import Editor
     exposing
         ( Model
-        , svgToCanvas
         , Tool(..)
         , toolName
         , Msg(..)
@@ -54,63 +53,50 @@ viewToolInfo : Model -> Tool -> Html Msg
 viewToolInfo model tool =
     case tool of
         TAddAbsolute ->
-            Html.map AddAbsoluteMsg (AddAbsolute.view model.addAbsolute)
+            AddAbsolute.view
+                { addPoint = AddPoint
+                , stateUpdated = UpdateAddAbsolute
+                , viewPort = model.viewPort
+                }
+                model.addAbsolute
 
         TAddRelative ->
-            Html.map AddRelativeMsg (AddRelative.view model.addRelative model.store)
+            AddRelative.view
+                { addPoint = AddPoint
+                , stateUpdated = UpdateAddRelative
+                , viewPort = model.viewPort
+                }
+                model.addRelative
+                model.store
 
 
 viewCanvas : Model -> Html Msg
 viewCanvas model =
-    let
-        moveCallback p =
-            UpdateMouse p
-
-        leaveCallback =
-            LeaveCanvas
-    in
-        Canvas.view
-            (clickCallback model)
-            moveCallback
-            leaveCallback
-            (drawTool model)
-            model.center
-            model.store
-
-
-clickCallback : Model -> Position -> Msg
-clickCallback model p =
-    case model.selectedTool of
-        Just TAddAbsolute ->
-            Handle <|
-                AddAbsolute.callback
-                    model.addAbsolute
-                    (svgToCanvas model p)
-
-        Just TAddRelative ->
-            Handle <|
-                AddRelative.callback
-                    model.addRelative
-                    model.store
-                    (svgToCanvas model p)
-
-        Nothing ->
-            Handle Nothing
+    Canvas.view
+        (drawTool model)
+        model.viewPort
+        model.store
 
 
 drawTool : Model -> Svg Msg
 drawTool model =
     case model.selectedTool of
         Just TAddAbsolute ->
-            AddAbsolute.draw
+            AddAbsolute.svg
+                { addPoint = AddPoint
+                , stateUpdated = UpdateAddAbsolute
+                , viewPort = model.viewPort
+                }
                 model.addAbsolute
-                (Maybe.map (svgToCanvas model) model.mouse)
 
         Just TAddRelative ->
-            AddRelative.draw
+            AddRelative.svg
+                { addPoint = AddPoint
+                , stateUpdated = UpdateAddRelative
+                , viewPort = model.viewPort
+                }
                 model.addRelative
                 model.store
-                (Maybe.map (svgToCanvas model) model.mouse)
 
         Nothing ->
             Svg.g [] []

@@ -1,42 +1,54 @@
 module Tools.AddAbsolute
     exposing
-        ( Model
+        ( State
         , init
-        , callback
-        , draw
-        , Msg(..)
-        , update
+        , svg
         , view
         )
 
 import Html exposing (Html)
-import Html.Attributes as Attributes
-import Html.Events as Events
+import Html.Attributes as Html
+import Html.Events as Html
 import Input.Number
 import Math.Vector2 exposing (..)
 import Svg exposing (Svg)
+import Svg.Attributes as Svg
+import Svg.Events as Svg
 
 
 {- internal -}
 
-import Callback exposing (..)
+import Events
 import Svg.Extra as Svg
 import Types exposing (..)
 
 
-{- model -}
+{- state -}
 
 
-type alias Model =
+type alias State =
     { x : Maybe Int
     , y : Maybe Int
+    , mouse : Maybe Position
     }
 
 
-init : Model
+init : State
 init =
     { x = Nothing
     , y = Nothing
+    , mouse = Nothing
+    }
+
+
+
+{- config -}
+
+
+type alias Config msg =
+    { addPoint : Point -> msg
+    , stateUpdated : State -> msg
+    , viewPort : ViewPort
     }
 
 
@@ -44,143 +56,158 @@ init =
 {- canvas -}
 
 
-callback : Model -> Position -> Maybe Callback
-callback model p =
-    case ( model.x, model.y ) of
-        ( Just x, Just y ) ->
-            Just (AddPoint (absolute (vec2 (toFloat x) (toFloat y))))
+svg : Config msg -> State -> Svg msg
+svg config state =
+    Svg.g []
+        [ case state.mouse of
+            Just p ->
+                case ( state.x, state.y ) of
+                    ( Just x, Just y ) ->
+                        Svg.g []
+                            [ Svg.drawPoint (vec2 (toFloat x) (toFloat y))
+                            , Svg.drawSelector (vec2 (toFloat x) (toFloat y))
+                            ]
 
-        ( Just x, Nothing ) ->
-            Just (AddPoint (absolute (vec2 (toFloat x) (toFloat p.y))))
+                    ( Just x, Nothing ) ->
+                        Svg.g []
+                            [ Svg.drawVerticalLine (toFloat x)
+                            , Svg.drawPoint (vec2 (toFloat x) (toFloat p.y))
+                            , Svg.drawSelector (vec2 (toFloat x) (toFloat p.y))
+                            ]
 
-        ( Nothing, Just y ) ->
-            Just (AddPoint (absolute (vec2 (toFloat p.x) (toFloat y))))
+                    ( Nothing, Just y ) ->
+                        Svg.g []
+                            [ Svg.drawHorizontalLine (toFloat y)
+                            , Svg.drawPoint (vec2 (toFloat p.x) (toFloat y))
+                            , Svg.drawSelector (vec2 (toFloat p.x) (toFloat y))
+                            ]
 
-        ( Nothing, Nothing ) ->
-            Just (AddPoint (absolute (vec2 (toFloat p.x) (toFloat p.y))))
+                    ( Nothing, Nothing ) ->
+                        Svg.g []
+                            [ Svg.drawPoint (vec2 (toFloat p.x) (toFloat p.y))
+                            , Svg.drawSelector (vec2 (toFloat p.x) (toFloat p.y))
+                            ]
 
+            Nothing ->
+                case ( state.x, state.y ) of
+                    ( Just x, Just y ) ->
+                        Svg.g []
+                            [ Svg.drawPoint (vec2 (toFloat x) (toFloat y))
+                            , Svg.drawSelector (vec2 (toFloat x) (toFloat y))
+                            ]
 
-draw : Model -> Maybe Position -> Svg msg
-draw model maybeP =
-    case maybeP of
-        Just p ->
-            case ( model.x, model.y ) of
-                ( Just x, Just y ) ->
-                    Svg.g []
-                        [ Svg.drawPoint (vec2 (toFloat x) (toFloat y))
-                        , Svg.drawSelector (vec2 (toFloat x) (toFloat y))
-                        ]
+                    ( Just x, Nothing ) ->
+                        Svg.g []
+                            [ Svg.drawVerticalLine (toFloat x) ]
 
-                ( Just x, Nothing ) ->
-                    Svg.g []
-                        [ Svg.drawVerticalLine (toFloat x)
-                        , Svg.drawPoint (vec2 (toFloat x) (toFloat p.y))
-                        , Svg.drawSelector (vec2 (toFloat x) (toFloat p.y))
-                        ]
+                    ( Nothing, Just y ) ->
+                        Svg.g []
+                            [ Svg.drawHorizontalLine (toFloat y) ]
 
-                ( Nothing, Just y ) ->
-                    Svg.g []
-                        [ Svg.drawHorizontalLine (toFloat y)
-                        , Svg.drawPoint (vec2 (toFloat p.x) (toFloat y))
-                        , Svg.drawSelector (vec2 (toFloat p.x) (toFloat y))
-                        ]
-
-                ( Nothing, Nothing ) ->
-                    Svg.g []
-                        [ Svg.drawPoint (vec2 (toFloat p.x) (toFloat p.y))
-                        , Svg.drawSelector (vec2 (toFloat p.x) (toFloat p.y))
-                        ]
-
-        Nothing ->
-            case ( model.x, model.y ) of
-                ( Just x, Just y ) ->
-                    Svg.g []
-                        [ Svg.drawPoint (vec2 (toFloat x) (toFloat y))
-                        , Svg.drawSelector (vec2 (toFloat x) (toFloat y))
-                        ]
-
-                ( Just x, Nothing ) ->
-                    Svg.g []
-                        [ Svg.drawVerticalLine (toFloat x) ]
-
-                ( Nothing, Just y ) ->
-                    Svg.g []
-                        [ Svg.drawHorizontalLine (toFloat y) ]
-
-                ( Nothing, Nothing ) ->
-                    Svg.g [] []
+                    ( Nothing, Nothing ) ->
+                        Svg.g [] []
+        , eventRect config state
+        ]
 
 
-
-{- msg -}
-
-
-type Msg
-    = UpdateX (Maybe Int)
-    | UpdateY (Maybe Int)
-    | Add Int Int
-
-
-
-{- update -}
-
-
-update : Msg -> Model -> ( Model, Maybe Callback )
-update msg model =
-    case msg of
-        UpdateX newX ->
-            ( { model | x = newX }, Nothing )
-
-        UpdateY newY ->
-            ( { model | y = newY }, Nothing )
-
-        Add x y ->
-            let
-                point =
-                    absolute (vec2 (toFloat x) (toFloat y))
-            in
-                ( model, Just (AddPoint point) )
+eventRect : Config msg -> State -> Svg msg
+eventRect config state =
+    Svg.rect
+        [ Svg.x (toString config.viewPort.x)
+        , Svg.y (toString config.viewPort.y)
+        , Svg.width (toString config.viewPort.width)
+        , Svg.height (toString config.viewPort.height)
+        , Svg.fill "transparent"
+        , Svg.strokeWidth "0"
+        , Events.onClick (addPoint config state)
+        , Events.onMove (updateMouse config.stateUpdated state config.viewPort << Just)
+        , Svg.onMouseOut (updateMouse config.stateUpdated state config.viewPort Nothing)
+        ]
+        []
 
 
 
 {- view -}
 
 
-view : Model -> Html Msg
-view model =
+view : Config msg -> State -> Html msg
+view config state =
     let
         buttonAttributes =
-            case ( model.x, model.y ) of
+            case ( state.x, state.y ) of
                 ( Just x, Just y ) ->
-                    [ Events.onClick (Add x y)
-                    , Attributes.disabled False
-                    ]
+                    let
+                        point =
+                            absolute (vec2 (toFloat x) (toFloat y))
+                    in
+                        [ Html.onClick (config.addPoint point)
+                        , Html.disabled False
+                        ]
 
                 _ ->
-                    [ Attributes.disabled True ]
+                    [ Html.disabled True ]
     in
         Html.div []
             [ Html.div []
                 [ Html.text "x:"
                 , Input.Number.input
-                    (Input.Number.defaultOptions UpdateX)
+                    (Input.Number.defaultOptions (updateX config.stateUpdated state))
                     []
-                    model.x
+                    state.x
                 , Html.button
-                    [ Events.onClick (UpdateX Nothing) ]
+                    [ Html.onClick (updateX config.stateUpdated state Nothing) ]
                     [ Html.text "clear" ]
                 ]
             , Html.div []
                 [ Html.text "y:"
                 , Input.Number.input
-                    (Input.Number.defaultOptions UpdateY)
+                    (Input.Number.defaultOptions (updateY config.stateUpdated state))
                     []
-                    model.y
+                    state.y
                 , Html.button
-                    [ Events.onClick (UpdateY Nothing) ]
+                    [ Html.onClick (updateY config.stateUpdated state Nothing) ]
                     [ Html.text "clear" ]
                 ]
             , Html.button
                 buttonAttributes
                 [ Html.text "add" ]
             ]
+
+
+
+{- events -}
+
+
+addPoint : Config msg -> State -> Position -> msg
+addPoint config state position =
+    let
+        p =
+            svgToCanvas config.viewPort position
+    in
+        case ( state.x, state.y ) of
+            ( Just x, Just y ) ->
+                config.addPoint (absolute (vec2 (toFloat x) (toFloat y)))
+
+            ( Just x, Nothing ) ->
+                config.addPoint (absolute (vec2 (toFloat x) (toFloat p.y)))
+
+            ( Nothing, Just y ) ->
+                config.addPoint (absolute (vec2 (toFloat p.x) (toFloat y)))
+
+            ( Nothing, Nothing ) ->
+                config.addPoint (absolute (vec2 (toFloat p.x) (toFloat p.y)))
+
+
+updateX : (State -> msg) -> State -> Maybe Int -> msg
+updateX callback state newX =
+    callback { state | x = newX }
+
+
+updateY : (State -> msg) -> State -> Maybe Int -> msg
+updateY callback state newY =
+    callback { state | y = newY }
+
+
+updateMouse : (State -> msg) -> State -> ViewPort -> Maybe Position -> msg
+updateMouse callback state viewPort newMouse =
+    callback { state | mouse = Maybe.map (svgToCanvas viewPort) newMouse }
