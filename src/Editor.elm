@@ -3,6 +3,7 @@ module Editor
         ( Model
         , Tool(..)
         , toolName
+        , allTools
         , Msg(..)
         , init
         , update
@@ -23,42 +24,47 @@ import Tools.AddRelative as AddRelative
 type alias Model =
     { store : PointStore
     , nextId : Id
-    , addAbsolute : AddAbsolute.State
-    , addRelative : AddRelative.State
-    , selectedTool : Maybe Tool
+    , tool : Tool
     , viewPort : ViewPort
     }
 
 
 type Tool
-    = TAddAbsolute
-    | TAddRelative
+    = AddAbsolute AddAbsolute.State
+    | AddRelative AddRelative.State
+    | None
 
 
 toolName : Tool -> String
 toolName tool =
     case tool of
-        TAddAbsolute ->
+        AddAbsolute _ ->
             "absolute"
 
-        TAddRelative ->
+        AddRelative _ ->
             "relative"
+
+        None ->
+            "none"
+
+
+allTools : List Tool
+allTools =
+    [ AddAbsolute AddAbsolute.init
+    , AddRelative AddRelative.init
+    ]
 
 
 type Msg
-    = SelectTool Tool
+    = UpdateTool Tool
     | AddPoint Point
-    | UpdateAddAbsolute AddAbsolute.State
-    | UpdateAddRelative AddRelative.State
 
 
 init : ( Model, Cmd Msg )
 init =
     { store = emptyStore
     , nextId = firstId
-    , addAbsolute = AddAbsolute.init
-    , addRelative = AddRelative.init
-    , selectedTool = Nothing
+    , tool = None
     , viewPort =
         { x = -320
         , y = -320
@@ -72,24 +78,16 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        SelectTool tool ->
-            { model | selectedTool = Just tool } ! []
+        UpdateTool tool ->
+            { model | tool = tool } ! []
 
         AddPoint point ->
             { model
                 | store = Dict.insert model.nextId point model.store
                 , nextId = model.nextId + 1
-                , addAbsolute = AddAbsolute.init
-                , addRelative = AddRelative.init
-                , selectedTool = Nothing
+                , tool = None
             }
                 ! []
-
-        UpdateAddAbsolute state ->
-            { model | addAbsolute = state } ! []
-
-        UpdateAddRelative state ->
-            { model | addRelative = state } ! []
 
 
 subscriptions : Model -> Sub Msg

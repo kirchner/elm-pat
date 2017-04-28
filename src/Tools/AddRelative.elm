@@ -1,6 +1,7 @@
 module Tools.AddRelative
     exposing
         ( State
+        , Config
         , svg
         , init
         , view

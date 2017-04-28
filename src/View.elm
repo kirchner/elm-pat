@@ -12,6 +12,7 @@ import Editor
         ( Model
         , Tool(..)
         , toolName
+        , allTools
         , Msg(..)
         )
 import Tools.AddAbsolute as AddAbsolute
@@ -20,83 +21,86 @@ import Types exposing (..)
 import View.Canvas as Canvas
 
 
+{- main view -}
+
+
 view : Model -> Html Msg
 view model =
-    let
-        divs =
-            [ Just viewToolBox
-            , model.selectedTool |> Maybe.map (viewToolInfo model)
-            , Just (viewCanvas model)
-            ]
-    in
-        Html.div [] (List.filterMap identity divs)
+    Html.div []
+        [ viewToolBox
+        , viewToolInfo model.viewPort model.store model.tool
+        , viewCanvas model
+        ]
+
+
+
+{- tool box -}
 
 
 viewToolBox : Html Msg
 viewToolBox =
     let
-        tools =
-            [ TAddAbsolute
-            , TAddRelative
-            ]
-
         button tool =
             Html.button
-                [ Events.onClick (SelectTool tool) ]
+                [ Events.onClick (UpdateTool tool) ]
                 [ Html.text (toolName tool) ]
     in
-        Html.div []
-            (tools |> List.map button)
+        Html.div [] (allTools |> List.map button)
 
 
-viewToolInfo : Model -> Tool -> Html Msg
-viewToolInfo model tool =
+viewToolInfo : ViewPort -> PointStore -> Tool -> Html Msg
+viewToolInfo viewPort store tool =
     case tool of
-        TAddAbsolute ->
-            AddAbsolute.view
-                { addPoint = AddPoint
-                , stateUpdated = UpdateAddAbsolute
-                , viewPort = model.viewPort
-                }
-                model.addAbsolute
+        AddAbsolute state ->
+            AddAbsolute.view (addAbsoluteConfig viewPort) state
 
-        TAddRelative ->
-            AddRelative.view
-                { addPoint = AddPoint
-                , stateUpdated = UpdateAddRelative
-                , viewPort = model.viewPort
-                }
-                model.addRelative
-                model.store
+        AddRelative state ->
+            AddRelative.view (addRelativeConfig viewPort) state store
+
+        None ->
+            Html.div [] []
+
+
+
+{- canvas -}
 
 
 viewCanvas : Model -> Html Msg
 viewCanvas model =
     Canvas.view
-        (drawTool model)
+        (drawTool model.viewPort model.store model.tool)
         model.viewPort
         model.store
 
 
-drawTool : Model -> Svg Msg
-drawTool model =
-    case model.selectedTool of
-        Just TAddAbsolute ->
-            AddAbsolute.svg
-                { addPoint = AddPoint
-                , stateUpdated = UpdateAddAbsolute
-                , viewPort = model.viewPort
-                }
-                model.addAbsolute
+drawTool : ViewPort -> PointStore -> Tool -> Svg Msg
+drawTool viewPort store tool =
+    case tool of
+        AddAbsolute state ->
+            AddAbsolute.svg (addAbsoluteConfig viewPort) state
 
-        Just TAddRelative ->
-            AddRelative.svg
-                { addPoint = AddPoint
-                , stateUpdated = UpdateAddRelative
-                , viewPort = model.viewPort
-                }
-                model.addRelative
-                model.store
+        AddRelative state ->
+            AddRelative.svg (addRelativeConfig viewPort) state store
 
-        Nothing ->
+        None ->
             Svg.g [] []
+
+
+
+{- tool configurations -}
+
+
+addAbsoluteConfig : ViewPort -> AddAbsolute.Config Msg
+addAbsoluteConfig viewPort =
+    { addPoint = AddPoint
+    , stateUpdated = UpdateTool << AddAbsolute
+    , viewPort = viewPort
+    }
+
+
+addRelativeConfig : ViewPort -> AddRelative.Config Msg
+addRelativeConfig viewPort =
+    { addPoint = AddPoint
+    , stateUpdated = UpdateTool << AddRelative
+    , viewPort = viewPort
+    }

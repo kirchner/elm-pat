@@ -1,6 +1,7 @@
 module Tools.AddAbsolute
     exposing
         ( State
+        , Config
         , init
         , svg
         , view
