@@ -113,6 +113,7 @@ addAbsoluteConfig viewPort =
 addRelativeConfig : ViewPort -> Relative.Config Msg
 addRelativeConfig viewPort =
     { addPoint = AddPoint
+    , updatePoint = UpdatePoint
     , stateUpdated = UpdateTool << Relative
     , viewPort = viewPort
     }

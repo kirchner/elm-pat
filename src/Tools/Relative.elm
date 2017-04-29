@@ -4,6 +4,7 @@ module Tools.Relative
         , Config
         , svg
         , init
+        , initWith
         , view
         )
 
@@ -32,20 +33,32 @@ import Types exposing (..)
 
 type alias State =
     WithMouse
-        { id : Maybe String
+        { anchor : Maybe String
         , x : Maybe Float
         , y : Maybe Float
         , focused : Maybe Id
+        , id : Maybe Id
         }
 
 
 init : State
 init =
-    { id = Nothing
+    { anchor = Nothing
     , x = Nothing
     , y = Nothing
     , focused = Nothing
+    , id = Nothing
     , mouse = Nothing
+    }
+
+
+initWith : Id -> Id -> Vec2 -> State
+initWith id anchor w =
+    { init
+        | anchor = Just (toString anchor)
+        , x = Just (getX w)
+        , y = Just (getY w)
+        , id = Just id
     }
 
 
@@ -55,6 +68,7 @@ init =
 
 type alias Config msg =
     { addPoint : Point -> msg
+    , updatePoint : Id -> Point -> msg
     , stateUpdated : State -> msg
     , viewPort : ViewPort
     }
@@ -64,7 +78,7 @@ svg : Config msg -> State -> PointStore -> Svg msg
 svg config state store =
     let
         anchorPosition =
-            state.id
+            state.anchor
                 |> Maybe.andThen (String.toInt >> Result.toMaybe)
                 |> Maybe.andThen (flip Dict.get store)
                 |> Maybe.andThen (position store)
@@ -158,25 +172,48 @@ drawNewPoint config state v =
 
 eventRect : Config msg -> State -> PointStore -> Svg msg
 eventRect config state store =
-    case addPoint config state store of
-        Just callback ->
-            Svg.rect
-                [ Svg.x (toString config.viewPort.x)
-                , Svg.y (toString config.viewPort.y)
-                , Svg.width (toString config.viewPort.width)
-                , Svg.height (toString config.viewPort.height)
-                , Svg.fill "transparent"
-                , Svg.strokeWidth "0"
-                , Events.onClick callback
-                , Events.onMove
-                    (updateMouse config.stateUpdated state config.viewPort << Just)
-                , Svg.onMouseOut
-                    (updateMouse config.stateUpdated state config.viewPort Nothing)
-                ]
-                []
+    case state.id of
+        Just id ->
+            case updatePoint config state store id of
+                Just callback ->
+                    Svg.rect
+                        [ Svg.x (toString config.viewPort.x)
+                        , Svg.y (toString config.viewPort.y)
+                        , Svg.width (toString config.viewPort.width)
+                        , Svg.height (toString config.viewPort.height)
+                        , Svg.fill "transparent"
+                        , Svg.strokeWidth "0"
+                        , Events.onClick callback
+                        , Events.onMove
+                            (updateMouse config.stateUpdated state config.viewPort << Just)
+                        , Svg.onMouseOut
+                            (updateMouse config.stateUpdated state config.viewPort Nothing)
+                        ]
+                        []
+
+                Nothing ->
+                    Svg.g [] []
 
         Nothing ->
-            Svg.g [] []
+            case addPoint config state store of
+                Just callback ->
+                    Svg.rect
+                        [ Svg.x (toString config.viewPort.x)
+                        , Svg.y (toString config.viewPort.y)
+                        , Svg.width (toString config.viewPort.width)
+                        , Svg.height (toString config.viewPort.height)
+                        , Svg.fill "transparent"
+                        , Svg.strokeWidth "0"
+                        , Events.onClick callback
+                        , Events.onMove
+                            (updateMouse config.stateUpdated state config.viewPort << Just)
+                        , Svg.onMouseOut
+                            (updateMouse config.stateUpdated state config.viewPort Nothing)
+                        ]
+                        []
+
+                Nothing ->
+                    Svg.g [] []
 
 
 eventCircles : Config msg -> State -> PointStore -> Svg msg
@@ -197,7 +234,7 @@ eventCircle config state store ( id, point ) =
                     , Svg.fill "transparent"
                     , Svg.strokeWidth "0"
                     , Svg.onClick
-                        (updateId config.stateUpdated state (Just (toString id)))
+                        (updateAnchor config.stateUpdated state (Just (toString id)))
                     , Svg.onMouseOver
                         (updateFocused config.stateUpdated state (Just id))
                     , Svg.onMouseOut
@@ -230,7 +267,7 @@ view config state store =
 
         buttonAttributes =
             case
-                ( Maybe.andThen (Result.toMaybe << String.toInt) state.id
+                ( Maybe.andThen (Result.toMaybe << String.toInt) state.anchor
                 , state.x
                 , state.y
                 )
@@ -258,12 +295,12 @@ view config state store =
                             , text = "select point"
                             , enabled = True
                             }
-                    , onChange = updateId config.stateUpdated state
+                    , onChange = updateAnchor config.stateUpdated state
                     }
                     []
-                    state.id
+                    state.anchor
                 , Html.button
-                    [ Html.onClick (updateId config.stateUpdated state Nothing) ]
+                    [ Html.onClick (updateAnchor config.stateUpdated state Nothing) ]
                     [ Html.text "clear" ]
                 ]
             , Html.div []
@@ -312,11 +349,11 @@ addPoint : Config msg -> State -> PointStore -> Maybe (Position -> msg)
 addPoint config state store =
     let
         anchorId =
-            state.id
+            state.anchor
                 |> Maybe.andThen (String.toInt >> Result.toMaybe)
 
         anchorPosition =
-            state.id
+            state.anchor
                 |> Maybe.andThen (String.toInt >> Result.toMaybe)
                 |> Maybe.andThen (flip Dict.get store)
                 |> Maybe.andThen (position store)
@@ -346,11 +383,49 @@ addPoint config state store =
                 Nothing
 
 
-updateId : (State -> msg) -> State -> Maybe String -> msg
-updateId callback state newId =
+updatePoint : Config msg -> State -> PointStore -> Id -> Maybe (Position -> msg)
+updatePoint config state store id =
+    let
+        anchorId =
+            state.anchor
+                |> Maybe.andThen (String.toInt >> Result.toMaybe)
+
+        anchorPosition =
+            state.anchor
+                |> Maybe.andThen (String.toInt >> Result.toMaybe)
+                |> Maybe.andThen (flip Dict.get store)
+                |> Maybe.andThen (position store)
+    in
+        case ( anchorId, anchorPosition ) of
+            ( Just anchor, Just v ) ->
+                Just <|
+                    \pos ->
+                        let
+                            p =
+                                svgToCanvas config.viewPort pos
+
+                            x =
+                                state.x
+                                    |> Maybe.withDefault (toFloat p.x - getX v)
+
+                            y =
+                                state.y
+                                    |> Maybe.withDefault (toFloat p.y - getY v)
+
+                            w =
+                                vec2 x y
+                        in
+                            config.updatePoint id (relative anchor w)
+
+            _ ->
+                Nothing
+
+
+updateAnchor : (State -> msg) -> State -> Maybe String -> msg
+updateAnchor callback state newAnchor =
     callback
         { state
-            | id = newId
+            | anchor = newAnchor
             , focused = Nothing
         }
 

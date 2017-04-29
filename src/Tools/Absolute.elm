@@ -3,7 +3,7 @@ module Tools.Absolute
         ( State
         , Config
         , init
-        , fromStore
+        , initWith
         , svg
         , view
         )
@@ -47,22 +47,13 @@ init =
     }
 
 
-fromStore : PointStore -> Id -> State
-fromStore store id =
-    let
-        ( x, y ) =
-            case Dict.get id store |> Maybe.andThen (position store) of
-                Just v ->
-                    ( Just (getX v), Just (getY v) )
-
-                Nothing ->
-                    ( Nothing, Nothing )
-    in
-        { init
-            | x = x
-            , y = y
-            , id = Just id
-        }
+initWith : Id -> Vec2 -> State
+initWith id v =
+    { init
+        | x = Just (getX v)
+        , y = Just (getY v)
+        , id = Just id
+    }
 
 
 
