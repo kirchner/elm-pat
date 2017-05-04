@@ -25,6 +25,7 @@ import Events
 import Svg.Extra as Svg
 import Tools.Common exposing (..)
 import Types exposing (..)
+import SharedStyles exposing (..)
 
 
 {- state -}
@@ -172,7 +173,7 @@ eventRect config state =
 
 view : Config msg -> State -> Html msg
 view config state =
-    Html.div []
+    Html.div [ class [ ToolBox ] ]
         [ Html.div []
             [ Html.text "x:"
             , inputX config state []

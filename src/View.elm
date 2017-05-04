@@ -24,6 +24,7 @@ import Types
         , PointStore
         )
 import View.Canvas as Canvas
+import SharedStyles exposing (..)
 
 
 {- main view -}
@@ -50,7 +51,9 @@ viewToolBox =
                 [ Events.onClick (UpdateTool tool) ]
                 [ Html.text (toolName tool) ]
     in
-        Html.div [] (allTools |> List.map button)
+        Html.div
+            [ id ToolBar ]
+            (allTools |> List.map button)
 
 
 viewToolInfo : ViewPort -> PointStore -> Tool -> Html Msg
