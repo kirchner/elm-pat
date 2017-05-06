@@ -3,6 +3,7 @@ module Editor
         ( Model
         , Tool(..)
         , toolName
+        , toolDescription
         , allTools
         , Msg(..)
         , init
@@ -12,6 +13,8 @@ module Editor
 
 import Dict
 import Math.Vector2 exposing (..)
+import Task
+import Window
 
 
 {- internal -}
@@ -53,6 +56,22 @@ toolName tool =
             "none"
 
 
+toolDescription : Tool -> String
+toolDescription tool =
+    case tool of
+        Absolute _ ->
+            "add a point given by absolute coordinates"
+
+        Relative _ ->
+            "relative"
+
+        Select _ ->
+            "select"
+
+        None ->
+            "none"
+
+
 allTools : List Tool
 allTools =
     [ Absolute Absolute.init
@@ -66,6 +85,7 @@ type Msg
     | AddPoint Point
     | SelectPoint Id
     | UpdatePoint Id Point
+    | Resize Window.Size
 
 
 init : ( Model, Cmd Msg )
@@ -80,7 +100,7 @@ init =
         , height = 640
         }
     }
-        ! []
+        ! [ Task.perform Resize Window.size ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -115,7 +135,19 @@ update msg model =
             }
                 ! []
 
+        Resize size ->
+            { model
+                | viewPort =
+                    { x = size.width // (-2)
+                    , y = size.height // (-2)
+                    , width = size.width
+                    , height = size.height
+                    }
+            }
+                ! []
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Sub.batch
+        [ Window.resizes Resize ]

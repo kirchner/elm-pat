@@ -6,6 +6,7 @@ module Events
 
 import Json.Decode exposing (..)
 import VirtualDom exposing (on)
+import Platform exposing (Task)
 
 
 {- internal -}

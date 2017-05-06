@@ -1,8 +1,10 @@
 module View exposing (view)
 
 import Html exposing (Html)
+import Html.Attributes as Html
 import Html.Events as Events
 import Svg exposing (Svg)
+import Css
 
 
 {- internal -}
@@ -12,6 +14,7 @@ import Editor
         ( Model
         , Tool(..)
         , toolName
+        , toolDescription
         , allTools
         , Msg(..)
         )
@@ -27,14 +30,26 @@ import View.Canvas as Canvas
 import SharedStyles exposing (..)
 
 
+styles =
+    Css.asPairs >> Html.style
+
+
+
 {- main view -}
 
 
 view : Model -> Html Msg
 view model =
     Html.div []
-        [ viewToolBox
-        , viewToolInfo model.viewPort model.store model.tool
+        [ Html.div
+            [ styles
+                [ Css.position Css.absolute
+                , Css.property "pointer-events" "none"
+                ]
+            ]
+            [ viewToolBox
+            , viewToolInfo model.viewPort model.store model.tool
+            ]
         , viewCanvas model
         ]
 
@@ -47,12 +62,18 @@ viewToolBox : Html Msg
 viewToolBox =
     let
         button tool =
-            Html.button
-                [ Events.onClick (UpdateTool tool) ]
-                [ Html.text (toolName tool) ]
+            Html.div [ class [ ToolbarButtonWrapper ] ]
+                [ Html.div
+                    [ class [ ToolbarButton ]
+                    , Events.onClick (UpdateTool tool)
+                    ]
+                    [ Html.text (toolName tool) ]
+                , Html.div [ class [ ToolbarTooltip ] ]
+                    [ Html.text (toolDescription tool) ]
+                ]
     in
         Html.div
-            [ id ToolBar ]
+            [ class [ ToolbarMain ] ]
             (allTools |> List.map button)
 
 

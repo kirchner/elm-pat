@@ -3,17 +3,20 @@ module SharedStyles exposing (..)
 import Html.CssHelpers exposing (withNamespace)
 
 
-type CssClasses
-    = ToolBox
+type ToolbarClass
+    = ToolbarMain
+    | ToolbarButtonWrapper
+    | ToolbarButton
+    | ToolbarTooltip
+    | ToolTextfield
+    | ToolbarRow
+    | ToolbarColumn
+    | ToolbarIconButton
 
 
-type CssIds
-    = ToolBar
-
-
-editorNamespace =
-    withNamespace "editor"
+toolbarNamespace =
+    withNamespace "toolbar"
 
 
 { id, class, classList } =
-    editorNamespace
+    toolbarNamespace

@@ -17,6 +17,7 @@ import Math.Vector2 exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
+import Css
 
 
 {- internal -}
@@ -25,7 +26,18 @@ import Events
 import Svg.Extra as Svg
 import Tools.Common exposing (..)
 import Types exposing (..)
-import SharedStyles exposing (..)
+import SharedStyles
+    exposing
+        ( ToolbarClass(..)
+        , toolbarNamespace
+        , class
+        )
+import View.Colors exposing (..)
+
+
+styles =
+    Css.asPairs >> Html.style
+
 
 
 {- state -}
@@ -173,32 +185,82 @@ eventRect config state =
 
 view : Config msg -> State -> Html msg
 view config state =
-    Html.div [ class [ ToolBox ] ]
-        [ Html.div []
-            [ Html.text "x:"
-            , inputX config state []
-            , Html.button
-                [ Html.onClick (updateX config.stateUpdated state Nothing) ]
-                [ Html.text "clear" ]
+    let
+        row attrs nodes =
+            Html.div ([ class [ ToolbarRow ] ] ++ attrs) nodes
+
+        cell attrs nodes =
+            Html.div ([ class [ ToolbarColumn ] ] ++ attrs) nodes
+
+        icon name =
+            cell
+                [ styles
+                    [ Css.displayFlex
+                    , Css.flexFlow1 Css.row
+                    , Css.alignItems Css.center
+                    ]
+                ]
+                [ Html.div
+                    [ class [ ToolbarIconButton ] ]
+                    [ Html.i
+                        [ Html.class "material-icons"
+                        , Html.onClick (updateX config.stateUpdated state Nothing)
+                        , styles
+                            [ Css.fontSize (Css.rem 0.9)
+                            , Css.lineHeight (Css.rem 0.9)
+                            , Css.position Css.absolute
+                            , Css.top (Css.pct 50)
+                            , Css.left (Css.pct 50)
+                            , Css.transform (Css.translate2 (Css.pct -50) (Css.pct -50))
+                            ]
+                        ]
+                        [ Html.text name ]
+                    ]
+                ]
+
+        variable { name, input } =
+            row []
+                [ cell
+                    [ styles
+                        [ Css.displayFlex
+                        , Css.alignItems Css.baseline
+                        ]
+                    ]
+                    [ Html.div
+                        [ styles
+                            [ Css.fontSize (Css.rem 1)
+                            , Css.lineHeight (Css.rem 1)
+                            , Css.paddingRight (Css.rem 0.4)
+                            ]
+                        ]
+                        [ Html.text name ]
+                    , Html.div
+                        []
+                        [ input config state [ class [ ToolTextfield ] ] ]
+                    ]
+                , icon "delete"
+                ]
+    in
+        Html.div
+            [ styles
+                [ Css.backgroundColor (Css.hex base2)
+                , Css.width (Css.rem 10)
+                , Css.property "pointer-events" "auto"
+                ]
             ]
-        , Html.div []
-            [ Html.text "y:"
-            , inputY config state []
-            , Html.button
-                [ Html.onClick (updateY config.stateUpdated state Nothing) ]
-                [ Html.text "clear" ]
+            [ variable { name = "x =", input = inputX }
+            , variable { name = "y =", input = inputY }
+            , case state.id of
+                Just id ->
+                    updateButton [ class [ ToolbarButton ] ] config state id
+
+                Nothing ->
+                    addButton [ class [ ToolbarButton ] ] config state
             ]
-        , case state.id of
-            Just id ->
-                updateButton config state id
-
-            Nothing ->
-                addButton config state
-        ]
 
 
-addButton : Config msg -> State -> Html msg
-addButton config state =
+addButton : List (Html.Attribute msg) -> Config msg -> State -> Html msg
+addButton attrs_ config state =
     let
         attrs =
             case ( state.x, state.y ) of
@@ -214,11 +276,11 @@ addButton config state =
                 _ ->
                     [ Html.disabled True ]
     in
-        Html.button attrs [ Html.text "add" ]
+        Html.div (attrs_ ++ attrs) [ Html.text "add" ]
 
 
-updateButton : Config msg -> State -> Id -> Html msg
-updateButton config state id =
+updateButton : List (Html.Attribute msg) -> Config msg -> State -> Id -> Html msg
+updateButton attrs_ config state id =
     let
         attrs =
             case ( state.x, state.y ) of
@@ -234,7 +296,7 @@ updateButton config state id =
                 _ ->
                     [ Html.disabled True ]
     in
-        Html.button attrs [ Html.text "update" ]
+        Html.div (attrs_ ++ attrs) [ Html.text "update" ]
 
 
 inputX : Config msg -> State -> List (Html.Attribute msg) -> Html msg
