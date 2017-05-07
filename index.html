@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>elm-pat</title>
+    <link rel="stylesheet" href="editor.css">
+    <script type="text/javascript" src="elm.js"></script>
+    <style type="text/css">
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  </head>
+
+  <body>
+    <div id="elm-landing-pad"></div>
+
+    <script type="text/javascript">
+      var app = Elm.App.embed(document.getElementById("elm-landing-pad"));
+    </script>
+  </body>
+</html>
