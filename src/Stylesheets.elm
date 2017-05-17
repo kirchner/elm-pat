@@ -1,7 +1,12 @@
 port module Stylesheets exposing (..)
 
 import Css.File exposing (CssFileStructure, CssCompilerProgram)
-import EditorCss as Editor
+
+
+{- internal -}
+
+import View
+import Tools.Absolute
 
 
 port files : CssFileStructure -> Cmd msg
@@ -10,7 +15,9 @@ port files : CssFileStructure -> Cmd msg
 fileStructure : CssFileStructure
 fileStructure =
     Css.File.toFileStructure
-        [ ( "editor.css", Css.File.compile [ Editor.css ] ) ]
+        [ ( "toolbar.css", Css.File.compile [ View.css ] )
+        , ( "absolute.css", Css.File.compile [ Tools.Absolute.css ] )
+        ]
 
 
 main : CssCompilerProgram

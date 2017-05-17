@@ -1,10 +1,13 @@
-module View exposing (view)
+module View exposing (view, css)
 
+import Css exposing (..)
+import Css.Namespace exposing (namespace)
+import View.Colors exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
+import Html.CssHelpers exposing (withNamespace)
 import Html.Events as Events
 import Svg exposing (Svg)
-import Css
 
 
 {- internal -}
@@ -27,12 +30,6 @@ import Types
         , PointStore
         )
 import View.Canvas as Canvas
-import SharedStyles exposing (..)
-
-
-styles =
-    Css.asPairs >> Html.style
-
 
 
 {- main view -}
@@ -40,18 +37,22 @@ styles =
 
 view : Model -> Html Msg
 view model =
-    Html.div []
-        [ Html.div
-            [ styles
-                [ Css.position Css.absolute
-                , Css.property "pointer-events" "none"
+    let
+        styles =
+            Css.asPairs >> Html.style
+    in
+        Html.div []
+            [ Html.div
+                [ styles
+                    [ Css.position Css.absolute
+                    , Css.property "pointer-events" "none"
+                    ]
                 ]
+                [ viewToolBox
+                , viewToolInfo model.viewPort model.store model.tool
+                ]
+            , viewCanvas model
             ]
-            [ viewToolBox
-            , viewToolInfo model.viewPort model.store model.tool
-            ]
-        , viewCanvas model
-        ]
 
 
 
@@ -62,18 +63,18 @@ viewToolBox : Html Msg
 viewToolBox =
     let
         button tool =
-            Html.div [ class [ ToolbarButtonWrapper ] ]
+            Html.div [ class [ ButtonWrapper ] ]
                 [ Html.div
-                    [ class [ ToolbarButton ]
+                    [ class [ Button ]
                     , Events.onClick (UpdateTool tool)
                     ]
                     [ Html.text (toolName tool) ]
-                , Html.div [ class [ ToolbarTooltip ] ]
+                , Html.div [ class [ Tooltip ] ]
                     [ Html.text (toolDescription tool) ]
                 ]
     in
         Html.div
-            [ class [ ToolbarMain ] ]
+            [ class [ Main ] ]
             (allTools |> List.map button)
 
 
@@ -149,3 +150,76 @@ selectConfig viewPort =
     , stateUpdated = UpdateTool << Select
     , viewPort = viewPort
     }
+
+
+
+{- css -}
+
+
+type Class
+    = Main
+    | ButtonWrapper
+    | Button
+    | Tooltip
+
+
+{ id, class, classList } =
+    withNamespace "toolbar"
+
+
+css =
+    (stylesheet << namespace "toolbar")
+        [ Css.class Main
+            [ displayFlex
+            , flexFlow1 row
+            , property "pointer-events" "auto"
+            ]
+        , Css.class ButtonWrapper
+            [ position relative
+            , hover
+                [ Css.descendants
+                    [ Css.class Tooltip
+                        [ opacity (num 1)
+                        , property "visibility" "visible"
+                        , transforms
+                            [ translateX (pct -50)
+                            , scale3d 1 1 1
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        , Css.class Button
+            [ textAlign center
+            , width (Css.rem 10)
+            , height (Css.rem 2)
+            , lineHeight (Css.rem 2)
+            , color (hex base0)
+            , backgroundColor (hex base03)
+            , cursor pointer
+            , hover
+                [ backgroundColor (hex base02) ]
+            ]
+        , Css.class Tooltip
+            [ display inlineBlock
+            , property "visibility" "invisible"
+            , opacity (num 0)
+            , transforms
+                [ translateX (pct -50)
+                , scale3d 0 0 1
+                ]
+            , property "transition"
+                ("opacity 150ms ease-in-out"
+                    ++ ", transform 150ms ease-in-out"
+                )
+            , position absolute
+            , top (pct 100)
+            , left (pct 50)
+            , marginTop (Css.rem 0.5)
+            , padding (Css.rem 0.2)
+            , color (hex base0)
+            , backgroundColor (hex base2)
+            , fontSize smaller
+            , borderRadius (px 2)
+            ]
+        ]

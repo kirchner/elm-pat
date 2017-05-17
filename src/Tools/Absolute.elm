@@ -6,18 +6,21 @@ module Tools.Absolute
         , initWith
         , svg
         , view
+        , css
         )
 
+import Css exposing (..)
+import Css.Namespace exposing (namespace)
 import Dict
 import Html exposing (Html)
 import Html.Attributes as Html
+import Html.CssHelpers exposing (withNamespace)
 import Html.Events as Html
 import Input.Float
 import Math.Vector2 exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
-import Css
 
 
 {- internal -}
@@ -26,17 +29,18 @@ import Events
 import Svg.Extra as Svg
 import Tools.Common exposing (..)
 import Types exposing (..)
-import SharedStyles
-    exposing
-        ( ToolbarClass(..)
-        , toolbarNamespace
-        , class
-        )
 import View.Colors exposing (..)
 
 
-styles =
-    Css.asPairs >> Html.style
+{- TODO: rename these in Types -}
+
+
+absolute =
+    Types.absolute
+
+
+position =
+    Types.position
 
 
 
@@ -187,10 +191,10 @@ view : Config msg -> State -> Html msg
 view config state =
     let
         row attrs nodes =
-            Html.div ([ class [ ToolbarRow ] ] ++ attrs) nodes
+            Html.div ([ class [ Row ] ] ++ attrs) nodes
 
         cell attrs nodes =
-            Html.div ([ class [ ToolbarColumn ] ] ++ attrs) nodes
+            Html.div ([ class [ Column ] ] ++ attrs) nodes
 
         icon name =
             cell
@@ -201,7 +205,7 @@ view config state =
                     ]
                 ]
                 [ Html.div
-                    [ class [ ToolbarIconButton ] ]
+                    [ class [ IconButton ] ]
                     [ Html.i
                         [ Html.class "material-icons"
                         , Html.onClick (updateX config.stateUpdated state Nothing)
@@ -234,9 +238,7 @@ view config state =
                             ]
                         ]
                         [ Html.text name ]
-                    , Html.div
-                        []
-                        [ input config state [ class [ ToolTextfield ] ] ]
+                    , input config state [ class [ Textfield ] ]
                     ]
                 , icon "delete"
                 ]
@@ -252,10 +254,10 @@ view config state =
             , variable { name = "y =", input = inputY }
             , case state.id of
                 Just id ->
-                    updateButton [ class [ ToolbarButton ] ] config state id
+                    updateButton [ class [ Button ] ] config state id
 
                 Nothing ->
-                    addButton [ class [ ToolbarButton ] ] config state
+                    addButton [ class [ Button ] ] config state
             ]
 
 
@@ -357,3 +359,79 @@ updateX callback state newX =
 updateY : (State -> msg) -> State -> Maybe Float -> msg
 updateY callback state newY =
     callback { state | y = newY }
+
+
+
+{- css -}
+
+
+type Class
+    = Row
+    | Column
+    | IconButton
+    | Textfield
+    | Button
+
+
+{ id, class, classList } =
+    withNamespace "absolute"
+
+
+css =
+    (stylesheet << namespace "absolute")
+        [ Css.class Button
+            [ textAlign center
+            , width (Css.rem 10)
+            , height (Css.rem 2)
+            , lineHeight (Css.rem 2)
+            , color (hex base0)
+            , backgroundColor (hex base03)
+            , cursor pointer
+            , hover
+                [ backgroundColor (hex base02) ]
+            ]
+        , Css.class Textfield
+            [ borderColor transparent
+            , fontFamily monospace
+            , fontSize (Css.rem 1)
+            , lineHeight (Css.rem 1)
+            , width (Css.rem 4.8)
+            , backgroundColor transparent
+            , focus
+                [ outline none
+                , borderColor (hex base02)
+                ]
+            ]
+        , Css.class Row
+            [ displayFlex
+            , flexFlow1 row
+
+            --, justifyContent flexStart
+            , width (Css.rem 10)
+            , alignItems stretch
+            ]
+        , Css.class Column
+            [ padding (Css.rem 0.2)
+            , fontFamily monospace
+            , fontSize (Css.rem 1)
+            , lineHeight (Css.rem 1)
+            ]
+        , Css.class IconButton
+            [ fontSize (Css.rem 1)
+            , lineHeight (Css.rem 1)
+            , width (Css.rem 1.5)
+            , height (Css.rem 1.5)
+            , borderRadius (pct 50)
+            , color (hex base0)
+            , backgroundColor transparent
+            , cursor pointer
+            , hover
+                [ backgroundColor (hex base02)
+                ]
+            , Css.position Css.relative
+            ]
+        ]
+
+
+styles =
+    Css.asPairs >> Html.style
