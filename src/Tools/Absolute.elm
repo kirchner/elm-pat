@@ -1,33 +1,26 @@
 module Tools.Absolute
     exposing
-        ( State
-        , Config
+        ( Config
+        , State
         , init
         , initWith
         , svg
         , view
-        , css
         )
 
-import Css exposing (..)
-import Css.Namespace exposing (namespace)
 import Dict
+import Events
 import Html exposing (Html)
 import Html.Attributes as Html
-import Html.CssHelpers exposing (withNamespace)
 import Html.Events as Html
 import Input.Float
 import Math.Vector2 exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
-
-
-{- internal -}
-
-import Events
 import Svg.Extra as Svg
 import Tools.Common exposing (..)
+import Tools.Styles exposing (..)
 import Types exposing (..)
 import View.Colors exposing (..)
 
@@ -189,80 +182,21 @@ eventRect config state =
 
 view : Config msg -> State -> Html msg
 view config state =
-    let
-        row attrs nodes =
-            Html.div ([ class [ Row ] ] ++ attrs) nodes
+    Html.div
+        [ class [ ToolBox ] ]
+        [ floatInput "x" state.x (updateX config.stateUpdated state)
+        , floatInput "y" state.y (updateY config.stateUpdated state)
+        , case state.id of
+            Just id ->
+                action state "update" (config.updatePoint id)
 
-        cell attrs nodes =
-            Html.div ([ class [ Column ] ] ++ attrs) nodes
-
-        icon name =
-            cell
-                [ styles
-                    [ Css.displayFlex
-                    , Css.flexFlow1 Css.row
-                    , Css.alignItems Css.center
-                    ]
-                ]
-                [ Html.div
-                    [ class [ IconButton ] ]
-                    [ Html.i
-                        [ Html.class "material-icons"
-                        , Html.onClick (updateX config.stateUpdated state Nothing)
-                        , styles
-                            [ Css.fontSize (Css.rem 0.9)
-                            , Css.lineHeight (Css.rem 0.9)
-                            , Css.position Css.absolute
-                            , Css.top (Css.pct 50)
-                            , Css.left (Css.pct 50)
-                            , Css.transform (Css.translate2 (Css.pct -50) (Css.pct -50))
-                            ]
-                        ]
-                        [ Html.text name ]
-                    ]
-                ]
-
-        variable { name, input } =
-            row []
-                [ cell
-                    [ styles
-                        [ Css.displayFlex
-                        , Css.alignItems Css.baseline
-                        ]
-                    ]
-                    [ Html.div
-                        [ styles
-                            [ Css.fontSize (Css.rem 1)
-                            , Css.lineHeight (Css.rem 1)
-                            , Css.paddingRight (Css.rem 0.4)
-                            ]
-                        ]
-                        [ Html.text name ]
-                    , input config state [ class [ Textfield ] ]
-                    ]
-                , icon "delete"
-                ]
-    in
-        Html.div
-            [ styles
-                [ Css.backgroundColor (Css.hex base2)
-                , Css.width (Css.rem 10)
-                , Css.property "pointer-events" "auto"
-                ]
-            ]
-            [ variable { name = "x =", input = inputX }
-            , variable { name = "y =", input = inputY }
-            , case state.id of
-                Just id ->
-                    updateButton [ class [ Button ] ] config state id
-
-                Nothing ->
-                    addButton [ class [ Button ] ] config state
-            ]
+            Nothing ->
+                action state "add" config.addPoint
+        ]
 
 
-addButton : List (Html.Attribute msg) -> Config msg -> State -> Html msg
-addButton attrs_ config state =
+action : State -> String -> (Point -> msg) -> Html msg
+action state title callback =
     let
         attrs =
             case ( state.x, state.y ) of
@@ -271,52 +205,16 @@ addButton attrs_ config state =
                         point =
                             absolute (vec2 x y)
                     in
-                        [ Html.onClick (config.addPoint point)
-                        , Html.disabled False
-                        ]
+                    [ Html.onClick (callback point)
+                    , Html.disabled False
+                    ]
 
                 _ ->
                     [ Html.disabled True ]
     in
-        Html.div (attrs_ ++ attrs) [ Html.text "add" ]
-
-
-updateButton : List (Html.Attribute msg) -> Config msg -> State -> Id -> Html msg
-updateButton attrs_ config state id =
-    let
-        attrs =
-            case ( state.x, state.y ) of
-                ( Just x, Just y ) ->
-                    let
-                        point =
-                            absolute (vec2 x y)
-                    in
-                        [ Html.onClick (config.updatePoint id point)
-                        , Html.disabled False
-                        ]
-
-                _ ->
-                    [ Html.disabled True ]
-    in
-        Html.div (attrs_ ++ attrs) [ Html.text "update" ]
-
-
-inputX : Config msg -> State -> List (Html.Attribute msg) -> Html msg
-inputX config state attrs =
-    let
-        options =
-            Input.Float.defaultOptions (updateX config.stateUpdated state)
-    in
-        Input.Float.input options attrs state.x
-
-
-inputY : Config msg -> State -> List (Html.Attribute msg) -> Html msg
-inputY config state attrs =
-    let
-        options =
-            Input.Float.defaultOptions (updateY config.stateUpdated state)
-    in
-        Input.Float.input options attrs state.y
+    Html.div
+        ([ class [ Button ] ] ++ attrs)
+        [ Html.text title ]
 
 
 
@@ -359,79 +257,3 @@ updateX callback state newX =
 updateY : (State -> msg) -> State -> Maybe Float -> msg
 updateY callback state newY =
     callback { state | y = newY }
-
-
-
-{- css -}
-
-
-type Class
-    = Row
-    | Column
-    | IconButton
-    | Textfield
-    | Button
-
-
-{ id, class, classList } =
-    withNamespace "absolute"
-
-
-css =
-    (stylesheet << namespace "absolute")
-        [ Css.class Button
-            [ textAlign center
-            , width (Css.rem 10)
-            , height (Css.rem 2)
-            , lineHeight (Css.rem 2)
-            , color (hex base0)
-            , backgroundColor (hex base03)
-            , cursor pointer
-            , hover
-                [ backgroundColor (hex base02) ]
-            ]
-        , Css.class Textfield
-            [ borderColor transparent
-            , fontFamily monospace
-            , fontSize (Css.rem 1)
-            , lineHeight (Css.rem 1)
-            , width (Css.rem 4.8)
-            , backgroundColor transparent
-            , focus
-                [ outline none
-                , borderColor (hex base02)
-                ]
-            ]
-        , Css.class Row
-            [ displayFlex
-            , flexFlow1 row
-
-            --, justifyContent flexStart
-            , width (Css.rem 10)
-            , alignItems stretch
-            ]
-        , Css.class Column
-            [ padding (Css.rem 0.2)
-            , fontFamily monospace
-            , fontSize (Css.rem 1)
-            , lineHeight (Css.rem 1)
-            ]
-        , Css.class IconButton
-            [ fontSize (Css.rem 1)
-            , lineHeight (Css.rem 1)
-            , width (Css.rem 1.5)
-            , height (Css.rem 1.5)
-            , borderRadius (pct 50)
-            , color (hex base0)
-            , backgroundColor transparent
-            , cursor pointer
-            , hover
-                [ backgroundColor (hex base02)
-                ]
-            , Css.position Css.relative
-            ]
-        ]
-
-
-styles =
-    Css.asPairs >> Html.style

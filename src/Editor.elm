@@ -1,28 +1,26 @@
 module Editor
     exposing
         ( Model
-        , Tool(..)
-        , toolName
-        , toolDescription
-        , allTools
         , Msg(..)
+        , Tool(..)
+        , allTools
         , init
-        , update
         , subscriptions
+        , toolDescription
+        , toolName
+        , update
         )
+
+{- internal -}
 
 import Dict
 import Math.Vector2 exposing (..)
 import Task
-import Window
-
-
-{- internal -}
-
-import Types exposing (..)
 import Tools.Absolute as Absolute
 import Tools.Relative as Relative
 import Tools.Select as Select
+import Types exposing (..)
+import Window
 
 
 type alias Model =
@@ -85,6 +83,7 @@ type Msg
     | AddPoint Point
     | SelectPoint Id
     | UpdatePoint Id Point
+    | DeletePoint Id
     | Resize Window.Size
 
 
@@ -135,11 +134,17 @@ update msg model =
             }
                 ! []
 
+        DeletePoint id ->
+            { model
+                | store = Dict.remove id model.store
+            }
+                ! []
+
         Resize size ->
             { model
                 | viewPort =
-                    { x = size.width // (-2)
-                    , y = size.height // (-2)
+                    { x = size.width // -2
+                    , y = size.height // -2
                     , width = size.width
                     , height = size.height
                     }

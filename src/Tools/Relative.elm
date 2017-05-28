@@ -1,15 +1,19 @@
 module Tools.Relative
     exposing
-        ( State
-        , Config
-        , svg
+        ( Config
+        , State
         , init
         , initWith
+        , svg
         , view
         )
 
+{- internal -}
+
+import Css
 import Dict
 import Dropdown
+import Events
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.Events as Html
@@ -18,14 +22,11 @@ import Math.Vector2 exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
-
-
-{- internal -}
-
-import Events
 import Svg.Extra as Svg
 import Tools.Common exposing (..)
+import Tools.Styles exposing (..)
 import Types exposing (..)
+import View.Colors exposing (..)
 
 
 {- state -}
@@ -83,23 +84,23 @@ svg config state store =
                 |> Maybe.andThen (flip Dict.get store)
                 |> Maybe.andThen (position store)
     in
-        case anchorPosition of
-            Just v ->
-                Svg.g []
-                    [ case state.mouse of
-                        Just position ->
-                            drawCursor config state v position
+    case anchorPosition of
+        Just v ->
+            Svg.g []
+                [ case state.mouse of
+                    Just position ->
+                        drawCursor config state v position
 
-                        Nothing ->
-                            Svg.g [] []
-                    , drawLines config state v
-                    , drawNewPoint config state v
-                    , eventRect config state store
-                    ]
+                    Nothing ->
+                        Svg.g [] []
+                , drawLines config state v
+                , drawNewPoint config state v
+                , eventRect config state store
+                ]
 
-            Nothing ->
-                Svg.g []
-                    [ eventCircles config state store ]
+        Nothing ->
+            Svg.g []
+                [ eventCircles config state store ]
 
 
 drawCursor : Config msg -> State -> Vec2 -> Position -> Svg msg
@@ -112,18 +113,18 @@ drawCursor config state v p =
                 , Svg.drawRectArrow v (vec2 x y)
                 ]
     in
-        case ( state.x, state.y ) of
-            ( Just x, Just y ) ->
-                Svg.g [] []
+    case ( state.x, state.y ) of
+        ( Just x, Just y ) ->
+            Svg.g [] []
 
-            ( Just x, Nothing ) ->
-                draw (getX v + x) (toFloat p.y)
+        ( Just x, Nothing ) ->
+            draw (getX v + x) (toFloat p.y)
 
-            ( Nothing, Just y ) ->
-                draw (toFloat p.x) (getY v + y)
+        ( Nothing, Just y ) ->
+            draw (toFloat p.x) (getY v + y)
 
-            ( Nothing, Nothing ) ->
-                draw (toFloat p.x) (toFloat p.y)
+        ( Nothing, Nothing ) ->
+            draw (toFloat p.x) (toFloat p.y)
 
 
 drawLines : Config msg -> State -> Vec2 -> Svg msg
@@ -137,16 +138,16 @@ drawLines config state v =
                 deltaX =
                     x + getX v
             in
-                Svg.g []
-                    [ Svg.drawVerticalLine deltaX ]
+            Svg.g []
+                [ Svg.drawVerticalLine deltaX ]
 
         ( Nothing, Just y ) ->
             let
                 deltaY =
                     y + getY v
             in
-                Svg.g []
-                    [ Svg.drawHorizontalLine deltaY ]
+            Svg.g []
+                [ Svg.drawHorizontalLine deltaY ]
 
         ( Nothing, Nothing ) ->
             Svg.g [] []
@@ -158,13 +159,13 @@ drawNewPoint config state v =
         ( Just x, Just y ) ->
             let
                 w =
-                    (vec2 (getX v + x) (getY v + y))
+                    vec2 (getX v + x) (getY v + y)
             in
-                Svg.g []
-                    [ Svg.drawPoint w
-                    , Svg.drawSelector w
-                    , Svg.drawRectArrow v w
-                    ]
+            Svg.g []
+                [ Svg.drawPoint w
+                , Svg.drawSelector w
+                , Svg.drawRectArrow v w
+                ]
 
         _ ->
             Svg.g [] []
@@ -247,8 +248,8 @@ eventCircle config state store ( id, point ) =
                     Svg.g [] []
                 ]
     in
-        position store point
-            |> Maybe.map draw
+    position store point
+        |> Maybe.map draw
 
 
 view : Config msg -> State -> PointStore -> Html msg
@@ -264,8 +265,42 @@ view config state store =
                         , enabled = True
                         }
                     )
+    in
+    Html.div
+        [ class [ ToolBox ] ]
+        [ Html.div []
+            [ Html.text "id:"
+            , Dropdown.dropdown
+                { items = items
+                , emptyItem =
+                    Just
+                        { value = "-1"
+                        , text = "select point"
+                        , enabled = True
+                        }
+                , onChange = updateAnchor config.stateUpdated state
+                }
+                []
+                state.anchor
+            , Html.button
+                [ Html.onClick (updateAnchor config.stateUpdated state Nothing) ]
+                [ Html.text "clear" ]
+            ]
+        , floatInput "x" state.x (updateX config.stateUpdated state)
+        , floatInput "y" state.y (updateY config.stateUpdated state)
+        , case state.id of
+            Just id ->
+                action state "update" (config.updatePoint id)
 
-        buttonAttributes =
+            Nothing ->
+                action state "add" config.addPoint
+        ]
+
+
+action : State -> String -> (Point -> msg) -> Html msg
+action state title callback =
+    let
+        attrs =
             case
                 ( Maybe.andThen (Result.toMaybe << String.toInt) state.anchor
                 , state.x
@@ -277,68 +312,16 @@ view config state store =
                         point =
                             relative id (vec2 x y)
                     in
-                        [ Html.onClick (config.addPoint point)
-                        , Html.disabled False
-                        ]
+                    [ Html.onClick (callback point)
+                    , Html.disabled False
+                    ]
 
                 _ ->
                     [ Html.disabled True ]
     in
-        Html.div []
-            [ Html.div []
-                [ Html.text "id:"
-                , Dropdown.dropdown
-                    { items = items
-                    , emptyItem =
-                        Just
-                            { value = "-1"
-                            , text = "select point"
-                            , enabled = True
-                            }
-                    , onChange = updateAnchor config.stateUpdated state
-                    }
-                    []
-                    state.anchor
-                , Html.button
-                    [ Html.onClick (updateAnchor config.stateUpdated state Nothing) ]
-                    [ Html.text "clear" ]
-                ]
-            , Html.div []
-                [ Html.text "x:"
-                , inputX config state []
-                , Html.button
-                    [ Html.onClick (updateX config.stateUpdated state Nothing) ]
-                    [ Html.text "clear" ]
-                ]
-            , Html.div []
-                [ Html.text "y:"
-                , inputY config state []
-                , Html.button
-                    [ Html.onClick (updateY config.stateUpdated state Nothing) ]
-                    [ Html.text "clear" ]
-                ]
-            , Html.button
-                buttonAttributes
-                [ Html.text "add" ]
-            ]
-
-
-inputX : Config msg -> State -> List (Html.Attribute msg) -> Html msg
-inputX config state attrs =
-    let
-        options =
-            Input.Float.defaultOptions (updateX config.stateUpdated state)
-    in
-        Input.Float.input options attrs state.x
-
-
-inputY : Config msg -> State -> List (Html.Attribute msg) -> Html msg
-inputY config state attrs =
-    let
-        options =
-            Input.Float.defaultOptions (updateY config.stateUpdated state)
-    in
-        Input.Float.input options attrs state.y
+    Html.div
+        ([ class [ Button ] ] ++ attrs)
+        [ Html.text title ]
 
 
 
@@ -358,29 +341,29 @@ addPoint config state store =
                 |> Maybe.andThen (flip Dict.get store)
                 |> Maybe.andThen (position store)
     in
-        case ( anchorId, anchorPosition ) of
-            ( Just id, Just v ) ->
-                Just <|
-                    \pos ->
-                        let
-                            p =
-                                svgToCanvas config.viewPort pos
+    case ( anchorId, anchorPosition ) of
+        ( Just id, Just v ) ->
+            Just <|
+                \pos ->
+                    let
+                        p =
+                            svgToCanvas config.viewPort pos
 
-                            x =
-                                state.x
-                                    |> Maybe.withDefault (toFloat p.x - getX v)
+                        x =
+                            state.x
+                                |> Maybe.withDefault (toFloat p.x - getX v)
 
-                            y =
-                                state.y
-                                    |> Maybe.withDefault (toFloat p.y - getY v)
+                        y =
+                            state.y
+                                |> Maybe.withDefault (toFloat p.y - getY v)
 
-                            w =
-                                vec2 x y
-                        in
-                            config.addPoint (relative id w)
+                        w =
+                            vec2 x y
+                    in
+                    config.addPoint (relative id w)
 
-            _ ->
-                Nothing
+        _ ->
+            Nothing
 
 
 updatePoint : Config msg -> State -> PointStore -> Id -> Maybe (Position -> msg)
@@ -396,29 +379,29 @@ updatePoint config state store id =
                 |> Maybe.andThen (flip Dict.get store)
                 |> Maybe.andThen (position store)
     in
-        case ( anchorId, anchorPosition ) of
-            ( Just anchor, Just v ) ->
-                Just <|
-                    \pos ->
-                        let
-                            p =
-                                svgToCanvas config.viewPort pos
+    case ( anchorId, anchorPosition ) of
+        ( Just anchor, Just v ) ->
+            Just <|
+                \pos ->
+                    let
+                        p =
+                            svgToCanvas config.viewPort pos
 
-                            x =
-                                state.x
-                                    |> Maybe.withDefault (toFloat p.x - getX v)
+                        x =
+                            state.x
+                                |> Maybe.withDefault (toFloat p.x - getX v)
 
-                            y =
-                                state.y
-                                    |> Maybe.withDefault (toFloat p.y - getY v)
+                        y =
+                            state.y
+                                |> Maybe.withDefault (toFloat p.y - getY v)
 
-                            w =
-                                vec2 x y
-                        in
-                            config.updatePoint id (relative anchor w)
+                        w =
+                            vec2 x y
+                    in
+                    config.updatePoint id (relative anchor w)
 
-            _ ->
-                Nothing
+        _ ->
+            Nothing
 
 
 updateAnchor : (State -> msg) -> State -> Maybe String -> msg

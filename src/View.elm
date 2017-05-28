@@ -1,35 +1,34 @@
-module View exposing (view, css)
+module View exposing (css, view)
 
 import Css exposing (..)
 import Css.Namespace exposing (namespace)
-import View.Colors exposing (..)
+import Dict
+import Editor
+    exposing
+        ( Model
+        , Msg(..)
+        , Tool(..)
+        , allTools
+        , toolDescription
+        , toolName
+        )
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.CssHelpers exposing (withNamespace)
 import Html.Events as Events
 import Svg exposing (Svg)
-
-
-{- internal -}
-
-import Editor
-    exposing
-        ( Model
-        , Tool(..)
-        , toolName
-        , toolDescription
-        , allTools
-        , Msg(..)
-        )
 import Tools.Absolute as Absolute
 import Tools.Relative as Relative
 import Tools.Select as Select
 import Types
     exposing
-        ( ViewPort
+        ( Id
+        , Point
         , PointStore
+        , ViewPort
         )
 import View.Canvas as Canvas
+import View.Colors exposing (..)
 
 
 {- main view -}
@@ -41,18 +40,26 @@ view model =
         styles =
             Css.asPairs >> Html.style
     in
-        Html.div []
-            [ Html.div
-                [ styles
-                    [ Css.position Css.absolute
-                    , Css.property "pointer-events" "none"
-                    ]
+    Html.div []
+        [ Html.div
+            [ styles
+                [ Css.position Css.absolute
+                , Css.property "pointer-events" "none"
                 ]
-                [ viewToolBox
-                , viewToolInfo model.viewPort model.store model.tool
-                ]
-            , viewCanvas model
             ]
+            [ viewToolBox
+            , viewToolInfo model.viewPort model.store model.tool
+            ]
+        , Html.div
+            [ styles
+                [ Css.position Css.absolute
+                , Css.top (Css.pct 80)
+                ]
+            ]
+            [ viewPointList model.store
+            ]
+        , viewCanvas model
+        ]
 
 
 
@@ -73,9 +80,9 @@ viewToolBox =
                     [ Html.text (toolDescription tool) ]
                 ]
     in
-        Html.div
-            [ class [ Main ] ]
-            (allTools |> List.map button)
+    Html.div
+        [ class [ Main ] ]
+        (allTools |> List.map button)
 
 
 viewToolInfo : ViewPort -> PointStore -> Tool -> Html Msg
@@ -92,6 +99,65 @@ viewToolInfo viewPort store tool =
 
         None ->
             Html.div [] []
+
+
+
+{- pointlist -}
+
+
+viewPointList : PointStore -> Html Msg
+viewPointList store =
+    let
+        styles =
+            Css.asPairs >> Html.style
+    in
+    Html.div
+        [ styles
+            [ displayFlex
+            , flexFlow1 column
+            , color (hex base0)
+            , backgroundColor (hex base03)
+            ]
+        ]
+        [ Html.div
+            []
+            [ Html.text "point list" ]
+        , Dict.toList store
+            |> List.map viewPointEntry
+            |> Html.div
+                [ styles
+                    [ displayFlex
+                    , flexFlow1 column
+                    ]
+                ]
+        ]
+
+
+viewPointEntry : ( Id, Point ) -> Html Msg
+viewPointEntry ( id, point ) =
+    let
+        styles =
+            Css.asPairs >> Html.style
+    in
+    Html.div
+        [ styles
+            [ displayFlex
+            , flexFlow1 row
+            ]
+        ]
+        [ Html.div []
+            [ Html.text (toString id ++ ": " ++ toString point) ]
+        , Html.div
+            [ Events.onClick (SelectPoint id)
+            , class [ Button ]
+            ]
+            [ Html.text "edit" ]
+        , Html.div
+            [ Events.onClick (DeletePoint id)
+            , class [ Button ]
+            ]
+            [ Html.text "delete" ]
+        ]
 
 
 

@@ -6,7 +6,7 @@ import Css.File exposing (CssFileStructure, CssCompilerProgram)
 {- internal -}
 
 import View
-import Tools.Absolute
+import Tools.Styles
 
 
 port files : CssFileStructure -> Cmd msg
@@ -16,7 +16,7 @@ fileStructure : CssFileStructure
 fileStructure =
     Css.File.toFileStructure
         [ ( "toolbar.css", Css.File.compile [ View.css ] )
-        , ( "absolute.css", Css.File.compile [ Tools.Absolute.css ] )
+        , ( "tools.css", Css.File.compile [ Tools.Styles.css ] )
         ]
 
 
