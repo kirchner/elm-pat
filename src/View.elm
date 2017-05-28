@@ -2,7 +2,7 @@ module View exposing (css, view)
 
 import Css exposing (..)
 import Css.Namespace exposing (namespace)
-import Dict
+import Dict exposing (Dict)
 import Editor
     exposing
         ( Model
@@ -12,6 +12,7 @@ import Editor
         , toolDescription
         , toolName
         )
+import Expr exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.CssHelpers exposing (withNamespace)
@@ -53,11 +54,19 @@ view model =
         , Html.div
             [ styles
                 [ Css.position Css.absolute
-                , Css.top (Css.pct 80)
+                , Css.bottom (Css.pct 0)
+                , Css.left (Css.pct 0)
                 ]
             ]
-            [ viewPointList model.store
+            [ viewPointList model.store ]
+        , Html.div
+            [ styles
+                [ Css.position Css.absolute
+                , Css.bottom (Css.pct 0)
+                , Css.right (Css.pct 0)
+                ]
             ]
+            [ viewVariableList model.variables model.newName model.newValue ]
         , viewCanvas model
         ]
 
@@ -157,6 +166,125 @@ viewPointEntry ( id, point ) =
             , class [ Button ]
             ]
             [ Html.text "delete" ]
+        ]
+
+
+
+{- variable list -}
+
+
+viewVariableList : Dict String E -> Maybe String -> Maybe E -> Html Msg
+viewVariableList variables newName newValue =
+    let
+        styles =
+            Css.asPairs >> Html.style
+    in
+    Html.div
+        [ styles
+            [ displayFlex
+            , flexFlow1 column
+            , color (hex base0)
+            , backgroundColor (hex base03)
+            ]
+        ]
+        [ Html.div
+            []
+            [ Html.text "variables" ]
+        , Dict.toList variables
+            |> List.map (viewVariable variables)
+            |> Html.div
+                [ styles
+                    [ displayFlex
+                    , flexFlow1 column
+                    ]
+                ]
+        , Html.div
+            [ styles
+                [ displayFlex
+                , flexFlow1 row
+                ]
+            ]
+            [ Html.div []
+                [ Html.text "name:" ]
+            , Html.input
+                [ Events.onInput NameUpdated
+                , styles
+                    [ case newName of
+                        Nothing ->
+                            color (hex red)
+
+                        Just _ ->
+                            color (hex base0)
+                    , backgroundColor (hex base03)
+                    , borderColor transparent
+                    , fontFamily monospace
+                    , fontSize (Css.rem 1)
+                    , lineHeight (Css.rem 1)
+                    , width (Css.rem 4.8)
+                    , backgroundColor transparent
+                    , focus
+                        [ outline none
+                        , borderColor (hex base02)
+                        ]
+                    ]
+                ]
+                []
+            , Html.div []
+                [ Html.text "value:" ]
+            , Html.input
+                [ Events.onInput ValueUpdated
+                , styles
+                    [ case newValue of
+                        Nothing ->
+                            color (hex red)
+
+                        Just _ ->
+                            color (hex base0)
+                    , backgroundColor (hex base03)
+                    , borderColor transparent
+                    , fontFamily monospace
+                    , fontSize (Css.rem 1)
+                    , lineHeight (Css.rem 1)
+                    , width (Css.rem 4.8)
+                    , backgroundColor transparent
+                    , focus
+                        [ outline none
+                        , borderColor (hex base02)
+                        ]
+                    ]
+                ]
+                []
+            , Html.div
+                [ class [ Button ]
+                , Events.onClick AddVariable
+                ]
+                [ Html.text "add" ]
+            ]
+        ]
+
+
+viewVariable : Dict String E -> ( String, E ) -> Html Msg
+viewVariable variables ( name, expr ) =
+    let
+        styles =
+            Css.asPairs >> Html.style
+    in
+    Html.div
+        [ styles
+            [ displayFlex
+            , flexFlow1 row
+            ]
+        ]
+        [ Html.div []
+            [ String.concat
+                [ name
+                , ": "
+                , Expr.print expr
+                , " = "
+                , toString (Expr.compute variables expr)
+                ]
+                |> Html.text
+            ]
         ]
 
 

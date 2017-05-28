@@ -17,6 +17,7 @@
         "elm-lang/svg": "2.0.0 <= v < 3.0.0",
         "elm-lang/virtual-dom": "2.0.4 <= v < 3.0.0",
         "elm-lang/window": "1.0.1 <= v < 2.0.0",
+        "elm-tools/parser": "2.0.1 <= v < 3.0.0",
         "rtfeldman/elm-css": "8.2.0 <= v < 9.0.0",
         "rtfeldman/elm-css-helpers": "2.1.0 <= v < 3.0.0"
     },

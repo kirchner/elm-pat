@@ -13,7 +13,13 @@ module Editor
 
 {- internal -}
 
-import Dict
+import Dict exposing (Dict)
+import Expr
+    exposing
+        ( E
+        , parse
+        , parseVariable
+        )
 import Math.Vector2 exposing (..)
 import Task
 import Tools.Absolute as Absolute
@@ -26,6 +32,9 @@ import Window
 type alias Model =
     { store : PointStore
     , nextId : Id
+    , variables : Dict String E
+    , newName : Maybe String
+    , newValue : Maybe E
     , tool : Tool
     , viewPort : ViewPort
     }
@@ -84,6 +93,9 @@ type Msg
     | SelectPoint Id
     | UpdatePoint Id Point
     | DeletePoint Id
+    | ValueUpdated String
+    | NameUpdated String
+    | AddVariable
     | Resize Window.Size
 
 
@@ -91,6 +103,9 @@ init : ( Model, Cmd Msg )
 init =
     { store = emptyStore
     , nextId = firstId
+    , variables = Dict.empty
+    , newName = Nothing
+    , newValue = Nothing
     , tool = None
     , viewPort =
         { x = -320
@@ -139,6 +154,32 @@ update msg model =
                 | store = Dict.remove id model.store
             }
                 ! []
+
+        NameUpdated s ->
+            { model
+                | newName = parseVariable s
+            }
+                ! []
+
+        ValueUpdated s ->
+            { model
+                | newValue = parse s
+            }
+                ! []
+
+        AddVariable ->
+            case ( model.newName, model.newValue ) of
+                ( Just name, Just value ) ->
+                    { model
+                        | variables =
+                            Dict.insert name value model.variables
+                        , newName = Nothing
+                        , newValue = Nothing
+                    }
+                        ! []
+
+                _ ->
+                    model ! []
 
         Resize size ->
             { model
