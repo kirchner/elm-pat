@@ -185,6 +185,21 @@ printPoint variables point =
                 , ")"
                 ]
 
+        Types.Relative anchorId p q ->
+            String.concat
+                [ "from "
+                , toString anchorId
+                , ": ("
+                , Expr.print p
+                , ", "
+                , Expr.print q
+                , ") = ("
+                , toString (compute variables p)
+                , ", "
+                , toString (compute variables q)
+                , ")"
+                ]
+
         _ ->
             toString point
 

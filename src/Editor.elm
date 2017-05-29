@@ -134,10 +134,16 @@ update msg model =
         SelectPoint id ->
             case Dict.get id model.store of
                 Just (Types.Absolute x y) ->
-                    { model | tool = Absolute (Absolute.initWith id x y) } ! []
+                    { model
+                        | tool = Absolute (Absolute.initWith id x y)
+                    }
+                        ! []
 
-                Just (Types.Relative anchor w) ->
-                    { model | tool = Relative (Relative.initWith id anchor w) } ! []
+                Just (Types.Relative anchor p q) ->
+                    { model
+                        | tool = Relative (Relative.initWith id anchor p q)
+                    }
+                        ! []
 
                 _ ->
                     { model | tool = None } ! []

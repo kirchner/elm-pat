@@ -76,7 +76,7 @@ point store variables point =
             position store variables point
                 |> Maybe.map Svg.drawPoint
 
-        Relative id _ ->
+        Relative id _ _ ->
             let
                 draw v w =
                     Svg.g []

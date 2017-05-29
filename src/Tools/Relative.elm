@@ -36,8 +36,8 @@ import View.Colors exposing (..)
 type alias State =
     WithMouse
         { anchor : Maybe String
-        , x : Maybe Float
-        , y : Maybe Float
+        , x : Maybe E
+        , y : Maybe E
         , focused : Maybe Id
         , id : Maybe Id
         }
@@ -54,12 +54,12 @@ init =
     }
 
 
-initWith : Id -> Id -> Vec2 -> State
-initWith id anchor w =
+initWith : Id -> Id -> E -> E -> State
+initWith id anchor x y =
     { init
         | anchor = Just (toString anchor)
-        , x = Just (getX w)
-        , y = Just (getY w)
+        , x = Just x
+        , y = Just y
         , id = Just id
     }
 
@@ -90,12 +90,12 @@ svg config state store variables =
             Svg.g []
                 [ case state.mouse of
                     Just position ->
-                        drawCursor config state v position
+                        drawCursor variables config state v position
 
                     Nothing ->
                         Svg.g [] []
-                , drawLines config state v
-                , drawNewPoint config state v
+                , drawLines variables config state v
+                , drawNewPoint variables config state v
                 , eventRect config state store variables
                 ]
 
@@ -104,8 +104,8 @@ svg config state store variables =
                 [ eventCircles config state store variables ]
 
 
-drawCursor : Config msg -> State -> Vec2 -> Position -> Svg msg
-drawCursor config state v p =
+drawCursor : Dict String E -> Config msg -> State -> Vec2 -> Position -> Svg msg
+drawCursor variables config state v p =
     let
         draw x y =
             Svg.g []
@@ -118,58 +118,57 @@ drawCursor config state v p =
         ( Just x, Just y ) ->
             Svg.g [] []
 
-        ( Just x, Nothing ) ->
-            draw (getX v + x) (toFloat p.y)
+        _ ->
+            draw
+                (state.x
+                    |> Maybe.andThen (compute variables)
+                    |> Maybe.withDefault (toFloat p.x)
+                )
+                (state.y
+                    |> Maybe.andThen (compute variables)
+                    |> Maybe.withDefault (toFloat p.y)
+                )
 
-        ( Nothing, Just y ) ->
-            draw (toFloat p.x) (getY v + y)
 
-        ( Nothing, Nothing ) ->
-            draw (toFloat p.x) (toFloat p.y)
+drawLines : Dict String E -> Config msg -> State -> Vec2 -> Svg msg
+drawLines variables config state v =
+    let
+        verticalLine x =
+            Svg.drawVerticalLine (x + getX v)
 
-
-drawLines : Config msg -> State -> Vec2 -> Svg msg
-drawLines config state v =
+        horizontalLine y =
+            Svg.drawHorizontalLine (y + getY v)
+    in
     case ( state.x, state.y ) of
         ( Just x, Just y ) ->
             Svg.g [] []
-
-        ( Just x, Nothing ) ->
-            let
-                deltaX =
-                    x + getX v
-            in
-            Svg.g []
-                [ Svg.drawVerticalLine deltaX ]
-
-        ( Nothing, Just y ) ->
-            let
-                deltaY =
-                    y + getY v
-            in
-            Svg.g []
-                [ Svg.drawHorizontalLine deltaY ]
-
-        ( Nothing, Nothing ) ->
-            Svg.g [] []
-
-
-drawNewPoint : Config msg -> State -> Vec2 -> Svg msg
-drawNewPoint config state v =
-    case ( state.x, state.y ) of
-        ( Just x, Just y ) ->
-            let
-                w =
-                    vec2 (getX v + x) (getY v + y)
-            in
-            Svg.g []
-                [ Svg.drawPoint w
-                , Svg.drawSelector w
-                , Svg.drawRectArrow v w
-                ]
 
         _ ->
-            Svg.g [] []
+            Svg.g [] <|
+                List.filterMap identity
+                    [ state.x
+                        |> Maybe.andThen (compute variables)
+                        |> Maybe.map verticalLine
+                    , state.y
+                        |> Maybe.andThen (compute variables)
+                        |> Maybe.map horizontalLine
+                    ]
+
+
+drawNewPoint : Dict String E -> Config msg -> State -> Vec2 -> Svg msg
+drawNewPoint variables config state v =
+    let
+        draw x y =
+            Svg.g []
+                [ Svg.drawPoint (vec2 x y)
+                , Svg.drawSelector (vec2 x y)
+                , Svg.drawRectArrow v (vec2 x y)
+                ]
+    in
+    Maybe.map2 draw
+        (state.x |> Maybe.andThen (compute variables))
+        (state.y |> Maybe.andThen (compute variables))
+        |> Maybe.withDefault (Svg.g [] [])
 
 
 eventRect : Config msg -> State -> PointStore -> Dict String E -> Svg msg
@@ -301,8 +300,8 @@ view config state store =
                 [ Html.onClick (updateAnchor config.stateUpdated state Nothing) ]
                 [ Html.text "clear" ]
             ]
-        , floatInput "x" state.x (updateX config.stateUpdated state)
-        , floatInput "y" state.y (updateY config.stateUpdated state)
+        , exprInput "x" state.x (updateX config.stateUpdated state)
+        , exprInput "y" state.y (updateY config.stateUpdated state)
         , case state.id of
             Just id ->
                 action state "update" (config.updatePoint id)
@@ -325,7 +324,7 @@ action state title callback =
                 ( Just id, Just x, Just y ) ->
                     let
                         point =
-                            relative id (vec2 x y)
+                            Relative id x y
                     in
                     [ Html.onClick (callback point)
                     , Html.disabled False
@@ -371,16 +370,13 @@ addPoint config state store variables =
 
                         x =
                             state.x
-                                |> Maybe.withDefault (toFloat p.x - getX v)
+                                |> Maybe.withDefault (Number (toFloat p.x - getX v))
 
                         y =
                             state.y
-                                |> Maybe.withDefault (toFloat p.y - getY v)
-
-                        w =
-                            vec2 x y
+                                |> Maybe.withDefault (Number (toFloat p.y - getY v))
                     in
-                    config.addPoint (relative id w)
+                    config.addPoint (Relative id x y)
 
         _ ->
             Nothing
@@ -415,16 +411,13 @@ updatePoint config state store variables id =
 
                         x =
                             state.x
-                                |> Maybe.withDefault (toFloat p.x - getX v)
+                                |> Maybe.withDefault (Number (toFloat p.x - getX v))
 
                         y =
                             state.y
-                                |> Maybe.withDefault (toFloat p.y - getY v)
-
-                        w =
-                            vec2 x y
+                                |> Maybe.withDefault (Number (toFloat p.y - getY v))
                     in
-                    config.updatePoint id (relative anchor w)
+                    config.updatePoint id (Relative anchor x y)
 
         _ ->
             Nothing
@@ -439,14 +432,14 @@ updateAnchor callback state newAnchor =
         }
 
 
-updateX : (State -> msg) -> State -> Maybe Float -> msg
-updateX callback state newX =
-    callback { state | x = newX }
+updateX : (State -> msg) -> State -> String -> msg
+updateX callback state s =
+    callback { state | x = parse s }
 
 
-updateY : (State -> msg) -> State -> Maybe Float -> msg
-updateY callback state newY =
-    callback { state | y = newY }
+updateY : (State -> msg) -> State -> String -> msg
+updateY callback state s =
+    callback { state | y = parse s }
 
 
 updateFocused : (State -> msg) -> State -> Maybe Id -> msg

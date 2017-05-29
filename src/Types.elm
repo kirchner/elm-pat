@@ -41,7 +41,7 @@ toVec p =
 
 type Point
     = Absolute E E
-    | Relative Id Vec2
+    | Relative Id E E
     | Between Id Id Ratio
 
 
@@ -55,8 +55,8 @@ absolute v =
 
 
 relative : Id -> Vec2 -> Point
-relative =
-    Relative
+relative id v =
+    Relative id (Number (getX v)) (Number (getY v))
 
 
 
@@ -104,10 +104,11 @@ position store variables point =
                 (compute variables x)
                 (compute variables y)
 
-        Relative id v ->
-            Maybe.map
-                (add v)
+        Relative id p q ->
+            Maybe.map3 (\v p q -> v |> add (vec2 p q))
                 (lookUp id)
+                (compute variables p)
+                (compute variables q)
 
         Between idA idB ratio ->
             Maybe.map2
