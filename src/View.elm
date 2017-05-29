@@ -49,7 +49,7 @@ view model =
                 ]
             ]
             [ viewToolBox
-            , viewToolInfo model.viewPort model.store model.tool
+            , viewToolInfo model.viewPort model.variables model.store model.tool
             ]
         , Html.div
             [ styles
@@ -58,7 +58,7 @@ view model =
                 , Css.left (Css.pct 0)
                 ]
             ]
-            [ viewPointList model.store ]
+            [ viewPointList model.variables model.store ]
         , Html.div
             [ styles
                 [ Css.position Css.absolute
@@ -94,11 +94,11 @@ viewToolBox =
         (allTools |> List.map button)
 
 
-viewToolInfo : ViewPort -> PointStore -> Tool -> Html Msg
-viewToolInfo viewPort store tool =
+viewToolInfo : ViewPort -> Dict String E -> PointStore -> Tool -> Html Msg
+viewToolInfo viewPort variables store tool =
     case tool of
         Absolute state ->
-            Absolute.view (addAbsoluteConfig viewPort) state
+            Absolute.view variables (addAbsoluteConfig viewPort) state
 
         Relative state ->
             Relative.view (addRelativeConfig viewPort) state store
@@ -114,8 +114,8 @@ viewToolInfo viewPort store tool =
 {- pointlist -}
 
 
-viewPointList : PointStore -> Html Msg
-viewPointList store =
+viewPointList : Dict String E -> PointStore -> Html Msg
+viewPointList variables store =
     let
         styles =
             Css.asPairs >> Html.style
@@ -132,7 +132,7 @@ viewPointList store =
             []
             [ Html.text "point list" ]
         , Dict.toList store
-            |> List.map viewPointEntry
+            |> List.map (viewPointEntry variables)
             |> Html.div
                 [ styles
                     [ displayFlex
@@ -142,8 +142,8 @@ viewPointList store =
         ]
 
 
-viewPointEntry : ( Id, Point ) -> Html Msg
-viewPointEntry ( id, point ) =
+viewPointEntry : Dict String E -> ( Id, Point ) -> Html Msg
+viewPointEntry variables ( id, point ) =
     let
         styles =
             Css.asPairs >> Html.style
@@ -155,7 +155,7 @@ viewPointEntry ( id, point ) =
             ]
         ]
         [ Html.div []
-            [ Html.text (toString id ++ ": " ++ toString point) ]
+            [ Html.text (toString id ++ ": " ++ printPoint variables point) ]
         , Html.div
             [ Events.onClick (SelectPoint id)
             , class [ Button ]
@@ -167,6 +167,26 @@ viewPointEntry ( id, point ) =
             ]
             [ Html.text "delete" ]
         ]
+
+
+printPoint : Dict String E -> Point -> String
+printPoint variables point =
+    case point of
+        Types.Absolute x y ->
+            String.concat
+                [ "("
+                , Expr.print x
+                , ", "
+                , Expr.print y
+                , ") = ("
+                , toString (compute variables x)
+                , ", "
+                , toString (compute variables y)
+                , ")"
+                ]
+
+        _ ->
+            toString point
 
 
 
@@ -295,22 +315,23 @@ viewVariable variables ( name, expr ) =
 viewCanvas : Model -> Html Msg
 viewCanvas model =
     Canvas.view
-        (drawTool model.viewPort model.store model.tool)
+        (drawTool model.viewPort model.variables model.store model.tool)
         model.viewPort
         model.store
+        model.variables
 
 
-drawTool : ViewPort -> PointStore -> Tool -> Svg Msg
-drawTool viewPort store tool =
+drawTool : ViewPort -> Dict String E -> PointStore -> Tool -> Svg Msg
+drawTool viewPort variables store tool =
     case tool of
         Absolute state ->
-            Absolute.svg (addAbsoluteConfig viewPort) state
+            Absolute.svg variables (addAbsoluteConfig viewPort) state
 
         Relative state ->
-            Relative.svg (addRelativeConfig viewPort) state store
+            Relative.svg (addRelativeConfig viewPort) state store variables
 
         Select state ->
-            Select.svg (selectConfig viewPort) state store
+            Select.svg (selectConfig viewPort) state store variables
 
         None ->
             Svg.g [] []

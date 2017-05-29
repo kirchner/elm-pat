@@ -1,25 +1,26 @@
 module Types
     exposing
-        ( Position
-        , toVec
+        ( Id
         , Point(..)
-        , Ratio
-        , absolute
-        , relative
         , PointStore
-        , Id
+        , Position
+        , Ratio
+        , ViewPort
+        , absolute
+        , canvasToSvg
         , emptyStore
+        , equals
         , firstId
         , position
         , positionById
-        , ViewPort
-        , canvasToSvg
+        , relative
         , svgToCanvas
+        , toVec
         , vec
-        , equals
         )
 
 import Dict exposing (Dict)
+import Expr exposing (..)
 import Math.Vector2 exposing (..)
 
 
@@ -39,7 +40,7 @@ toVec p =
 
 
 type Point
-    = Absolute Vec2
+    = Absolute E E
     | Relative Id Vec2
     | Between Id Id Ratio
 
@@ -49,8 +50,8 @@ type alias Ratio =
 
 
 absolute : Vec2 -> Point
-absolute =
-    Absolute
+absolute v =
+    Absolute (Number (getX v)) (Number (getY v))
 
 
 relative : Id -> Vec2 -> Point
@@ -84,33 +85,35 @@ firstId =
 {- helpers -}
 
 
-positionById : PointStore -> Id -> Maybe Vec2
-positionById store id =
+positionById : PointStore -> Dict String E -> Id -> Maybe Vec2
+positionById store variables id =
     Dict.get id store
-        |> Maybe.andThen (position store)
+        |> Maybe.andThen (position store variables)
 
 
-position : PointStore -> Point -> Maybe Vec2
-position store point =
+position : PointStore -> Dict String E -> Point -> Maybe Vec2
+position store variables point =
     let
         lookUp id =
             Dict.get id store
-                |> Maybe.andThen (position store)
+                |> Maybe.andThen (position store variables)
     in
-        case point of
-            Absolute v ->
-                Just v
+    case point of
+        Absolute x y ->
+            Maybe.map2 vec2
+                (compute variables x)
+                (compute variables y)
 
-            Relative id v ->
-                Maybe.map
-                    (add v)
-                    (lookUp id)
+        Relative id v ->
+            Maybe.map
+                (add v)
+                (lookUp id)
 
-            Between idA idB ratio ->
-                Maybe.map2
-                    (\v w -> sub w v |> scale ratio |> add w)
-                    (lookUp idA)
-                    (lookUp idB)
+        Between idA idB ratio ->
+            Maybe.map2
+                (\v w -> sub w v |> scale ratio |> add w)
+                (lookUp idA)
+                (lookUp idB)
 
 
 type alias ViewPort =

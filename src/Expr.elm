@@ -1,6 +1,6 @@
 module Expr
     exposing
-        ( E
+        ( E(..)
         , compute
         , parse
         , parseVariable

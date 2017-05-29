@@ -1,24 +1,21 @@
 module View.Canvas exposing (view)
 
-import Dict
+import Dict exposing (..)
+import Events
+import Expr exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Math.Vector2 exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
-
-
-{- internal -}
-
-import Events
-import View.Colors as Colors
 import Svg.Extra as Svg
 import Types exposing (..)
+import View.Colors as Colors
 
 
-view : Svg msg -> ViewPort -> PointStore -> Html msg
-view tool viewPort store =
+view : Svg msg -> ViewPort -> PointStore -> Dict String E -> Html msg
+view tool viewPort store variables =
     let
         viewBoxString =
             String.join " "
@@ -28,18 +25,18 @@ view tool viewPort store =
                 , toString viewPort.height
                 ]
     in
-        Svg.svg
-            [ Svg.viewBox viewBoxString
-            , Html.style
-                [ ( "background-color", Colors.base3 )
-                , ( "width", toString viewPort.width )
-                , ( "height", toString viewPort.height )
-                ]
+    Svg.svg
+        [ Svg.viewBox viewBoxString
+        , Html.style
+            [ ( "background-color", Colors.base3 )
+            , ( "width", toString viewPort.width )
+            , ( "height", toString viewPort.height )
             ]
-            [ origin
-            , Svg.g [] (points store)
-            , tool
-            ]
+        ]
+        [ origin
+        , Svg.g [] (points store variables)
+        , tool
+        ]
 
 
 origin : Svg msg
@@ -66,17 +63,17 @@ origin =
         ]
 
 
-points : PointStore -> List (Svg msg)
-points store =
+points : PointStore -> Dict String E -> List (Svg msg)
+points store variables =
     Dict.values store
-        |> List.filterMap (point store)
+        |> List.filterMap (point store variables)
 
 
-point : PointStore -> Point -> Maybe (Svg msg)
-point store point =
+point : PointStore -> Dict String E -> Point -> Maybe (Svg msg)
+point store variables point =
     case point of
-        Absolute _ ->
-            position store point
+        Absolute _ _ ->
+            position store variables point
                 |> Maybe.map Svg.drawPoint
 
         Relative id _ ->
@@ -84,13 +81,13 @@ point store point =
                 draw v w =
                     Svg.g []
                         [ Svg.drawPoint w
-                        , Svg.drawRectArrow v w 
+                        , Svg.drawRectArrow v w
                         ]
             in
-                Maybe.map2
-                    draw
-                    (positionById store id)
-                    (position store point)
+            Maybe.map2
+                draw
+                (positionById store variables id)
+                (position store variables point)
 
         Between idA idB _ ->
             Just (Svg.g [] [])

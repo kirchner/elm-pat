@@ -1,21 +1,20 @@
 module Tools.Select
     exposing
-        ( State
-        , Config
+        ( Config
+        , State
         , init
         , svg
         )
 
-import Dict
+{- internal -}
+
+import Dict exposing (Dict)
+import Events
+import Expr exposing (..)
 import Math.Vector2 exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
-
-
-{- internal -}
-
-import Events
 import Svg.Extra as Svg
 import Tools.Common exposing (..)
 import Types exposing (..)
@@ -46,19 +45,33 @@ type alias Config msg =
     }
 
 
-svg : Config msg -> State -> PointStore -> Svg msg
-svg config state store =
-    eventCircles config state store
+svg : Config msg -> State -> PointStore -> Dict String E -> Svg msg
+svg config state store variables =
+    eventCircles config state store variables
 
 
-eventCircles : Config msg -> State -> PointStore -> Svg msg
-eventCircles config state store =
+eventCircles :
+    Config msg
+    -> State
+    -> PointStore
+    -> Dict String E
+    -> Svg msg
+eventCircles config state store variables =
     Svg.g []
-        (List.filterMap (eventCircle config state store) (Dict.toList store))
+        (List.filterMap
+            (eventCircle config state store variables)
+            (Dict.toList store)
+        )
 
 
-eventCircle : Config msg -> State -> PointStore -> ( Id, Point ) -> Maybe (Svg msg)
-eventCircle config state store ( id, point ) =
+eventCircle :
+    Config msg
+    -> State
+    -> PointStore
+    -> Dict String E
+    -> ( Id, Point )
+    -> Maybe (Svg msg)
+eventCircle config state store variables ( id, point ) =
     let
         draw v =
             Svg.g []
@@ -81,8 +94,8 @@ eventCircle config state store ( id, point ) =
                     Svg.g [] []
                 ]
     in
-        position store point
-            |> Maybe.map draw
+    position store variables point
+        |> Maybe.map draw
 
 
 

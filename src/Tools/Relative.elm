@@ -11,9 +11,10 @@ module Tools.Relative
 {- internal -}
 
 import Css
-import Dict
+import Dict exposing (Dict)
 import Dropdown
 import Events
+import Expr exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.Events as Html
@@ -75,14 +76,14 @@ type alias Config msg =
     }
 
 
-svg : Config msg -> State -> PointStore -> Svg msg
-svg config state store =
+svg : Config msg -> State -> PointStore -> Dict String E -> Svg msg
+svg config state store variables =
     let
         anchorPosition =
             state.anchor
                 |> Maybe.andThen (String.toInt >> Result.toMaybe)
                 |> Maybe.andThen (flip Dict.get store)
-                |> Maybe.andThen (position store)
+                |> Maybe.andThen (position store variables)
     in
     case anchorPosition of
         Just v ->
@@ -95,12 +96,12 @@ svg config state store =
                         Svg.g [] []
                 , drawLines config state v
                 , drawNewPoint config state v
-                , eventRect config state store
+                , eventRect config state store variables
                 ]
 
         Nothing ->
             Svg.g []
-                [ eventCircles config state store ]
+                [ eventCircles config state store variables ]
 
 
 drawCursor : Config msg -> State -> Vec2 -> Position -> Svg msg
@@ -171,11 +172,11 @@ drawNewPoint config state v =
             Svg.g [] []
 
 
-eventRect : Config msg -> State -> PointStore -> Svg msg
-eventRect config state store =
+eventRect : Config msg -> State -> PointStore -> Dict String E -> Svg msg
+eventRect config state store variables =
     case state.id of
         Just id ->
-            case updatePoint config state store id of
+            case updatePoint config state store variables id of
                 Just callback ->
                     Svg.rect
                         [ Svg.x (toString config.viewPort.x)
@@ -196,7 +197,7 @@ eventRect config state store =
                     Svg.g [] []
 
         Nothing ->
-            case addPoint config state store of
+            case addPoint config state store variables of
                 Just callback ->
                     Svg.rect
                         [ Svg.x (toString config.viewPort.x)
@@ -217,14 +218,28 @@ eventRect config state store =
                     Svg.g [] []
 
 
-eventCircles : Config msg -> State -> PointStore -> Svg msg
-eventCircles config state store =
+eventCircles :
+    Config msg
+    -> State
+    -> PointStore
+    -> Dict String E
+    -> Svg msg
+eventCircles config state store variables =
     Svg.g []
-        (List.filterMap (eventCircle config state store) (Dict.toList store))
+        (List.filterMap
+            (eventCircle config state store variables)
+            (Dict.toList store)
+        )
 
 
-eventCircle : Config msg -> State -> PointStore -> ( Id, Point ) -> Maybe (Svg msg)
-eventCircle config state store ( id, point ) =
+eventCircle :
+    Config msg
+    -> State
+    -> PointStore
+    -> Dict String E
+    -> ( Id, Point )
+    -> Maybe (Svg msg)
+eventCircle config state store variables ( id, point ) =
     let
         draw v =
             Svg.g []
@@ -248,7 +263,7 @@ eventCircle config state store ( id, point ) =
                     Svg.g [] []
                 ]
     in
-    position store point
+    position store variables point
         |> Maybe.map draw
 
 
@@ -328,8 +343,13 @@ action state title callback =
 {- events -}
 
 
-addPoint : Config msg -> State -> PointStore -> Maybe (Position -> msg)
-addPoint config state store =
+addPoint :
+    Config msg
+    -> State
+    -> PointStore
+    -> Dict String E
+    -> Maybe (Position -> msg)
+addPoint config state store variables =
     let
         anchorId =
             state.anchor
@@ -339,7 +359,7 @@ addPoint config state store =
             state.anchor
                 |> Maybe.andThen (String.toInt >> Result.toMaybe)
                 |> Maybe.andThen (flip Dict.get store)
-                |> Maybe.andThen (position store)
+                |> Maybe.andThen (position store variables)
     in
     case ( anchorId, anchorPosition ) of
         ( Just id, Just v ) ->
@@ -366,8 +386,14 @@ addPoint config state store =
             Nothing
 
 
-updatePoint : Config msg -> State -> PointStore -> Id -> Maybe (Position -> msg)
-updatePoint config state store id =
+updatePoint :
+    Config msg
+    -> State
+    -> PointStore
+    -> Dict String E
+    -> Id
+    -> Maybe (Position -> msg)
+updatePoint config state store variables id =
     let
         anchorId =
             state.anchor
@@ -377,7 +403,7 @@ updatePoint config state store id =
             state.anchor
                 |> Maybe.andThen (String.toInt >> Result.toMaybe)
                 |> Maybe.andThen (flip Dict.get store)
-                |> Maybe.andThen (position store)
+                |> Maybe.andThen (position store variables)
     in
     case ( anchorId, anchorPosition ) of
         ( Just anchor, Just v ) ->
