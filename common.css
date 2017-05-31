@@ -1,0 +1,41 @@
+.common__IconButtonBig {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 4px;
+    color: #839496;
+    background-color: transparent;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.common__IconButtonBig:hover {
+    background-color: #fdf6e3;
+}
+
+.common__IconBig {
+    font-size: 2.5rem !important;
+    line-height: 2.5rem !important;
+}
+
+.common__IconButtonSmall {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 4px;
+    color: #839496;
+    background-color: transparent;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.common__IconButtonSmall:hover {
+    background-color: #fdf6e3;
+}
+
+.common__IconSmall {
+    font-size: 1rem !important;
+    line-height: 1rem !important;
+}

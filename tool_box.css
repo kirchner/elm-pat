@@ -1,0 +1,5 @@
+.tool-box__Container {
+    display: flex;
+    flex-flow: column;
+    pointer-events: auto;
+}

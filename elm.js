@@ -6678,6 +6678,137 @@ var _elm_lang$core$Regex$AtMost = function (a) {
 };
 var _elm_lang$core$Regex$All = {ctor: 'All'};
 
+var _elm_lang$core$Set$foldr = F3(
+	function (f, b, _p0) {
+		var _p1 = _p0;
+		return A3(
+			_elm_lang$core$Dict$foldr,
+			F3(
+				function (k, _p2, b) {
+					return A2(f, k, b);
+				}),
+			b,
+			_p1._0);
+	});
+var _elm_lang$core$Set$foldl = F3(
+	function (f, b, _p3) {
+		var _p4 = _p3;
+		return A3(
+			_elm_lang$core$Dict$foldl,
+			F3(
+				function (k, _p5, b) {
+					return A2(f, k, b);
+				}),
+			b,
+			_p4._0);
+	});
+var _elm_lang$core$Set$toList = function (_p6) {
+	var _p7 = _p6;
+	return _elm_lang$core$Dict$keys(_p7._0);
+};
+var _elm_lang$core$Set$size = function (_p8) {
+	var _p9 = _p8;
+	return _elm_lang$core$Dict$size(_p9._0);
+};
+var _elm_lang$core$Set$member = F2(
+	function (k, _p10) {
+		var _p11 = _p10;
+		return A2(_elm_lang$core$Dict$member, k, _p11._0);
+	});
+var _elm_lang$core$Set$isEmpty = function (_p12) {
+	var _p13 = _p12;
+	return _elm_lang$core$Dict$isEmpty(_p13._0);
+};
+var _elm_lang$core$Set$Set_elm_builtin = function (a) {
+	return {ctor: 'Set_elm_builtin', _0: a};
+};
+var _elm_lang$core$Set$empty = _elm_lang$core$Set$Set_elm_builtin(_elm_lang$core$Dict$empty);
+var _elm_lang$core$Set$singleton = function (k) {
+	return _elm_lang$core$Set$Set_elm_builtin(
+		A2(
+			_elm_lang$core$Dict$singleton,
+			k,
+			{ctor: '_Tuple0'}));
+};
+var _elm_lang$core$Set$insert = F2(
+	function (k, _p14) {
+		var _p15 = _p14;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A3(
+				_elm_lang$core$Dict$insert,
+				k,
+				{ctor: '_Tuple0'},
+				_p15._0));
+	});
+var _elm_lang$core$Set$fromList = function (xs) {
+	return A3(_elm_lang$core$List$foldl, _elm_lang$core$Set$insert, _elm_lang$core$Set$empty, xs);
+};
+var _elm_lang$core$Set$map = F2(
+	function (f, s) {
+		return _elm_lang$core$Set$fromList(
+			A2(
+				_elm_lang$core$List$map,
+				f,
+				_elm_lang$core$Set$toList(s)));
+	});
+var _elm_lang$core$Set$remove = F2(
+	function (k, _p16) {
+		var _p17 = _p16;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$remove, k, _p17._0));
+	});
+var _elm_lang$core$Set$union = F2(
+	function (_p19, _p18) {
+		var _p20 = _p19;
+		var _p21 = _p18;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$union, _p20._0, _p21._0));
+	});
+var _elm_lang$core$Set$intersect = F2(
+	function (_p23, _p22) {
+		var _p24 = _p23;
+		var _p25 = _p22;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$intersect, _p24._0, _p25._0));
+	});
+var _elm_lang$core$Set$diff = F2(
+	function (_p27, _p26) {
+		var _p28 = _p27;
+		var _p29 = _p26;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$diff, _p28._0, _p29._0));
+	});
+var _elm_lang$core$Set$filter = F2(
+	function (p, _p30) {
+		var _p31 = _p30;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(
+				_elm_lang$core$Dict$filter,
+				F2(
+					function (k, _p32) {
+						return p(k);
+					}),
+				_p31._0));
+	});
+var _elm_lang$core$Set$partition = F2(
+	function (p, _p33) {
+		var _p34 = _p33;
+		var _p35 = A2(
+			_elm_lang$core$Dict$partition,
+			F2(
+				function (k, _p36) {
+					return p(k);
+				}),
+			_p34._0);
+		var p1 = _p35._0;
+		var p2 = _p35._1;
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Set$Set_elm_builtin(p1),
+			_1: _elm_lang$core$Set$Set_elm_builtin(p2)
+		};
+	});
+
 var _elm_lang$dom$Native_Dom = function() {
 
 var fakeNode = {
@@ -9858,6 +9989,1672 @@ var _elm_lang$window$Window$subMap = F2(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Window'] = {pkg: 'elm-lang/window', init: _elm_lang$window$Window$init, onEffects: _elm_lang$window$Window$onEffects, onSelfMsg: _elm_lang$window$Window$onSelfMsg, tag: 'sub', subMap: _elm_lang$window$Window$subMap};
 
+var _elm_tools$parser_primitives$Native_ParserPrimitives = function() {
+
+
+// STRINGS
+
+function isSubString(smallString, offset, row, col, bigString)
+{
+	var smallLength = smallString.length;
+	var bigLength = bigString.length - offset;
+
+	if (bigLength < smallLength)
+	{
+		return tuple3(-1, row, col);
+	}
+
+	for (var i = 0; i < smallLength; i++)
+	{
+		var char = smallString[i];
+
+		if (char !== bigString[offset + i])
+		{
+			return tuple3(-1, row, col);
+		}
+
+		// if it is a two word character
+		if ((bigString.charCodeAt(offset) & 0xF800) === 0xD800)
+		{
+			i++
+			if (smallString[i] !== bigString[offset + i])
+			{
+				return tuple3(-1, row, col);
+			}
+			col++;
+			continue;
+		}
+
+		// if it is a newline
+		if (char === '\n')
+		{
+			row++;
+			col = 1;
+			continue;
+		}
+
+		// if it is a one word character
+		col++
+	}
+
+	return tuple3(offset + smallLength, row, col);
+}
+
+function tuple3(a, b, c)
+{
+	return { ctor: '_Tuple3', _0: a, _1: b, _2: c };
+}
+
+
+// CHARS
+
+var mkChar = _elm_lang$core$Native_Utils.chr;
+
+function isSubChar(predicate, offset, string)
+{
+	if (offset >= string.length)
+	{
+		return -1;
+	}
+
+	if ((string.charCodeAt(offset) & 0xF800) === 0xD800)
+	{
+		return predicate(mkChar(string.substr(offset, 2)))
+			? offset + 2
+			: -1;
+	}
+
+	var char = string[offset];
+
+	return predicate(mkChar(char))
+		? ((char === '\n') ? -2 : (offset + 1))
+		: -1;
+}
+
+
+// FIND STRING
+
+function findSubString(before, smallString, offset, row, col, bigString)
+{
+	var newOffset = bigString.indexOf(smallString, offset);
+
+	if (newOffset === -1)
+	{
+		return tuple3(-1, row, col);
+	}
+
+	var scanTarget = before ? newOffset	: newOffset + smallString.length;
+
+	while (offset < scanTarget)
+	{
+		var char = bigString[offset];
+
+		if (char === '\n')
+		{
+			offset++;
+			row++;
+			col = 1;
+			continue;
+		}
+
+		if ((bigString.charCodeAt(offset) & 0xF800) === 0xD800)
+		{
+			offset += 2;
+			col++;
+			continue;
+		}
+
+		offset++;
+		col++;
+	}
+
+	return tuple3(offset, row, col);
+}
+
+
+return {
+	isSubString: F5(isSubString),
+	isSubChar: F3(isSubChar),
+	findSubString: F6(findSubString)
+};
+
+}();
+
+var _elm_tools$parser_primitives$ParserPrimitives$findSubString = _elm_tools$parser_primitives$Native_ParserPrimitives.findSubString;
+var _elm_tools$parser_primitives$ParserPrimitives$isSubChar = _elm_tools$parser_primitives$Native_ParserPrimitives.isSubChar;
+var _elm_tools$parser_primitives$ParserPrimitives$isSubString = _elm_tools$parser_primitives$Native_ParserPrimitives.isSubString;
+
+var _elm_tools$parser$Parser_Internal$isPlusOrMinus = function ($char) {
+	return _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('+')) || _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('-'));
+};
+var _elm_tools$parser$Parser_Internal$isZero = function ($char) {
+	return _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('0'));
+};
+var _elm_tools$parser$Parser_Internal$isE = function ($char) {
+	return _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('e')) || _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('E'));
+};
+var _elm_tools$parser$Parser_Internal$isDot = function ($char) {
+	return _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('.'));
+};
+var _elm_tools$parser$Parser_Internal$isBadIntEnd = function ($char) {
+	return _elm_lang$core$Char$isDigit($char) || (_elm_lang$core$Char$isUpper($char) || (_elm_lang$core$Char$isLower($char) || _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('.'))));
+};
+var _elm_tools$parser$Parser_Internal$chomp = F3(
+	function (isGood, offset, source) {
+		chomp:
+		while (true) {
+			var newOffset = A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, isGood, offset, source);
+			if (_elm_lang$core$Native_Utils.cmp(newOffset, 0) < 0) {
+				return offset;
+			} else {
+				var _v0 = isGood,
+					_v1 = newOffset,
+					_v2 = source;
+				isGood = _v0;
+				offset = _v1;
+				source = _v2;
+				continue chomp;
+			}
+		}
+	});
+var _elm_tools$parser$Parser_Internal$chompDigits = F3(
+	function (isValidDigit, offset, source) {
+		var newOffset = A3(_elm_tools$parser$Parser_Internal$chomp, isValidDigit, offset, source);
+		return _elm_lang$core$Native_Utils.eq(newOffset, offset) ? _elm_lang$core$Result$Err(newOffset) : ((!_elm_lang$core$Native_Utils.eq(
+			A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, _elm_tools$parser$Parser_Internal$isBadIntEnd, newOffset, source),
+			-1)) ? _elm_lang$core$Result$Err(newOffset) : _elm_lang$core$Result$Ok(newOffset));
+	});
+var _elm_tools$parser$Parser_Internal$chompExp = F2(
+	function (offset, source) {
+		var eOffset = A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, _elm_tools$parser$Parser_Internal$isE, offset, source);
+		if (_elm_lang$core$Native_Utils.eq(eOffset, -1)) {
+			return _elm_lang$core$Result$Ok(offset);
+		} else {
+			var opOffset = A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, _elm_tools$parser$Parser_Internal$isPlusOrMinus, eOffset, source);
+			var expOffset = _elm_lang$core$Native_Utils.eq(opOffset, -1) ? eOffset : opOffset;
+			return (!_elm_lang$core$Native_Utils.eq(
+				A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, _elm_tools$parser$Parser_Internal$isZero, expOffset, source),
+				-1)) ? _elm_lang$core$Result$Err(expOffset) : (_elm_lang$core$Native_Utils.eq(
+				A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, _elm_lang$core$Char$isDigit, expOffset, source),
+				-1) ? _elm_lang$core$Result$Err(expOffset) : A3(_elm_tools$parser$Parser_Internal$chompDigits, _elm_lang$core$Char$isDigit, expOffset, source));
+		}
+	});
+var _elm_tools$parser$Parser_Internal$chompDotAndExp = F2(
+	function (offset, source) {
+		var dotOffset = A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, _elm_tools$parser$Parser_Internal$isDot, offset, source);
+		return _elm_lang$core$Native_Utils.eq(dotOffset, -1) ? A2(_elm_tools$parser$Parser_Internal$chompExp, offset, source) : A2(
+			_elm_tools$parser$Parser_Internal$chompExp,
+			A3(_elm_tools$parser$Parser_Internal$chomp, _elm_lang$core$Char$isDigit, dotOffset, source),
+			source);
+	});
+var _elm_tools$parser$Parser_Internal$State = F6(
+	function (a, b, c, d, e, f) {
+		return {source: a, offset: b, indent: c, context: d, row: e, col: f};
+	});
+var _elm_tools$parser$Parser_Internal$Parser = function (a) {
+	return {ctor: 'Parser', _0: a};
+};
+var _elm_tools$parser$Parser_Internal$Bad = F2(
+	function (a, b) {
+		return {ctor: 'Bad', _0: a, _1: b};
+	});
+var _elm_tools$parser$Parser_Internal$Good = F2(
+	function (a, b) {
+		return {ctor: 'Good', _0: a, _1: b};
+	});
+
+var _elm_tools$parser$Parser$changeContext = F2(
+	function (newContext, _p0) {
+		var _p1 = _p0;
+		return {source: _p1.source, offset: _p1.offset, indent: _p1.indent, context: newContext, row: _p1.row, col: _p1.col};
+	});
+var _elm_tools$parser$Parser$sourceMap = F2(
+	function (func, _p2) {
+		var _p3 = _p2;
+		return _elm_tools$parser$Parser_Internal$Parser(
+			function (_p4) {
+				var _p5 = _p4;
+				var _p6 = _p3._0(_p5);
+				if (_p6.ctor === 'Bad') {
+					return A2(_elm_tools$parser$Parser_Internal$Bad, _p6._0, _p6._1);
+				} else {
+					var _p7 = _p6._1;
+					var subString = A3(_elm_lang$core$String$slice, _p5.offset, _p7.offset, _p5.source);
+					return A2(
+						_elm_tools$parser$Parser_Internal$Good,
+						A2(func, subString, _p6._0),
+						_p7);
+				}
+			});
+	});
+var _elm_tools$parser$Parser$source = function (parser) {
+	return A2(_elm_tools$parser$Parser$sourceMap, _elm_lang$core$Basics$always, parser);
+};
+var _elm_tools$parser$Parser$badFloatMsg = 'The `Parser.float` parser seems to have a bug.\nPlease report an SSCCE to <https://github.com/elm-tools/parser/issues>.';
+var _elm_tools$parser$Parser$floatHelp = F3(
+	function (offset, zeroOffset, source) {
+		if (_elm_lang$core$Native_Utils.cmp(zeroOffset, 0) > -1) {
+			return A2(_elm_tools$parser$Parser_Internal$chompDotAndExp, zeroOffset, source);
+		} else {
+			var dotOffset = A3(_elm_tools$parser$Parser_Internal$chomp, _elm_lang$core$Char$isDigit, offset, source);
+			var result = A2(_elm_tools$parser$Parser_Internal$chompDotAndExp, dotOffset, source);
+			var _p8 = result;
+			if (_p8.ctor === 'Err') {
+				return result;
+			} else {
+				var _p9 = _p8._0;
+				return _elm_lang$core$Native_Utils.eq(_p9, offset) ? _elm_lang$core$Result$Err(_p9) : result;
+			}
+		}
+	});
+var _elm_tools$parser$Parser$badIntMsg = 'The `Parser.int` parser seems to have a bug.\nPlease report an SSCCE to <https://github.com/elm-tools/parser/issues>.';
+var _elm_tools$parser$Parser$isX = function ($char) {
+	return _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('x'));
+};
+var _elm_tools$parser$Parser$isO = function ($char) {
+	return _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('o'));
+};
+var _elm_tools$parser$Parser$isZero = function ($char) {
+	return _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('0'));
+};
+var _elm_tools$parser$Parser$intHelp = F3(
+	function (offset, zeroOffset, source) {
+		return _elm_lang$core$Native_Utils.eq(zeroOffset, -1) ? A3(_elm_tools$parser$Parser_Internal$chompDigits, _elm_lang$core$Char$isDigit, offset, source) : ((!_elm_lang$core$Native_Utils.eq(
+			A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, _elm_tools$parser$Parser$isX, zeroOffset, source),
+			-1)) ? A3(_elm_tools$parser$Parser_Internal$chompDigits, _elm_lang$core$Char$isHexDigit, offset + 2, source) : (_elm_lang$core$Native_Utils.eq(
+			A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, _elm_tools$parser$Parser_Internal$isBadIntEnd, zeroOffset, source),
+			-1) ? _elm_lang$core$Result$Ok(zeroOffset) : _elm_lang$core$Result$Err(zeroOffset)));
+	});
+var _elm_tools$parser$Parser$token = F2(
+	function (makeProblem, str) {
+		return _elm_tools$parser$Parser_Internal$Parser(
+			function (_p10) {
+				var _p11 = _p10;
+				var _p13 = _p11.source;
+				var _p12 = A5(_elm_tools$parser_primitives$ParserPrimitives$isSubString, str, _p11.offset, _p11.row, _p11.col, _p13);
+				var newOffset = _p12._0;
+				var newRow = _p12._1;
+				var newCol = _p12._2;
+				return _elm_lang$core$Native_Utils.eq(newOffset, -1) ? A2(
+					_elm_tools$parser$Parser_Internal$Bad,
+					makeProblem(str),
+					_p11) : A2(
+					_elm_tools$parser$Parser_Internal$Good,
+					{ctor: '_Tuple0'},
+					{source: _p13, offset: newOffset, indent: _p11.indent, context: _p11.context, row: newRow, col: newCol});
+			});
+	});
+var _elm_tools$parser$Parser$delayedCommitMap = F3(
+	function (func, _p15, _p14) {
+		var _p16 = _p15;
+		var _p17 = _p14;
+		return _elm_tools$parser$Parser_Internal$Parser(
+			function (state1) {
+				var _p18 = _p16._0(state1);
+				if (_p18.ctor === 'Bad') {
+					return A2(_elm_tools$parser$Parser_Internal$Bad, _p18._0, state1);
+				} else {
+					var _p22 = _p18._1;
+					var _p19 = _p17._0(_p22);
+					if (_p19.ctor === 'Good') {
+						return A2(
+							_elm_tools$parser$Parser_Internal$Good,
+							A2(func, _p18._0, _p19._0),
+							_p19._1);
+					} else {
+						var _p21 = _p19._0;
+						var _p20 = _p19._1;
+						return (_elm_lang$core$Native_Utils.eq(_p22.row, _p20.row) && _elm_lang$core$Native_Utils.eq(_p22.col, _p20.col)) ? A2(_elm_tools$parser$Parser_Internal$Bad, _p21, state1) : A2(_elm_tools$parser$Parser_Internal$Bad, _p21, _p20);
+					}
+				}
+			});
+	});
+var _elm_tools$parser$Parser$delayedCommit = F2(
+	function (filler, realStuff) {
+		return A3(
+			_elm_tools$parser$Parser$delayedCommitMap,
+			F2(
+				function (_p23, v) {
+					return v;
+				}),
+			filler,
+			realStuff);
+	});
+var _elm_tools$parser$Parser$lazy = function (thunk) {
+	return _elm_tools$parser$Parser_Internal$Parser(
+		function (state) {
+			var _p24 = thunk(
+				{ctor: '_Tuple0'});
+			var parse = _p24._0;
+			return parse(state);
+		});
+};
+var _elm_tools$parser$Parser$andThen = F2(
+	function (callback, _p25) {
+		var _p26 = _p25;
+		return _elm_tools$parser$Parser_Internal$Parser(
+			function (state1) {
+				var _p27 = _p26._0(state1);
+				if (_p27.ctor === 'Bad') {
+					return A2(_elm_tools$parser$Parser_Internal$Bad, _p27._0, _p27._1);
+				} else {
+					var _p28 = callback(_p27._0);
+					var parseB = _p28._0;
+					return parseB(_p27._1);
+				}
+			});
+	});
+var _elm_tools$parser$Parser$apply = F2(
+	function (f, a) {
+		return f(a);
+	});
+var _elm_tools$parser$Parser$map2 = F3(
+	function (func, _p30, _p29) {
+		var _p31 = _p30;
+		var _p32 = _p29;
+		return _elm_tools$parser$Parser_Internal$Parser(
+			function (state1) {
+				var _p33 = _p31._0(state1);
+				if (_p33.ctor === 'Bad') {
+					return A2(_elm_tools$parser$Parser_Internal$Bad, _p33._0, _p33._1);
+				} else {
+					var _p34 = _p32._0(_p33._1);
+					if (_p34.ctor === 'Bad') {
+						return A2(_elm_tools$parser$Parser_Internal$Bad, _p34._0, _p34._1);
+					} else {
+						return A2(
+							_elm_tools$parser$Parser_Internal$Good,
+							A2(func, _p33._0, _p34._0),
+							_p34._1);
+					}
+				}
+			});
+	});
+var _elm_tools$parser$Parser_ops = _elm_tools$parser$Parser_ops || {};
+_elm_tools$parser$Parser_ops['|='] = F2(
+	function (parseFunc, parseArg) {
+		return A3(_elm_tools$parser$Parser$map2, _elm_tools$parser$Parser$apply, parseFunc, parseArg);
+	});
+var _elm_tools$parser$Parser_ops = _elm_tools$parser$Parser_ops || {};
+_elm_tools$parser$Parser_ops['|.'] = F2(
+	function (keepParser, ignoreParser) {
+		return A3(_elm_tools$parser$Parser$map2, _elm_lang$core$Basics$always, keepParser, ignoreParser);
+	});
+var _elm_tools$parser$Parser$map = F2(
+	function (func, _p35) {
+		var _p36 = _p35;
+		return _elm_tools$parser$Parser_Internal$Parser(
+			function (state1) {
+				var _p37 = _p36._0(state1);
+				if (_p37.ctor === 'Good') {
+					return A2(
+						_elm_tools$parser$Parser_Internal$Good,
+						func(_p37._0),
+						_p37._1);
+				} else {
+					return A2(_elm_tools$parser$Parser_Internal$Bad, _p37._0, _p37._1);
+				}
+			});
+	});
+var _elm_tools$parser$Parser$succeed = function (a) {
+	return _elm_tools$parser$Parser_Internal$Parser(
+		function (state) {
+			return A2(_elm_tools$parser$Parser_Internal$Good, a, state);
+		});
+};
+var _elm_tools$parser$Parser$run = F2(
+	function (_p38, source) {
+		var _p39 = _p38;
+		var initialState = {
+			source: source,
+			offset: 0,
+			indent: 1,
+			context: {ctor: '[]'},
+			row: 1,
+			col: 1
+		};
+		var _p40 = _p39._0(initialState);
+		if (_p40.ctor === 'Good') {
+			return _elm_lang$core$Result$Ok(_p40._0);
+		} else {
+			return _elm_lang$core$Result$Err(
+				{row: _p40._1.row, col: _p40._1.col, source: source, problem: _p40._0, context: _p40._1.context});
+		}
+	});
+var _elm_tools$parser$Parser$Error = F5(
+	function (a, b, c, d, e) {
+		return {row: a, col: b, source: c, problem: d, context: e};
+	});
+var _elm_tools$parser$Parser$Context = F3(
+	function (a, b, c) {
+		return {row: a, col: b, description: c};
+	});
+var _elm_tools$parser$Parser$inContext = F2(
+	function (ctx, _p41) {
+		var _p42 = _p41;
+		return _elm_tools$parser$Parser_Internal$Parser(
+			function (_p43) {
+				var _p44 = _p43;
+				var _p46 = _p44.context;
+				var state1 = A2(
+					_elm_tools$parser$Parser$changeContext,
+					{
+						ctor: '::',
+						_0: A3(_elm_tools$parser$Parser$Context, _p44.row, _p44.col, ctx),
+						_1: _p46
+					},
+					_p44);
+				var _p45 = _p42._0(state1);
+				if (_p45.ctor === 'Good') {
+					return A2(
+						_elm_tools$parser$Parser_Internal$Good,
+						_p45._0,
+						A2(_elm_tools$parser$Parser$changeContext, _p46, _p45._1));
+				} else {
+					return _p45;
+				}
+			});
+	});
+var _elm_tools$parser$Parser$Fail = function (a) {
+	return {ctor: 'Fail', _0: a};
+};
+var _elm_tools$parser$Parser$fail = function (message) {
+	return _elm_tools$parser$Parser_Internal$Parser(
+		function (state) {
+			return A2(
+				_elm_tools$parser$Parser_Internal$Bad,
+				_elm_tools$parser$Parser$Fail(message),
+				state);
+		});
+};
+var _elm_tools$parser$Parser$ExpectingClosing = function (a) {
+	return {ctor: 'ExpectingClosing', _0: a};
+};
+var _elm_tools$parser$Parser$ignoreUntil = function (str) {
+	return _elm_tools$parser$Parser_Internal$Parser(
+		function (_p47) {
+			var _p48 = _p47;
+			var _p50 = _p48.source;
+			var _p49 = A6(_elm_tools$parser_primitives$ParserPrimitives$findSubString, false, str, _p48.offset, _p48.row, _p48.col, _p50);
+			var newOffset = _p49._0;
+			var newRow = _p49._1;
+			var newCol = _p49._2;
+			return _elm_lang$core$Native_Utils.eq(newOffset, -1) ? A2(
+				_elm_tools$parser$Parser_Internal$Bad,
+				_elm_tools$parser$Parser$ExpectingClosing(str),
+				_p48) : A2(
+				_elm_tools$parser$Parser_Internal$Good,
+				{ctor: '_Tuple0'},
+				{source: _p50, offset: newOffset, indent: _p48.indent, context: _p48.context, row: newRow, col: newCol});
+		});
+};
+var _elm_tools$parser$Parser$ExpectingVariable = {ctor: 'ExpectingVariable'};
+var _elm_tools$parser$Parser$ExpectingKeyword = function (a) {
+	return {ctor: 'ExpectingKeyword', _0: a};
+};
+var _elm_tools$parser$Parser$keyword = function (str) {
+	return A2(_elm_tools$parser$Parser$token, _elm_tools$parser$Parser$ExpectingKeyword, str);
+};
+var _elm_tools$parser$Parser$ExpectingSymbol = function (a) {
+	return {ctor: 'ExpectingSymbol', _0: a};
+};
+var _elm_tools$parser$Parser$symbol = function (str) {
+	return A2(_elm_tools$parser$Parser$token, _elm_tools$parser$Parser$ExpectingSymbol, str);
+};
+var _elm_tools$parser$Parser$ExpectingEnd = {ctor: 'ExpectingEnd'};
+var _elm_tools$parser$Parser$end = _elm_tools$parser$Parser_Internal$Parser(
+	function (state) {
+		return _elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$String$length(state.source),
+			state.offset) ? A2(
+			_elm_tools$parser$Parser_Internal$Good,
+			{ctor: '_Tuple0'},
+			state) : A2(_elm_tools$parser$Parser_Internal$Bad, _elm_tools$parser$Parser$ExpectingEnd, state);
+	});
+var _elm_tools$parser$Parser$BadRepeat = {ctor: 'BadRepeat'};
+var _elm_tools$parser$Parser$repeatExactly = F4(
+	function (n, parse, revList, state1) {
+		repeatExactly:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.cmp(n, 0) < 1) {
+				return A2(
+					_elm_tools$parser$Parser_Internal$Good,
+					_elm_lang$core$List$reverse(revList),
+					state1);
+			} else {
+				var _p51 = parse(state1);
+				if (_p51.ctor === 'Good') {
+					var _p52 = _p51._1;
+					if (_elm_lang$core$Native_Utils.eq(state1.row, _p52.row) && _elm_lang$core$Native_Utils.eq(state1.col, _p52.col)) {
+						return A2(_elm_tools$parser$Parser_Internal$Bad, _elm_tools$parser$Parser$BadRepeat, _p52);
+					} else {
+						var _v25 = n - 1,
+							_v26 = parse,
+							_v27 = {ctor: '::', _0: _p51._0, _1: revList},
+							_v28 = _p52;
+						n = _v25;
+						parse = _v26;
+						revList = _v27;
+						state1 = _v28;
+						continue repeatExactly;
+					}
+				} else {
+					return A2(_elm_tools$parser$Parser_Internal$Bad, _p51._0, _p51._1);
+				}
+			}
+		}
+	});
+var _elm_tools$parser$Parser$repeatAtLeast = F4(
+	function (n, parse, revList, state1) {
+		repeatAtLeast:
+		while (true) {
+			var _p53 = parse(state1);
+			if (_p53.ctor === 'Good') {
+				var _p54 = _p53._1;
+				if (_elm_lang$core$Native_Utils.eq(state1.row, _p54.row) && _elm_lang$core$Native_Utils.eq(state1.col, _p54.col)) {
+					return A2(_elm_tools$parser$Parser_Internal$Bad, _elm_tools$parser$Parser$BadRepeat, _p54);
+				} else {
+					var _v30 = n - 1,
+						_v31 = parse,
+						_v32 = {ctor: '::', _0: _p53._0, _1: revList},
+						_v33 = _p54;
+					n = _v30;
+					parse = _v31;
+					revList = _v32;
+					state1 = _v33;
+					continue repeatAtLeast;
+				}
+			} else {
+				var _p55 = _p53._1;
+				return (_elm_lang$core$Native_Utils.eq(state1.row, _p55.row) && (_elm_lang$core$Native_Utils.eq(state1.col, _p55.col) && (_elm_lang$core$Native_Utils.cmp(n, 0) < 1))) ? A2(
+					_elm_tools$parser$Parser_Internal$Good,
+					_elm_lang$core$List$reverse(revList),
+					state1) : A2(_elm_tools$parser$Parser_Internal$Bad, _p53._0, _p55);
+			}
+		}
+	});
+var _elm_tools$parser$Parser$repeat = F2(
+	function (count, _p56) {
+		var _p57 = _p56;
+		var _p59 = _p57._0;
+		var _p58 = count;
+		if (_p58.ctor === 'Exactly') {
+			return _elm_tools$parser$Parser_Internal$Parser(
+				function (state) {
+					return A4(
+						_elm_tools$parser$Parser$repeatExactly,
+						_p58._0,
+						_p59,
+						{ctor: '[]'},
+						state);
+				});
+		} else {
+			return _elm_tools$parser$Parser_Internal$Parser(
+				function (state) {
+					return A4(
+						_elm_tools$parser$Parser$repeatAtLeast,
+						_p58._0,
+						_p59,
+						{ctor: '[]'},
+						state);
+				});
+		}
+	});
+var _elm_tools$parser$Parser$ignoreExactly = F8(
+	function (n, predicate, source, offset, indent, context, row, col) {
+		ignoreExactly:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.cmp(n, 0) < 1) {
+				return A2(
+					_elm_tools$parser$Parser_Internal$Good,
+					{ctor: '_Tuple0'},
+					{source: source, offset: offset, indent: indent, context: context, row: row, col: col});
+			} else {
+				var newOffset = A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, predicate, offset, source);
+				if (_elm_lang$core$Native_Utils.eq(newOffset, -1)) {
+					return A2(
+						_elm_tools$parser$Parser_Internal$Bad,
+						_elm_tools$parser$Parser$BadRepeat,
+						{source: source, offset: offset, indent: indent, context: context, row: row, col: col});
+				} else {
+					if (_elm_lang$core$Native_Utils.eq(newOffset, -2)) {
+						var _v36 = n - 1,
+							_v37 = predicate,
+							_v38 = source,
+							_v39 = offset + 1,
+							_v40 = indent,
+							_v41 = context,
+							_v42 = row + 1,
+							_v43 = 1;
+						n = _v36;
+						predicate = _v37;
+						source = _v38;
+						offset = _v39;
+						indent = _v40;
+						context = _v41;
+						row = _v42;
+						col = _v43;
+						continue ignoreExactly;
+					} else {
+						var _v44 = n - 1,
+							_v45 = predicate,
+							_v46 = source,
+							_v47 = newOffset,
+							_v48 = indent,
+							_v49 = context,
+							_v50 = row,
+							_v51 = col + 1;
+						n = _v44;
+						predicate = _v45;
+						source = _v46;
+						offset = _v47;
+						indent = _v48;
+						context = _v49;
+						row = _v50;
+						col = _v51;
+						continue ignoreExactly;
+					}
+				}
+			}
+		}
+	});
+var _elm_tools$parser$Parser$ignoreAtLeast = F8(
+	function (n, predicate, source, offset, indent, context, row, col) {
+		ignoreAtLeast:
+		while (true) {
+			var newOffset = A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, predicate, offset, source);
+			if (_elm_lang$core$Native_Utils.eq(newOffset, -1)) {
+				var state = {source: source, offset: offset, indent: indent, context: context, row: row, col: col};
+				return (_elm_lang$core$Native_Utils.cmp(n, 0) < 1) ? A2(
+					_elm_tools$parser$Parser_Internal$Good,
+					{ctor: '_Tuple0'},
+					state) : A2(_elm_tools$parser$Parser_Internal$Bad, _elm_tools$parser$Parser$BadRepeat, state);
+			} else {
+				if (_elm_lang$core$Native_Utils.eq(newOffset, -2)) {
+					var _v52 = n - 1,
+						_v53 = predicate,
+						_v54 = source,
+						_v55 = offset + 1,
+						_v56 = indent,
+						_v57 = context,
+						_v58 = row + 1,
+						_v59 = 1;
+					n = _v52;
+					predicate = _v53;
+					source = _v54;
+					offset = _v55;
+					indent = _v56;
+					context = _v57;
+					row = _v58;
+					col = _v59;
+					continue ignoreAtLeast;
+				} else {
+					var _v60 = n - 1,
+						_v61 = predicate,
+						_v62 = source,
+						_v63 = newOffset,
+						_v64 = indent,
+						_v65 = context,
+						_v66 = row,
+						_v67 = col + 1;
+					n = _v60;
+					predicate = _v61;
+					source = _v62;
+					offset = _v63;
+					indent = _v64;
+					context = _v65;
+					row = _v66;
+					col = _v67;
+					continue ignoreAtLeast;
+				}
+			}
+		}
+	});
+var _elm_tools$parser$Parser$ignore = F2(
+	function (count, predicate) {
+		var _p60 = count;
+		if (_p60.ctor === 'Exactly') {
+			return _elm_tools$parser$Parser_Internal$Parser(
+				function (_p61) {
+					var _p62 = _p61;
+					return A8(_elm_tools$parser$Parser$ignoreExactly, _p60._0, predicate, _p62.source, _p62.offset, _p62.indent, _p62.context, _p62.row, _p62.col);
+				});
+		} else {
+			return _elm_tools$parser$Parser_Internal$Parser(
+				function (_p63) {
+					var _p64 = _p63;
+					return A8(_elm_tools$parser$Parser$ignoreAtLeast, _p60._0, predicate, _p64.source, _p64.offset, _p64.indent, _p64.context, _p64.row, _p64.col);
+				});
+		}
+	});
+var _elm_tools$parser$Parser$keep = F2(
+	function (count, predicate) {
+		return _elm_tools$parser$Parser$source(
+			A2(_elm_tools$parser$Parser$ignore, count, predicate));
+	});
+var _elm_tools$parser$Parser$BadFloat = {ctor: 'BadFloat'};
+var _elm_tools$parser$Parser$float = _elm_tools$parser$Parser_Internal$Parser(
+	function (_p65) {
+		var _p66 = _p65;
+		var _p77 = _p66.source;
+		var _p76 = _p66.row;
+		var _p75 = _p66.offset;
+		var _p74 = _p66.indent;
+		var _p73 = _p66.context;
+		var _p72 = _p66.col;
+		var _p67 = A3(
+			_elm_tools$parser$Parser$floatHelp,
+			_p75,
+			A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, _elm_tools$parser$Parser$isZero, _p75, _p77),
+			_p77);
+		if (_p67.ctor === 'Err') {
+			var _p68 = _p67._0;
+			return A2(
+				_elm_tools$parser$Parser_Internal$Bad,
+				_elm_tools$parser$Parser$BadFloat,
+				{source: _p77, offset: _p68, indent: _p74, context: _p73, row: _p76, col: _p72 + (_p68 - _p75)});
+		} else {
+			var _p71 = _p67._0;
+			var _p69 = _elm_lang$core$String$toFloat(
+				A3(_elm_lang$core$String$slice, _p75, _p71, _p77));
+			if (_p69.ctor === 'Err') {
+				return _elm_lang$core$Native_Utils.crashCase(
+					'Parser',
+					{
+						start: {line: 733, column: 9},
+						end: {line: 745, column: 16}
+					},
+					_p69)(_elm_tools$parser$Parser$badFloatMsg);
+			} else {
+				return A2(
+					_elm_tools$parser$Parser_Internal$Good,
+					_p69._0,
+					{source: _p77, offset: _p71, indent: _p74, context: _p73, row: _p76, col: _p72 + (_p71 - _p75)});
+			}
+		}
+	});
+var _elm_tools$parser$Parser$BadInt = {ctor: 'BadInt'};
+var _elm_tools$parser$Parser$int = _elm_tools$parser$Parser_Internal$Parser(
+	function (_p78) {
+		var _p79 = _p78;
+		var _p90 = _p79.source;
+		var _p89 = _p79.row;
+		var _p88 = _p79.offset;
+		var _p87 = _p79.indent;
+		var _p86 = _p79.context;
+		var _p85 = _p79.col;
+		var _p80 = A3(
+			_elm_tools$parser$Parser$intHelp,
+			_p88,
+			A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, _elm_tools$parser$Parser$isZero, _p88, _p90),
+			_p90);
+		if (_p80.ctor === 'Err') {
+			var _p81 = _p80._0;
+			return A2(
+				_elm_tools$parser$Parser_Internal$Bad,
+				_elm_tools$parser$Parser$BadInt,
+				{source: _p90, offset: _p81, indent: _p87, context: _p86, row: _p89, col: _p85 + (_p81 - _p88)});
+		} else {
+			var _p84 = _p80._0;
+			var _p82 = _elm_lang$core$String$toInt(
+				A3(_elm_lang$core$String$slice, _p88, _p84, _p90));
+			if (_p82.ctor === 'Err') {
+				return _elm_lang$core$Native_Utils.crashCase(
+					'Parser',
+					{
+						start: {line: 638, column: 9},
+						end: {line: 650, column: 16}
+					},
+					_p82)(_elm_tools$parser$Parser$badIntMsg);
+			} else {
+				return A2(
+					_elm_tools$parser$Parser_Internal$Good,
+					_p82._0,
+					{source: _p90, offset: _p84, indent: _p87, context: _p86, row: _p89, col: _p85 + (_p84 - _p88)});
+			}
+		}
+	});
+var _elm_tools$parser$Parser$BadOneOf = function (a) {
+	return {ctor: 'BadOneOf', _0: a};
+};
+var _elm_tools$parser$Parser$oneOfHelp = F3(
+	function (state, problems, parsers) {
+		oneOfHelp:
+		while (true) {
+			var _p91 = parsers;
+			if (_p91.ctor === '[]') {
+				return A2(
+					_elm_tools$parser$Parser_Internal$Bad,
+					_elm_tools$parser$Parser$BadOneOf(
+						_elm_lang$core$List$reverse(problems)),
+					state);
+			} else {
+				var _p92 = _p91._0._0(state);
+				if (_p92.ctor === 'Good') {
+					return _p92;
+				} else {
+					if (_elm_lang$core$Native_Utils.eq(state.row, _p92._1.row) && _elm_lang$core$Native_Utils.eq(state.col, _p92._1.col)) {
+						var _v79 = state,
+							_v80 = {ctor: '::', _0: _p92._0, _1: problems},
+							_v81 = _p91._1;
+						state = _v79;
+						problems = _v80;
+						parsers = _v81;
+						continue oneOfHelp;
+					} else {
+						return _p92;
+					}
+				}
+			}
+		}
+	});
+var _elm_tools$parser$Parser$oneOf = function (parsers) {
+	return _elm_tools$parser$Parser_Internal$Parser(
+		function (state) {
+			return A3(
+				_elm_tools$parser$Parser$oneOfHelp,
+				state,
+				{ctor: '[]'},
+				parsers);
+		});
+};
+var _elm_tools$parser$Parser$Exactly = function (a) {
+	return {ctor: 'Exactly', _0: a};
+};
+var _elm_tools$parser$Parser$AtLeast = function (a) {
+	return {ctor: 'AtLeast', _0: a};
+};
+var _elm_tools$parser$Parser$zeroOrMore = _elm_tools$parser$Parser$AtLeast(0);
+var _elm_tools$parser$Parser$oneOrMore = _elm_tools$parser$Parser$AtLeast(1);
+
+var _elm_tools$parser$Parser_LanguageKit$isChar = function ($char) {
+	return true;
+};
+var _elm_tools$parser$Parser_LanguageKit$isTab = function ($char) {
+	return _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('\t'));
+};
+var _elm_tools$parser$Parser_LanguageKit$isSpace = function ($char) {
+	return _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr(' ')) || (_elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('\n')) || _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('\r')));
+};
+var _elm_tools$parser$Parser_LanguageKit$chompSpaces = A2(_elm_tools$parser$Parser$ignore, _elm_tools$parser$Parser$zeroOrMore, _elm_tools$parser$Parser_LanguageKit$isSpace);
+var _elm_tools$parser$Parser_LanguageKit$revAlways = F2(
+	function (_p0, keep) {
+		return keep;
+	});
+var _elm_tools$parser$Parser_LanguageKit$ignore = F2(
+	function (ignoreParser, keepParser) {
+		return A3(_elm_tools$parser$Parser$map2, _elm_tools$parser$Parser_LanguageKit$revAlways, ignoreParser, keepParser);
+	});
+var _elm_tools$parser$Parser_LanguageKit_ops = _elm_tools$parser$Parser_LanguageKit_ops || {};
+_elm_tools$parser$Parser_LanguageKit_ops['|-'] = _elm_tools$parser$Parser_LanguageKit$ignore;
+var _elm_tools$parser$Parser_LanguageKit$sequenceEndMandatory = F5(
+	function (end, spaces, parseItem, sep, revItems) {
+		var chompRest = function (item) {
+			return A5(
+				_elm_tools$parser$Parser_LanguageKit$sequenceEndMandatory,
+				end,
+				spaces,
+				parseItem,
+				sep,
+				{ctor: '::', _0: item, _1: revItems});
+		};
+		return _elm_tools$parser$Parser$oneOf(
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_tools$parser$Parser$andThen,
+					chompRest,
+					A2(
+						_elm_tools$parser$Parser_ops['|.'],
+						A2(
+							_elm_tools$parser$Parser_ops['|.'],
+							A2(_elm_tools$parser$Parser_ops['|.'], parseItem, spaces),
+							_elm_tools$parser$Parser$symbol(sep)),
+						spaces)),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+						_elm_tools$parser$Parser$symbol(end),
+						_elm_tools$parser$Parser$succeed(
+							_elm_lang$core$List$reverse(revItems))),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _elm_tools$parser$Parser_LanguageKit$sequenceEndForbidden = F5(
+	function (end, spaces, parseItem, sep, revItems) {
+		var chompRest = function (item) {
+			return A5(
+				_elm_tools$parser$Parser_LanguageKit$sequenceEndForbidden,
+				end,
+				spaces,
+				parseItem,
+				sep,
+				{ctor: '::', _0: item, _1: revItems});
+		};
+		return A2(
+			_elm_tools$parser$Parser_LanguageKit$ignore,
+			spaces,
+			_elm_tools$parser$Parser$oneOf(
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+						A2(
+							_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+							_elm_tools$parser$Parser$symbol(sep),
+							spaces),
+						A2(_elm_tools$parser$Parser$andThen, chompRest, parseItem)),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+							_elm_tools$parser$Parser$symbol(end),
+							_elm_tools$parser$Parser$succeed(
+								_elm_lang$core$List$reverse(revItems))),
+						_1: {ctor: '[]'}
+					}
+				}));
+	});
+var _elm_tools$parser$Parser_LanguageKit$sequenceEndOptional = F5(
+	function (end, spaces, parseItem, sep, revItems) {
+		var chompRest = function (item) {
+			return A5(
+				_elm_tools$parser$Parser_LanguageKit$sequenceEndOptional,
+				end,
+				spaces,
+				parseItem,
+				sep,
+				{ctor: '::', _0: item, _1: revItems});
+		};
+		var parseEnd = A2(
+			_elm_tools$parser$Parser$andThen,
+			function (_p1) {
+				return _elm_tools$parser$Parser$succeed(
+					_elm_lang$core$List$reverse(revItems));
+			},
+			_elm_tools$parser$Parser$symbol(end));
+		return A2(
+			_elm_tools$parser$Parser_LanguageKit$ignore,
+			spaces,
+			_elm_tools$parser$Parser$oneOf(
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+						A2(
+							_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+							_elm_tools$parser$Parser$symbol(sep),
+							spaces),
+						_elm_tools$parser$Parser$oneOf(
+							{
+								ctor: '::',
+								_0: A2(_elm_tools$parser$Parser$andThen, chompRest, parseItem),
+								_1: {
+									ctor: '::',
+									_0: parseEnd,
+									_1: {ctor: '[]'}
+								}
+							})),
+					_1: {
+						ctor: '::',
+						_0: parseEnd,
+						_1: {ctor: '[]'}
+					}
+				}));
+	});
+var _elm_tools$parser$Parser_LanguageKit$sequenceEnd = F5(
+	function (end, spaces, parseItem, sep, trailing) {
+		var chompRest = function (item) {
+			var _p2 = trailing;
+			switch (_p2.ctor) {
+				case 'Forbidden':
+					return A5(
+						_elm_tools$parser$Parser_LanguageKit$sequenceEndForbidden,
+						end,
+						spaces,
+						parseItem,
+						sep,
+						{
+							ctor: '::',
+							_0: item,
+							_1: {ctor: '[]'}
+						});
+				case 'Optional':
+					return A5(
+						_elm_tools$parser$Parser_LanguageKit$sequenceEndOptional,
+						end,
+						spaces,
+						parseItem,
+						sep,
+						{
+							ctor: '::',
+							_0: item,
+							_1: {ctor: '[]'}
+						});
+				default:
+					return A2(
+						_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+						A2(
+							_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+							A2(
+								_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+								spaces,
+								_elm_tools$parser$Parser$symbol(sep)),
+							spaces),
+						A5(
+							_elm_tools$parser$Parser_LanguageKit$sequenceEndMandatory,
+							end,
+							spaces,
+							parseItem,
+							sep,
+							{
+								ctor: '::',
+								_0: item,
+								_1: {ctor: '[]'}
+							}));
+			}
+		};
+		return _elm_tools$parser$Parser$oneOf(
+			{
+				ctor: '::',
+				_0: A2(_elm_tools$parser$Parser$andThen, chompRest, parseItem),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+						_elm_tools$parser$Parser$symbol(end),
+						_elm_tools$parser$Parser$succeed(
+							{ctor: '[]'})),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _elm_tools$parser$Parser_LanguageKit$whitespaceHelp = function (parser) {
+	return A2(
+		_elm_tools$parser$Parser_LanguageKit$ignore,
+		_elm_tools$parser$Parser_LanguageKit$chompSpaces,
+		_elm_tools$parser$Parser$oneOf(
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_tools$parser$Parser$andThen,
+					function (_p3) {
+						return _elm_tools$parser$Parser_LanguageKit$whitespaceHelp(parser);
+					},
+					parser),
+				_1: {
+					ctor: '::',
+					_0: _elm_tools$parser$Parser$succeed(
+						{ctor: '_Tuple0'}),
+					_1: {ctor: '[]'}
+				}
+			}));
+};
+var _elm_tools$parser$Parser_LanguageKit$nestableCommentHelp = F4(
+	function (isNotRelevant, start, end, nestLevel) {
+		return _elm_tools$parser$Parser$lazy(
+			function (_p4) {
+				return A2(
+					_elm_tools$parser$Parser_LanguageKit$ignore,
+					A2(_elm_tools$parser$Parser$ignore, _elm_tools$parser$Parser$zeroOrMore, isNotRelevant),
+					_elm_tools$parser$Parser$oneOf(
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_tools$parser$Parser_LanguageKit$ignore,
+								_elm_tools$parser$Parser$symbol(end),
+								_elm_lang$core$Native_Utils.eq(nestLevel, 1) ? _elm_tools$parser$Parser$succeed(
+									{ctor: '_Tuple0'}) : A4(_elm_tools$parser$Parser_LanguageKit$nestableCommentHelp, isNotRelevant, start, end, nestLevel - 1)),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_tools$parser$Parser_LanguageKit$ignore,
+									_elm_tools$parser$Parser$symbol(start),
+									A4(_elm_tools$parser$Parser_LanguageKit$nestableCommentHelp, isNotRelevant, start, end, nestLevel + 1)),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_tools$parser$Parser_LanguageKit$ignore,
+										A2(
+											_elm_tools$parser$Parser$ignore,
+											_elm_tools$parser$Parser$Exactly(1),
+											_elm_tools$parser$Parser_LanguageKit$isChar),
+										A4(_elm_tools$parser$Parser_LanguageKit$nestableCommentHelp, isNotRelevant, start, end, nestLevel)),
+									_1: {ctor: '[]'}
+								}
+							}
+						}));
+			});
+	});
+var _elm_tools$parser$Parser_LanguageKit$nestableComment = F2(
+	function (start, end) {
+		var _p5 = {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$String$uncons(start),
+			_1: _elm_lang$core$String$uncons(end)
+		};
+		if (_p5._0.ctor === 'Nothing') {
+			return _elm_tools$parser$Parser$fail('Trying to parse a multi-line comment, but the start token cannot be the empty string!');
+		} else {
+			if (_p5._1.ctor === 'Nothing') {
+				return _elm_tools$parser$Parser$fail('Trying to parse a multi-line comment, but the end token cannot be the empty string!');
+			} else {
+				var isNotRelevant = function ($char) {
+					return (!_elm_lang$core$Native_Utils.eq($char, _p5._0._0._0)) && (!_elm_lang$core$Native_Utils.eq($char, _p5._1._0._0));
+				};
+				return A2(
+					_elm_tools$parser$Parser_ops['|.'],
+					_elm_tools$parser$Parser$symbol(start),
+					A4(_elm_tools$parser$Parser_LanguageKit$nestableCommentHelp, isNotRelevant, start, end, 1));
+			}
+		}
+	});
+var _elm_tools$parser$Parser_LanguageKit$whitespace = function (_p6) {
+	var _p7 = _p6;
+	var multiParser = function () {
+		var _p8 = _p7.multiComment;
+		switch (_p8.ctor) {
+			case 'NoMultiComment':
+				return {ctor: '[]'};
+			case 'UnnestableComment':
+				return {
+					ctor: '::',
+					_0: A2(
+						_elm_tools$parser$Parser_ops['|.'],
+						_elm_tools$parser$Parser$symbol(_p8._0),
+						_elm_tools$parser$Parser$ignoreUntil(_p8._1)),
+					_1: {ctor: '[]'}
+				};
+			default:
+				return {
+					ctor: '::',
+					_0: A2(_elm_tools$parser$Parser_LanguageKit$nestableComment, _p8._0, _p8._1),
+					_1: {ctor: '[]'}
+				};
+		}
+	}();
+	var lineParser = function () {
+		var _p9 = _p7.lineComment;
+		if (_p9.ctor === 'NoLineComment') {
+			return {ctor: '[]'};
+		} else {
+			return {
+				ctor: '::',
+				_0: A2(
+					_elm_tools$parser$Parser_ops['|.'],
+					_elm_tools$parser$Parser$symbol(_p9._0),
+					_elm_tools$parser$Parser$ignoreUntil('\n')),
+				_1: {ctor: '[]'}
+			};
+		}
+	}();
+	var tabParser = _p7.allowTabs ? {
+		ctor: '::',
+		_0: A2(_elm_tools$parser$Parser$ignore, _elm_tools$parser$Parser$zeroOrMore, _elm_tools$parser$Parser_LanguageKit$isTab),
+		_1: {ctor: '[]'}
+	} : {ctor: '[]'};
+	return _elm_tools$parser$Parser_LanguageKit$whitespaceHelp(
+		_elm_tools$parser$Parser$oneOf(
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				tabParser,
+				A2(_elm_lang$core$Basics_ops['++'], lineParser, multiParser))));
+};
+var _elm_tools$parser$Parser_LanguageKit$sequence = function (_p10) {
+	var _p11 = _p10;
+	var _p12 = _p11.spaces;
+	return A2(
+		_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+		A2(
+			_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+			_elm_tools$parser$Parser$symbol(_p11.start),
+			_p12),
+		A5(_elm_tools$parser$Parser_LanguageKit$sequenceEnd, _p11.end, _p12, _p11.item, _p11.separator, _p11.trailing));
+};
+var _elm_tools$parser$Parser_LanguageKit$varHelp = F7(
+	function (isGood, offset, row, col, source, indent, context) {
+		varHelp:
+		while (true) {
+			var newOffset = A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, isGood, offset, source);
+			if (_elm_lang$core$Native_Utils.eq(newOffset, -1)) {
+				return {source: source, offset: offset, indent: indent, context: context, row: row, col: col};
+			} else {
+				if (_elm_lang$core$Native_Utils.eq(newOffset, -2)) {
+					var _v6 = isGood,
+						_v7 = offset + 1,
+						_v8 = row + 1,
+						_v9 = 1,
+						_v10 = source,
+						_v11 = indent,
+						_v12 = context;
+					isGood = _v6;
+					offset = _v7;
+					row = _v8;
+					col = _v9;
+					source = _v10;
+					indent = _v11;
+					context = _v12;
+					continue varHelp;
+				} else {
+					var _v13 = isGood,
+						_v14 = newOffset,
+						_v15 = row,
+						_v16 = col + 1,
+						_v17 = source,
+						_v18 = indent,
+						_v19 = context;
+					isGood = _v13;
+					offset = _v14;
+					row = _v15;
+					col = _v16;
+					source = _v17;
+					indent = _v18;
+					context = _v19;
+					continue varHelp;
+				}
+			}
+		}
+	});
+var _elm_tools$parser$Parser_LanguageKit$variable = F3(
+	function (isFirst, isOther, keywords) {
+		return _elm_tools$parser$Parser_Internal$Parser(
+			function (_p13) {
+				var _p14 = _p13;
+				var _p20 = _p14;
+				var _p19 = _p14.source;
+				var _p18 = _p14.row;
+				var _p17 = _p14.offset;
+				var _p16 = _p14.indent;
+				var _p15 = _p14.context;
+				var firstOffset = A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, isFirst, _p17, _p19);
+				if (_elm_lang$core$Native_Utils.eq(firstOffset, -1)) {
+					return A2(_elm_tools$parser$Parser_Internal$Bad, _elm_tools$parser$Parser$ExpectingVariable, _p20);
+				} else {
+					var state2 = _elm_lang$core$Native_Utils.eq(firstOffset, -2) ? A7(_elm_tools$parser$Parser_LanguageKit$varHelp, isOther, _p17 + 1, _p18 + 1, 1, _p19, _p16, _p15) : A7(_elm_tools$parser$Parser_LanguageKit$varHelp, isOther, firstOffset, _p18, _p14.col + 1, _p19, _p16, _p15);
+					var name = A3(_elm_lang$core$String$slice, _p17, state2.offset, _p19);
+					return A2(_elm_lang$core$Set$member, name, keywords) ? A2(_elm_tools$parser$Parser_Internal$Bad, _elm_tools$parser$Parser$ExpectingVariable, _p20) : A2(_elm_tools$parser$Parser_Internal$Good, name, state2);
+				}
+			});
+	});
+var _elm_tools$parser$Parser_LanguageKit$Mandatory = {ctor: 'Mandatory'};
+var _elm_tools$parser$Parser_LanguageKit$Optional = {ctor: 'Optional'};
+var _elm_tools$parser$Parser_LanguageKit$Forbidden = {ctor: 'Forbidden'};
+var _elm_tools$parser$Parser_LanguageKit$list = F2(
+	function (spaces, item) {
+		return _elm_tools$parser$Parser_LanguageKit$sequence(
+			{start: '[', separator: ',', end: ']', spaces: spaces, item: item, trailing: _elm_tools$parser$Parser_LanguageKit$Forbidden});
+	});
+var _elm_tools$parser$Parser_LanguageKit$record = F2(
+	function (spaces, item) {
+		return _elm_tools$parser$Parser_LanguageKit$sequence(
+			{start: '{', separator: ',', end: '}', spaces: spaces, item: item, trailing: _elm_tools$parser$Parser_LanguageKit$Forbidden});
+	});
+var _elm_tools$parser$Parser_LanguageKit$tuple = F2(
+	function (spaces, item) {
+		return _elm_tools$parser$Parser_LanguageKit$sequence(
+			{start: '(', separator: ',', end: ')', spaces: spaces, item: item, trailing: _elm_tools$parser$Parser_LanguageKit$Forbidden});
+	});
+var _elm_tools$parser$Parser_LanguageKit$LineComment = function (a) {
+	return {ctor: 'LineComment', _0: a};
+};
+var _elm_tools$parser$Parser_LanguageKit$NoLineComment = {ctor: 'NoLineComment'};
+var _elm_tools$parser$Parser_LanguageKit$UnnestableComment = F2(
+	function (a, b) {
+		return {ctor: 'UnnestableComment', _0: a, _1: b};
+	});
+var _elm_tools$parser$Parser_LanguageKit$NestableComment = F2(
+	function (a, b) {
+		return {ctor: 'NestableComment', _0: a, _1: b};
+	});
+var _elm_tools$parser$Parser_LanguageKit$NoMultiComment = {ctor: 'NoMultiComment'};
+
+var _kirchner$elm_pat$Expr$spaces = A2(
+	_elm_tools$parser$Parser$ignore,
+	_elm_tools$parser$Parser$zeroOrMore,
+	function (c) {
+		return _elm_lang$core$Native_Utils.eq(
+			c,
+			_elm_lang$core$Native_Utils.chr(' '));
+	});
+var _kirchner$elm_pat$Expr$isVarChar = function ($char) {
+	return _elm_lang$core$Char$isLower($char) || (_elm_lang$core$Char$isUpper($char) || _elm_lang$core$Char$isDigit($char));
+};
+var _kirchner$elm_pat$Expr$parseVariable = function (s) {
+	return _elm_lang$core$Result$toMaybe(
+		A2(
+			_elm_tools$parser$Parser$run,
+			A2(
+				_elm_tools$parser$Parser_ops['|.'],
+				A2(
+					_elm_tools$parser$Parser_ops['|='],
+					_elm_tools$parser$Parser$succeed(_elm_lang$core$Basics$identity),
+					A3(_elm_tools$parser$Parser_LanguageKit$variable, _elm_lang$core$Char$isLower, _kirchner$elm_pat$Expr$isVarChar, _elm_lang$core$Set$empty)),
+				_elm_tools$parser$Parser$end),
+			s));
+};
+var _kirchner$elm_pat$Expr$print = function (expr) {
+	var apply = F3(
+		function (operator, e1, e2) {
+			return _elm_lang$core$String$concat(
+				{
+					ctor: '::',
+					_0: _kirchner$elm_pat$Expr$print(e1),
+					_1: {
+						ctor: '::',
+						_0: ' ',
+						_1: {
+							ctor: '::',
+							_0: operator,
+							_1: {
+								ctor: '::',
+								_0: ' ',
+								_1: {
+									ctor: '::',
+									_0: _kirchner$elm_pat$Expr$print(e2),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				});
+		});
+	var _p0 = expr;
+	switch (_p0.ctor) {
+		case 'Number':
+			return _elm_lang$core$Basics$toString(_p0._0);
+		case 'Symbol':
+			return _p0._0;
+		case 'Sum':
+			return A3(apply, '+', _p0._0, _p0._1);
+		case 'Difference':
+			return A3(apply, '-', _p0._0, _p0._1);
+		case 'Product':
+			return A3(apply, '*', _p0._0, _p0._1);
+		default:
+			return A3(apply, '/', _p0._0, _p0._1);
+	}
+};
+var _kirchner$elm_pat$Expr$compute = F2(
+	function (variables, expr) {
+		var apply = F3(
+			function (func, e1, e2) {
+				return A3(
+					_elm_lang$core$Maybe$map2,
+					func,
+					A2(_kirchner$elm_pat$Expr$compute, variables, e1),
+					A2(_kirchner$elm_pat$Expr$compute, variables, e2));
+			});
+		var _p1 = expr;
+		switch (_p1.ctor) {
+			case 'Number':
+				return _elm_lang$core$Maybe$Just(_p1._0);
+			case 'Symbol':
+				return A2(
+					_elm_lang$core$Maybe$andThen,
+					_kirchner$elm_pat$Expr$compute(variables),
+					A2(_elm_lang$core$Dict$get, _p1._0, variables));
+			case 'Sum':
+				return A3(
+					apply,
+					F2(
+						function (f1, f2) {
+							return f1 + f2;
+						}),
+					_p1._0,
+					_p1._1);
+			case 'Difference':
+				return A3(
+					apply,
+					F2(
+						function (f1, f2) {
+							return f1 - f2;
+						}),
+					_p1._0,
+					_p1._1);
+			case 'Product':
+				return A3(
+					apply,
+					F2(
+						function (f1, f2) {
+							return f1 * f2;
+						}),
+					_p1._0,
+					_p1._1);
+			default:
+				return A3(
+					apply,
+					F2(
+						function (f1, f2) {
+							return f1 / f2;
+						}),
+					_p1._0,
+					_p1._1);
+		}
+	});
+var _kirchner$elm_pat$Expr$Quotient = F2(
+	function (a, b) {
+		return {ctor: 'Quotient', _0: a, _1: b};
+	});
+var _kirchner$elm_pat$Expr$Product = F2(
+	function (a, b) {
+		return {ctor: 'Product', _0: a, _1: b};
+	});
+var _kirchner$elm_pat$Expr$Difference = F2(
+	function (a, b) {
+		return {ctor: 'Difference', _0: a, _1: b};
+	});
+var _kirchner$elm_pat$Expr$Sum = F2(
+	function (a, b) {
+		return {ctor: 'Sum', _0: a, _1: b};
+	});
+var _kirchner$elm_pat$Expr$Symbol = function (a) {
+	return {ctor: 'Symbol', _0: a};
+};
+var _kirchner$elm_pat$Expr$Number = function (a) {
+	return {ctor: 'Number', _0: a};
+};
+var _kirchner$elm_pat$Expr$atom = _elm_tools$parser$Parser$oneOf(
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_tools$parser$Parser_ops['|='],
+			_elm_tools$parser$Parser$succeed(_kirchner$elm_pat$Expr$Number),
+			_elm_tools$parser$Parser$float),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_elm_tools$parser$Parser_ops['|='],
+				_elm_tools$parser$Parser$succeed(_kirchner$elm_pat$Expr$Symbol),
+				A3(_elm_tools$parser$Parser_LanguageKit$variable, _elm_lang$core$Char$isLower, _kirchner$elm_pat$Expr$isVarChar, _elm_lang$core$Set$empty)),
+			_1: {ctor: '[]'}
+		}
+	});
+var _kirchner$elm_pat$Expr$factor = _elm_tools$parser$Parser$oneOf(
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_tools$parser$Parser_ops['|.'],
+			A2(
+				_elm_tools$parser$Parser_ops['|='],
+				A2(
+					_elm_tools$parser$Parser_ops['|.'],
+					_elm_tools$parser$Parser$succeed(_elm_lang$core$Basics$identity),
+					_elm_tools$parser$Parser$symbol('(')),
+				_elm_tools$parser$Parser$lazy(
+					function (_p2) {
+						return _kirchner$elm_pat$Expr$expr;
+					})),
+			_elm_tools$parser$Parser$symbol(')')),
+		_1: {
+			ctor: '::',
+			_0: _kirchner$elm_pat$Expr$atom,
+			_1: {ctor: '[]'}
+		}
+	});
+var _kirchner$elm_pat$Expr$expr = A2(
+	_elm_tools$parser$Parser$andThen,
+	function (t) {
+		return _kirchner$elm_pat$Expr$exprHelp(t);
+	},
+	_elm_tools$parser$Parser$lazy(
+		function (_p3) {
+			return _kirchner$elm_pat$Expr$term;
+		}));
+var _kirchner$elm_pat$Expr$exprHelp = function (t) {
+	return _elm_tools$parser$Parser$oneOf(
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_tools$parser$Parser$andThen,
+				function (t) {
+					return _kirchner$elm_pat$Expr$exprHelp(t);
+				},
+				_kirchner$elm_pat$Expr$sum(t)),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_tools$parser$Parser$andThen,
+					function (t) {
+						return _kirchner$elm_pat$Expr$exprHelp(t);
+					},
+					_kirchner$elm_pat$Expr$difference(t)),
+				_1: {
+					ctor: '::',
+					_0: _elm_tools$parser$Parser$succeed(t),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _kirchner$elm_pat$Expr$difference = function (t) {
+	return A2(
+		_elm_tools$parser$Parser$delayedCommit,
+		_kirchner$elm_pat$Expr$spaces,
+		A2(
+			_elm_tools$parser$Parser_ops['|='],
+			A2(
+				_elm_tools$parser$Parser_ops['|.'],
+				A2(
+					_elm_tools$parser$Parser_ops['|.'],
+					_elm_tools$parser$Parser$succeed(
+						_kirchner$elm_pat$Expr$Difference(t)),
+					_elm_tools$parser$Parser$symbol('-')),
+				_kirchner$elm_pat$Expr$spaces),
+			_kirchner$elm_pat$Expr$term));
+};
+var _kirchner$elm_pat$Expr$term = A2(
+	_elm_tools$parser$Parser$andThen,
+	function (f) {
+		return _kirchner$elm_pat$Expr$termHelp(f);
+	},
+	_elm_tools$parser$Parser$lazy(
+		function (_p4) {
+			return _kirchner$elm_pat$Expr$factor;
+		}));
+var _kirchner$elm_pat$Expr$termHelp = function (f) {
+	return _elm_tools$parser$Parser$oneOf(
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_tools$parser$Parser$andThen,
+				function (f) {
+					return _kirchner$elm_pat$Expr$termHelp(f);
+				},
+				_kirchner$elm_pat$Expr$product(f)),
+			_1: {
+				ctor: '::',
+				_0: _kirchner$elm_pat$Expr$quotient(f),
+				_1: {
+					ctor: '::',
+					_0: _elm_tools$parser$Parser$succeed(f),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _kirchner$elm_pat$Expr$product = function (f) {
+	return A2(
+		_elm_tools$parser$Parser$delayedCommit,
+		_kirchner$elm_pat$Expr$spaces,
+		A2(
+			_elm_tools$parser$Parser_ops['|='],
+			A2(
+				_elm_tools$parser$Parser_ops['|.'],
+				A2(
+					_elm_tools$parser$Parser_ops['|.'],
+					_elm_tools$parser$Parser$succeed(
+						_kirchner$elm_pat$Expr$Product(f)),
+					_elm_tools$parser$Parser$symbol('*')),
+				_kirchner$elm_pat$Expr$spaces),
+			_kirchner$elm_pat$Expr$factor));
+};
+var _kirchner$elm_pat$Expr$quotient = function (f) {
+	return A2(
+		_elm_tools$parser$Parser$delayedCommit,
+		_kirchner$elm_pat$Expr$spaces,
+		A2(
+			_elm_tools$parser$Parser_ops['|='],
+			A2(
+				_elm_tools$parser$Parser_ops['|.'],
+				A2(
+					_elm_tools$parser$Parser_ops['|.'],
+					_elm_tools$parser$Parser$succeed(
+						_kirchner$elm_pat$Expr$Quotient(f)),
+					_elm_tools$parser$Parser$symbol('/')),
+				_kirchner$elm_pat$Expr$spaces),
+			_kirchner$elm_pat$Expr$factor));
+};
+var _kirchner$elm_pat$Expr$sum = function (t) {
+	return A2(
+		_elm_tools$parser$Parser$delayedCommit,
+		_kirchner$elm_pat$Expr$spaces,
+		A2(
+			_elm_tools$parser$Parser_ops['|='],
+			A2(
+				_elm_tools$parser$Parser_ops['|.'],
+				A2(
+					_elm_tools$parser$Parser_ops['|.'],
+					_elm_tools$parser$Parser$succeed(
+						_kirchner$elm_pat$Expr$Sum(t)),
+					_elm_tools$parser$Parser$symbol('+')),
+				_kirchner$elm_pat$Expr$spaces),
+			_kirchner$elm_pat$Expr$term));
+};
+var _kirchner$elm_pat$Expr$parse = function (s) {
+	return _elm_lang$core$Result$toMaybe(
+		A2(_elm_tools$parser$Parser$run, _kirchner$elm_pat$Expr$expr, s));
+};
+
 var _kirchner$elm_pat$Types$equals = F2(
 	function (maybe, a) {
 		var _p0 = maybe;
@@ -9882,23 +11679,35 @@ var _kirchner$elm_pat$Types$canvasToSvg = F2(
 	function (viewPort, p) {
 		return {x: p.x - viewPort.x, y: p.y - viewPort.y};
 	});
-var _kirchner$elm_pat$Types$position = F2(
-	function (store, point) {
+var _kirchner$elm_pat$Types$position = F3(
+	function (store, variables, point) {
 		var lookUp = function (id) {
 			return A2(
 				_elm_lang$core$Maybe$andThen,
-				_kirchner$elm_pat$Types$position(store),
+				A2(_kirchner$elm_pat$Types$position, store, variables),
 				A2(_elm_lang$core$Dict$get, id, store));
 		};
 		var _p1 = point;
 		switch (_p1.ctor) {
 			case 'Absolute':
-				return _elm_lang$core$Maybe$Just(_p1._0);
+				return A3(
+					_elm_lang$core$Maybe$map2,
+					_elm_community$linear_algebra$Math_Vector2$vec2,
+					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._0),
+					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._1));
 			case 'Relative':
-				return A2(
-					_elm_lang$core$Maybe$map,
-					_elm_community$linear_algebra$Math_Vector2$add(_p1._1),
-					lookUp(_p1._0));
+				return A4(
+					_elm_lang$core$Maybe$map3,
+					F3(
+						function (v, p, q) {
+							return A2(
+								_elm_community$linear_algebra$Math_Vector2$add,
+								A2(_elm_community$linear_algebra$Math_Vector2$vec2, p, q),
+								v);
+						}),
+					lookUp(_p1._0),
+					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._1),
+					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._2));
 			default:
 				return A3(
 					_elm_lang$core$Maybe$map2,
@@ -9916,11 +11725,11 @@ var _kirchner$elm_pat$Types$position = F2(
 					lookUp(_p1._1));
 		}
 	});
-var _kirchner$elm_pat$Types$positionById = F2(
-	function (store, id) {
+var _kirchner$elm_pat$Types$positionById = F3(
+	function (store, variables, id) {
 		return A2(
 			_elm_lang$core$Maybe$andThen,
-			_kirchner$elm_pat$Types$position(store),
+			A2(_kirchner$elm_pat$Types$position, store, variables),
 			A2(_elm_lang$core$Dict$get, id, store));
 	});
 var _kirchner$elm_pat$Types$firstId = 0;
@@ -9943,15 +11752,50 @@ var _kirchner$elm_pat$Types$Between = F3(
 	function (a, b, c) {
 		return {ctor: 'Between', _0: a, _1: b, _2: c};
 	});
-var _kirchner$elm_pat$Types$Relative = F2(
-	function (a, b) {
-		return {ctor: 'Relative', _0: a, _1: b};
+var _kirchner$elm_pat$Types$Relative = F3(
+	function (a, b, c) {
+		return {ctor: 'Relative', _0: a, _1: b, _2: c};
 	});
-var _kirchner$elm_pat$Types$relative = _kirchner$elm_pat$Types$Relative;
-var _kirchner$elm_pat$Types$Absolute = function (a) {
-	return {ctor: 'Absolute', _0: a};
+var _kirchner$elm_pat$Types$relative = F2(
+	function (id, v) {
+		return A3(
+			_kirchner$elm_pat$Types$Relative,
+			id,
+			_kirchner$elm_pat$Expr$Number(
+				_elm_community$linear_algebra$Math_Vector2$getX(v)),
+			_kirchner$elm_pat$Expr$Number(
+				_elm_community$linear_algebra$Math_Vector2$getY(v)));
+	});
+var _kirchner$elm_pat$Types$Absolute = F2(
+	function (a, b) {
+		return {ctor: 'Absolute', _0: a, _1: b};
+	});
+var _kirchner$elm_pat$Types$absolute = function (v) {
+	return A2(
+		_kirchner$elm_pat$Types$Absolute,
+		_kirchner$elm_pat$Expr$Number(
+			_elm_community$linear_algebra$Math_Vector2$getX(v)),
+		_kirchner$elm_pat$Expr$Number(
+			_elm_community$linear_algebra$Math_Vector2$getY(v)));
 };
-var _kirchner$elm_pat$Types$absolute = _kirchner$elm_pat$Types$Absolute;
+
+var _kirchner$elm_pat$Events$positionDecoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_kirchner$elm_pat$Types$Position,
+	A2(_elm_lang$core$Json_Decode$field, 'offsetX', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'offsetY', _elm_lang$core$Json_Decode$int));
+var _kirchner$elm_pat$Events$onMove = function (tagger) {
+	return A2(
+		_elm_lang$virtual_dom$VirtualDom$on,
+		'mousemove',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _kirchner$elm_pat$Events$positionDecoder));
+};
+var _kirchner$elm_pat$Events$onClick = function (tagger) {
+	return A2(
+		_elm_lang$virtual_dom$VirtualDom$on,
+		'click',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _kirchner$elm_pat$Events$positionDecoder));
+};
 
 var _kirchner$elm_pat$Input_Decoder$Event = F4(
 	function (a, b, c, d) {
@@ -10462,6 +12306,230 @@ var _kirchner$elm_pat$Input_Float$StringOptions = F5(
 	function (a, b, c, d, e) {
 		return {maxLength: a, maxValue: b, minValue: c, onInput: d, hasFocus: e};
 	});
+
+var _kirchner$elm_pat$Styles_Colors$green = '#859900';
+var _kirchner$elm_pat$Styles_Colors$cyan = '#2aa198';
+var _kirchner$elm_pat$Styles_Colors$blue = '#268bd2';
+var _kirchner$elm_pat$Styles_Colors$violet = '#6c71c4';
+var _kirchner$elm_pat$Styles_Colors$magenta = '#d33682';
+var _kirchner$elm_pat$Styles_Colors$red = '#dc322f';
+var _kirchner$elm_pat$Styles_Colors$orange = '#cb4b16';
+var _kirchner$elm_pat$Styles_Colors$yellow = '#b58900';
+var _kirchner$elm_pat$Styles_Colors$base3 = '#fdf6e3';
+var _kirchner$elm_pat$Styles_Colors$base2 = '#eee8d5';
+var _kirchner$elm_pat$Styles_Colors$base1 = '#93a1a1';
+var _kirchner$elm_pat$Styles_Colors$base0 = '#839496';
+var _kirchner$elm_pat$Styles_Colors$base00 = '#657b83';
+var _kirchner$elm_pat$Styles_Colors$base01 = '#586e75';
+var _kirchner$elm_pat$Styles_Colors$base02 = '#073642';
+var _kirchner$elm_pat$Styles_Colors$base03 = '#002b36';
+
+var _kirchner$elm_pat$Svg_Extra$drawVerticalLine = function (x) {
+	return A2(
+		_elm_lang$svg$Svg$line,
+		{
+			ctor: '::',
+			_0: _elm_lang$svg$Svg_Attributes$x1(
+				_elm_lang$core$Basics$toString(x)),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$y1('-1000'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$x2(
+						_elm_lang$core$Basics$toString(x)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$y2('1000'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		{ctor: '[]'});
+};
+var _kirchner$elm_pat$Svg_Extra$drawHorizontalLine = function (y) {
+	return A2(
+		_elm_lang$svg$Svg$line,
+		{
+			ctor: '::',
+			_0: _elm_lang$svg$Svg_Attributes$x1('-1000'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$y1(
+					_elm_lang$core$Basics$toString(y)),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$x2('1000'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$y2(
+							_elm_lang$core$Basics$toString(y)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		{ctor: '[]'});
+};
+var _kirchner$elm_pat$Svg_Extra$drawArrow = F2(
+	function (v, w) {
+		return A2(
+			_elm_lang$svg$Svg$line,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$x1(
+					_elm_lang$core$Basics$toString(
+						_elm_community$linear_algebra$Math_Vector2$getX(v))),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$y1(
+						_elm_lang$core$Basics$toString(
+							_elm_community$linear_algebra$Math_Vector2$getY(v))),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$x2(
+							_elm_lang$core$Basics$toString(
+								_elm_community$linear_algebra$Math_Vector2$getX(w))),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$y2(
+								_elm_lang$core$Basics$toString(
+									_elm_community$linear_algebra$Math_Vector2$getY(w))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			{ctor: '[]'});
+	});
+var _kirchner$elm_pat$Svg_Extra$drawRectArrow = F2(
+	function (v, w) {
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_kirchner$elm_pat$Svg_Extra$drawArrow,
+					v,
+					A2(
+						_elm_community$linear_algebra$Math_Vector2$vec2,
+						_elm_community$linear_algebra$Math_Vector2$getX(w),
+						_elm_community$linear_algebra$Math_Vector2$getY(v))),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_kirchner$elm_pat$Svg_Extra$drawArrow,
+						A2(
+							_elm_community$linear_algebra$Math_Vector2$vec2,
+							_elm_community$linear_algebra$Math_Vector2$getX(w),
+							_elm_community$linear_algebra$Math_Vector2$getY(v)),
+						w),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _kirchner$elm_pat$Svg_Extra$drawSelector = function (v) {
+	return A2(
+		_elm_lang$svg$Svg$circle,
+		{
+			ctor: '::',
+			_0: _elm_lang$svg$Svg_Attributes$cx(
+				_elm_lang$core$Basics$toString(
+					_elm_community$linear_algebra$Math_Vector2$getX(v))),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$cy(
+					_elm_lang$core$Basics$toString(
+						_elm_community$linear_algebra$Math_Vector2$getY(v))),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$r('5'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$fill('none'),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		},
+		{ctor: '[]'});
+};
+var _kirchner$elm_pat$Svg_Extra$drawPoint = function (v) {
+	return A2(
+		_elm_lang$svg$Svg$circle,
+		{
+			ctor: '::',
+			_0: _elm_lang$svg$Svg_Attributes$cx(
+				_elm_lang$core$Basics$toString(
+					_elm_community$linear_algebra$Math_Vector2$getX(v))),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$cy(
+					_elm_lang$core$Basics$toString(
+						_elm_community$linear_algebra$Math_Vector2$getY(v))),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$r('1'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$fill(_kirchner$elm_pat$Styles_Colors$base0),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		},
+		{ctor: '[]'});
+};
 
 var _rtfeldman$elm_css_util$Css_Helpers$toCssIdentifier = function (identifier) {
 	return A4(
@@ -15223,259 +17291,213 @@ var _rtfeldman$elm_css$Css$thin = _rtfeldman$elm_css$Css$IntentionallyUnsupporte
 var _rtfeldman$elm_css$Css$thick = _rtfeldman$elm_css$Css$IntentionallyUnsupportedPleaseSeeDocs;
 var _rtfeldman$elm_css$Css$blink = _rtfeldman$elm_css$Css$IntentionallyUnsupportedPleaseSeeDocs;
 
-var _kirchner$elm_pat$Events$positionDecoder = A3(
-	_elm_lang$core$Json_Decode$map2,
-	_kirchner$elm_pat$Types$Position,
-	A2(_elm_lang$core$Json_Decode$field, 'offsetX', _elm_lang$core$Json_Decode$int),
-	A2(_elm_lang$core$Json_Decode$field, 'offsetY', _elm_lang$core$Json_Decode$int));
-var _kirchner$elm_pat$Events$onMove = function (tagger) {
-	return A2(
-		_elm_lang$virtual_dom$VirtualDom$on,
-		'mousemove',
-		A2(_elm_lang$core$Json_Decode$map, tagger, _kirchner$elm_pat$Events$positionDecoder));
-};
-var _kirchner$elm_pat$Events$onClick = function (tagger) {
-	return A2(
-		_elm_lang$virtual_dom$VirtualDom$on,
-		'click',
-		A2(_elm_lang$core$Json_Decode$map, tagger, _kirchner$elm_pat$Events$positionDecoder));
-};
-
-var _kirchner$elm_pat$View_Colors$green = '#859900';
-var _kirchner$elm_pat$View_Colors$cyan = '#2aa198';
-var _kirchner$elm_pat$View_Colors$blue = '#268bd2';
-var _kirchner$elm_pat$View_Colors$violet = '#6c71c4';
-var _kirchner$elm_pat$View_Colors$magenta = '#d33682';
-var _kirchner$elm_pat$View_Colors$red = '#dc322f';
-var _kirchner$elm_pat$View_Colors$orange = '#cb4b16';
-var _kirchner$elm_pat$View_Colors$yellow = '#b58900';
-var _kirchner$elm_pat$View_Colors$base3 = '#fdf6e3';
-var _kirchner$elm_pat$View_Colors$base2 = '#eee8d5';
-var _kirchner$elm_pat$View_Colors$base1 = '#93a1a1';
-var _kirchner$elm_pat$View_Colors$base0 = '#839496';
-var _kirchner$elm_pat$View_Colors$base00 = '#657b83';
-var _kirchner$elm_pat$View_Colors$base01 = '#586e75';
-var _kirchner$elm_pat$View_Colors$base02 = '#073642';
-var _kirchner$elm_pat$View_Colors$base03 = '#002b36';
-
-var _kirchner$elm_pat$Svg_Extra$drawVerticalLine = function (x) {
-	return A2(
-		_elm_lang$svg$Svg$line,
-		{
-			ctor: '::',
-			_0: _elm_lang$svg$Svg_Attributes$x1(
-				_elm_lang$core$Basics$toString(x)),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$y1('-1000'),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$x2(
-						_elm_lang$core$Basics$toString(x)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$y2('1000'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$View_Colors$base1),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		{ctor: '[]'});
-};
-var _kirchner$elm_pat$Svg_Extra$drawHorizontalLine = function (y) {
-	return A2(
-		_elm_lang$svg$Svg$line,
-		{
-			ctor: '::',
-			_0: _elm_lang$svg$Svg_Attributes$x1('-1000'),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$y1(
-					_elm_lang$core$Basics$toString(y)),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$x2('1000'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$y2(
-							_elm_lang$core$Basics$toString(y)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$View_Colors$base1),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		{ctor: '[]'});
-};
-var _kirchner$elm_pat$Svg_Extra$drawArrow = F2(
-	function (v, w) {
-		return A2(
-			_elm_lang$svg$Svg$line,
-			{
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$x1(
-					_elm_lang$core$Basics$toString(
-						_elm_community$linear_algebra$Math_Vector2$getX(v))),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$y1(
-						_elm_lang$core$Basics$toString(
-							_elm_community$linear_algebra$Math_Vector2$getY(v))),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$x2(
-							_elm_lang$core$Basics$toString(
-								_elm_community$linear_algebra$Math_Vector2$getX(w))),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$y2(
-								_elm_lang$core$Basics$toString(
-									_elm_community$linear_algebra$Math_Vector2$getY(w))),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$View_Colors$base1),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			{ctor: '[]'});
-	});
-var _kirchner$elm_pat$Svg_Extra$drawRectArrow = F2(
-	function (v, w) {
-		return A2(
-			_elm_lang$svg$Svg$g,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: A2(
-					_kirchner$elm_pat$Svg_Extra$drawArrow,
-					v,
-					A2(
-						_elm_community$linear_algebra$Math_Vector2$vec2,
-						_elm_community$linear_algebra$Math_Vector2$getX(w),
-						_elm_community$linear_algebra$Math_Vector2$getY(v))),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_kirchner$elm_pat$Svg_Extra$drawArrow,
-						A2(
-							_elm_community$linear_algebra$Math_Vector2$vec2,
-							_elm_community$linear_algebra$Math_Vector2$getX(w),
-							_elm_community$linear_algebra$Math_Vector2$getY(v)),
-						w),
-					_1: {ctor: '[]'}
-				}
-			});
-	});
-var _kirchner$elm_pat$Svg_Extra$drawSelector = function (v) {
-	return A2(
-		_elm_lang$svg$Svg$circle,
-		{
-			ctor: '::',
-			_0: _elm_lang$svg$Svg_Attributes$cx(
-				_elm_lang$core$Basics$toString(
-					_elm_community$linear_algebra$Math_Vector2$getX(v))),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$cy(
-					_elm_lang$core$Basics$toString(
-						_elm_community$linear_algebra$Math_Vector2$getY(v))),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$r('5'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$View_Colors$base1),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$fill('none'),
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}
-			}
-		},
-		{ctor: '[]'});
-};
-var _kirchner$elm_pat$Svg_Extra$drawPoint = function (v) {
-	return A2(
-		_elm_lang$svg$Svg$circle,
-		{
-			ctor: '::',
-			_0: _elm_lang$svg$Svg_Attributes$cx(
-				_elm_lang$core$Basics$toString(
-					_elm_community$linear_algebra$Math_Vector2$getX(v))),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$cy(
-					_elm_lang$core$Basics$toString(
-						_elm_community$linear_algebra$Math_Vector2$getY(v))),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$r('1'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$fill(_kirchner$elm_pat$View_Colors$base0),
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			}
-		},
-		{ctor: '[]'});
-};
-
-var _kirchner$elm_pat$Tools_Common$updateMouse = F4(
-	function (callback, state, viewPort, newMouse) {
-		return callback(
-			_elm_lang$core$Native_Utils.update(
-				state,
+var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToProperty = F2(
+	function (name, property) {
+		var _p0 = property.key;
+		if (_p0 === 'animation-name') {
+			return _elm_lang$core$Native_Utils.update(
+				property,
 				{
-					mouse: A2(
-						_elm_lang$core$Maybe$map,
-						_kirchner$elm_pat$Types$svgToCanvas(viewPort),
-						newMouse)
-				}));
+					value: A2(_elm_lang$core$Basics_ops['++'], name, property.value)
+				});
+		} else {
+			return property;
+		}
+	});
+var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToRepeatable = F2(
+	function (name, selector) {
+		var _p1 = selector;
+		switch (_p1.ctor) {
+			case 'ClassSelector':
+				return _rtfeldman$elm_css$Css_Structure$ClassSelector(
+					A2(_elm_lang$core$Basics_ops['++'], name, _p1._0));
+			case 'IdSelector':
+				return _rtfeldman$elm_css$Css_Structure$IdSelector(_p1._0);
+			default:
+				return _rtfeldman$elm_css$Css_Structure$PseudoClassSelector(_p1._0);
+		}
+	});
+var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToSequence = F2(
+	function (name, sequence) {
+		var _p2 = sequence;
+		switch (_p2.ctor) {
+			case 'TypeSelectorSequence':
+				return A2(
+					_rtfeldman$elm_css$Css_Structure$TypeSelectorSequence,
+					_p2._0,
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToRepeatable(name),
+						_p2._1));
+			case 'UniversalSelectorSequence':
+				return _rtfeldman$elm_css$Css_Structure$UniversalSelectorSequence(
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToRepeatable(name),
+						_p2._0));
+			default:
+				return A2(
+					_rtfeldman$elm_css$Css_Structure$CustomSelector,
+					_p2._0,
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToRepeatable(name),
+						_p2._1));
+		}
+	});
+var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToSelector = F2(
+	function (name, _p3) {
+		var _p4 = _p3;
+		var apply = _rtfeldman$elm_css$Css_Namespace$applyNamespaceToSequence(name);
+		return A3(
+			_rtfeldman$elm_css$Css_Structure$Selector,
+			apply(_p4._0),
+			A2(
+				_elm_lang$core$List$map,
+				function (_p5) {
+					var _p6 = _p5;
+					return {
+						ctor: '_Tuple2',
+						_0: _p6._0,
+						_1: apply(_p6._1)
+					};
+				},
+				_p4._1),
+			_p4._2);
+	});
+var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin = F2(
+	function (name, mixin) {
+		var _p7 = mixin;
+		switch (_p7.ctor) {
+			case 'AppendProperty':
+				return _rtfeldman$elm_css$Css_Preprocess$AppendProperty(
+					A2(_rtfeldman$elm_css$Css_Namespace$applyNamespaceToProperty, name, _p7._0));
+			case 'ExtendSelector':
+				return A2(
+					_rtfeldman$elm_css$Css_Preprocess$ExtendSelector,
+					A2(_rtfeldman$elm_css$Css_Namespace$applyNamespaceToRepeatable, name, _p7._0),
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin(name),
+						_p7._1));
+			case 'NestSnippet':
+				return A2(
+					_rtfeldman$elm_css$Css_Preprocess$NestSnippet,
+					_p7._0,
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToSnippet(name),
+						_p7._1));
+			case 'WithPseudoElement':
+				return A2(
+					_rtfeldman$elm_css$Css_Preprocess$WithPseudoElement,
+					_p7._0,
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin(name),
+						_p7._1));
+			case 'WithMedia':
+				return A2(
+					_rtfeldman$elm_css$Css_Preprocess$WithMedia,
+					_p7._0,
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin(name),
+						_p7._1));
+			default:
+				return _rtfeldman$elm_css$Css_Preprocess$ApplyMixins(
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin(name),
+						_p7._0));
+		}
+	});
+var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToSnippet = F2(
+	function (name, _p8) {
+		var _p9 = _p8;
+		return _rtfeldman$elm_css$Css_Preprocess$Snippet(
+			A2(
+				_elm_lang$core$List$map,
+				_rtfeldman$elm_css$Css_Namespace$applyNamespaceToDeclaration(name),
+				_p9._0));
+	});
+var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToDeclaration = F2(
+	function (name, declaration) {
+		var _p10 = declaration;
+		switch (_p10.ctor) {
+			case 'StyleBlockDeclaration':
+				return _rtfeldman$elm_css$Css_Preprocess$StyleBlockDeclaration(
+					A2(_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyleBlock, name, _p10._0));
+			case 'MediaRule':
+				return A2(
+					_rtfeldman$elm_css$Css_Preprocess$MediaRule,
+					_p10._0,
+					A2(
+						_elm_lang$core$List$map,
+						_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyleBlock(name),
+						_p10._1));
+			case 'SupportsRule':
+				return A2(
+					_rtfeldman$elm_css$Css_Preprocess$SupportsRule,
+					_p10._0,
+					function (declarations) {
+						return {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css_Preprocess$Snippet(declarations),
+							_1: {ctor: '[]'}
+						};
+					}(
+						A2(
+							_elm_lang$core$List$map,
+							_rtfeldman$elm_css$Css_Namespace$applyNamespaceToDeclaration(name),
+							A2(_elm_lang$core$List$concatMap, _rtfeldman$elm_css$Css_Preprocess$unwrapSnippet, _p10._1))));
+			case 'DocumentRule':
+				return A5(
+					_rtfeldman$elm_css$Css_Preprocess$DocumentRule,
+					_p10._0,
+					_p10._1,
+					_p10._2,
+					_p10._3,
+					A2(_rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyleBlock, name, _p10._4));
+			case 'PageRule':
+				return declaration;
+			case 'FontFace':
+				return declaration;
+			case 'Keyframes':
+				return A2(
+					_rtfeldman$elm_css$Css_Preprocess$Keyframes,
+					A2(_elm_lang$core$Basics_ops['++'], name, _p10._0),
+					_p10._1);
+			case 'Viewport':
+				return declaration;
+			case 'CounterStyle':
+				return declaration;
+			default:
+				return declaration;
+		}
+	});
+var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToStyleBlock = F2(
+	function (name, _p11) {
+		var _p12 = _p11;
+		return A3(
+			_rtfeldman$elm_css$Css_Preprocess$StyleBlock,
+			A2(_rtfeldman$elm_css$Css_Namespace$applyNamespaceToSelector, name, _p12._0),
+			A2(
+				_elm_lang$core$List$map,
+				_rtfeldman$elm_css$Css_Namespace$applyNamespaceToSelector(name),
+				_p12._1),
+			A2(
+				_elm_lang$core$List$map,
+				_rtfeldman$elm_css$Css_Namespace$applyNamespaceToMixin(name),
+				_p12._2));
+	});
+var _rtfeldman$elm_css$Css_Namespace$namespace = F2(
+	function (rawIdentifier, snippets) {
+		return A2(
+			_elm_lang$core$List$map,
+			_rtfeldman$elm_css$Css_Namespace$applyNamespaceToSnippet(
+				_rtfeldman$elm_css_util$Css_Helpers$toCssIdentifier(rawIdentifier)),
+			snippets);
 	});
 
 var _rtfeldman$elm_css_helpers$Html_CssHelpers$stylesheetLink = function (url) {
@@ -15593,163 +17615,644 @@ var _rtfeldman$elm_css_helpers$Html_CssHelpers$Namespace = F4(
 		return {$class: a, classList: b, id: c, name: d};
 	});
 
-var _kirchner$elm_pat$SharedStyles$toolbarNamespace = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('toolbar');
-var _kirchner$elm_pat$SharedStyles$_p0 = _kirchner$elm_pat$SharedStyles$toolbarNamespace;
-var _kirchner$elm_pat$SharedStyles$id = _kirchner$elm_pat$SharedStyles$_p0.id;
-var _kirchner$elm_pat$SharedStyles$class = _kirchner$elm_pat$SharedStyles$_p0.$class;
-var _kirchner$elm_pat$SharedStyles$classList = _kirchner$elm_pat$SharedStyles$_p0.classList;
-var _kirchner$elm_pat$SharedStyles$ToolbarIconButton = {ctor: 'ToolbarIconButton'};
-var _kirchner$elm_pat$SharedStyles$ToolbarColumn = {ctor: 'ToolbarColumn'};
-var _kirchner$elm_pat$SharedStyles$ToolbarRow = {ctor: 'ToolbarRow'};
-var _kirchner$elm_pat$SharedStyles$ToolTextfield = {ctor: 'ToolTextfield'};
-var _kirchner$elm_pat$SharedStyles$ToolbarTooltip = {ctor: 'ToolbarTooltip'};
-var _kirchner$elm_pat$SharedStyles$ToolbarButton = {ctor: 'ToolbarButton'};
-var _kirchner$elm_pat$SharedStyles$ToolbarButtonWrapper = {ctor: 'ToolbarButtonWrapper'};
-var _kirchner$elm_pat$SharedStyles$ToolbarMain = {ctor: 'ToolbarMain'};
-
-var _kirchner$elm_pat$Tools_Absolute$updateY = F3(
-	function (callback, state, newY) {
-		return callback(
-			_elm_lang$core$Native_Utils.update(
-				state,
-				{y: newY}));
-	});
-var _kirchner$elm_pat$Tools_Absolute$updateX = F3(
-	function (callback, state, newX) {
-		return callback(
-			_elm_lang$core$Native_Utils.update(
-				state,
-				{x: newX}));
-	});
-var _kirchner$elm_pat$Tools_Absolute$point = F3(
-	function (maybeX, maybeY, p) {
-		var _p0 = {ctor: '_Tuple2', _0: maybeX, _1: maybeY};
-		if (_p0._0.ctor === 'Just') {
-			if (_p0._1.ctor === 'Just') {
-				return _kirchner$elm_pat$Types$absolute(
-					A2(_elm_community$linear_algebra$Math_Vector2$vec2, _p0._0._0, _p0._1._0));
-			} else {
-				return _kirchner$elm_pat$Types$absolute(
-					A2(
-						_elm_community$linear_algebra$Math_Vector2$vec2,
-						_p0._0._0,
-						_elm_lang$core$Basics$toFloat(p.y)));
-			}
-		} else {
-			if (_p0._1.ctor === 'Just') {
-				return _kirchner$elm_pat$Types$absolute(
-					A2(
-						_elm_community$linear_algebra$Math_Vector2$vec2,
-						_elm_lang$core$Basics$toFloat(p.x),
-						_p0._1._0));
-			} else {
-				return _kirchner$elm_pat$Types$absolute(
-					A2(_kirchner$elm_pat$Types$vec, p.x, p.y));
+var _kirchner$elm_pat$Tools_Styles$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('absolute');
+var _kirchner$elm_pat$Tools_Styles$id = _kirchner$elm_pat$Tools_Styles$_p0.id;
+var _kirchner$elm_pat$Tools_Styles$class = _kirchner$elm_pat$Tools_Styles$_p0.$class;
+var _kirchner$elm_pat$Tools_Styles$classList = _kirchner$elm_pat$Tools_Styles$_p0.classList;
+var _kirchner$elm_pat$Tools_Styles$VariableName = {ctor: 'VariableName'};
+var _kirchner$elm_pat$Tools_Styles$Button = {ctor: 'Button'};
+var _kirchner$elm_pat$Tools_Styles$Textfield = {ctor: 'Textfield'};
+var _kirchner$elm_pat$Tools_Styles$Icon = {ctor: 'Icon'};
+var _kirchner$elm_pat$Tools_Styles$IconButton = {ctor: 'IconButton'};
+var _kirchner$elm_pat$Tools_Styles$Column = {ctor: 'Column'};
+var _kirchner$elm_pat$Tools_Styles$Row = {ctor: 'Row'};
+var _kirchner$elm_pat$Tools_Styles$ToolBox = {ctor: 'ToolBox'};
+var _kirchner$elm_pat$Tools_Styles$css = function (_p1) {
+	return _rtfeldman$elm_css$Css$stylesheet(
+		A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'absolute', _p1));
+}(
+	{
+		ctor: '::',
+		_0: A2(
+			_rtfeldman$elm_css$Css$class,
+			_kirchner$elm_pat$Tools_Styles$ToolBox,
+			{
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$backgroundColor(
+					_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base2)),
+				_1: {
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$width(
+						_rtfeldman$elm_css$Css$rem(10)),
+					_1: {
+						ctor: '::',
+						_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'auto'),
+						_1: {ctor: '[]'}
+					}
+				}
+			}),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_rtfeldman$elm_css$Css$class,
+				_kirchner$elm_pat$Tools_Styles$Button,
+				{
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$width(
+							_rtfeldman$elm_css$Css$rem(10)),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$height(
+								_rtfeldman$elm_css$Css$rem(2)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$lineHeight(
+									_rtfeldman$elm_css$Css$rem(2)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$color(
+										_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$backgroundColor(
+											_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base03)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$hover(
+													{
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$backgroundColor(
+															_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base02)),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_rtfeldman$elm_css$Css$class,
+					_kirchner$elm_pat$Tools_Styles$Textfield,
+					{
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$borderColor(_rtfeldman$elm_css$Css$transparent),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$fontFamily(_rtfeldman$elm_css$Css$monospace),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$fontSize(
+									_rtfeldman$elm_css$Css$rem(1)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$lineHeight(
+										_rtfeldman$elm_css$Css$rem(1)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$width(
+											_rtfeldman$elm_css$Css$rem(4.8)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$backgroundColor(_rtfeldman$elm_css$Css$transparent),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$focus(
+													{
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$outline(_rtfeldman$elm_css$Css$none),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$borderColor(
+																_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base02)),
+															_1: {ctor: '[]'}
+														}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_rtfeldman$elm_css$Css$class,
+						_kirchner$elm_pat$Tools_Styles$Row,
+						{
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$displayFlex,
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$flexFlow1(_rtfeldman$elm_css$Css$row),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$width(
+										_rtfeldman$elm_css$Css$rem(10)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$alignItems(_rtfeldman$elm_css$Css$stretch),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_rtfeldman$elm_css$Css$class,
+							_kirchner$elm_pat$Tools_Styles$Column,
+							{
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$displayFlex,
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$alignItems(_rtfeldman$elm_css$Css$baseline),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$padding(
+											_rtfeldman$elm_css$Css$rem(0.2)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$fontFamily(_rtfeldman$elm_css$Css$monospace),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$fontSize(
+													_rtfeldman$elm_css$Css$rem(1)),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$lineHeight(
+														_rtfeldman$elm_css$Css$rem(1)),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_rtfeldman$elm_css$Css$class,
+								_kirchner$elm_pat$Tools_Styles$IconButton,
+								{
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$fontSize(
+										_rtfeldman$elm_css$Css$rem(1)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$lineHeight(
+											_rtfeldman$elm_css$Css$rem(1)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$width(
+												_rtfeldman$elm_css$Css$rem(1.5)),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$height(
+													_rtfeldman$elm_css$Css$rem(1.5)),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$borderRadius(
+														_rtfeldman$elm_css$Css$pct(50)),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$color(
+															_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$backgroundColor(_rtfeldman$elm_css$Css$transparent),
+															_1: {
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
+																_1: {
+																	ctor: '::',
+																	_0: _rtfeldman$elm_css$Css$hover(
+																		{
+																			ctor: '::',
+																			_0: _rtfeldman$elm_css$Css$backgroundColor(
+																				_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base02)),
+																			_1: {ctor: '[]'}
+																		}),
+																	_1: {
+																		ctor: '::',
+																		_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_rtfeldman$elm_css$Css$class,
+									_kirchner$elm_pat$Tools_Styles$Icon,
+									{
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$fontSize(
+											_rtfeldman$elm_css$Css$rem(0.9)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$lineHeight(
+												_rtfeldman$elm_css$Css$rem(0.9)),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$top(
+														_rtfeldman$elm_css$Css$pct(50)),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$left(
+															_rtfeldman$elm_css$Css$pct(50)),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$transform(
+																A2(
+																	_rtfeldman$elm_css$Css$translate2,
+																	_rtfeldman$elm_css$Css$pct(-50),
+																	_rtfeldman$elm_css$Css$pct(-50))),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_rtfeldman$elm_css$Css$class,
+										_kirchner$elm_pat$Tools_Styles$VariableName,
+										{
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$fontSize(
+												_rtfeldman$elm_css$Css$rem(1)),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$lineHeight(
+													_rtfeldman$elm_css$Css$rem(1)),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$paddingRight(
+														_rtfeldman$elm_css$Css$rem(0.4)),
+													_1: {ctor: '[]'}
+												}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	});
-var _kirchner$elm_pat$Tools_Absolute$updatePoint = F4(
-	function (config, state, id, position) {
+
+var _kirchner$elm_pat$Tools_Common$exprInput = F3(
+	function (name, e, callback) {
+		var input = A2(
+			_elm_lang$html$Html$input,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onInput(callback),
+				_1: {
+					ctor: '::',
+					_0: _kirchner$elm_pat$Tools_Styles$class(
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Tools_Styles$Textfield,
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			},
+			{ctor: '[]'});
+		var cell = F2(
+			function (attrs, nodes) {
+				return A2(
+					_elm_lang$html$Html$div,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Tools_Styles$class(
+								{
+									ctor: '::',
+									_0: _kirchner$elm_pat$Tools_Styles$Column,
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						},
+						attrs),
+					nodes);
+			});
+		var icon = function (name) {
+			return A2(
+				cell,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Tools_Styles$class(
+								{
+									ctor: '::',
+									_0: _kirchner$elm_pat$Tools_Styles$IconButton,
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$i,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('material-icons'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(
+											callback('')),
+										_1: {
+											ctor: '::',
+											_0: _kirchner$elm_pat$Tools_Styles$class(
+												{
+													ctor: '::',
+													_0: _kirchner$elm_pat$Tools_Styles$Icon,
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(name),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				});
+		};
+		var row = F2(
+			function (attrs, nodes) {
+				return A2(
+					_elm_lang$html$Html$div,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Tools_Styles$class(
+								{
+									ctor: '::',
+									_0: _kirchner$elm_pat$Tools_Styles$Row,
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						},
+						attrs),
+					nodes);
+			});
+		return A2(
+			row,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					cell,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _kirchner$elm_pat$Tools_Styles$class(
+									{
+										ctor: '::',
+										_0: _kirchner$elm_pat$Tools_Styles$VariableName,
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									A2(_elm_lang$core$Basics_ops['++'], name, ' =')),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: input,
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: icon('delete'),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _kirchner$elm_pat$Tools_Common$updateMouse = F4(
+	function (callback, state, viewPort, newMouse) {
+		return callback(
+			_elm_lang$core$Native_Utils.update(
+				state,
+				{
+					mouse: A2(
+						_elm_lang$core$Maybe$map,
+						_kirchner$elm_pat$Types$svgToCanvas(viewPort),
+						newMouse)
+				}));
+	});
+
+var _kirchner$elm_pat$Tools_Absolute$updateY = F3(
+	function (callback, state, s) {
+		return callback(
+			_elm_lang$core$Native_Utils.update(
+				state,
+				{
+					y: _kirchner$elm_pat$Expr$parse(s)
+				}));
+	});
+var _kirchner$elm_pat$Tools_Absolute$updateX = F3(
+	function (callback, state, s) {
+		return callback(
+			_elm_lang$core$Native_Utils.update(
+				state,
+				{
+					x: _kirchner$elm_pat$Expr$parse(s)
+				}));
+	});
+var _kirchner$elm_pat$Tools_Absolute$updatePoint = F5(
+	function (variables, config, state, id, position) {
+		var y = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_kirchner$elm_pat$Expr$Number(
+				_elm_lang$core$Basics$toFloat(
+					function (_) {
+						return _.y;
+					}(
+						A2(_kirchner$elm_pat$Types$svgToCanvas, config.viewPort, position)))),
+			state.y);
+		var x = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_kirchner$elm_pat$Expr$Number(
+				_elm_lang$core$Basics$toFloat(
+					function (_) {
+						return _.x;
+					}(
+						A2(_kirchner$elm_pat$Types$svgToCanvas, config.viewPort, position)))),
+			state.x);
 		return A2(
 			config.updatePoint,
 			id,
-			A3(
-				_kirchner$elm_pat$Tools_Absolute$point,
-				state.x,
-				state.y,
-				A2(_kirchner$elm_pat$Types$svgToCanvas, config.viewPort, position)));
+			A2(_kirchner$elm_pat$Types$Absolute, x, y));
 	});
-var _kirchner$elm_pat$Tools_Absolute$addPoint = F3(
-	function (config, state, position) {
+var _kirchner$elm_pat$Tools_Absolute$addPoint = F4(
+	function (variables, config, state, position) {
+		var y = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_kirchner$elm_pat$Expr$Number(
+				_elm_lang$core$Basics$toFloat(
+					function (_) {
+						return _.y;
+					}(
+						A2(_kirchner$elm_pat$Types$svgToCanvas, config.viewPort, position)))),
+			state.y);
+		var x = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_kirchner$elm_pat$Expr$Number(
+				_elm_lang$core$Basics$toFloat(
+					function (_) {
+						return _.x;
+					}(
+						A2(_kirchner$elm_pat$Types$svgToCanvas, config.viewPort, position)))),
+			state.x);
 		return config.addPoint(
-			A3(
-				_kirchner$elm_pat$Tools_Absolute$point,
-				state.x,
-				state.y,
-				A2(_kirchner$elm_pat$Types$svgToCanvas, config.viewPort, position)));
+			A2(_kirchner$elm_pat$Types$Absolute, x, y));
 	});
-var _kirchner$elm_pat$Tools_Absolute$inputY = F3(
-	function (config, state, attrs) {
-		var options = _kirchner$elm_pat$Input_Float$defaultOptions(
-			A2(_kirchner$elm_pat$Tools_Absolute$updateY, config.stateUpdated, state));
-		return A3(_kirchner$elm_pat$Input_Float$input, options, attrs, state.y);
-	});
-var _kirchner$elm_pat$Tools_Absolute$inputX = F3(
-	function (config, state, attrs) {
-		var options = _kirchner$elm_pat$Input_Float$defaultOptions(
-			A2(_kirchner$elm_pat$Tools_Absolute$updateX, config.stateUpdated, state));
-		return A3(_kirchner$elm_pat$Input_Float$input, options, attrs, state.x);
-	});
-var _kirchner$elm_pat$Tools_Absolute$updateButton = F4(
-	function (attrs_, config, state, id) {
-		var attrs = function () {
-			var _p1 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
-			if (((_p1.ctor === '_Tuple2') && (_p1._0.ctor === 'Just')) && (_p1._1.ctor === 'Just')) {
-				var point = _kirchner$elm_pat$Types$absolute(
-					A2(_elm_community$linear_algebra$Math_Vector2$vec2, _p1._0._0, _p1._1._0));
-				return {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(
-						A2(config.updatePoint, id, point)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$disabled(false),
-						_1: {ctor: '[]'}
-					}
-				};
-			} else {
-				return {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$disabled(true),
-					_1: {ctor: '[]'}
-				};
-			}
-		}();
-		return A2(
-			_elm_lang$html$Html$div,
-			A2(_elm_lang$core$Basics_ops['++'], attrs_, attrs),
+var _kirchner$elm_pat$Tools_Absolute$action = F4(
+	function (variables, state, title, callback) {
+		var attrs = A2(
+			_elm_lang$core$Maybe$withDefault,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html$text('update'),
+				_0: _elm_lang$html$Html_Attributes$disabled(true),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (point) {
+					return {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							callback(point)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$disabled(false),
+							_1: {ctor: '[]'}
+						}
+					};
+				},
+				A3(_elm_lang$core$Maybe$map2, _kirchner$elm_pat$Types$Absolute, state.x, state.y)));
+		return A2(
+			_elm_lang$html$Html$div,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				{
+					ctor: '::',
+					_0: _kirchner$elm_pat$Tools_Styles$class(
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Tools_Styles$Button,
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				},
+				attrs),
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(title),
 				_1: {ctor: '[]'}
 			});
 	});
-var _kirchner$elm_pat$Tools_Absolute$addButton = F3(
-	function (attrs_, config, state) {
-		var attrs = function () {
-			var _p2 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
-			if (((_p2.ctor === '_Tuple2') && (_p2._0.ctor === 'Just')) && (_p2._1.ctor === 'Just')) {
-				var point = _kirchner$elm_pat$Types$absolute(
-					A2(_elm_community$linear_algebra$Math_Vector2$vec2, _p2._0._0, _p2._1._0));
-				return {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(
-						config.addPoint(point)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$disabled(false),
-						_1: {ctor: '[]'}
-					}
-				};
-			} else {
-				return {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$disabled(true),
-					_1: {ctor: '[]'}
-				};
-			}
-		}();
+var _kirchner$elm_pat$Tools_Absolute$view = F3(
+	function (variables, config, state) {
 		return A2(
 			_elm_lang$html$Html$div,
-			A2(_elm_lang$core$Basics_ops['++'], attrs_, attrs),
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html$text('add'),
+				_0: _kirchner$elm_pat$Tools_Styles$class(
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Tools_Styles$ToolBox,
+						_1: {ctor: '[]'}
+					}),
 				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A3(
+					_kirchner$elm_pat$Tools_Common$exprInput,
+					'x',
+					state.x,
+					A2(_kirchner$elm_pat$Tools_Absolute$updateX, config.stateUpdated, state)),
+				_1: {
+					ctor: '::',
+					_0: A3(
+						_kirchner$elm_pat$Tools_Common$exprInput,
+						'y',
+						state.y,
+						A2(_kirchner$elm_pat$Tools_Absolute$updateY, config.stateUpdated, state)),
+					_1: {
+						ctor: '::',
+						_0: function () {
+							var _p0 = state.id;
+							if (_p0.ctor === 'Just') {
+								return A4(
+									_kirchner$elm_pat$Tools_Absolute$action,
+									variables,
+									state,
+									'update',
+									config.updatePoint(_p0._0));
+							} else {
+								return A4(_kirchner$elm_pat$Tools_Absolute$action, variables, state, 'add', config.addPoint);
+							}
+						}(),
+						_1: {ctor: '[]'}
+					}
+				}
 			});
 	});
-var _kirchner$elm_pat$Tools_Absolute$eventRect = F2(
-	function (config, state) {
+var _kirchner$elm_pat$Tools_Absolute$eventRect = F3(
+	function (variables, config, state) {
 		return A2(
 			_elm_lang$svg$Svg$rect,
 			{
@@ -15777,25 +18280,25 @@ var _kirchner$elm_pat$Tools_Absolute$eventRect = F2(
 									_1: {
 										ctor: '::',
 										_0: function () {
-											var _p3 = state.id;
-											if (_p3.ctor === 'Just') {
+											var _p1 = state.id;
+											if (_p1.ctor === 'Just') {
 												return _kirchner$elm_pat$Events$onClick(
-													A3(_kirchner$elm_pat$Tools_Absolute$updatePoint, config, state, _p3._0));
+													A4(_kirchner$elm_pat$Tools_Absolute$updatePoint, variables, config, state, _p1._0));
 											} else {
 												return _kirchner$elm_pat$Events$onClick(
-													A2(_kirchner$elm_pat$Tools_Absolute$addPoint, config, state));
+													A3(_kirchner$elm_pat$Tools_Absolute$addPoint, variables, config, state));
 											}
 										}(),
 										_1: {
 											ctor: '::',
 											_0: _kirchner$elm_pat$Events$onMove(
-												function (_p4) {
+												function (_p2) {
 													return A4(
 														_kirchner$elm_pat$Tools_Common$updateMouse,
 														config.stateUpdated,
 														state,
 														config.viewPort,
-														_elm_lang$core$Maybe$Just(_p4));
+														_elm_lang$core$Maybe$Just(_p2));
 												}),
 											_1: {
 												ctor: '::',
@@ -15813,154 +18316,131 @@ var _kirchner$elm_pat$Tools_Absolute$eventRect = F2(
 			},
 			{ctor: '[]'});
 	});
-var _kirchner$elm_pat$Tools_Absolute$drawNewPoint = F2(
-	function (config, state) {
-		var _p5 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
-		if (((_p5.ctor === '_Tuple2') && (_p5._0.ctor === 'Just')) && (_p5._1.ctor === 'Just')) {
-			var _p7 = _p5._1._0;
-			var _p6 = _p5._0._0;
+var _kirchner$elm_pat$Tools_Absolute$drawNewPoint = F3(
+	function (variables, config, state) {
+		var draw = F2(
+			function (x, y) {
+				return A2(
+					_elm_lang$svg$Svg$g,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Svg_Extra$drawPoint(
+							A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
+						_1: {
+							ctor: '::',
+							_0: _kirchner$elm_pat$Svg_Extra$drawSelector(
+								A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
+							_1: {ctor: '[]'}
+						}
+					});
+			});
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				{ctor: '[]'}),
+			A3(
+				_elm_lang$core$Maybe$map2,
+				draw,
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					_kirchner$elm_pat$Expr$compute(variables),
+					state.x),
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					_kirchner$elm_pat$Expr$compute(variables),
+					state.y)));
+	});
+var _kirchner$elm_pat$Tools_Absolute$drawLines = F3(
+	function (variables, config, state) {
+		var _p3 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
+		if (((_p3.ctor === '_Tuple2') && (_p3._0.ctor === 'Just')) && (_p3._1.ctor === 'Just')) {
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				{ctor: '[]'});
+		} else {
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				A2(
+					_elm_lang$core$List$filterMap,
+					_elm_lang$core$Basics$identity,
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$core$Maybe$map,
+							_kirchner$elm_pat$Svg_Extra$drawVerticalLine,
+							A2(
+								_elm_lang$core$Maybe$andThen,
+								_kirchner$elm_pat$Expr$compute(variables),
+								state.x)),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$core$Maybe$map,
+								_kirchner$elm_pat$Svg_Extra$drawVerticalLine,
+								A2(
+									_elm_lang$core$Maybe$andThen,
+									_kirchner$elm_pat$Expr$compute(variables),
+									state.x)),
+							_1: {ctor: '[]'}
+						}
+					}));
+		}
+	});
+var _kirchner$elm_pat$Tools_Absolute$drawCursor = F4(
+	function (variables, config, state, p) {
+		var y = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_elm_lang$core$Basics$toFloat(p.y),
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				_kirchner$elm_pat$Expr$compute(variables),
+				state.y));
+		var x = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_elm_lang$core$Basics$toFloat(p.x),
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				_kirchner$elm_pat$Expr$compute(variables),
+				state.x));
+		var _p4 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
+		if (((_p4.ctor === '_Tuple2') && (_p4._0.ctor === 'Just')) && (_p4._1.ctor === 'Just')) {
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				{ctor: '[]'});
+		} else {
 			return A2(
 				_elm_lang$svg$Svg$g,
 				{ctor: '[]'},
 				{
 					ctor: '::',
 					_0: _kirchner$elm_pat$Svg_Extra$drawPoint(
-						A2(_elm_community$linear_algebra$Math_Vector2$vec2, _p6, _p7)),
+						A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
 					_1: {
 						ctor: '::',
 						_0: _kirchner$elm_pat$Svg_Extra$drawSelector(
-							A2(_elm_community$linear_algebra$Math_Vector2$vec2, _p6, _p7)),
+							A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
 						_1: {ctor: '[]'}
 					}
 				});
-		} else {
-			return A2(
-				_elm_lang$svg$Svg$g,
-				{ctor: '[]'},
-				{ctor: '[]'});
 		}
 	});
-var _kirchner$elm_pat$Tools_Absolute$drawLines = F2(
-	function (config, state) {
-		var _p8 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
-		if (_p8._0.ctor === 'Just') {
-			if (_p8._1.ctor === 'Just') {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{ctor: '[]'});
-			} else {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _kirchner$elm_pat$Svg_Extra$drawVerticalLine(_p8._0._0),
-						_1: {ctor: '[]'}
-					});
-			}
-		} else {
-			if (_p8._1.ctor === 'Just') {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _kirchner$elm_pat$Svg_Extra$drawHorizontalLine(_p8._1._0),
-						_1: {ctor: '[]'}
-					});
-			} else {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{ctor: '[]'});
-			}
-		}
-	});
-var _kirchner$elm_pat$Tools_Absolute$drawCursor = F3(
-	function (config, state, p) {
-		var _p9 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
-		if (_p9._0.ctor === 'Just') {
-			if (_p9._1.ctor === 'Just') {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{ctor: '[]'});
-			} else {
-				var _p10 = _p9._0._0;
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _kirchner$elm_pat$Svg_Extra$drawPoint(
-							A2(
-								_elm_community$linear_algebra$Math_Vector2$vec2,
-								_p10,
-								_elm_lang$core$Basics$toFloat(p.y))),
-						_1: {
-							ctor: '::',
-							_0: _kirchner$elm_pat$Svg_Extra$drawSelector(
-								A2(
-									_elm_community$linear_algebra$Math_Vector2$vec2,
-									_p10,
-									_elm_lang$core$Basics$toFloat(p.y))),
-							_1: {ctor: '[]'}
-						}
-					});
-			}
-		} else {
-			if (_p9._1.ctor === 'Just') {
-				var _p11 = _p9._1._0;
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _kirchner$elm_pat$Svg_Extra$drawPoint(
-							A2(
-								_elm_community$linear_algebra$Math_Vector2$vec2,
-								_elm_lang$core$Basics$toFloat(p.x),
-								_p11)),
-						_1: {
-							ctor: '::',
-							_0: _kirchner$elm_pat$Svg_Extra$drawSelector(
-								A2(
-									_elm_community$linear_algebra$Math_Vector2$vec2,
-									_elm_lang$core$Basics$toFloat(p.x),
-									_p11)),
-							_1: {ctor: '[]'}
-						}
-					});
-			} else {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _kirchner$elm_pat$Svg_Extra$drawPoint(
-							A2(_kirchner$elm_pat$Types$vec, p.x, p.y)),
-						_1: {
-							ctor: '::',
-							_0: _kirchner$elm_pat$Svg_Extra$drawSelector(
-								A2(_kirchner$elm_pat$Types$vec, p.x, p.y)),
-							_1: {ctor: '[]'}
-						}
-					});
-			}
-		}
-	});
-var _kirchner$elm_pat$Tools_Absolute$svg = F2(
-	function (config, state) {
+var _kirchner$elm_pat$Tools_Absolute$svg = F3(
+	function (variables, config, state) {
 		return A2(
 			_elm_lang$svg$Svg$g,
 			{ctor: '[]'},
 			{
 				ctor: '::',
 				_0: function () {
-					var _p12 = state.mouse;
-					if (_p12.ctor === 'Just') {
-						return A3(_kirchner$elm_pat$Tools_Absolute$drawCursor, config, state, _p12._0);
+					var _p5 = state.mouse;
+					if (_p5.ctor === 'Just') {
+						return A4(_kirchner$elm_pat$Tools_Absolute$drawCursor, variables, config, state, _p5._0);
 					} else {
 						return A2(
 							_elm_lang$svg$Svg$g,
@@ -15970,13 +18450,13 @@ var _kirchner$elm_pat$Tools_Absolute$svg = F2(
 				}(),
 				_1: {
 					ctor: '::',
-					_0: A2(_kirchner$elm_pat$Tools_Absolute$drawLines, config, state),
+					_0: A3(_kirchner$elm_pat$Tools_Absolute$drawLines, variables, config, state),
 					_1: {
 						ctor: '::',
-						_0: A2(_kirchner$elm_pat$Tools_Absolute$drawNewPoint, config, state),
+						_0: A3(_kirchner$elm_pat$Tools_Absolute$drawNewPoint, variables, config, state),
 						_1: {
 							ctor: '::',
-							_0: A2(_kirchner$elm_pat$Tools_Absolute$eventRect, config, state),
+							_0: A3(_kirchner$elm_pat$Tools_Absolute$eventRect, variables, config, state),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -15984,316 +18464,18 @@ var _kirchner$elm_pat$Tools_Absolute$svg = F2(
 			});
 	});
 var _kirchner$elm_pat$Tools_Absolute$init = {x: _elm_lang$core$Maybe$Nothing, y: _elm_lang$core$Maybe$Nothing, id: _elm_lang$core$Maybe$Nothing, mouse: _elm_lang$core$Maybe$Nothing};
-var _kirchner$elm_pat$Tools_Absolute$initWith = F2(
-	function (id, v) {
+var _kirchner$elm_pat$Tools_Absolute$initWith = F3(
+	function (id, x, y) {
 		return _elm_lang$core$Native_Utils.update(
 			_kirchner$elm_pat$Tools_Absolute$init,
 			{
-				x: _elm_lang$core$Maybe$Just(
-					_elm_community$linear_algebra$Math_Vector2$getX(v)),
-				y: _elm_lang$core$Maybe$Just(
-					_elm_community$linear_algebra$Math_Vector2$getY(v)),
+				x: _elm_lang$core$Maybe$Just(x),
+				y: _elm_lang$core$Maybe$Just(y),
 				id: _elm_lang$core$Maybe$Just(id)
 			});
 	});
-var _kirchner$elm_pat$Tools_Absolute$styles = function (_p13) {
-	return _elm_lang$html$Html_Attributes$style(
-		_rtfeldman$elm_css$Css$asPairs(_p13));
-};
-var _kirchner$elm_pat$Tools_Absolute$view = F2(
-	function (config, state) {
-		var cell = F2(
-			function (attrs, nodes) {
-				return A2(
-					_elm_lang$html$Html$div,
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						{
-							ctor: '::',
-							_0: _kirchner$elm_pat$SharedStyles$class(
-								{
-									ctor: '::',
-									_0: _kirchner$elm_pat$SharedStyles$ToolbarColumn,
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						},
-						attrs),
-					nodes);
-			});
-		var icon = function (name) {
-			return A2(
-				cell,
-				{
-					ctor: '::',
-					_0: _kirchner$elm_pat$Tools_Absolute$styles(
-						{
-							ctor: '::',
-							_0: _rtfeldman$elm_css$Css$displayFlex,
-							_1: {
-								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$flexFlow1(_rtfeldman$elm_css$Css$row),
-								_1: {
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$alignItems(_rtfeldman$elm_css$Css$center),
-									_1: {ctor: '[]'}
-								}
-							}
-						}),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						{
-							ctor: '::',
-							_0: _kirchner$elm_pat$SharedStyles$class(
-								{
-									ctor: '::',
-									_0: _kirchner$elm_pat$SharedStyles$ToolbarIconButton,
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$i,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('material-icons'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(
-											A3(_kirchner$elm_pat$Tools_Absolute$updateX, config.stateUpdated, state, _elm_lang$core$Maybe$Nothing)),
-										_1: {
-											ctor: '::',
-											_0: _kirchner$elm_pat$Tools_Absolute$styles(
-												{
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$fontSize(
-														_rtfeldman$elm_css$Css$rem(0.9)),
-													_1: {
-														ctor: '::',
-														_0: _rtfeldman$elm_css$Css$lineHeight(
-															_rtfeldman$elm_css$Css$rem(0.9)),
-														_1: {
-															ctor: '::',
-															_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
-															_1: {
-																ctor: '::',
-																_0: _rtfeldman$elm_css$Css$top(
-																	_rtfeldman$elm_css$Css$pct(50)),
-																_1: {
-																	ctor: '::',
-																	_0: _rtfeldman$elm_css$Css$left(
-																		_rtfeldman$elm_css$Css$pct(50)),
-																	_1: {
-																		ctor: '::',
-																		_0: _rtfeldman$elm_css$Css$transform(
-																			A2(
-																				_rtfeldman$elm_css$Css$translate2,
-																				_rtfeldman$elm_css$Css$pct(-50),
-																				_rtfeldman$elm_css$Css$pct(-50))),
-																		_1: {ctor: '[]'}
-																	}
-																}
-															}
-														}
-													}
-												}),
-											_1: {ctor: '[]'}
-										}
-									}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(name),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				});
-		};
-		var row = F2(
-			function (attrs, nodes) {
-				return A2(
-					_elm_lang$html$Html$div,
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						{
-							ctor: '::',
-							_0: _kirchner$elm_pat$SharedStyles$class(
-								{
-									ctor: '::',
-									_0: _kirchner$elm_pat$SharedStyles$ToolbarRow,
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						},
-						attrs),
-					nodes);
-			});
-		var variable = function (_p14) {
-			var _p15 = _p14;
-			return A2(
-				row,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: A2(
-						cell,
-						{
-							ctor: '::',
-							_0: _kirchner$elm_pat$Tools_Absolute$styles(
-								{
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$displayFlex,
-									_1: {
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$alignItems(_rtfeldman$elm_css$Css$baseline),
-										_1: {ctor: '[]'}
-									}
-								}),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$div,
-								{
-									ctor: '::',
-									_0: _kirchner$elm_pat$Tools_Absolute$styles(
-										{
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$fontSize(
-												_rtfeldman$elm_css$Css$rem(1)),
-											_1: {
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$lineHeight(
-													_rtfeldman$elm_css$Css$rem(1)),
-												_1: {
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$paddingRight(
-														_rtfeldman$elm_css$Css$rem(0.4)),
-													_1: {ctor: '[]'}
-												}
-											}
-										}),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(_p15.name),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{ctor: '[]'},
-									{
-										ctor: '::',
-										_0: A3(
-											_p15.input,
-											config,
-											state,
-											{
-												ctor: '::',
-												_0: _kirchner$elm_pat$SharedStyles$class(
-													{
-														ctor: '::',
-														_0: _kirchner$elm_pat$SharedStyles$ToolTextfield,
-														_1: {ctor: '[]'}
-													}),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {
-						ctor: '::',
-						_0: icon('delete'),
-						_1: {ctor: '[]'}
-					}
-				});
-		};
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: _kirchner$elm_pat$Tools_Absolute$styles(
-					{
-						ctor: '::',
-						_0: _rtfeldman$elm_css$Css$backgroundColor(
-							_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$View_Colors$base2)),
-						_1: {
-							ctor: '::',
-							_0: _rtfeldman$elm_css$Css$width(
-								_rtfeldman$elm_css$Css$rem(10)),
-							_1: {
-								ctor: '::',
-								_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'auto'),
-								_1: {ctor: '[]'}
-							}
-						}
-					}),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: variable(
-					{name: 'x =', input: _kirchner$elm_pat$Tools_Absolute$inputX}),
-				_1: {
-					ctor: '::',
-					_0: variable(
-						{name: 'y =', input: _kirchner$elm_pat$Tools_Absolute$inputY}),
-					_1: {
-						ctor: '::',
-						_0: function () {
-							var _p16 = state.id;
-							if (_p16.ctor === 'Just') {
-								return A4(
-									_kirchner$elm_pat$Tools_Absolute$updateButton,
-									{
-										ctor: '::',
-										_0: _kirchner$elm_pat$SharedStyles$class(
-											{
-												ctor: '::',
-												_0: _kirchner$elm_pat$SharedStyles$ToolbarButton,
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									},
-									config,
-									state,
-									_p16._0);
-							} else {
-								return A3(
-									_kirchner$elm_pat$Tools_Absolute$addButton,
-									{
-										ctor: '::',
-										_0: _kirchner$elm_pat$SharedStyles$class(
-											{
-												ctor: '::',
-												_0: _kirchner$elm_pat$SharedStyles$ToolbarButton,
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									},
-									config,
-									state);
-							}
-						}(),
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-	});
+var _kirchner$elm_pat$Tools_Absolute$position = _kirchner$elm_pat$Types$position;
+var _kirchner$elm_pat$Tools_Absolute$absolute = _kirchner$elm_pat$Types$absolute;
 var _kirchner$elm_pat$Tools_Absolute$Config = F4(
 	function (a, b, c, d) {
 		return {addPoint: a, updatePoint: b, stateUpdated: c, viewPort: d};
@@ -16414,18 +18596,22 @@ var _kirchner$elm_pat$Tools_Relative$updateFocused = F3(
 				{focused: newFocused}));
 	});
 var _kirchner$elm_pat$Tools_Relative$updateY = F3(
-	function (callback, state, newY) {
+	function (callback, state, s) {
 		return callback(
 			_elm_lang$core$Native_Utils.update(
 				state,
-				{y: newY}));
+				{
+					y: _kirchner$elm_pat$Expr$parse(s)
+				}));
 	});
 var _kirchner$elm_pat$Tools_Relative$updateX = F3(
-	function (callback, state, newX) {
+	function (callback, state, s) {
 		return callback(
 			_elm_lang$core$Native_Utils.update(
 				state,
-				{x: newX}));
+				{
+					x: _kirchner$elm_pat$Expr$parse(s)
+				}));
 	});
 var _kirchner$elm_pat$Tools_Relative$updateAnchor = F3(
 	function (callback, state, newAnchor) {
@@ -16434,11 +18620,11 @@ var _kirchner$elm_pat$Tools_Relative$updateAnchor = F3(
 				state,
 				{anchor: newAnchor, focused: _elm_lang$core$Maybe$Nothing}));
 	});
-var _kirchner$elm_pat$Tools_Relative$updatePoint = F4(
-	function (config, state, store, id) {
+var _kirchner$elm_pat$Tools_Relative$updatePoint = F5(
+	function (config, state, store, variables, id) {
 		var anchorPosition = A2(
 			_elm_lang$core$Maybe$andThen,
-			_kirchner$elm_pat$Types$position(store),
+			A2(_kirchner$elm_pat$Types$position, store, variables),
 			A2(
 				_elm_lang$core$Maybe$andThen,
 				A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, store),
@@ -16464,27 +18650,28 @@ var _kirchner$elm_pat$Tools_Relative$updatePoint = F4(
 					var p = A2(_kirchner$elm_pat$Types$svgToCanvas, config.viewPort, pos);
 					var x = A2(
 						_elm_lang$core$Maybe$withDefault,
-						_elm_lang$core$Basics$toFloat(p.x) - _elm_community$linear_algebra$Math_Vector2$getX(_p3),
+						_kirchner$elm_pat$Expr$Number(
+							_elm_lang$core$Basics$toFloat(p.x) - _elm_community$linear_algebra$Math_Vector2$getX(_p3)),
 						state.x);
 					var y = A2(
 						_elm_lang$core$Maybe$withDefault,
-						_elm_lang$core$Basics$toFloat(p.y) - _elm_community$linear_algebra$Math_Vector2$getY(_p3),
+						_kirchner$elm_pat$Expr$Number(
+							_elm_lang$core$Basics$toFloat(p.y) - _elm_community$linear_algebra$Math_Vector2$getY(_p3)),
 						state.y);
-					var w = A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y);
 					return A2(
 						config.updatePoint,
 						id,
-						A2(_kirchner$elm_pat$Types$relative, _p2._0._0, w));
+						A3(_kirchner$elm_pat$Types$Relative, _p2._0._0, x, y));
 				});
 		} else {
 			return _elm_lang$core$Maybe$Nothing;
 		}
 	});
-var _kirchner$elm_pat$Tools_Relative$addPoint = F3(
-	function (config, state, store) {
+var _kirchner$elm_pat$Tools_Relative$addPoint = F4(
+	function (config, state, store, variables) {
 		var anchorPosition = A2(
 			_elm_lang$core$Maybe$andThen,
-			_kirchner$elm_pat$Types$position(store),
+			A2(_kirchner$elm_pat$Types$position, store, variables),
 			A2(
 				_elm_lang$core$Maybe$andThen,
 				A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, store),
@@ -16510,35 +18697,24 @@ var _kirchner$elm_pat$Tools_Relative$addPoint = F3(
 					var p = A2(_kirchner$elm_pat$Types$svgToCanvas, config.viewPort, pos);
 					var x = A2(
 						_elm_lang$core$Maybe$withDefault,
-						_elm_lang$core$Basics$toFloat(p.x) - _elm_community$linear_algebra$Math_Vector2$getX(_p7),
+						_kirchner$elm_pat$Expr$Number(
+							_elm_lang$core$Basics$toFloat(p.x) - _elm_community$linear_algebra$Math_Vector2$getX(_p7)),
 						state.x);
 					var y = A2(
 						_elm_lang$core$Maybe$withDefault,
-						_elm_lang$core$Basics$toFloat(p.y) - _elm_community$linear_algebra$Math_Vector2$getY(_p7),
+						_kirchner$elm_pat$Expr$Number(
+							_elm_lang$core$Basics$toFloat(p.y) - _elm_community$linear_algebra$Math_Vector2$getY(_p7)),
 						state.y);
-					var w = A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y);
 					return config.addPoint(
-						A2(_kirchner$elm_pat$Types$relative, _p6._0._0, w));
+						A3(_kirchner$elm_pat$Types$Relative, _p6._0._0, x, y));
 				});
 		} else {
 			return _elm_lang$core$Maybe$Nothing;
 		}
 	});
-var _kirchner$elm_pat$Tools_Relative$inputY = F3(
-	function (config, state, attrs) {
-		var options = _kirchner$elm_pat$Input_Float$defaultOptions(
-			A2(_kirchner$elm_pat$Tools_Relative$updateY, config.stateUpdated, state));
-		return A3(_kirchner$elm_pat$Input_Float$input, options, attrs, state.y);
-	});
-var _kirchner$elm_pat$Tools_Relative$inputX = F3(
-	function (config, state, attrs) {
-		var options = _kirchner$elm_pat$Input_Float$defaultOptions(
-			A2(_kirchner$elm_pat$Tools_Relative$updateX, config.stateUpdated, state));
-		return A3(_kirchner$elm_pat$Input_Float$input, options, attrs, state.x);
-	});
-var _kirchner$elm_pat$Tools_Relative$view = F3(
-	function (config, state, store) {
-		var buttonAttributes = function () {
+var _kirchner$elm_pat$Tools_Relative$action = F3(
+	function (state, title, callback) {
+		var attrs = function () {
 			var _p9 = {
 				ctor: '_Tuple3',
 				_0: A2(
@@ -16552,14 +18728,11 @@ var _kirchner$elm_pat$Tools_Relative$view = F3(
 				_2: state.y
 			};
 			if ((((_p9.ctor === '_Tuple3') && (_p9._0.ctor === 'Just')) && (_p9._1.ctor === 'Just')) && (_p9._2.ctor === 'Just')) {
-				var point = A2(
-					_kirchner$elm_pat$Types$relative,
-					_p9._0._0,
-					A2(_elm_community$linear_algebra$Math_Vector2$vec2, _p9._1._0, _p9._2._0));
+				var point = A3(_kirchner$elm_pat$Types$Relative, _p9._0._0, _p9._1._0, _p9._2._0);
 				return {
 					ctor: '::',
 					_0: _elm_lang$html$Html_Events$onClick(
-						config.addPoint(point)),
+						callback(point)),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Attributes$disabled(false),
@@ -16574,6 +18747,29 @@ var _kirchner$elm_pat$Tools_Relative$view = F3(
 				};
 			}
 		}();
+		return A2(
+			_elm_lang$html$Html$div,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				{
+					ctor: '::',
+					_0: _kirchner$elm_pat$Tools_Styles$class(
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Tools_Styles$Button,
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				},
+				attrs),
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(title),
+				_1: {ctor: '[]'}
+			});
+	});
+var _kirchner$elm_pat$Tools_Relative$view = F3(
+	function (config, state, store) {
 		var items = A2(
 			_elm_lang$core$List$map,
 			function (id) {
@@ -16589,7 +18785,16 @@ var _kirchner$elm_pat$Tools_Relative$view = F3(
 				_elm_lang$core$Dict$keys(store)));
 		return A2(
 			_elm_lang$html$Html$div,
-			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Tools_Styles$class(
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Tools_Styles$ToolBox,
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
 			{
 				ctor: '::',
 				_0: A2(
@@ -16631,92 +18836,42 @@ var _kirchner$elm_pat$Tools_Relative$view = F3(
 					}),
 				_1: {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('x:'),
-							_1: {
-								ctor: '::',
-								_0: A3(
-									_kirchner$elm_pat$Tools_Relative$inputX,
-									config,
-									state,
-									{ctor: '[]'}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$button,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(
-												A3(_kirchner$elm_pat$Tools_Relative$updateX, config.stateUpdated, state, _elm_lang$core$Maybe$Nothing)),
-											_1: {ctor: '[]'}
-										},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('clear'),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								}
-							}
-						}),
+					_0: A3(
+						_kirchner$elm_pat$Tools_Common$exprInput,
+						'x',
+						state.x,
+						A2(_kirchner$elm_pat$Tools_Relative$updateX, config.stateUpdated, state)),
 					_1: {
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('y:'),
-								_1: {
-									ctor: '::',
-									_0: A3(
-										_kirchner$elm_pat$Tools_Relative$inputY,
-										config,
-										state,
-										{ctor: '[]'}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$button,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(
-													A3(_kirchner$elm_pat$Tools_Relative$updateY, config.stateUpdated, state, _elm_lang$core$Maybe$Nothing)),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('clear'),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}
-								}
-							}),
+						_0: A3(
+							_kirchner$elm_pat$Tools_Common$exprInput,
+							'y',
+							state.y,
+							A2(_kirchner$elm_pat$Tools_Relative$updateY, config.stateUpdated, state)),
 						_1: {
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$button,
-								buttonAttributes,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('add'),
-									_1: {ctor: '[]'}
-								}),
+							_0: function () {
+								var _p10 = state.id;
+								if (_p10.ctor === 'Just') {
+									return A3(
+										_kirchner$elm_pat$Tools_Relative$action,
+										state,
+										'update',
+										config.updatePoint(_p10._0));
+								} else {
+									return A3(_kirchner$elm_pat$Tools_Relative$action, state, 'add', config.addPoint);
+								}
+							}(),
 							_1: {ctor: '[]'}
 						}
 					}
 				}
 			});
 	});
-var _kirchner$elm_pat$Tools_Relative$eventCircle = F4(
-	function (config, state, store, _p10) {
-		var _p11 = _p10;
-		var _p12 = _p11._0;
+var _kirchner$elm_pat$Tools_Relative$eventCircle = F5(
+	function (config, state, store, variables, _p11) {
+		var _p12 = _p11;
+		var _p13 = _p12._0;
 		var draw = function (v) {
 			return A2(
 				_elm_lang$svg$Svg$g,
@@ -16752,7 +18907,7 @@ var _kirchner$elm_pat$Tools_Relative$eventCircle = F4(
 														config.stateUpdated,
 														state,
 														_elm_lang$core$Maybe$Just(
-															_elm_lang$core$Basics$toString(_p12)))),
+															_elm_lang$core$Basics$toString(_p13)))),
 												_1: {
 													ctor: '::',
 													_0: _elm_lang$svg$Svg_Events$onMouseOver(
@@ -16760,7 +18915,7 @@ var _kirchner$elm_pat$Tools_Relative$eventCircle = F4(
 															_kirchner$elm_pat$Tools_Relative$updateFocused,
 															config.stateUpdated,
 															state,
-															_elm_lang$core$Maybe$Just(_p12))),
+															_elm_lang$core$Maybe$Just(_p13))),
 													_1: {
 														ctor: '::',
 														_0: _elm_lang$svg$Svg_Events$onMouseOut(
@@ -16777,7 +18932,7 @@ var _kirchner$elm_pat$Tools_Relative$eventCircle = F4(
 						{ctor: '[]'}),
 					_1: {
 						ctor: '::',
-						_0: A2(_kirchner$elm_pat$Types$equals, state.focused, _p12) ? _kirchner$elm_pat$Svg_Extra$drawSelector(v) : A2(
+						_0: A2(_kirchner$elm_pat$Types$equals, state.focused, _p13) ? _kirchner$elm_pat$Svg_Extra$drawSelector(v) : A2(
 							_elm_lang$svg$Svg$g,
 							{ctor: '[]'},
 							{ctor: '[]'}),
@@ -16788,24 +18943,24 @@ var _kirchner$elm_pat$Tools_Relative$eventCircle = F4(
 		return A2(
 			_elm_lang$core$Maybe$map,
 			draw,
-			A2(_kirchner$elm_pat$Types$position, store, _p11._1));
+			A3(_kirchner$elm_pat$Types$position, store, variables, _p12._1));
 	});
-var _kirchner$elm_pat$Tools_Relative$eventCircles = F3(
-	function (config, state, store) {
+var _kirchner$elm_pat$Tools_Relative$eventCircles = F4(
+	function (config, state, store, variables) {
 		return A2(
 			_elm_lang$svg$Svg$g,
 			{ctor: '[]'},
 			A2(
 				_elm_lang$core$List$filterMap,
-				A3(_kirchner$elm_pat$Tools_Relative$eventCircle, config, state, store),
+				A4(_kirchner$elm_pat$Tools_Relative$eventCircle, config, state, store, variables),
 				_elm_lang$core$Dict$toList(store)));
 	});
-var _kirchner$elm_pat$Tools_Relative$eventRect = F3(
-	function (config, state, store) {
-		var _p13 = state.id;
-		if (_p13.ctor === 'Just') {
-			var _p14 = A4(_kirchner$elm_pat$Tools_Relative$updatePoint, config, state, store, _p13._0);
-			if (_p14.ctor === 'Just') {
+var _kirchner$elm_pat$Tools_Relative$eventRect = F4(
+	function (config, state, store, variables) {
+		var _p14 = state.id;
+		if (_p14.ctor === 'Just') {
+			var _p15 = A5(_kirchner$elm_pat$Tools_Relative$updatePoint, config, state, store, variables, _p14._0);
+			if (_p15.ctor === 'Just') {
 				return A2(
 					_elm_lang$svg$Svg$rect,
 					{
@@ -16832,17 +18987,17 @@ var _kirchner$elm_pat$Tools_Relative$eventRect = F3(
 											_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
 											_1: {
 												ctor: '::',
-												_0: _kirchner$elm_pat$Events$onClick(_p14._0),
+												_0: _kirchner$elm_pat$Events$onClick(_p15._0),
 												_1: {
 													ctor: '::',
 													_0: _kirchner$elm_pat$Events$onMove(
-														function (_p15) {
+														function (_p16) {
 															return A4(
 																_kirchner$elm_pat$Tools_Common$updateMouse,
 																config.stateUpdated,
 																state,
 																config.viewPort,
-																_elm_lang$core$Maybe$Just(_p15));
+																_elm_lang$core$Maybe$Just(_p16));
 														}),
 													_1: {
 														ctor: '::',
@@ -16866,8 +19021,8 @@ var _kirchner$elm_pat$Tools_Relative$eventRect = F3(
 					{ctor: '[]'});
 			}
 		} else {
-			var _p16 = A3(_kirchner$elm_pat$Tools_Relative$addPoint, config, state, store);
-			if (_p16.ctor === 'Just') {
+			var _p17 = A4(_kirchner$elm_pat$Tools_Relative$addPoint, config, state, store, variables);
+			if (_p17.ctor === 'Just') {
 				return A2(
 					_elm_lang$svg$Svg$rect,
 					{
@@ -16894,17 +19049,17 @@ var _kirchner$elm_pat$Tools_Relative$eventRect = F3(
 											_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
 											_1: {
 												ctor: '::',
-												_0: _kirchner$elm_pat$Events$onClick(_p16._0),
+												_0: _kirchner$elm_pat$Events$onClick(_p17._0),
 												_1: {
 													ctor: '::',
 													_0: _kirchner$elm_pat$Events$onMove(
-														function (_p17) {
+														function (_p18) {
 															return A4(
 																_kirchner$elm_pat$Tools_Common$updateMouse,
 																config.stateUpdated,
 																state,
 																config.viewPort,
-																_elm_lang$core$Maybe$Just(_p17));
+																_elm_lang$core$Maybe$Just(_p18));
 														}),
 													_1: {
 														ctor: '::',
@@ -16929,78 +19084,98 @@ var _kirchner$elm_pat$Tools_Relative$eventRect = F3(
 			}
 		}
 	});
-var _kirchner$elm_pat$Tools_Relative$drawNewPoint = F3(
-	function (config, state, v) {
-		var _p18 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
-		if (((_p18.ctor === '_Tuple2') && (_p18._0.ctor === 'Just')) && (_p18._1.ctor === 'Just')) {
-			var w = A2(
-				_elm_community$linear_algebra$Math_Vector2$vec2,
-				_elm_community$linear_algebra$Math_Vector2$getX(v) + _p18._0._0,
-				_elm_community$linear_algebra$Math_Vector2$getY(v) + _p18._1._0);
-			return A2(
-				_elm_lang$svg$Svg$g,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _kirchner$elm_pat$Svg_Extra$drawPoint(w),
-					_1: {
+var _kirchner$elm_pat$Tools_Relative$drawNewPoint = F4(
+	function (variables, config, state, v) {
+		var draw = F2(
+			function (x, y) {
+				return A2(
+					_elm_lang$svg$Svg$g,
+					{ctor: '[]'},
+					{
 						ctor: '::',
-						_0: _kirchner$elm_pat$Svg_Extra$drawSelector(w),
+						_0: _kirchner$elm_pat$Svg_Extra$drawPoint(
+							A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
 						_1: {
 							ctor: '::',
-							_0: A2(_kirchner$elm_pat$Svg_Extra$drawRectArrow, v, w),
-							_1: {ctor: '[]'}
+							_0: _kirchner$elm_pat$Svg_Extra$drawSelector(
+								A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_kirchner$elm_pat$Svg_Extra$drawRectArrow,
+									v,
+									A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
+								_1: {ctor: '[]'}
+							}
 						}
-					}
-				});
-		} else {
+					});
+			});
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				{ctor: '[]'}),
+			A3(
+				_elm_lang$core$Maybe$map2,
+				draw,
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					_kirchner$elm_pat$Expr$compute(variables),
+					state.x),
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					_kirchner$elm_pat$Expr$compute(variables),
+					state.y)));
+	});
+var _kirchner$elm_pat$Tools_Relative$drawLines = F4(
+	function (variables, config, state, v) {
+		var horizontalLine = function (y) {
+			return _kirchner$elm_pat$Svg_Extra$drawHorizontalLine(
+				y + _elm_community$linear_algebra$Math_Vector2$getY(v));
+		};
+		var verticalLine = function (x) {
+			return _kirchner$elm_pat$Svg_Extra$drawVerticalLine(
+				x + _elm_community$linear_algebra$Math_Vector2$getX(v));
+		};
+		var _p19 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
+		if (((_p19.ctor === '_Tuple2') && (_p19._0.ctor === 'Just')) && (_p19._1.ctor === 'Just')) {
 			return A2(
 				_elm_lang$svg$Svg$g,
 				{ctor: '[]'},
 				{ctor: '[]'});
-		}
-	});
-var _kirchner$elm_pat$Tools_Relative$drawLines = F3(
-	function (config, state, v) {
-		var _p19 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
-		if (_p19._0.ctor === 'Just') {
-			if (_p19._1.ctor === 'Just') {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{ctor: '[]'});
-			} else {
-				var deltaX = _p19._0._0 + _elm_community$linear_algebra$Math_Vector2$getX(v);
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _kirchner$elm_pat$Svg_Extra$drawVerticalLine(deltaX),
-						_1: {ctor: '[]'}
-					});
-			}
 		} else {
-			if (_p19._1.ctor === 'Just') {
-				var deltaY = _p19._1._0 + _elm_community$linear_algebra$Math_Vector2$getY(v);
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				A2(
+					_elm_lang$core$List$filterMap,
+					_elm_lang$core$Basics$identity,
 					{
 						ctor: '::',
-						_0: _kirchner$elm_pat$Svg_Extra$drawHorizontalLine(deltaY),
-						_1: {ctor: '[]'}
-					});
-			} else {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{ctor: '[]'});
-			}
+						_0: A2(
+							_elm_lang$core$Maybe$map,
+							verticalLine,
+							A2(
+								_elm_lang$core$Maybe$andThen,
+								_kirchner$elm_pat$Expr$compute(variables),
+								state.x)),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$core$Maybe$map,
+								horizontalLine,
+								A2(
+									_elm_lang$core$Maybe$andThen,
+									_kirchner$elm_pat$Expr$compute(variables),
+									state.y)),
+							_1: {ctor: '[]'}
+						}
+					}));
 		}
 	});
-var _kirchner$elm_pat$Tools_Relative$drawCursor = F4(
-	function (config, state, v, p) {
+var _kirchner$elm_pat$Tools_Relative$drawCursor = F5(
+	function (variables, config, state, v, p) {
 		var draw = F2(
 			function (x, y) {
 				return A2(
@@ -17026,37 +19201,35 @@ var _kirchner$elm_pat$Tools_Relative$drawCursor = F4(
 					});
 			});
 		var _p20 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
-		if (_p20._0.ctor === 'Just') {
-			if (_p20._1.ctor === 'Just') {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{ctor: '[]'});
-			} else {
-				return A2(
-					draw,
-					_elm_community$linear_algebra$Math_Vector2$getX(v) + _p20._0._0,
-					_elm_lang$core$Basics$toFloat(p.y));
-			}
+		if (((_p20.ctor === '_Tuple2') && (_p20._0.ctor === 'Just')) && (_p20._1.ctor === 'Just')) {
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				{ctor: '[]'});
 		} else {
-			if (_p20._1.ctor === 'Just') {
-				return A2(
-					draw,
+			return A2(
+				draw,
+				A2(
+					_elm_lang$core$Maybe$withDefault,
 					_elm_lang$core$Basics$toFloat(p.x),
-					_elm_community$linear_algebra$Math_Vector2$getY(v) + _p20._1._0);
-			} else {
-				return A2(
-					draw,
-					_elm_lang$core$Basics$toFloat(p.x),
-					_elm_lang$core$Basics$toFloat(p.y));
-			}
+					A2(
+						_elm_lang$core$Maybe$andThen,
+						_kirchner$elm_pat$Expr$compute(variables),
+						state.x)),
+				A2(
+					_elm_lang$core$Maybe$withDefault,
+					_elm_lang$core$Basics$toFloat(p.y),
+					A2(
+						_elm_lang$core$Maybe$andThen,
+						_kirchner$elm_pat$Expr$compute(variables),
+						state.y)));
 		}
 	});
-var _kirchner$elm_pat$Tools_Relative$svg = F3(
-	function (config, state, store) {
+var _kirchner$elm_pat$Tools_Relative$svg = F4(
+	function (config, state, store, variables) {
 		var anchorPosition = A2(
 			_elm_lang$core$Maybe$andThen,
-			_kirchner$elm_pat$Types$position(store),
+			A2(_kirchner$elm_pat$Types$position, store, variables),
 			A2(
 				_elm_lang$core$Maybe$andThen,
 				A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, store),
@@ -17078,7 +19251,7 @@ var _kirchner$elm_pat$Tools_Relative$svg = F3(
 					_0: function () {
 						var _p23 = state.mouse;
 						if (_p23.ctor === 'Just') {
-							return A4(_kirchner$elm_pat$Tools_Relative$drawCursor, config, state, _p24, _p23._0);
+							return A5(_kirchner$elm_pat$Tools_Relative$drawCursor, variables, config, state, _p24, _p23._0);
 						} else {
 							return A2(
 								_elm_lang$svg$Svg$g,
@@ -17088,13 +19261,13 @@ var _kirchner$elm_pat$Tools_Relative$svg = F3(
 					}(),
 					_1: {
 						ctor: '::',
-						_0: A3(_kirchner$elm_pat$Tools_Relative$drawLines, config, state, _p24),
+						_0: A4(_kirchner$elm_pat$Tools_Relative$drawLines, variables, config, state, _p24),
 						_1: {
 							ctor: '::',
-							_0: A3(_kirchner$elm_pat$Tools_Relative$drawNewPoint, config, state, _p24),
+							_0: A4(_kirchner$elm_pat$Tools_Relative$drawNewPoint, variables, config, state, _p24),
 							_1: {
 								ctor: '::',
-								_0: A3(_kirchner$elm_pat$Tools_Relative$eventRect, config, state, store),
+								_0: A4(_kirchner$elm_pat$Tools_Relative$eventRect, config, state, store, variables),
 								_1: {ctor: '[]'}
 							}
 						}
@@ -17106,23 +19279,21 @@ var _kirchner$elm_pat$Tools_Relative$svg = F3(
 				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: A3(_kirchner$elm_pat$Tools_Relative$eventCircles, config, state, store),
+					_0: A4(_kirchner$elm_pat$Tools_Relative$eventCircles, config, state, store, variables),
 					_1: {ctor: '[]'}
 				});
 		}
 	});
 var _kirchner$elm_pat$Tools_Relative$init = {anchor: _elm_lang$core$Maybe$Nothing, x: _elm_lang$core$Maybe$Nothing, y: _elm_lang$core$Maybe$Nothing, focused: _elm_lang$core$Maybe$Nothing, id: _elm_lang$core$Maybe$Nothing, mouse: _elm_lang$core$Maybe$Nothing};
-var _kirchner$elm_pat$Tools_Relative$initWith = F3(
-	function (id, anchor, w) {
+var _kirchner$elm_pat$Tools_Relative$initWith = F4(
+	function (id, anchor, x, y) {
 		return _elm_lang$core$Native_Utils.update(
 			_kirchner$elm_pat$Tools_Relative$init,
 			{
 				anchor: _elm_lang$core$Maybe$Just(
 					_elm_lang$core$Basics$toString(anchor)),
-				x: _elm_lang$core$Maybe$Just(
-					_elm_community$linear_algebra$Math_Vector2$getX(w)),
-				y: _elm_lang$core$Maybe$Just(
-					_elm_community$linear_algebra$Math_Vector2$getY(w)),
+				x: _elm_lang$core$Maybe$Just(x),
+				y: _elm_lang$core$Maybe$Just(y),
 				id: _elm_lang$core$Maybe$Just(id)
 			});
 	});
@@ -17138,8 +19309,8 @@ var _kirchner$elm_pat$Tools_Select$updateFocused = F3(
 				state,
 				{focused: newFocused}));
 	});
-var _kirchner$elm_pat$Tools_Select$eventCircle = F4(
-	function (config, state, store, _p0) {
+var _kirchner$elm_pat$Tools_Select$eventCircle = F5(
+	function (config, state, store, variables, _p0) {
 		var _p1 = _p0;
 		var _p2 = _p1._0;
 		var draw = function (v) {
@@ -17208,21 +19379,21 @@ var _kirchner$elm_pat$Tools_Select$eventCircle = F4(
 		return A2(
 			_elm_lang$core$Maybe$map,
 			draw,
-			A2(_kirchner$elm_pat$Types$position, store, _p1._1));
+			A3(_kirchner$elm_pat$Types$position, store, variables, _p1._1));
 	});
-var _kirchner$elm_pat$Tools_Select$eventCircles = F3(
-	function (config, state, store) {
+var _kirchner$elm_pat$Tools_Select$eventCircles = F4(
+	function (config, state, store, variables) {
 		return A2(
 			_elm_lang$svg$Svg$g,
 			{ctor: '[]'},
 			A2(
 				_elm_lang$core$List$filterMap,
-				A3(_kirchner$elm_pat$Tools_Select$eventCircle, config, state, store),
+				A4(_kirchner$elm_pat$Tools_Select$eventCircle, config, state, store, variables),
 				_elm_lang$core$Dict$toList(store)));
 	});
-var _kirchner$elm_pat$Tools_Select$svg = F3(
-	function (config, state, store) {
-		return A3(_kirchner$elm_pat$Tools_Select$eventCircles, config, state, store);
+var _kirchner$elm_pat$Tools_Select$svg = F4(
+	function (config, state, store, variables) {
+		return A4(_kirchner$elm_pat$Tools_Select$eventCircles, config, state, store, variables);
 	});
 var _kirchner$elm_pat$Tools_Select$init = {focused: _elm_lang$core$Maybe$Nothing, mouse: _elm_lang$core$Maybe$Nothing};
 var _kirchner$elm_pat$Tools_Select$Config = F3(
@@ -17256,9 +19427,9 @@ var _kirchner$elm_pat$Editor$toolName = function (tool) {
 			return 'none';
 	}
 };
-var _kirchner$elm_pat$Editor$Model = F4(
-	function (a, b, c, d) {
-		return {store: a, nextId: b, tool: c, viewPort: d};
+var _kirchner$elm_pat$Editor$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {store: a, nextId: b, variables: c, newName: d, newValue: e, tool: f, viewPort: g};
 	});
 var _kirchner$elm_pat$Editor$None = {ctor: 'None'};
 var _kirchner$elm_pat$Editor$Select = function (a) {
@@ -17319,7 +19490,7 @@ var _kirchner$elm_pat$Editor$update = F2(
 										model,
 										{
 											tool: _kirchner$elm_pat$Editor$Absolute(
-												A2(_kirchner$elm_pat$Tools_Absolute$initWith, _p4, _p3._0._0))
+												A3(_kirchner$elm_pat$Tools_Absolute$initWith, _p4, _p3._0._0, _p3._0._1))
 										}),
 									{ctor: '[]'});
 							case 'Relative':
@@ -17329,7 +19500,7 @@ var _kirchner$elm_pat$Editor$update = F2(
 										model,
 										{
 											tool: _kirchner$elm_pat$Editor$Relative(
-												A3(_kirchner$elm_pat$Tools_Relative$initWith, _p4, _p3._0._0, _p3._0._1))
+												A4(_kirchner$elm_pat$Tools_Relative$initWith, _p4, _p3._0._0, _p3._0._1, _p3._0._2))
 										}),
 									{ctor: '[]'});
 							default:
@@ -17361,14 +19532,60 @@ var _kirchner$elm_pat$Editor$update = F2(
 							tool: _kirchner$elm_pat$Editor$None
 						}),
 					{ctor: '[]'});
-			default:
-				var _p6 = _p2._0;
+			case 'DeletePoint':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							viewPort: {x: (_p6.width / -2) | 0, y: (_p6.height / -2) | 0, width: _p6.width, height: _p6.height}
+							store: A2(_elm_lang$core$Dict$remove, _p2._0, model.store)
+						}),
+					{ctor: '[]'});
+			case 'NameUpdated':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							newName: _kirchner$elm_pat$Expr$parseVariable(_p2._0)
+						}),
+					{ctor: '[]'});
+			case 'ValueUpdated':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							newValue: _kirchner$elm_pat$Expr$parse(_p2._0)
+						}),
+					{ctor: '[]'});
+			case 'AddVariable':
+				var _p6 = {ctor: '_Tuple2', _0: model.newName, _1: model.newValue};
+				if (((_p6.ctor === '_Tuple2') && (_p6._0.ctor === 'Just')) && (_p6._1.ctor === 'Just')) {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								variables: A3(_elm_lang$core$Dict$insert, _p6._0._0, _p6._1._0, model.variables),
+								newName: _elm_lang$core$Maybe$Nothing,
+								newValue: _elm_lang$core$Maybe$Nothing
+							}),
+						{ctor: '[]'});
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						model,
+						{ctor: '[]'});
+				}
+			default:
+				var _p7 = _p2._0;
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							viewPort: {x: (_p7.width / -2) | 0, y: (_p7.height / -2) | 0, width: _p7.width, height: _p7.height}
 						}),
 					{ctor: '[]'});
 		}
@@ -17381,6 +19598,9 @@ var _kirchner$elm_pat$Editor$init = A2(
 	{
 		store: _kirchner$elm_pat$Types$emptyStore,
 		nextId: _kirchner$elm_pat$Types$firstId,
+		variables: _elm_lang$core$Dict$empty,
+		newName: _elm_lang$core$Maybe$Nothing,
+		newValue: _elm_lang$core$Maybe$Nothing,
 		tool: _kirchner$elm_pat$Editor$None,
 		viewPort: {x: -320, y: -320, width: 640, height: 640}
 	},
@@ -17397,6 +19617,16 @@ var _kirchner$elm_pat$Editor$subscriptions = function (model) {
 			_1: {ctor: '[]'}
 		});
 };
+var _kirchner$elm_pat$Editor$AddVariable = {ctor: 'AddVariable'};
+var _kirchner$elm_pat$Editor$NameUpdated = function (a) {
+	return {ctor: 'NameUpdated', _0: a};
+};
+var _kirchner$elm_pat$Editor$ValueUpdated = function (a) {
+	return {ctor: 'ValueUpdated', _0: a};
+};
+var _kirchner$elm_pat$Editor$DeletePoint = function (a) {
+	return {ctor: 'DeletePoint', _0: a};
+};
 var _kirchner$elm_pat$Editor$UpdatePoint = F2(
 	function (a, b) {
 		return {ctor: 'UpdatePoint', _0: a, _1: b};
@@ -17411,15 +19641,247 @@ var _kirchner$elm_pat$Editor$UpdateTool = function (a) {
 	return {ctor: 'UpdateTool', _0: a};
 };
 
-var _kirchner$elm_pat$View_Canvas$point = F2(
-	function (store, point) {
+var _rtfeldman$elm_css$Css_Elements$typeSelector = F2(
+	function (selectorStr, mixins) {
+		var sequence = A2(
+			_rtfeldman$elm_css$Css_Structure$TypeSelectorSequence,
+			_rtfeldman$elm_css$Css_Structure$TypeSelector(selectorStr),
+			{ctor: '[]'});
+		var selector = A3(
+			_rtfeldman$elm_css$Css_Structure$Selector,
+			sequence,
+			{ctor: '[]'},
+			_elm_lang$core$Maybe$Nothing);
+		return _rtfeldman$elm_css$Css_Preprocess$Snippet(
+			{
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css_Preprocess$StyleBlockDeclaration(
+					A3(
+						_rtfeldman$elm_css$Css_Preprocess$StyleBlock,
+						selector,
+						{ctor: '[]'},
+						mixins)),
+				_1: {ctor: '[]'}
+			});
+	});
+var _rtfeldman$elm_css$Css_Elements$html = _rtfeldman$elm_css$Css_Elements$typeSelector('html');
+var _rtfeldman$elm_css$Css_Elements$body = _rtfeldman$elm_css$Css_Elements$typeSelector('body');
+var _rtfeldman$elm_css$Css_Elements$article = _rtfeldman$elm_css$Css_Elements$typeSelector('article');
+var _rtfeldman$elm_css$Css_Elements$header = _rtfeldman$elm_css$Css_Elements$typeSelector('header');
+var _rtfeldman$elm_css$Css_Elements$footer = _rtfeldman$elm_css$Css_Elements$typeSelector('footer');
+var _rtfeldman$elm_css$Css_Elements$h1 = _rtfeldman$elm_css$Css_Elements$typeSelector('h1');
+var _rtfeldman$elm_css$Css_Elements$h2 = _rtfeldman$elm_css$Css_Elements$typeSelector('h2');
+var _rtfeldman$elm_css$Css_Elements$h3 = _rtfeldman$elm_css$Css_Elements$typeSelector('h3');
+var _rtfeldman$elm_css$Css_Elements$h4 = _rtfeldman$elm_css$Css_Elements$typeSelector('h4');
+var _rtfeldman$elm_css$Css_Elements$h5 = _rtfeldman$elm_css$Css_Elements$typeSelector('h5');
+var _rtfeldman$elm_css$Css_Elements$h6 = _rtfeldman$elm_css$Css_Elements$typeSelector('h6');
+var _rtfeldman$elm_css$Css_Elements$nav = _rtfeldman$elm_css$Css_Elements$typeSelector('nav');
+var _rtfeldman$elm_css$Css_Elements$section = _rtfeldman$elm_css$Css_Elements$typeSelector('section');
+var _rtfeldman$elm_css$Css_Elements$div = _rtfeldman$elm_css$Css_Elements$typeSelector('div');
+var _rtfeldman$elm_css$Css_Elements$hr = _rtfeldman$elm_css$Css_Elements$typeSelector('hr');
+var _rtfeldman$elm_css$Css_Elements$li = _rtfeldman$elm_css$Css_Elements$typeSelector('li');
+var _rtfeldman$elm_css$Css_Elements$main_ = _rtfeldman$elm_css$Css_Elements$typeSelector('main');
+var _rtfeldman$elm_css$Css_Elements$ol = _rtfeldman$elm_css$Css_Elements$typeSelector('ol');
+var _rtfeldman$elm_css$Css_Elements$p = _rtfeldman$elm_css$Css_Elements$typeSelector('p');
+var _rtfeldman$elm_css$Css_Elements$ul = _rtfeldman$elm_css$Css_Elements$typeSelector('ul');
+var _rtfeldman$elm_css$Css_Elements$pre = _rtfeldman$elm_css$Css_Elements$typeSelector('pre');
+var _rtfeldman$elm_css$Css_Elements$a = _rtfeldman$elm_css$Css_Elements$typeSelector('a');
+var _rtfeldman$elm_css$Css_Elements$code = _rtfeldman$elm_css$Css_Elements$typeSelector('code');
+var _rtfeldman$elm_css$Css_Elements$small = _rtfeldman$elm_css$Css_Elements$typeSelector('small');
+var _rtfeldman$elm_css$Css_Elements$span = _rtfeldman$elm_css$Css_Elements$typeSelector('span');
+var _rtfeldman$elm_css$Css_Elements$strong = _rtfeldman$elm_css$Css_Elements$typeSelector('strong');
+var _rtfeldman$elm_css$Css_Elements$i = _rtfeldman$elm_css$Css_Elements$typeSelector('i');
+var _rtfeldman$elm_css$Css_Elements$em = _rtfeldman$elm_css$Css_Elements$typeSelector('em');
+var _rtfeldman$elm_css$Css_Elements$img = _rtfeldman$elm_css$Css_Elements$typeSelector('img');
+var _rtfeldman$elm_css$Css_Elements$audio = _rtfeldman$elm_css$Css_Elements$typeSelector('audio');
+var _rtfeldman$elm_css$Css_Elements$video = _rtfeldman$elm_css$Css_Elements$typeSelector('video');
+var _rtfeldman$elm_css$Css_Elements$canvas = _rtfeldman$elm_css$Css_Elements$typeSelector('canvas');
+var _rtfeldman$elm_css$Css_Elements$caption = _rtfeldman$elm_css$Css_Elements$typeSelector('caption');
+var _rtfeldman$elm_css$Css_Elements$col = _rtfeldman$elm_css$Css_Elements$typeSelector('col');
+var _rtfeldman$elm_css$Css_Elements$colgroup = _rtfeldman$elm_css$Css_Elements$typeSelector('colgroup');
+var _rtfeldman$elm_css$Css_Elements$table = _rtfeldman$elm_css$Css_Elements$typeSelector('table');
+var _rtfeldman$elm_css$Css_Elements$tbody = _rtfeldman$elm_css$Css_Elements$typeSelector('tbody');
+var _rtfeldman$elm_css$Css_Elements$td = _rtfeldman$elm_css$Css_Elements$typeSelector('td');
+var _rtfeldman$elm_css$Css_Elements$tfoot = _rtfeldman$elm_css$Css_Elements$typeSelector('tfoot');
+var _rtfeldman$elm_css$Css_Elements$th = _rtfeldman$elm_css$Css_Elements$typeSelector('th');
+var _rtfeldman$elm_css$Css_Elements$thead = _rtfeldman$elm_css$Css_Elements$typeSelector('thead');
+var _rtfeldman$elm_css$Css_Elements$tr = _rtfeldman$elm_css$Css_Elements$typeSelector('tr');
+var _rtfeldman$elm_css$Css_Elements$button = _rtfeldman$elm_css$Css_Elements$typeSelector('button');
+var _rtfeldman$elm_css$Css_Elements$fieldset = _rtfeldman$elm_css$Css_Elements$typeSelector('fieldset');
+var _rtfeldman$elm_css$Css_Elements$form = _rtfeldman$elm_css$Css_Elements$typeSelector('form');
+var _rtfeldman$elm_css$Css_Elements$input = _rtfeldman$elm_css$Css_Elements$typeSelector('input');
+var _rtfeldman$elm_css$Css_Elements$label = _rtfeldman$elm_css$Css_Elements$typeSelector('label');
+var _rtfeldman$elm_css$Css_Elements$legend = _rtfeldman$elm_css$Css_Elements$typeSelector('legend');
+var _rtfeldman$elm_css$Css_Elements$optgroup = _rtfeldman$elm_css$Css_Elements$typeSelector('optgroup');
+var _rtfeldman$elm_css$Css_Elements$option = _rtfeldman$elm_css$Css_Elements$typeSelector('option');
+var _rtfeldman$elm_css$Css_Elements$progress = _rtfeldman$elm_css$Css_Elements$typeSelector('progress');
+var _rtfeldman$elm_css$Css_Elements$select = _rtfeldman$elm_css$Css_Elements$typeSelector('select');
+var _rtfeldman$elm_css$Css_Elements$textarea = _rtfeldman$elm_css$Css_Elements$typeSelector('textarea');
+var _rtfeldman$elm_css$Css_Elements$blockquote = _rtfeldman$elm_css$Css_Elements$typeSelector('blockquote');
+var _rtfeldman$elm_css$Css_Elements$svg = _rtfeldman$elm_css$Css_Elements$typeSelector('svg');
+var _rtfeldman$elm_css$Css_Elements$path = _rtfeldman$elm_css$Css_Elements$typeSelector('path');
+var _rtfeldman$elm_css$Css_Elements$rect = _rtfeldman$elm_css$Css_Elements$typeSelector('rect');
+var _rtfeldman$elm_css$Css_Elements$circle = _rtfeldman$elm_css$Css_Elements$typeSelector('circle');
+var _rtfeldman$elm_css$Css_Elements$ellipse = _rtfeldman$elm_css$Css_Elements$typeSelector('ellipse');
+var _rtfeldman$elm_css$Css_Elements$line = _rtfeldman$elm_css$Css_Elements$typeSelector('line');
+var _rtfeldman$elm_css$Css_Elements$polyline = _rtfeldman$elm_css$Css_Elements$typeSelector('polyline');
+var _rtfeldman$elm_css$Css_Elements$polygon = _rtfeldman$elm_css$Css_Elements$typeSelector('polygon');
+
+var _kirchner$elm_pat$Styles_Editor$rem = _rtfeldman$elm_css$Css$rem;
+var _kirchner$elm_pat$Styles_Editor$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('editor__');
+var _kirchner$elm_pat$Styles_Editor$id = _kirchner$elm_pat$Styles_Editor$_p0.id;
+var _kirchner$elm_pat$Styles_Editor$class = _kirchner$elm_pat$Styles_Editor$_p0.$class;
+var _kirchner$elm_pat$Styles_Editor$classList = _kirchner$elm_pat$Styles_Editor$_p0.classList;
+var _kirchner$elm_pat$Styles_Editor$ContainerBottomRight = {ctor: 'ContainerBottomRight'};
+var _kirchner$elm_pat$Styles_Editor$ContainerBottomLeft = {ctor: 'ContainerBottomLeft'};
+var _kirchner$elm_pat$Styles_Editor$ContainerTopLeft = {ctor: 'ContainerTopLeft'};
+var _kirchner$elm_pat$Styles_Editor$ContainerTopLeftLeft = {ctor: 'ContainerTopLeftLeft'};
+var _kirchner$elm_pat$Styles_Editor$Container = {ctor: 'Container'};
+var _kirchner$elm_pat$Styles_Editor$Main = {ctor: 'Main'};
+var _kirchner$elm_pat$Styles_Editor$css = function () {
+	var $class = _rtfeldman$elm_css$Css$class;
+	return function (_p1) {
+		return _rtfeldman$elm_css$Css$stylesheet(
+			A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'editor__', _p1));
+	}(
+		{
+			ctor: '::',
+			_0: A2(
+				$class,
+				_kirchner$elm_pat$Styles_Editor$Main,
+				{
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					$class,
+					_kirchner$elm_pat$Styles_Editor$Container,
+					{
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$padding(
+							_kirchner$elm_pat$Styles_Editor$rem(0.3)),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$borderRadius(
+								_rtfeldman$elm_css$Css$px(4)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$color(
+									_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$backgroundColor(
+										_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base2)),
+									_1: {
+										ctor: '::',
+										_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'none'),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						$class,
+						_kirchner$elm_pat$Styles_Editor$ContainerTopLeftLeft,
+						{
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$top(
+									_kirchner$elm_pat$Styles_Editor$rem(1)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$left(
+										_kirchner$elm_pat$Styles_Editor$rem(1)),
+									_1: {ctor: '[]'}
+								}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							$class,
+							_kirchner$elm_pat$Styles_Editor$ContainerTopLeft,
+							{
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$top(
+										_kirchner$elm_pat$Styles_Editor$rem(1)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$left(
+											_kirchner$elm_pat$Styles_Editor$rem(5)),
+										_1: {ctor: '[]'}
+									}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								$class,
+								_kirchner$elm_pat$Styles_Editor$ContainerBottomLeft,
+								{
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$bottom(
+											_kirchner$elm_pat$Styles_Editor$rem(1)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$left(
+												_kirchner$elm_pat$Styles_Editor$rem(1)),
+											_1: {ctor: '[]'}
+										}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									$class,
+									_kirchner$elm_pat$Styles_Editor$ContainerBottomRight,
+									{
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$bottom(
+												_kirchner$elm_pat$Styles_Editor$rem(1)),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$right(
+													_kirchner$elm_pat$Styles_Editor$rem(1)),
+												_1: {ctor: '[]'}
+											}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		});
+}();
+
+var _kirchner$elm_pat$View_Canvas$point = F3(
+	function (store, variables, point) {
 		var _p0 = point;
 		switch (_p0.ctor) {
 			case 'Absolute':
 				return A2(
 					_elm_lang$core$Maybe$map,
 					_kirchner$elm_pat$Svg_Extra$drawPoint,
-					A2(_kirchner$elm_pat$Types$position, store, point));
+					A3(_kirchner$elm_pat$Types$position, store, variables, point));
 			case 'Relative':
 				var draw = F2(
 					function (v, w) {
@@ -17439,8 +19901,8 @@ var _kirchner$elm_pat$View_Canvas$point = F2(
 				return A3(
 					_elm_lang$core$Maybe$map2,
 					draw,
-					A2(_kirchner$elm_pat$Types$positionById, store, _p0._0),
-					A2(_kirchner$elm_pat$Types$position, store, point));
+					A3(_kirchner$elm_pat$Types$positionById, store, variables, _p0._0),
+					A3(_kirchner$elm_pat$Types$position, store, variables, point));
 			default:
 				return _elm_lang$core$Maybe$Just(
 					A2(
@@ -17449,12 +19911,13 @@ var _kirchner$elm_pat$View_Canvas$point = F2(
 						{ctor: '[]'}));
 		}
 	});
-var _kirchner$elm_pat$View_Canvas$points = function (store) {
-	return A2(
-		_elm_lang$core$List$filterMap,
-		_kirchner$elm_pat$View_Canvas$point(store),
-		_elm_lang$core$Dict$values(store));
-};
+var _kirchner$elm_pat$View_Canvas$points = F2(
+	function (store, variables) {
+		return A2(
+			_elm_lang$core$List$filterMap,
+			A2(_kirchner$elm_pat$View_Canvas$point, store, variables),
+			_elm_lang$core$Dict$values(store));
+	});
 var _kirchner$elm_pat$View_Canvas$origin = A2(
 	_elm_lang$svg$Svg$g,
 	{ctor: '[]'},
@@ -17476,7 +19939,7 @@ var _kirchner$elm_pat$View_Canvas$origin = A2(
 							_0: _elm_lang$svg$Svg_Attributes$y2('0'),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$View_Colors$green),
+								_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$green),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
@@ -17506,7 +19969,7 @@ var _kirchner$elm_pat$View_Canvas$origin = A2(
 								_0: _elm_lang$svg$Svg_Attributes$y2('10'),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$View_Colors$green),
+									_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$green),
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
@@ -17521,8 +19984,8 @@ var _kirchner$elm_pat$View_Canvas$origin = A2(
 			_1: {ctor: '[]'}
 		}
 	});
-var _kirchner$elm_pat$View_Canvas$view = F3(
-	function (tool, viewPort, store) {
+var _kirchner$elm_pat$View_Canvas$view = F4(
+	function (tool, viewPort, store, variables) {
 		var viewBoxString = A2(
 			_elm_lang$core$String$join,
 			' ',
@@ -17553,7 +20016,7 @@ var _kirchner$elm_pat$View_Canvas$view = F3(
 					_0: _elm_lang$html$Html_Attributes$style(
 						{
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'background-color', _1: _kirchner$elm_pat$View_Colors$base3},
+							_0: {ctor: '_Tuple2', _0: 'background-color', _1: _kirchner$elm_pat$Styles_Colors$base3},
 							_1: {
 								ctor: '::',
 								_0: {
@@ -17583,7 +20046,7 @@ var _kirchner$elm_pat$View_Canvas$view = F3(
 					_0: A2(
 						_elm_lang$svg$Svg$g,
 						{ctor: '[]'},
-						_kirchner$elm_pat$View_Canvas$points(store)),
+						A2(_kirchner$elm_pat$View_Canvas$points, store, variables)),
 					_1: {
 						ctor: '::',
 						_0: tool,
@@ -17591,6 +20054,1612 @@ var _kirchner$elm_pat$View_Canvas$view = F3(
 					}
 				}
 			});
+	});
+
+var _kirchner$elm_pat$Styles_PointTable$rem = _rtfeldman$elm_css$Css$rem;
+var _kirchner$elm_pat$Styles_PointTable$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('point-table__');
+var _kirchner$elm_pat$Styles_PointTable$id = _kirchner$elm_pat$Styles_PointTable$_p0.id;
+var _kirchner$elm_pat$Styles_PointTable$class = _kirchner$elm_pat$Styles_PointTable$_p0.$class;
+var _kirchner$elm_pat$Styles_PointTable$classList = _kirchner$elm_pat$Styles_PointTable$_p0.classList;
+var _kirchner$elm_pat$Styles_PointTable$Icon = {ctor: 'Icon'};
+var _kirchner$elm_pat$Styles_PointTable$IconButton = {ctor: 'IconButton'};
+var _kirchner$elm_pat$Styles_PointTable$CellAction = {ctor: 'CellAction'};
+var _kirchner$elm_pat$Styles_PointTable$CellType = {ctor: 'CellType'};
+var _kirchner$elm_pat$Styles_PointTable$CellCoordinate = {ctor: 'CellCoordinate'};
+var _kirchner$elm_pat$Styles_PointTable$CellId = {ctor: 'CellId'};
+var _kirchner$elm_pat$Styles_PointTable$Table = {ctor: 'Table'};
+var _kirchner$elm_pat$Styles_PointTable$css = function () {
+	var $class = _rtfeldman$elm_css$Css$class;
+	return function (_p1) {
+		return _rtfeldman$elm_css$Css$stylesheet(
+			A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'point-table__', _p1));
+	}(
+		{
+			ctor: '::',
+			_0: A2(
+				$class,
+				_kirchner$elm_pat$Styles_PointTable$Table,
+				{
+					ctor: '::',
+					_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'auto'),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$fontFamily(_rtfeldman$elm_css$Css$monospace),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$fontSize(
+								_rtfeldman$elm_css$Css$px(16)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$lineHeight(
+									_kirchner$elm_pat$Styles_PointTable$rem(1)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$borderCollapse(_rtfeldman$elm_css$Css$collapse),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$children(
+											{
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css_Elements$tr(
+													{
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$children(
+															{
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css_Elements$th(
+																	{
+																		ctor: '::',
+																		_0: _rtfeldman$elm_css$Css$paddingLeft(
+																			_kirchner$elm_pat$Styles_PointTable$rem(0.3)),
+																		_1: {
+																			ctor: '::',
+																			_0: _rtfeldman$elm_css$Css$paddingRight(
+																				_kirchner$elm_pat$Styles_PointTable$rem(0.3)),
+																			_1: {
+																				ctor: '::',
+																				_0: _rtfeldman$elm_css$Css$paddingTop(
+																					_kirchner$elm_pat$Styles_PointTable$rem(0.5)),
+																				_1: {
+																					ctor: '::',
+																					_0: _rtfeldman$elm_css$Css$paddingBottom(
+																						_kirchner$elm_pat$Styles_PointTable$rem(0.5)),
+																					_1: {
+																						ctor: '::',
+																						_0: A3(
+																							_rtfeldman$elm_css$Css$borderBottom3,
+																							_rtfeldman$elm_css$Css$px(1),
+																							_rtfeldman$elm_css$Css$solid,
+																							_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
+																						_1: {
+																							ctor: '::',
+																							_0: _rtfeldman$elm_css$Css$fontWeight(_rtfeldman$elm_css$Css$bold),
+																							_1: {ctor: '[]'}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}),
+																_1: {
+																	ctor: '::',
+																	_0: _rtfeldman$elm_css$Css_Elements$td(
+																		{
+																			ctor: '::',
+																			_0: _rtfeldman$elm_css$Css$paddingLeft(
+																				_kirchner$elm_pat$Styles_PointTable$rem(0.3)),
+																			_1: {
+																				ctor: '::',
+																				_0: _rtfeldman$elm_css$Css$paddingRight(
+																					_kirchner$elm_pat$Styles_PointTable$rem(0.3)),
+																				_1: {
+																					ctor: '::',
+																					_0: _rtfeldman$elm_css$Css$paddingTop(
+																						_kirchner$elm_pat$Styles_PointTable$rem(0.5)),
+																					_1: {
+																						ctor: '::',
+																						_0: _rtfeldman$elm_css$Css$paddingBottom(
+																							_kirchner$elm_pat$Styles_PointTable$rem(0.5)),
+																						_1: {ctor: '[]'}
+																					}
+																				}
+																			}
+																		}),
+																	_1: {ctor: '[]'}
+																}
+															}),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					$class,
+					_kirchner$elm_pat$Styles_PointTable$CellId,
+					{
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$width(
+							_kirchner$elm_pat$Styles_PointTable$rem(1)),
+						_1: {
+							ctor: '::',
+							_0: A3(
+								_rtfeldman$elm_css$Css$borderRight3,
+								_rtfeldman$elm_css$Css$px(1),
+								_rtfeldman$elm_css$Css$solid,
+								_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$right),
+								_1: {ctor: '[]'}
+							}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						$class,
+						_kirchner$elm_pat$Styles_PointTable$CellCoordinate,
+						{
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$width(
+								_kirchner$elm_pat$Styles_PointTable$rem(3)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$right),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							$class,
+							_kirchner$elm_pat$Styles_PointTable$CellType,
+							{
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$width(
+									_kirchner$elm_pat$Styles_PointTable$rem(6)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								$class,
+								_kirchner$elm_pat$Styles_PointTable$CellAction,
+								{
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$width(
+										_kirchner$elm_pat$Styles_PointTable$rem(1)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									$class,
+									_kirchner$elm_pat$Styles_PointTable$IconButton,
+									{
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$width(
+											_kirchner$elm_pat$Styles_PointTable$rem(1)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$height(
+												_kirchner$elm_pat$Styles_PointTable$rem(1)),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$borderRadius(
+													_rtfeldman$elm_css$Css$pct(50)),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$color(
+														_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$backgroundColor(_rtfeldman$elm_css$Css$transparent),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
+															_1: {
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css$hover(
+																	{
+																		ctor: '::',
+																		_0: _rtfeldman$elm_css$Css$backgroundColor(
+																			_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {
+																	ctor: '::',
+																	_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+																	_1: {ctor: '[]'}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										$class,
+										_kirchner$elm_pat$Styles_PointTable$Icon,
+										{
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$important(
+												_rtfeldman$elm_css$Css$fontSize(
+													_kirchner$elm_pat$Styles_PointTable$rem(0.6))),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$important(
+													_rtfeldman$elm_css$Css$lineHeight(
+														_kirchner$elm_pat$Styles_PointTable$rem(0.6))),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$top(
+															_rtfeldman$elm_css$Css$pct(50)),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$left(
+																_rtfeldman$elm_css$Css$pct(50)),
+															_1: {
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css$transform(
+																	A2(
+																		_rtfeldman$elm_css$Css$translate2,
+																		_rtfeldman$elm_css$Css$pct(-50),
+																		_rtfeldman$elm_css$Css$pct(-50))),
+																_1: {ctor: '[]'}
+															}
+														}
+													}
+												}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+}();
+
+var _kirchner$elm_pat$Styles_Common$rem = _rtfeldman$elm_css$Css$rem;
+var _kirchner$elm_pat$Styles_Common$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('common__');
+var _kirchner$elm_pat$Styles_Common$id = _kirchner$elm_pat$Styles_Common$_p0.id;
+var _kirchner$elm_pat$Styles_Common$class = _kirchner$elm_pat$Styles_Common$_p0.$class;
+var _kirchner$elm_pat$Styles_Common$classList = _kirchner$elm_pat$Styles_Common$_p0.classList;
+var _kirchner$elm_pat$Styles_Common$IconSmall = {ctor: 'IconSmall'};
+var _kirchner$elm_pat$Styles_Common$IconButtonSmall = {ctor: 'IconButtonSmall'};
+var _kirchner$elm_pat$Styles_Common$IconBig = {ctor: 'IconBig'};
+var _kirchner$elm_pat$Styles_Common$IconButtonBig = {ctor: 'IconButtonBig'};
+var _kirchner$elm_pat$Styles_Common$css = function () {
+	var $class = _rtfeldman$elm_css$Css$class;
+	return function (_p1) {
+		return _rtfeldman$elm_css$Css$stylesheet(
+			A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'common__', _p1));
+	}(
+		{
+			ctor: '::',
+			_0: A2(
+				$class,
+				_kirchner$elm_pat$Styles_Common$IconButtonBig,
+				{
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$width(
+						_kirchner$elm_pat$Styles_Common$rem(3)),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$height(
+							_kirchner$elm_pat$Styles_Common$rem(3)),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$borderRadius(
+								_rtfeldman$elm_css$Css$px(4)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$color(
+									_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$backgroundColor(_rtfeldman$elm_css$Css$transparent),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$hover(
+												{
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$backgroundColor(
+														_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
+													_1: {ctor: '[]'}
+												}),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$displayFlex,
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$justifyContent(_rtfeldman$elm_css$Css$center),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$alignItems(_rtfeldman$elm_css$Css$center),
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					$class,
+					_kirchner$elm_pat$Styles_Common$IconBig,
+					{
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$important(
+							_rtfeldman$elm_css$Css$fontSize(
+								_kirchner$elm_pat$Styles_Common$rem(2.5))),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$important(
+								_rtfeldman$elm_css$Css$lineHeight(
+									_kirchner$elm_pat$Styles_Common$rem(2.5))),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						$class,
+						_kirchner$elm_pat$Styles_Common$IconButtonSmall,
+						{
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$width(
+								_kirchner$elm_pat$Styles_Common$rem(1)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$height(
+									_kirchner$elm_pat$Styles_Common$rem(1)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$borderRadius(
+										_rtfeldman$elm_css$Css$px(4)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$color(
+											_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$backgroundColor(_rtfeldman$elm_css$Css$transparent),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$hover(
+														{
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$backgroundColor(
+																_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$displayFlex,
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$justifyContent(_rtfeldman$elm_css$Css$center),
+															_1: {
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css$alignItems(_rtfeldman$elm_css$Css$center),
+																_1: {ctor: '[]'}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							$class,
+							_kirchner$elm_pat$Styles_Common$IconSmall,
+							{
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$important(
+									_rtfeldman$elm_css$Css$fontSize(
+										_kirchner$elm_pat$Styles_Common$rem(1))),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$important(
+										_rtfeldman$elm_css$Css$lineHeight(
+											_kirchner$elm_pat$Styles_Common$rem(1))),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		});
+}();
+
+var _kirchner$elm_pat$Views_Common$iconSmall = F2(
+	function (name, callback) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Styles_Common$class(
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Styles_Common$IconButtonSmall,
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$i,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('material-icons'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(callback),
+							_1: {
+								ctor: '::',
+								_0: _kirchner$elm_pat$Styles_Common$class(
+									{
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_Common$IconSmall,
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(name),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _kirchner$elm_pat$Views_Common$iconBig = F2(
+	function (name, callback) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Styles_Common$class(
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Styles_Common$IconButtonBig,
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$i,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('material-icons'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(callback),
+							_1: {
+								ctor: '::',
+								_0: _kirchner$elm_pat$Styles_Common$class(
+									{
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_Common$IconBig,
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(name),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+
+var _kirchner$elm_pat$Views_PointTable$printPoint = F2(
+	function (variables, point) {
+		var _p0 = point;
+		switch (_p0.ctor) {
+			case 'Absolute':
+				return 'absolute';
+			case 'Relative':
+				return 'relative';
+			default:
+				return _elm_lang$core$Basics$toString(point);
+		}
+	});
+var _kirchner$elm_pat$Views_PointTable$viewPointEntry = F3(
+	function (variables, store, _p1) {
+		var _p2 = _p1;
+		var _p4 = _p2._1;
+		var _p3 = _p2._0;
+		var v = A3(_kirchner$elm_pat$Types$position, store, variables, _p4);
+		var x = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			A2(
+				_elm_lang$core$Maybe$map,
+				_elm_lang$core$Basics$toString,
+				A2(_elm_lang$core$Maybe$map, _elm_community$linear_algebra$Math_Vector2$getX, v)));
+		var y = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			A2(
+				_elm_lang$core$Maybe$map,
+				_elm_lang$core$Basics$toString,
+				A2(_elm_lang$core$Maybe$map, _elm_community$linear_algebra$Math_Vector2$getY, v)));
+		return A2(
+			_elm_lang$html$Html$tr,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$td,
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Styles_PointTable$class(
+							{
+								ctor: '::',
+								_0: _kirchner$elm_pat$Styles_PointTable$CellId,
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							_elm_lang$core$Basics$toString(_p3)),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$td,
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Styles_PointTable$class(
+								{
+									ctor: '::',
+									_0: _kirchner$elm_pat$Styles_PointTable$CellCoordinate,
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(x),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$td,
+							{
+								ctor: '::',
+								_0: _kirchner$elm_pat$Styles_PointTable$class(
+									{
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_PointTable$CellCoordinate,
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(y),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$td,
+								{
+									ctor: '::',
+									_0: _kirchner$elm_pat$Styles_PointTable$class(
+										{
+											ctor: '::',
+											_0: _kirchner$elm_pat$Styles_PointTable$CellType,
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										A2(_kirchner$elm_pat$Views_PointTable$printPoint, variables, _p4)),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$td,
+									{
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_PointTable$class(
+											{
+												ctor: '::',
+												_0: _kirchner$elm_pat$Styles_PointTable$CellAction,
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_kirchner$elm_pat$Views_Common$iconSmall,
+											'edit',
+											_kirchner$elm_pat$Editor$SelectPoint(_p3)),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$td,
+										{
+											ctor: '::',
+											_0: _kirchner$elm_pat$Styles_PointTable$class(
+												{
+													ctor: '::',
+													_0: _kirchner$elm_pat$Styles_PointTable$CellAction,
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A2(
+												_kirchner$elm_pat$Views_Common$iconSmall,
+												'delete',
+												_kirchner$elm_pat$Editor$DeletePoint(_p3)),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			});
+	});
+var _kirchner$elm_pat$Views_PointTable$view = F2(
+	function (variables, store) {
+		return A2(
+			_elm_lang$html$Html$table,
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Styles_PointTable$class(
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Styles_PointTable$Table,
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$tr,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$th,
+							{
+								ctor: '::',
+								_0: _kirchner$elm_pat$Styles_PointTable$class(
+									{
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_PointTable$CellId,
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('#'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$th,
+								{
+									ctor: '::',
+									_0: _kirchner$elm_pat$Styles_PointTable$class(
+										{
+											ctor: '::',
+											_0: _kirchner$elm_pat$Styles_PointTable$CellCoordinate,
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('x'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$th,
+									{
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_PointTable$class(
+											{
+												ctor: '::',
+												_0: _kirchner$elm_pat$Styles_PointTable$CellCoordinate,
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('y'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$th,
+										{
+											ctor: '::',
+											_0: _kirchner$elm_pat$Styles_PointTable$class(
+												{
+													ctor: '::',
+													_0: _kirchner$elm_pat$Styles_PointTable$CellType,
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										},
+										{ctor: '[]'}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$th,
+											{
+												ctor: '::',
+												_0: _kirchner$elm_pat$Styles_PointTable$class(
+													{
+														ctor: '::',
+														_0: _kirchner$elm_pat$Styles_PointTable$CellAction,
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$th,
+												{
+													ctor: '::',
+													_0: _kirchner$elm_pat$Styles_PointTable$class(
+														{
+															ctor: '::',
+															_0: _kirchner$elm_pat$Styles_PointTable$CellAction,
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												},
+												{ctor: '[]'}),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}),
+				_1: A2(
+					_elm_lang$core$List$map,
+					A2(_kirchner$elm_pat$Views_PointTable$viewPointEntry, variables, store),
+					_elm_lang$core$Dict$toList(store))
+			});
+	});
+
+var _kirchner$elm_pat$Styles_ToolBox$rem = _rtfeldman$elm_css$Css$rem;
+var _kirchner$elm_pat$Styles_ToolBox$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('tool-box__');
+var _kirchner$elm_pat$Styles_ToolBox$id = _kirchner$elm_pat$Styles_ToolBox$_p0.id;
+var _kirchner$elm_pat$Styles_ToolBox$class = _kirchner$elm_pat$Styles_ToolBox$_p0.$class;
+var _kirchner$elm_pat$Styles_ToolBox$classList = _kirchner$elm_pat$Styles_ToolBox$_p0.classList;
+var _kirchner$elm_pat$Styles_ToolBox$Container = {ctor: 'Container'};
+var _kirchner$elm_pat$Styles_ToolBox$css = function () {
+	var $class = _rtfeldman$elm_css$Css$class;
+	return function (_p1) {
+		return _rtfeldman$elm_css$Css$stylesheet(
+			A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'tool-box__', _p1));
+	}(
+		{
+			ctor: '::',
+			_0: A2(
+				$class,
+				_kirchner$elm_pat$Styles_ToolBox$Container,
+				{
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$displayFlex,
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$flexFlow1(_rtfeldman$elm_css$Css$column),
+						_1: {
+							ctor: '::',
+							_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'auto'),
+							_1: {ctor: '[]'}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		});
+}();
+
+var _kirchner$elm_pat$Views_ToolBox$view = function () {
+	var button = function (tool) {
+		return A2(
+			_kirchner$elm_pat$Views_Common$iconBig,
+			'edit',
+			_kirchner$elm_pat$Editor$UpdateTool(tool));
+	};
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _kirchner$elm_pat$Styles_ToolBox$class(
+				{
+					ctor: '::',
+					_0: _kirchner$elm_pat$Styles_ToolBox$Container,
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
+		A2(_elm_lang$core$List$map, button, _kirchner$elm_pat$Editor$allTools));
+}();
+
+var _kirchner$elm_pat$Styles_VariableTable$rem = _rtfeldman$elm_css$Css$rem;
+var _kirchner$elm_pat$Styles_VariableTable$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('variable-table__');
+var _kirchner$elm_pat$Styles_VariableTable$id = _kirchner$elm_pat$Styles_VariableTable$_p0.id;
+var _kirchner$elm_pat$Styles_VariableTable$class = _kirchner$elm_pat$Styles_VariableTable$_p0.$class;
+var _kirchner$elm_pat$Styles_VariableTable$classList = _kirchner$elm_pat$Styles_VariableTable$_p0.classList;
+var _kirchner$elm_pat$Styles_VariableTable$InputBad = {ctor: 'InputBad'};
+var _kirchner$elm_pat$Styles_VariableTable$Input = {ctor: 'Input'};
+var _kirchner$elm_pat$Styles_VariableTable$Icon = {ctor: 'Icon'};
+var _kirchner$elm_pat$Styles_VariableTable$IconButton = {ctor: 'IconButton'};
+var _kirchner$elm_pat$Styles_VariableTable$CellAction = {ctor: 'CellAction'};
+var _kirchner$elm_pat$Styles_VariableTable$CellValue = {ctor: 'CellValue'};
+var _kirchner$elm_pat$Styles_VariableTable$CellFormula = {ctor: 'CellFormula'};
+var _kirchner$elm_pat$Styles_VariableTable$CellName = {ctor: 'CellName'};
+var _kirchner$elm_pat$Styles_VariableTable$CellSign = {ctor: 'CellSign'};
+var _kirchner$elm_pat$Styles_VariableTable$Table = {ctor: 'Table'};
+var _kirchner$elm_pat$Styles_VariableTable$css = function () {
+	var $class = _rtfeldman$elm_css$Css$class;
+	return function (_p1) {
+		return _rtfeldman$elm_css$Css$stylesheet(
+			A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'variable-table__', _p1));
+	}(
+		{
+			ctor: '::',
+			_0: A2(
+				$class,
+				_kirchner$elm_pat$Styles_VariableTable$Table,
+				{
+					ctor: '::',
+					_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'auto'),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$fontFamily(_rtfeldman$elm_css$Css$monospace),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$fontSize(
+								_rtfeldman$elm_css$Css$px(16)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$lineHeight(
+									_kirchner$elm_pat$Styles_VariableTable$rem(1)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$borderCollapse(_rtfeldman$elm_css$Css$collapse),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$children(
+											{
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css_Elements$tr(
+													{
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$children(
+															{
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css_Elements$th(
+																	{
+																		ctor: '::',
+																		_0: _rtfeldman$elm_css$Css$paddingLeft(
+																			_kirchner$elm_pat$Styles_VariableTable$rem(0.3)),
+																		_1: {
+																			ctor: '::',
+																			_0: _rtfeldman$elm_css$Css$paddingRight(
+																				_kirchner$elm_pat$Styles_VariableTable$rem(0.3)),
+																			_1: {
+																				ctor: '::',
+																				_0: _rtfeldman$elm_css$Css$paddingTop(
+																					_kirchner$elm_pat$Styles_VariableTable$rem(0.5)),
+																				_1: {
+																					ctor: '::',
+																					_0: _rtfeldman$elm_css$Css$paddingBottom(
+																						_kirchner$elm_pat$Styles_VariableTable$rem(0.5)),
+																					_1: {
+																						ctor: '::',
+																						_0: A3(
+																							_rtfeldman$elm_css$Css$borderTop3,
+																							_rtfeldman$elm_css$Css$px(1),
+																							_rtfeldman$elm_css$Css$solid,
+																							_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
+																						_1: {ctor: '[]'}
+																					}
+																				}
+																			}
+																		}
+																	}),
+																_1: {
+																	ctor: '::',
+																	_0: _rtfeldman$elm_css$Css_Elements$td(
+																		{
+																			ctor: '::',
+																			_0: _rtfeldman$elm_css$Css$paddingLeft(
+																				_kirchner$elm_pat$Styles_VariableTable$rem(0.3)),
+																			_1: {
+																				ctor: '::',
+																				_0: _rtfeldman$elm_css$Css$paddingRight(
+																					_kirchner$elm_pat$Styles_VariableTable$rem(0.3)),
+																				_1: {
+																					ctor: '::',
+																					_0: _rtfeldman$elm_css$Css$paddingTop(
+																						_kirchner$elm_pat$Styles_VariableTable$rem(0.5)),
+																					_1: {
+																						ctor: '::',
+																						_0: _rtfeldman$elm_css$Css$paddingBottom(
+																							_kirchner$elm_pat$Styles_VariableTable$rem(0.5)),
+																						_1: {
+																							ctor: '::',
+																							_0: _rtfeldman$elm_css$Css$verticalAlign(_rtfeldman$elm_css$Css$top),
+																							_1: {ctor: '[]'}
+																						}
+																					}
+																				}
+																			}
+																		}),
+																	_1: {ctor: '[]'}
+																}
+															}),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					$class,
+					_kirchner$elm_pat$Styles_VariableTable$CellSign,
+					{
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$width(
+							_kirchner$elm_pat$Styles_VariableTable$rem(2)),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						$class,
+						_kirchner$elm_pat$Styles_VariableTable$CellName,
+						{
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$width(
+								_kirchner$elm_pat$Styles_VariableTable$rem(5)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$right),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							$class,
+							_kirchner$elm_pat$Styles_VariableTable$CellFormula,
+							{
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$width(
+									_kirchner$elm_pat$Styles_VariableTable$rem(8)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$left),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								$class,
+								_kirchner$elm_pat$Styles_VariableTable$CellValue,
+								{
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$width(
+										_kirchner$elm_pat$Styles_VariableTable$rem(3)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$left),
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									$class,
+									_kirchner$elm_pat$Styles_VariableTable$CellAction,
+									{
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$width(
+											_kirchner$elm_pat$Styles_VariableTable$rem(1)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										$class,
+										_kirchner$elm_pat$Styles_VariableTable$IconButton,
+										{
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$width(
+												_kirchner$elm_pat$Styles_VariableTable$rem(1)),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$height(
+													_kirchner$elm_pat$Styles_VariableTable$rem(1)),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$borderRadius(
+														_rtfeldman$elm_css$Css$pct(50)),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$color(
+															_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$backgroundColor(_rtfeldman$elm_css$Css$transparent),
+															_1: {
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
+																_1: {
+																	ctor: '::',
+																	_0: _rtfeldman$elm_css$Css$hover(
+																		{
+																			ctor: '::',
+																			_0: _rtfeldman$elm_css$Css$backgroundColor(
+																				_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
+																			_1: {ctor: '[]'}
+																		}),
+																	_1: {
+																		ctor: '::',
+																		_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											$class,
+											_kirchner$elm_pat$Styles_VariableTable$Icon,
+											{
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$important(
+													_rtfeldman$elm_css$Css$fontSize(
+														_kirchner$elm_pat$Styles_VariableTable$rem(0.6))),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$important(
+														_rtfeldman$elm_css$Css$lineHeight(
+															_kirchner$elm_pat$Styles_VariableTable$rem(0.6))),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$top(
+																_rtfeldman$elm_css$Css$pct(50)),
+															_1: {
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css$left(
+																	_rtfeldman$elm_css$Css$pct(50)),
+																_1: {
+																	ctor: '::',
+																	_0: _rtfeldman$elm_css$Css$transform(
+																		A2(
+																			_rtfeldman$elm_css$Css$translate2,
+																			_rtfeldman$elm_css$Css$pct(-50),
+																			_rtfeldman$elm_css$Css$pct(-50))),
+																	_1: {ctor: '[]'}
+																}
+															}
+														}
+													}
+												}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												$class,
+												_kirchner$elm_pat$Styles_VariableTable$Input,
+												{
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$backgroundColor(
+														_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base03)),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$borderColor(_rtfeldman$elm_css$Css$transparent),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$border(_rtfeldman$elm_css$Css$zero),
+															_1: {
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css$fontFamily(_rtfeldman$elm_css$Css$monospace),
+																_1: {
+																	ctor: '::',
+																	_0: _rtfeldman$elm_css$Css$fontSize(
+																		_rtfeldman$elm_css$Css$px(16)),
+																	_1: {
+																		ctor: '::',
+																		_0: _rtfeldman$elm_css$Css$lineHeight(
+																			_kirchner$elm_pat$Styles_VariableTable$rem(1)),
+																		_1: {
+																			ctor: '::',
+																			_0: _rtfeldman$elm_css$Css$width(
+																				_kirchner$elm_pat$Styles_VariableTable$rem(6)),
+																			_1: {
+																				ctor: '::',
+																				_0: _rtfeldman$elm_css$Css$backgroundColor(_rtfeldman$elm_css$Css$transparent),
+																				_1: {
+																					ctor: '::',
+																					_0: _rtfeldman$elm_css$Css$color(
+																						_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+																					_1: {
+																						ctor: '::',
+																						_0: _rtfeldman$elm_css$Css$focus(
+																							{
+																								ctor: '::',
+																								_0: _rtfeldman$elm_css$Css$outline(_rtfeldman$elm_css$Css$none),
+																								_1: {
+																									ctor: '::',
+																									_0: _rtfeldman$elm_css$Css$borderColor(
+																										_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base02)),
+																									_1: {ctor: '[]'}
+																								}
+																							}),
+																						_1: {ctor: '[]'}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													$class,
+													_kirchner$elm_pat$Styles_VariableTable$InputBad,
+													{
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$color(
+															_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$red)),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+}();
+
+var _kirchner$elm_pat$Views_VariableTable$cellSign = function (sign) {
+	return A2(
+		_elm_lang$html$Html$td,
+		{
+			ctor: '::',
+			_0: _kirchner$elm_pat$Styles_VariableTable$class(
+				{
+					ctor: '::',
+					_0: _kirchner$elm_pat$Styles_VariableTable$CellSign,
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(sign),
+			_1: {ctor: '[]'}
+		});
+};
+var _kirchner$elm_pat$Views_VariableTable$viewVariable = F2(
+	function (variables, _p0) {
+		var _p1 = _p0;
+		var _p2 = _p1._1;
+		return A2(
+			_elm_lang$html$Html$tr,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$td,
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Styles_VariableTable$class(
+							{
+								ctor: '::',
+								_0: _kirchner$elm_pat$Styles_VariableTable$CellName,
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(_p1._0),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: _kirchner$elm_pat$Views_VariableTable$cellSign('='),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$td,
+							{
+								ctor: '::',
+								_0: _kirchner$elm_pat$Styles_VariableTable$class(
+									{
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_VariableTable$CellFormula,
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									_kirchner$elm_pat$Expr$print(_p2)),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _kirchner$elm_pat$Views_VariableTable$cellSign('='),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$td,
+									{
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_VariableTable$class(
+											{
+												ctor: '::',
+												_0: _kirchner$elm_pat$Styles_VariableTable$CellValue,
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(
+											A2(
+												_elm_lang$core$Maybe$withDefault,
+												'',
+												A2(
+													_elm_lang$core$Maybe$map,
+													_elm_lang$core$Basics$toString,
+													A2(_kirchner$elm_pat$Expr$compute, variables, _p2)))),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$td,
+										{
+											ctor: '::',
+											_0: _kirchner$elm_pat$Styles_VariableTable$class(
+												{
+													ctor: '::',
+													_0: _kirchner$elm_pat$Styles_VariableTable$CellAction,
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										},
+										{ctor: '[]'}),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			});
+	});
+var _kirchner$elm_pat$Views_VariableTable$view = F3(
+	function (variables, newName, newValue) {
+		return A2(
+			_elm_lang$html$Html$table,
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Styles_VariableTable$class(
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Styles_VariableTable$Table,
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(
+					_elm_lang$core$List$map,
+					_kirchner$elm_pat$Views_VariableTable$viewVariable(variables),
+					_elm_lang$core$Dict$toList(variables)),
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$tr,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$th,
+								{
+									ctor: '::',
+									_0: _kirchner$elm_pat$Styles_VariableTable$class(
+										{
+											ctor: '::',
+											_0: _kirchner$elm_pat$Styles_VariableTable$CellName,
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$input,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onInput(_kirchner$elm_pat$Editor$NameUpdated),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$placeholder('name'),
+												_1: {
+													ctor: '::',
+													_0: _kirchner$elm_pat$Styles_VariableTable$class(
+														{
+															ctor: '::',
+															_0: _kirchner$elm_pat$Styles_VariableTable$Input,
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: _kirchner$elm_pat$Styles_VariableTable$classList(
+															{
+																ctor: '::',
+																_0: {
+																	ctor: '_Tuple2',
+																	_0: _kirchner$elm_pat$Styles_VariableTable$InputBad,
+																	_1: _elm_lang$core$Native_Utils.eq(newName, _elm_lang$core$Maybe$Nothing)
+																},
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										},
+										{ctor: '[]'}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$th,
+									{
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_VariableTable$class(
+											{
+												ctor: '::',
+												_0: _kirchner$elm_pat$Styles_VariableTable$CellSign,
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('='),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$th,
+										{
+											ctor: '::',
+											_0: _kirchner$elm_pat$Styles_VariableTable$class(
+												{
+													ctor: '::',
+													_0: _kirchner$elm_pat$Styles_VariableTable$CellFormula,
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$input,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onInput(_kirchner$elm_pat$Editor$ValueUpdated),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$placeholder('value'),
+														_1: {
+															ctor: '::',
+															_0: _kirchner$elm_pat$Styles_VariableTable$class(
+																{
+																	ctor: '::',
+																	_0: _kirchner$elm_pat$Styles_VariableTable$Input,
+																	_1: {ctor: '[]'}
+																}),
+															_1: {
+																ctor: '::',
+																_0: _kirchner$elm_pat$Styles_VariableTable$classList(
+																	{
+																		ctor: '::',
+																		_0: {
+																			ctor: '_Tuple2',
+																			_0: _kirchner$elm_pat$Styles_VariableTable$InputBad,
+																			_1: _elm_lang$core$Native_Utils.eq(newValue, _elm_lang$core$Maybe$Nothing)
+																		},
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {ctor: '[]'}
+															}
+														}
+													}
+												},
+												{ctor: '[]'}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$th,
+											{
+												ctor: '::',
+												_0: _kirchner$elm_pat$Styles_VariableTable$class(
+													{
+														ctor: '::',
+														_0: _kirchner$elm_pat$Styles_VariableTable$CellSign,
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$th,
+												{
+													ctor: '::',
+													_0: _kirchner$elm_pat$Styles_VariableTable$class(
+														{
+															ctor: '::',
+															_0: _kirchner$elm_pat$Styles_VariableTable$CellValue,
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												},
+												{ctor: '[]'}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$th,
+													{
+														ctor: '::',
+														_0: _kirchner$elm_pat$Styles_VariableTable$class(
+															{
+																ctor: '::',
+																_0: _kirchner$elm_pat$Styles_VariableTable$CellAction,
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: A2(_kirchner$elm_pat$Views_Common$iconSmall, 'add', _kirchner$elm_pat$Editor$AddVariable),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}));
 	});
 
 var _kirchner$elm_pat$View$selectConfig = function (viewPort) {
@@ -17625,27 +21694,30 @@ var _kirchner$elm_pat$View$addAbsoluteConfig = function (viewPort) {
 		viewPort: viewPort
 	};
 };
-var _kirchner$elm_pat$View$drawTool = F3(
-	function (viewPort, store, tool) {
+var _kirchner$elm_pat$View$drawTool = F4(
+	function (viewPort, variables, store, tool) {
 		var _p3 = tool;
 		switch (_p3.ctor) {
 			case 'Absolute':
-				return A2(
+				return A3(
 					_kirchner$elm_pat$Tools_Absolute$svg,
+					variables,
 					_kirchner$elm_pat$View$addAbsoluteConfig(viewPort),
 					_p3._0);
 			case 'Relative':
-				return A3(
+				return A4(
 					_kirchner$elm_pat$Tools_Relative$svg,
 					_kirchner$elm_pat$View$addRelativeConfig(viewPort),
 					_p3._0,
-					store);
+					store,
+					variables);
 			case 'Select':
-				return A3(
+				return A4(
 					_kirchner$elm_pat$Tools_Select$svg,
 					_kirchner$elm_pat$View$selectConfig(viewPort),
 					_p3._0,
-					store);
+					store,
+					variables);
 			default:
 				return A2(
 					_elm_lang$svg$Svg$g,
@@ -17654,157 +21726,178 @@ var _kirchner$elm_pat$View$drawTool = F3(
 		}
 	});
 var _kirchner$elm_pat$View$viewCanvas = function (model) {
-	return A3(
+	return A4(
 		_kirchner$elm_pat$View_Canvas$view,
-		A3(_kirchner$elm_pat$View$drawTool, model.viewPort, model.store, model.tool),
+		A4(_kirchner$elm_pat$View$drawTool, model.viewPort, model.variables, model.store, model.tool),
 		model.viewPort,
-		model.store);
+		model.store,
+		model.variables);
 };
-var _kirchner$elm_pat$View$viewToolInfo = F3(
-	function (viewPort, store, tool) {
+var _kirchner$elm_pat$View$viewToolInfo = F4(
+	function (viewPort, variables, store, tool) {
 		var _p4 = tool;
 		switch (_p4.ctor) {
 			case 'Absolute':
-				return A2(
-					_kirchner$elm_pat$Tools_Absolute$view,
-					_kirchner$elm_pat$View$addAbsoluteConfig(viewPort),
-					_p4._0);
-			case 'Relative':
-				return A3(
-					_kirchner$elm_pat$Tools_Relative$view,
-					_kirchner$elm_pat$View$addRelativeConfig(viewPort),
-					_p4._0,
-					store);
-			case 'Select':
-				return A2(
-					_elm_lang$html$Html$div,
-					{ctor: '[]'},
-					{ctor: '[]'});
-			default:
-				return A2(
-					_elm_lang$html$Html$div,
-					{ctor: '[]'},
-					{ctor: '[]'});
-		}
-	});
-var _kirchner$elm_pat$View$viewToolBox = function () {
-	var button = function (tool) {
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: _kirchner$elm_pat$SharedStyles$class(
-					{
-						ctor: '::',
-						_0: _kirchner$elm_pat$SharedStyles$ToolbarButtonWrapper,
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _kirchner$elm_pat$SharedStyles$class(
-							{
-								ctor: '::',
-								_0: _kirchner$elm_pat$SharedStyles$ToolbarButton,
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(
-								_kirchner$elm_pat$Editor$UpdateTool(tool)),
-							_1: {ctor: '[]'}
-						}
-					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(
-							_kirchner$elm_pat$Editor$toolName(tool)),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
+				return _elm_lang$core$Maybe$Just(
+					A2(
 						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _kirchner$elm_pat$SharedStyles$class(
+							_0: _kirchner$elm_pat$Styles_Editor$class(
 								{
 									ctor: '::',
-									_0: _kirchner$elm_pat$SharedStyles$ToolbarTooltip,
-									_1: {ctor: '[]'}
+									_0: _kirchner$elm_pat$Styles_Editor$Container,
+									_1: {
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_Editor$ContainerTopLeft,
+										_1: {ctor: '[]'}
+									}
 								}),
 							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(
-								_kirchner$elm_pat$Editor$toolDescription(tool)),
+							_0: A3(
+								_kirchner$elm_pat$Tools_Absolute$view,
+								variables,
+								_kirchner$elm_pat$View$addAbsoluteConfig(viewPort),
+								_p4._0),
 							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}
-			});
-	};
+						}));
+			case 'Relative':
+				return _elm_lang$core$Maybe$Just(
+					A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Styles_Editor$class(
+								{
+									ctor: '::',
+									_0: _kirchner$elm_pat$Styles_Editor$Container,
+									_1: {
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_Editor$ContainerTopLeft,
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A3(
+								_kirchner$elm_pat$Tools_Relative$view,
+								_kirchner$elm_pat$View$addRelativeConfig(viewPort),
+								_p4._0,
+								store),
+							_1: {ctor: '[]'}
+						}));
+			case 'Select':
+				return _elm_lang$core$Maybe$Nothing;
+			default:
+				return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _kirchner$elm_pat$View$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
-			_0: _kirchner$elm_pat$SharedStyles$class(
+			_0: _kirchner$elm_pat$Styles_Editor$class(
 				{
 					ctor: '::',
-					_0: _kirchner$elm_pat$SharedStyles$ToolbarMain,
+					_0: _kirchner$elm_pat$Styles_Editor$Main,
 					_1: {ctor: '[]'}
 				}),
 			_1: {ctor: '[]'}
 		},
-		A2(_elm_lang$core$List$map, button, _kirchner$elm_pat$Editor$allTools));
-}();
-var _kirchner$elm_pat$View$styles = function (_p5) {
-	return _elm_lang$html$Html_Attributes$style(
-		_rtfeldman$elm_css$Css$asPairs(_p5));
-};
-var _kirchner$elm_pat$View$view = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _kirchner$elm_pat$View$styles(
+		A2(
+			_elm_lang$core$List$filterMap,
+			_elm_lang$core$Basics$identity,
+			{
+				ctor: '::',
+				_0: _elm_lang$core$Maybe$Just(
+					A2(
+						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
-							_1: {
-								ctor: '::',
-								_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'none'),
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {ctor: '[]'}
-				},
-				{
+							_0: _kirchner$elm_pat$Styles_Editor$class(
+								{
+									ctor: '::',
+									_0: _kirchner$elm_pat$Styles_Editor$Container,
+									_1: {
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_Editor$ContainerTopLeftLeft,
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Views_ToolBox$view,
+							_1: {ctor: '[]'}
+						})),
+				_1: {
 					ctor: '::',
-					_0: _kirchner$elm_pat$View$viewToolBox,
+					_0: A4(_kirchner$elm_pat$View$viewToolInfo, model.viewPort, model.variables, model.store, model.tool),
 					_1: {
 						ctor: '::',
-						_0: A3(_kirchner$elm_pat$View$viewToolInfo, model.viewPort, model.store, model.tool),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$core$Maybe$Just(
+							A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _kirchner$elm_pat$Styles_Editor$class(
+										{
+											ctor: '::',
+											_0: _kirchner$elm_pat$Styles_Editor$Container,
+											_1: {
+												ctor: '::',
+												_0: _kirchner$elm_pat$Styles_Editor$ContainerBottomLeft,
+												_1: {ctor: '[]'}
+											}
+										}),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(_kirchner$elm_pat$Views_PointTable$view, model.variables, model.store),
+									_1: {ctor: '[]'}
+								})),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$core$Maybe$Just(
+								A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_Editor$class(
+											{
+												ctor: '::',
+												_0: _kirchner$elm_pat$Styles_Editor$Container,
+												_1: {
+													ctor: '::',
+													_0: _kirchner$elm_pat$Styles_Editor$ContainerBottomRight,
+													_1: {ctor: '[]'}
+												}
+											}),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A3(_kirchner$elm_pat$Views_VariableTable$view, model.variables, model.newName, model.newValue),
+										_1: {ctor: '[]'}
+									})),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$core$Maybe$Just(
+									_kirchner$elm_pat$View$viewCanvas(model)),
+								_1: {ctor: '[]'}
+							}
+						}
 					}
-				}),
-			_1: {
-				ctor: '::',
-				_0: _kirchner$elm_pat$View$viewCanvas(model),
-				_1: {ctor: '[]'}
-			}
-		});
+				}
+			}));
 };
 
 var _kirchner$elm_pat$App$main = _elm_lang$html$Html$program(

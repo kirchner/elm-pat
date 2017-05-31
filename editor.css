@@ -1,96 +1,35 @@
-body {
-    font-family: sans-serif;
-    padding: 0;
-    margin: 0;
-}
-
-.toolbarToolbarMain {
-    display: flex;
-    flex-flow: row;
-    pointer-events: auto;
-}
-
-.toolbarToolbarButtonWrapper {
+.editor__Main {
     position: relative;
 }
 
-.toolbarToolbarButtonWrapper:hover  .toolbarToolbarTooltip {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) scale3d(1, 1, 1);
-}
-
-.toolbarToolbarButton {
-    text-align: center;
-    width: 10rem;
-    height: 2rem;
-    line-height: 2rem;
-    color: #839496;
-    background-color: #002b36;
-    cursor: pointer;
-}
-
-.toolbarToolbarButton:hover {
-    background-color: #073642;
-}
-
-.toolbarToolbarTooltip {
-    display: inline-block;
-    visibility: invisible;
-    opacity: 0;
-    transform: translateX(-50%) scale3d(0, 0, 1);
-    transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-top: 0.5rem;
-    padding: 0.2rem;
+.editor__Container {
+    padding: 0.3rem;
+    border-radius: 4px;
     color: #839496;
     background-color: #eee8d5;
-    font-size: smaller;
-    border-radius: 2px;
+    pointer-events: none;
 }
 
-.toolbarToolTextfield {
-    border-color: transparent;
-    font-family: monospace;
-    font-size: 1rem;
-    line-height: 1rem;
-    width: 4.8rem;
-    background-color: transparent;
+.editor__ContainerTopLeftLeft {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
 }
 
-.toolbarToolTextfield:focus {
-    outline: none;
-    border-color: #073642;
+.editor__ContainerTopLeft {
+    position: absolute;
+    top: 1rem;
+    left: 5rem;
 }
 
-.toolbarToolbarRow {
-    display: flex;
-    flex-flow: row;
-    width: 10rem;
-    align-items: stretch;
+.editor__ContainerBottomLeft {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
 }
 
-.toolbarToolbarColumn {
-    padding: 0.2rem;
-    font-family: monospace;
-    font-size: 1rem;
-    line-height: 1rem;
-}
-
-.toolbarToolbarIconButton {
-    font-size: 1rem;
-    line-height: 1rem;
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 50%;
-    color: #839496;
-    background-color: transparent;
-    cursor: pointer;
-    position: relative;
-}
-
-.toolbarToolbarIconButton:hover {
-    background-color: #073642;
+.editor__ContainerBottomRight {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
 }

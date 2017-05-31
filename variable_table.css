@@ -1,0 +1,92 @@
+.variable-table__Table {
+    pointer-events: auto;
+    font-family: monospace;
+    font-size: 16px;
+    line-height: 1rem;
+    border-collapse: collapse;
+}
+
+.variable-table__Table > tr > th {
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-top: 1px solid #fdf6e3;
+}
+
+.variable-table__Table > tr > td {
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    vertical-align: top;
+}
+
+.variable-table__CellSign {
+    width: 2rem;
+    text-align: center;
+}
+
+.variable-table__CellName {
+    width: 5rem;
+    text-align: right;
+}
+
+.variable-table__CellFormula {
+    width: 8rem;
+    text-align: left;
+}
+
+.variable-table__CellValue {
+    width: 3rem;
+    text-align: left;
+}
+
+.variable-table__CellAction {
+    width: 1rem;
+    text-align: center;
+}
+
+.variable-table__IconButton {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    color: #839496;
+    background-color: transparent;
+    cursor: pointer;
+    position: relative;
+}
+
+.variable-table__IconButton:hover {
+    background-color: #fdf6e3;
+}
+
+.variable-table__Icon {
+    font-size: 0.6rem !important;
+    line-height: 0.6rem !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.variable-table__Input {
+    background-color: #002b36;
+    border-color: transparent;
+    border: 0;
+    font-family: monospace;
+    font-size: 16px;
+    line-height: 1rem;
+    width: 6rem;
+    background-color: transparent;
+    color: #839496;
+}
+
+.variable-table__Input:focus {
+    outline: none;
+    border-color: #073642;
+}
+
+.variable-table__InputBad {
+    color: #dc322f;
+}
