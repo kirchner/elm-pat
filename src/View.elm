@@ -1,8 +1,5 @@
-module View exposing (css, view)
+module View exposing (view)
 
-import Css exposing (..)
-import Css.Elements
-import Css.Namespace exposing (namespace)
 import Dict exposing (Dict)
 import Editor
     exposing
@@ -16,10 +13,14 @@ import Editor
 import Expr exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
-import Html.CssHelpers exposing (withNamespace)
 import Html.Events as Events
 import Math.Vector2 exposing (..)
 import Styles.Colors exposing (..)
+import Styles.Editor
+    exposing
+        ( Class(..)
+        , class
+        )
 import Svg exposing (Svg)
 import Tools.Absolute as Absolute
 import Tools.Relative as Relative
@@ -33,6 +34,7 @@ import Types
         )
 import View.Canvas as Canvas
 import Views.PointTable as PointTable
+import Views.ToolBox as ToolBox
 import Views.VariableTable as VariableTable
 
 
@@ -41,35 +43,18 @@ import Views.VariableTable as VariableTable
 
 view : Model -> Html Msg
 view model =
-    let
-        styles =
-            Css.asPairs >> Html.style
-    in
-    Html.div []
+    Html.div
+        [ class [ Main ] ]
         [ Html.div
-            [ styles
-                [ Css.position Css.absolute
-                , Css.property "pointer-events" "none"
-                ]
-            ]
-            [ viewToolBox
+            [ class [ Container, ContainerTopLeft ] ]
+            [ ToolBox.view
             , viewToolInfo model.viewPort model.variables model.store model.tool
             ]
         , Html.div
-            [ styles
-                [ Css.position Css.absolute
-                , Css.bottom (Css.pct 0)
-                , Css.left (Css.pct 0)
-                ]
-            ]
+            [ class [ Container, ContainerBottomLeft ] ]
             [ PointTable.view model.variables model.store ]
         , Html.div
-            [ styles
-                [ Css.position Css.absolute
-                , Css.bottom (Css.pct 0)
-                , Css.right (Css.pct 0)
-                ]
-            ]
+            [ class [ Container, ContainerBottomRight ] ]
             [ VariableTable.view model.variables model.newName model.newValue ]
         , viewCanvas model
         ]
@@ -77,25 +62,6 @@ view model =
 
 
 {- tool box -}
-
-
-viewToolBox : Html Msg
-viewToolBox =
-    let
-        button tool =
-            Html.div [ class [ ButtonWrapper ] ]
-                [ Html.div
-                    [ class [ Button ]
-                    , Events.onClick (UpdateTool tool)
-                    ]
-                    [ Html.text (toolName tool) ]
-                , Html.div [ class [ Tooltip ] ]
-                    [ Html.text (toolDescription tool) ]
-                ]
-    in
-    Html.div
-        [ class [ Main ] ]
-        (allTools |> List.map button)
 
 
 viewToolInfo : ViewPort -> Dict String E -> PointStore -> Tool -> Html Msg
@@ -171,78 +137,3 @@ selectConfig viewPort =
     , stateUpdated = UpdateTool << Select
     , viewPort = viewPort
     }
-
-
-
-{- css -}
-
-
-type Class
-    = Main
-    | ButtonWrapper
-    | Button
-    | Tooltip
-
-
-{ id, class, classList } =
-    withNamespace "toolbar"
-
-
-css =
-    (stylesheet << namespace "toolbar")
-        [ Css.Elements.body
-            [ margin zero ]
-        , Css.class Main
-            [ displayFlex
-            , flexFlow1 row
-            , property "pointer-events" "auto"
-            ]
-        , Css.class ButtonWrapper
-            [ position relative
-            , hover
-                [ Css.descendants
-                    [ Css.class Tooltip
-                        [ opacity (num 1)
-                        , property "visibility" "visible"
-                        , transforms
-                            [ translateX (pct -50)
-                            , scale3d 1 1 1
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        , Css.class Button
-            [ textAlign center
-            , width (Css.rem 10)
-            , height (Css.rem 2)
-            , lineHeight (Css.rem 2)
-            , color (hex base0)
-            , backgroundColor (hex base03)
-            , cursor pointer
-            , hover
-                [ backgroundColor (hex base02) ]
-            ]
-        , Css.class Tooltip
-            [ display inlineBlock
-            , property "visibility" "invisible"
-            , opacity (num 0)
-            , transforms
-                [ translateX (pct -50)
-                , scale3d 0 0 1
-                ]
-            , property "transition"
-                ("opacity 150ms ease-in-out"
-                    ++ ", transform 150ms ease-in-out"
-                )
-            , position absolute
-            , top (pct 100)
-            , left (pct 50)
-            , marginTop (Css.rem 0.5)
-            , padding (Css.rem 0.2)
-            , color (hex base0)
-            , backgroundColor (hex base2)
-            , fontSize smaller
-            , borderRadius (px 2)
-            ]
-        ]

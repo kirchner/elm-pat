@@ -19,22 +19,11 @@ import Types
         , Point
         , PointStore
         )
+import Views.Common exposing (iconSmall)
 
 
 view : Dict String E -> Maybe String -> Maybe E -> Html Msg
 view variables newName newValue =
-    let
-        icon name callback =
-            div
-                [ class [ IconButton ] ]
-                [ i
-                    [ Html.class "material-icons"
-                    , onClick callback
-                    , class [ Icon ]
-                    ]
-                    [ text name ]
-                ]
-    in
     table
         [ class [ Table ] ]
         ((variables
@@ -76,7 +65,7 @@ view variables newName newValue =
                         []
                     , th
                         [ class [ CellAction ] ]
-                        [ icon "add" AddVariable ]
+                        [ iconSmall "add" AddVariable ]
                     ]
                ]
         )

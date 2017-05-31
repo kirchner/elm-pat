@@ -35,9 +35,7 @@ css =
     in
     (stylesheet << namespace "point-table__")
         [ class Table
-            [ color (hex base0)
-            , backgroundColor (hex base2)
-            , property "pointer-events" "auto"
+            [ property "pointer-events" "auto"
             , fontFamily monospace
             , fontSize (px 16)
             , lineHeight (rem 1)
@@ -48,15 +46,16 @@ css =
                         [ th
                             [ paddingLeft (rem 0.3)
                             , paddingRight (rem 0.3)
-                            , paddingTop (rem 0.2)
-                            , paddingBottom (rem 0.2)
+                            , paddingTop (rem 0.5)
+                            , paddingBottom (rem 0.5)
                             , borderBottom3 (px 1) solid (hex base3)
+                            , fontWeight bold
                             ]
                         , td
                             [ paddingLeft (rem 0.3)
                             , paddingRight (rem 0.3)
-                            , paddingTop (rem 0.1)
-                            , paddingBottom (rem 0.1)
+                            , paddingTop (rem 0.5)
+                            , paddingBottom (rem 0.5)
                             ]
                         ]
                     ]

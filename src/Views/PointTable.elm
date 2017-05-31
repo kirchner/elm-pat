@@ -18,6 +18,7 @@ import Types
         , Point
         , PointStore
         )
+import Views.Common exposing (iconSmall)
 
 
 view : Dict String E -> PointStore -> Html Msg
@@ -68,17 +69,6 @@ viewPointEntry variables store ( id, point ) =
                 |> Maybe.map getY
                 |> Maybe.map toString
                 |> Maybe.withDefault ""
-
-        icon name callback =
-            div
-                [ class [ IconButton ] ]
-                [ i
-                    [ Html.class "material-icons"
-                    , onClick callback
-                    , class [ Icon ]
-                    ]
-                    [ text name ]
-                ]
     in
     tr []
         [ td
@@ -95,10 +85,10 @@ viewPointEntry variables store ( id, point ) =
             [ text (printPoint variables point) ]
         , td
             [ class [ CellAction ] ]
-            [ icon "edit" (SelectPoint id) ]
+            [ iconSmall "edit" (SelectPoint id) ]
         , td
             [ class [ CellAction ] ]
-            [ icon "delete" (DeletePoint id) ]
+            [ iconSmall "delete" (DeletePoint id) ]
         ]
 
 
