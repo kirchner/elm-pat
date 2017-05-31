@@ -19746,61 +19746,49 @@ var _kirchner$elm_pat$Styles_Editor$css = function () {
 	}(
 		{
 			ctor: '::',
-			_0: A2(
-				$class,
-				_kirchner$elm_pat$Styles_Editor$Main,
+			_0: _rtfeldman$elm_css$Css_Elements$body(
 				{
 					ctor: '::',
-					_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+					_0: _rtfeldman$elm_css$Css$margin(_rtfeldman$elm_css$Css$zero),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
 					$class,
-					_kirchner$elm_pat$Styles_Editor$Container,
+					_kirchner$elm_pat$Styles_Editor$Main,
 					{
 						ctor: '::',
-						_0: _rtfeldman$elm_css$Css$padding(
-							_kirchner$elm_pat$Styles_Editor$rem(0.3)),
-						_1: {
-							ctor: '::',
-							_0: _rtfeldman$elm_css$Css$borderRadius(
-								_rtfeldman$elm_css$Css$px(4)),
-							_1: {
-								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$color(
-									_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
-								_1: {
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$backgroundColor(
-										_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base2)),
-									_1: {
-										ctor: '::',
-										_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'none'),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
+						_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+						_1: {ctor: '[]'}
 					}),
 				_1: {
 					ctor: '::',
 					_0: A2(
 						$class,
-						_kirchner$elm_pat$Styles_Editor$ContainerTopLeftLeft,
+						_kirchner$elm_pat$Styles_Editor$Container,
 						{
 							ctor: '::',
-							_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+							_0: _rtfeldman$elm_css$Css$padding(
+								_kirchner$elm_pat$Styles_Editor$rem(0.3)),
 							_1: {
 								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$top(
-									_kirchner$elm_pat$Styles_Editor$rem(1)),
+								_0: _rtfeldman$elm_css$Css$borderRadius(
+									_rtfeldman$elm_css$Css$px(4)),
 								_1: {
 									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$left(
-										_kirchner$elm_pat$Styles_Editor$rem(1)),
-									_1: {ctor: '[]'}
+									_0: _rtfeldman$elm_css$Css$color(
+										_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$backgroundColor(
+											_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base2)),
+										_1: {
+											ctor: '::',
+											_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'none'),
+											_1: {ctor: '[]'}
+										}
+									}
 								}
 							}
 						}),
@@ -19808,7 +19796,7 @@ var _kirchner$elm_pat$Styles_Editor$css = function () {
 						ctor: '::',
 						_0: A2(
 							$class,
-							_kirchner$elm_pat$Styles_Editor$ContainerTopLeft,
+							_kirchner$elm_pat$Styles_Editor$ContainerTopLeftLeft,
 							{
 								ctor: '::',
 								_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
@@ -19819,7 +19807,7 @@ var _kirchner$elm_pat$Styles_Editor$css = function () {
 									_1: {
 										ctor: '::',
 										_0: _rtfeldman$elm_css$Css$left(
-											_kirchner$elm_pat$Styles_Editor$rem(5)),
+											_kirchner$elm_pat$Styles_Editor$rem(1)),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -19828,18 +19816,18 @@ var _kirchner$elm_pat$Styles_Editor$css = function () {
 							ctor: '::',
 							_0: A2(
 								$class,
-								_kirchner$elm_pat$Styles_Editor$ContainerBottomLeft,
+								_kirchner$elm_pat$Styles_Editor$ContainerTopLeft,
 								{
 									ctor: '::',
 									_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
 									_1: {
 										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$bottom(
+										_0: _rtfeldman$elm_css$Css$top(
 											_kirchner$elm_pat$Styles_Editor$rem(1)),
 										_1: {
 											ctor: '::',
 											_0: _rtfeldman$elm_css$Css$left(
-												_kirchner$elm_pat$Styles_Editor$rem(1)),
+												_kirchner$elm_pat$Styles_Editor$rem(5)),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -19848,7 +19836,7 @@ var _kirchner$elm_pat$Styles_Editor$css = function () {
 								ctor: '::',
 								_0: A2(
 									$class,
-									_kirchner$elm_pat$Styles_Editor$ContainerBottomRight,
+									_kirchner$elm_pat$Styles_Editor$ContainerBottomLeft,
 									{
 										ctor: '::',
 										_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
@@ -19858,13 +19846,34 @@ var _kirchner$elm_pat$Styles_Editor$css = function () {
 												_kirchner$elm_pat$Styles_Editor$rem(1)),
 											_1: {
 												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$right(
+												_0: _rtfeldman$elm_css$Css$left(
 													_kirchner$elm_pat$Styles_Editor$rem(1)),
 												_1: {ctor: '[]'}
 											}
 										}
 									}),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: A2(
+										$class,
+										_kirchner$elm_pat$Styles_Editor$ContainerBottomRight,
+										{
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$bottom(
+													_kirchner$elm_pat$Styles_Editor$rem(1)),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$right(
+														_kirchner$elm_pat$Styles_Editor$rem(1)),
+													_1: {ctor: '[]'}
+												}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}
