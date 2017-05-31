@@ -33,7 +33,9 @@ css =
             Css.class
     in
     (stylesheet << namespace "editor__")
-        [ class Main
+        [ body
+            [ margin zero ]
+        , class Main
             [ position relative ]
         , class Container
             [ padding (rem 0.3)
