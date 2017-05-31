@@ -7,7 +7,7 @@ import Html exposing (..)
 import Html.Attributes as Html
 import Html.Events exposing (..)
 import Math.Vector2 exposing (..)
-import Styles.PointTable as PointTable
+import Styles.PointTable
     exposing
         ( Class(..)
         , class
@@ -23,7 +23,7 @@ import Types
 view : Dict String E -> PointStore -> Html Msg
 view variables store =
     table
-        [ PointTable.class [ Table ] ]
+        [ class [ Table ] ]
         (tr []
             [ th
                 [ class [ CellId ] ]

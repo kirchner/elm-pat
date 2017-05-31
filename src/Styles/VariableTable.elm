@@ -1,4 +1,4 @@
-module Styles.PointTable
+module Styles.VariableTable
     exposing
         ( Class(..)
         , class
@@ -16,16 +16,19 @@ import Styles.Colors exposing (..)
 
 type Class
     = Table
-    | CellId
-    | CellCoordinate
-    | CellType
+    | CellSign
+    | CellName
+    | CellFormula
+    | CellValue
     | CellAction
     | IconButton
     | Icon
+    | Input
+    | InputBad
 
 
 { id, class, classList } =
-    withNamespace "point-table__"
+    withNamespace "variable-table__"
 
 
 css =
@@ -33,7 +36,7 @@ css =
         class =
             Css.class
     in
-    (stylesheet << namespace "point-table__")
+    (stylesheet << namespace "variable-table__")
         [ class Table
             [ color (hex base0)
             , backgroundColor (hex base2)
@@ -50,30 +53,34 @@ css =
                             , paddingRight (rem 0.3)
                             , paddingTop (rem 0.2)
                             , paddingBottom (rem 0.2)
-                            , borderBottom3 (px 1) solid (hex base3)
+                            , borderTop3 (px 1) solid (hex base3)
                             ]
                         , td
                             [ paddingLeft (rem 0.3)
                             , paddingRight (rem 0.3)
                             , paddingTop (rem 0.1)
                             , paddingBottom (rem 0.1)
+                            , verticalAlign top
                             ]
                         ]
                     ]
                 ]
             ]
-        , class CellId
-            [ width (rem 1)
-            , borderRight3 (px 1) solid (hex base3)
-            , textAlign right
-            ]
-        , class CellCoordinate
-            [ width (rem 3)
-            , textAlign right
-            ]
-        , class CellType
-            [ width (rem 6)
+        , class CellSign
+            [ width (rem 2)
             , textAlign center
+            ]
+        , class CellName
+            [ width (rem 5)
+            , textAlign right
+            ]
+        , class CellFormula
+            [ width (rem 8)
+            , textAlign left
+            ]
+        , class CellValue
+            [ width (rem 3)
+            , textAlign left
             ]
         , class CellAction
             [ width (rem 1)
@@ -98,6 +105,23 @@ css =
             , left (pct 50)
             , transform (translate2 (pct -50) (pct -50))
             ]
+        , class Input
+            [ backgroundColor (hex base03)
+            , borderColor transparent
+            , border zero
+            , fontFamily monospace
+            , fontSize (px 16)
+            , lineHeight (rem 1)
+            , width (rem 6)
+            , backgroundColor transparent
+            , color (hex base0)
+            , focus
+                [ outline none
+                , borderColor (hex base02)
+                ]
+            ]
+        , class InputBad
+            [ color (hex red) ]
         ]
 
 

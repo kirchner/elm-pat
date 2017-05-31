@@ -33,6 +33,7 @@ import Types
         )
 import View.Canvas as Canvas
 import Views.PointTable as PointTable
+import Views.VariableTable as VariableTable
 
 
 {- main view -}
@@ -69,7 +70,7 @@ view model =
                 , Css.right (Css.pct 0)
                 ]
             ]
-            [ viewVariableList model.variables model.newName model.newValue ]
+            [ VariableTable.view model.variables model.newName model.newValue ]
         , viewCanvas model
         ]
 
@@ -111,121 +112,6 @@ viewToolInfo viewPort variables store tool =
 
         None ->
             Html.div [] []
-
-
-
-{- variable list -}
-
-
-viewVariableList : Dict String E -> Maybe String -> Maybe E -> Html Msg
-viewVariableList variables newName newValue =
-    let
-        styles =
-            Css.asPairs >> Html.style
-
-        icon name callback =
-            Html.div
-                [ class [ IconButton ] ]
-                [ Html.i
-                    [ Html.class "material-icons"
-                    , Events.onClick callback
-                    , class [ Icon ]
-                    ]
-                    [ Html.text name ]
-                ]
-    in
-    Html.div
-        [ class [ VariableList ] ]
-        [ Html.table
-            [ styles [ borderCollapse collapse ] ]
-            (Dict.toList variables |> List.map (viewVariable variables))
-        , Html.tr [ class [ ContentRow ] ]
-            [ Html.td
-                [ class [ ContentCell ] ]
-                [ Html.input
-                    [ Events.onInput NameUpdated
-                    , Html.placeholder "name"
-                    , styles
-                        [ case newName of
-                            Nothing ->
-                                color (hex red)
-
-                            Just _ ->
-                                color (hex base0)
-                        , backgroundColor (hex base03)
-                        , borderColor transparent
-                        , border zero
-                        , fontFamily monospace
-                        , fontSize (Css.rem 1)
-                        , lineHeight (Css.rem 1)
-                        , width (Css.rem 6)
-                        , backgroundColor transparent
-                        , focus
-                            [ outline none
-                            , borderColor (hex base02)
-                            ]
-                        ]
-                    ]
-                    []
-                ]
-            , Html.td
-                [ class [ ContentCell ] ]
-                [ Html.input
-                    [ Events.onInput ValueUpdated
-                    , Html.placeholder "value"
-                    , styles
-                        [ case newValue of
-                            Nothing ->
-                                color (hex red)
-
-                            Just _ ->
-                                color (hex base0)
-                        , backgroundColor (hex base03)
-                        , borderColor transparent
-                        , border zero
-                        , fontFamily monospace
-                        , fontSize (Css.rem 1)
-                        , lineHeight (Css.rem 1)
-                        , width (Css.rem 10)
-                        , backgroundColor transparent
-                        , focus
-                            [ outline none
-                            , borderColor (hex base02)
-                            ]
-                        ]
-                    ]
-                    []
-                ]
-            , Html.td
-                [ class [ ContentCell ] ]
-                [ icon "add" AddVariable ]
-            ]
-        ]
-
-
-viewVariable : Dict String E -> ( String, E ) -> Html Msg
-viewVariable variables ( name, expr ) =
-    let
-        styles =
-            Css.asPairs >> Html.style
-    in
-    Html.div
-        [ styles
-            [ displayFlex
-            , flexFlow1 row
-            ]
-        ]
-        [ Html.div []
-            [ String.concat
-                [ name
-                , ": "
-                , Expr.print expr
-                , " = "
-                , toString (Expr.compute variables expr)
-                ]
-                |> Html.text
-            ]
-        ]
 
 
 
@@ -296,13 +182,6 @@ type Class
     | ButtonWrapper
     | Button
     | Tooltip
-    | PointList
-    | VariableList
-    | HeaderCell
-    | ContentRow
-    | ContentCell
-    | IconButton
-    | Icon
 
 
 { id, class, classList } =
@@ -365,60 +244,5 @@ css =
             , backgroundColor (hex base2)
             , fontSize smaller
             , borderRadius (px 2)
-            ]
-        , Css.class PointList
-            [ color (hex base0)
-            , backgroundColor (hex base2)
-            , property "pointer-events" "auto"
-            , fontFamily monospace
-            , fontSize (Css.rem 1)
-            , lineHeight (Css.rem 1)
-            ]
-        , Css.class VariableList
-            [ color (hex base0)
-            , backgroundColor (hex base2)
-            , property "pointer-events" "auto"
-            , fontFamily monospace
-            , fontSize (Css.rem 1)
-            , lineHeight (Css.rem 1)
-            ]
-        , Css.class HeaderCell
-            [ paddingLeft (Css.rem 0.3)
-            , paddingRight (Css.rem 0.3)
-            , paddingTop (Css.rem 0.1)
-            , paddingBottom (Css.rem 0.2)
-            , borderBottom3 (px 1) solid (hex base02)
-            , textAlign right
-            ]
-        , Css.class ContentRow
-            [ hover
-                [ backgroundColor (hex base3) ]
-            ]
-        , Css.class ContentCell
-            [ paddingLeft (Css.rem 0.3)
-            , paddingRight (Css.rem 0.3)
-            , paddingTop (Css.rem 0.1)
-            , paddingBottom (Css.rem 0.1)
-            , textAlign right
-            ]
-        , Css.class IconButton
-            [ width (Css.rem 1)
-            , height (Css.rem 1)
-            , borderRadius (pct 50)
-            , color (hex base0)
-            , backgroundColor transparent
-            , cursor pointer
-            , hover
-                [ backgroundColor (hex base02)
-                ]
-            , Css.position Css.relative
-            ]
-        , Css.class Icon
-            [ important (Css.fontSize (Css.rem 0.6))
-            , important (Css.lineHeight (Css.rem 0.6))
-            , Css.position Css.absolute
-            , Css.top (Css.pct 50)
-            , Css.left (Css.pct 50)
-            , Css.transform (Css.translate2 (Css.pct -50) (Css.pct -50))
             ]
         ]
