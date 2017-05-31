@@ -3,7 +3,7 @@ module Tools.Styles exposing (..)
 import Css exposing (..)
 import Css.Namespace exposing (namespace)
 import Html.CssHelpers exposing (withNamespace)
-import View.Colors exposing (..)
+import Styles.Colors exposing (..)
 
 
 {- css -}

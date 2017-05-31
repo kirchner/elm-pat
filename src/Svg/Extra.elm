@@ -1,21 +1,17 @@
 module Svg.Extra
     exposing
-        ( drawPoint
-        , drawSelector
-        , drawArrow
-        , drawRectArrow
-        , drawVerticalLine
+        ( drawArrow
         , drawHorizontalLine
+        , drawPoint
+        , drawRectArrow
+        , drawSelector
+        , drawVerticalLine
         )
 
 import Math.Vector2 exposing (..)
+import Styles.Colors as Colors
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
-
-
-{- internal -}
-
-import View.Colors as Colors
 
 
 drawPoint : Vec2 -> Svg msg

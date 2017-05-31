@@ -1,4 +1,4 @@
-module View.Colors exposing (..)
+module Styles.Colors exposing (..)
 
 
 base03 =

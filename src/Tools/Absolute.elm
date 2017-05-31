@@ -23,7 +23,7 @@ import Svg.Extra as Svg
 import Tools.Common exposing (..)
 import Tools.Styles exposing (..)
 import Types exposing (..)
-import View.Colors exposing (..)
+import Styles.Colors exposing (..)
 
 
 {- TODO: rename these in Types -}

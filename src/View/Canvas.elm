@@ -11,7 +11,7 @@ import Svg.Attributes as Svg
 import Svg.Events as Svg
 import Svg.Extra as Svg
 import Types exposing (..)
-import View.Colors as Colors
+import Styles.Colors as Colors
 
 
 view : Svg msg -> ViewPort -> PointStore -> Dict String E -> Html msg

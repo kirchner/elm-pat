@@ -31,7 +31,8 @@ import Types
         , ViewPort
         )
 import View.Canvas as Canvas
-import View.Colors exposing (..)
+import Styles.Colors exposing (..)
+import Views.PointTable as PointTable
 
 
 {- main view -}
@@ -60,7 +61,7 @@ view model =
                 , Css.left (Css.pct 0)
                 ]
             ]
-            [ viewPointList model.variables model.store ]
+            [ PointTable.view model.variables model.store ]
         , Html.div
             [ styles
                 [ Css.position Css.absolute
