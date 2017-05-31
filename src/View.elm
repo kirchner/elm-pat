@@ -19,6 +19,7 @@ import Html.Attributes as Html
 import Html.CssHelpers exposing (withNamespace)
 import Html.Events as Events
 import Math.Vector2 exposing (..)
+import Styles.Colors exposing (..)
 import Svg exposing (Svg)
 import Tools.Absolute as Absolute
 import Tools.Relative as Relative
@@ -31,7 +32,6 @@ import Types
         , ViewPort
         )
 import View.Canvas as Canvas
-import Styles.Colors exposing (..)
 import Views.PointTable as PointTable
 
 
@@ -111,121 +111,6 @@ viewToolInfo viewPort variables store tool =
 
         None ->
             Html.div [] []
-
-
-
-{- pointlist -}
-
-
-viewPointList : Dict String E -> PointStore -> Html Msg
-viewPointList variables store =
-    let
-        styles =
-            Css.asPairs >> Html.style
-
-        rem =
-            Css.rem
-    in
-    Html.div
-        [ class [ PointList ] ]
-        [ Html.table
-            [ styles [ borderCollapse collapse ] ]
-            (Html.tr
-                [ styles
-                    [ borderBottom3 (px 1) solid (hex base02) ]
-                ]
-                [ Html.th
-                    [ class [ HeaderCell ] ]
-                    [ Html.text "#" ]
-                , Html.th
-                    [ class [ HeaderCell ]
-                    , styles
-                        [ width (rem 3) ]
-                    ]
-                    [ Html.text "x" ]
-                , Html.th
-                    [ class [ HeaderCell ]
-                    , styles
-                        [ width (rem 3) ]
-                    ]
-                    [ Html.text "y" ]
-                , Html.th [ class [ HeaderCell ] ] []
-                , Html.th [ class [ HeaderCell ] ] []
-                , Html.th [ class [ HeaderCell ] ] []
-                ]
-                :: (Dict.toList store |> List.map (viewPointEntry variables store))
-            )
-        ]
-
-
-viewPointEntry : Dict String E -> PointStore -> ( Id, Point ) -> Html Msg
-viewPointEntry variables store ( id, point ) =
-    let
-        styles =
-            Css.asPairs >> Html.style
-
-        v =
-            Types.position store variables point
-
-        x =
-            v
-                |> Maybe.map getX
-                |> Maybe.map toString
-                |> Maybe.withDefault ""
-
-        y =
-            v
-                |> Maybe.map getY
-                |> Maybe.map toString
-                |> Maybe.withDefault ""
-
-        icon name callback =
-            Html.div
-                [ class [ IconButton ] ]
-                [ Html.i
-                    [ Html.class "material-icons"
-                    , Events.onClick callback
-                    , class [ Icon ]
-                    ]
-                    [ Html.text name ]
-                ]
-    in
-    Html.tr [ class [ ContentRow ] ]
-        [ Html.td
-            [ class [ ContentCell ] ]
-            [ Html.text (toString id) ]
-        , Html.td
-            [ class [ ContentCell ] ]
-            [ Html.text x ]
-        , Html.td [ class [ ContentCell ] ]
-            [ Html.text y ]
-        , Html.td
-            [ class [ ContentCell ]
-            , styles
-                [ textAlign left
-                , paddingLeft (Css.rem 1.5)
-                , paddingRight (Css.rem 1.5)
-                ]
-            ]
-            [ Html.text (printPoint variables point) ]
-        , Html.td [ class [ ContentCell ] ]
-            [ icon "edit" (SelectPoint id) ]
-        , Html.td [ class [ ContentCell ] ]
-            [ icon "delete" (DeletePoint id) ]
-        ]
-
-
-printPoint : Dict String E -> Point -> String
-printPoint variables point =
-    case point of
-        Types.Absolute _ _ ->
-            "absolute"
-
-        Types.Relative _ _ _ ->
-            "relative"
-
-        _ ->
-            toString point
 
 
 
