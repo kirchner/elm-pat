@@ -43,41 +43,49 @@ import Views.VariableTable as VariableTable
 
 view : Model -> Html Msg
 view model =
-    Html.div
-        [ class [ Main ] ]
-        [ Html.div
-            [ class [ Container, ContainerTopLeft ] ]
-            [ ToolBox.view
-            , viewToolInfo model.viewPort model.variables model.store model.tool
-            ]
-        , Html.div
+    [ Just <|
+        Html.div
+            [ class [ Container, ContainerTopLeftLeft ] ]
+            [ ToolBox.view ]
+    , viewToolInfo model.viewPort model.variables model.store model.tool
+    , Just <|
+        Html.div
             [ class [ Container, ContainerBottomLeft ] ]
             [ PointTable.view model.variables model.store ]
-        , Html.div
+    , Just <|
+        Html.div
             [ class [ Container, ContainerBottomRight ] ]
             [ VariableTable.view model.variables model.newName model.newValue ]
-        , viewCanvas model
-        ]
+    , Just <| viewCanvas model
+    ]
+        |> List.filterMap identity
+        |> Html.div [ class [ Main ] ]
 
 
 
 {- tool box -}
 
 
-viewToolInfo : ViewPort -> Dict String E -> PointStore -> Tool -> Html Msg
+viewToolInfo : ViewPort -> Dict String E -> PointStore -> Tool -> Maybe (Html Msg)
 viewToolInfo viewPort variables store tool =
     case tool of
         Absolute state ->
-            Absolute.view variables (addAbsoluteConfig viewPort) state
+            Just <|
+                Html.div
+                    [ class [ Container, ContainerTopLeft ] ]
+                    [ Absolute.view variables (addAbsoluteConfig viewPort) state ]
 
         Relative state ->
-            Relative.view (addRelativeConfig viewPort) state store
+            Just <|
+                Html.div
+                    [ class [ Container, ContainerTopLeft ] ]
+                    [ Relative.view (addRelativeConfig viewPort) state store ]
 
         Select _ ->
-            Html.div [] []
+            Nothing
 
         None ->
-            Html.div [] []
+            Nothing
 
 
 

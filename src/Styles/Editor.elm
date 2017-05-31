@@ -17,6 +17,7 @@ import Styles.Colors exposing (..)
 type Class
     = Main
     | Container
+    | ContainerTopLeftLeft
     | ContainerTopLeft
     | ContainerBottomLeft
     | ContainerBottomRight
@@ -41,10 +42,15 @@ css =
             , backgroundColor (hex base2)
             , property "pointer-events" "none"
             ]
-        , class ContainerTopLeft
+        , class ContainerTopLeftLeft
             [ position absolute
             , top (rem 1)
             , left (rem 1)
+            ]
+        , class ContainerTopLeft
+            [ position absolute
+            , top (rem 1)
+            , left (rem 5)
             ]
         , class ContainerBottomLeft
             [ position absolute
