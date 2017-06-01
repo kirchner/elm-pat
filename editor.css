@@ -6,12 +6,16 @@ body {
     position: relative;
 }
 
+.editor__MouseMove {
+    cursor: move;
+}
+
 .editor__Container {
     padding: 0.3rem;
     border-radius: 4px;
     color: #839496;
     background-color: #eee8d5;
-    pointer-events: none;
+    pointer-events: auto;
 }
 
 .editor__ContainerTopLeftLeft {
