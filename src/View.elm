@@ -7,6 +7,7 @@ import Editor
         , Msg(..)
         , Tool(..)
         , allTools
+        , getViewPort
         , toolDescription
         , toolName
         )
@@ -20,6 +21,7 @@ import Styles.Editor
     exposing
         ( Class(..)
         , class
+        , classList
         )
 import Svg exposing (Svg)
 import Tools.Absolute as Absolute
@@ -59,7 +61,10 @@ view model =
     , Just <| viewCanvas model
     ]
         |> List.filterMap identity
-        |> Html.div [ class [ Main ] ]
+        |> Html.div
+            [ class [ Main ]
+            , classList [ ( MouseMove, model.drag /= Nothing ) ]
+            ]
 
 
 
@@ -96,7 +101,8 @@ viewCanvas : Model -> Html Msg
 viewCanvas model =
     Canvas.view
         (drawTool model.viewPort model.variables model.store model.tool)
-        model.viewPort
+        DragStart
+        (getViewPort model.viewPort model.drag)
         model.store
         model.variables
 

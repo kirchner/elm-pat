@@ -1,17 +1,16 @@
 module Events
     exposing
         ( onClick
+        , onMouseDown
         , onMove
         )
 
-import Json.Decode exposing (..)
-import VirtualDom exposing (on)
-import Platform exposing (Task)
-
-
 {- internal -}
 
+import Json.Decode exposing (..)
+import Platform exposing (Task)
 import Types exposing (Position)
+import VirtualDom exposing (on)
 
 
 onClick : (Position -> msg) -> VirtualDom.Property msg
@@ -22,6 +21,11 @@ onClick tagger =
 onMove : (Position -> msg) -> VirtualDom.Property msg
 onMove tagger =
     on "mousemove" (map tagger positionDecoder)
+
+
+onMouseDown : (Position -> msg) -> VirtualDom.Property msg
+onMouseDown tagger =
+    on "mousedown" (map tagger positionDecoder)
 
 
 positionDecoder : Decoder Position

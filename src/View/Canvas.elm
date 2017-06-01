@@ -6,16 +6,22 @@ import Expr exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Math.Vector2 exposing (..)
+import Styles.Colors as Colors
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
 import Svg.Extra as Svg
 import Types exposing (..)
-import Styles.Colors as Colors
 
 
-view : Svg msg -> ViewPort -> PointStore -> Dict String E -> Html msg
-view tool viewPort store variables =
+view :
+    Svg msg
+    -> (Position -> msg)
+    -> ViewPort
+    -> PointStore
+    -> Dict String E
+    -> Html msg
+view tool startDrag viewPort store variables =
     let
         viewBoxString =
             String.join " "
@@ -33,10 +39,25 @@ view tool viewPort store variables =
             , ( "height", toString viewPort.height )
             ]
         ]
-        [ origin
+        [ dragArea startDrag viewPort
+        , origin
         , Svg.g [] (points store variables)
         , tool
         ]
+
+
+dragArea : (Position -> msg) -> ViewPort -> Svg msg
+dragArea startDrag viewPort =
+    Svg.rect
+        [ Svg.x (toString viewPort.x)
+        , Svg.y (toString viewPort.y)
+        , Svg.width (toString viewPort.width)
+        , Svg.height (toString viewPort.height)
+        , Svg.fill "transparent"
+        , Svg.strokeWidth "0"
+        , Events.onMouseDown startDrag
+        ]
+        []
 
 
 origin : Svg msg

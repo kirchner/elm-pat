@@ -16,6 +16,7 @@ import Styles.Colors exposing (..)
 
 type Class
     = Main
+    | MouseMove
     | Container
     | ContainerTopLeftLeft
     | ContainerTopLeft
@@ -37,12 +38,14 @@ css =
             [ margin zero ]
         , class Main
             [ position relative ]
+        , class MouseMove
+            [ cursor move ]
         , class Container
             [ padding (rem 0.3)
             , borderRadius (px 4)
             , color (hex base0)
             , backgroundColor (hex base2)
-            , property "pointer-events" "none"
+            , property "pointer-events" "auto"
             ]
         , class ContainerTopLeftLeft
             [ position absolute

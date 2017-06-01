@@ -9,6 +9,7 @@ module Editor
         , toolDescription
         , toolName
         , update
+        , getViewPort
         )
 
 {- internal -}
@@ -21,6 +22,7 @@ import Expr
         , parseVariable
         )
 import Math.Vector2 exposing (..)
+import Mouse
 import Task
 import Tools.Absolute as Absolute
 import Tools.Relative as Relative
@@ -37,6 +39,7 @@ type alias Model =
     , newValue : Maybe E
     , tool : Tool
     , viewPort : ViewPort
+    , drag : Maybe Drag
     }
 
 
@@ -87,6 +90,12 @@ allTools =
     ]
 
 
+type alias Drag =
+    { start : Position
+    , current : Position
+    }
+
+
 type Msg
     = UpdateTool Tool
     | AddPoint Point
@@ -97,6 +106,9 @@ type Msg
     | NameUpdated String
     | AddVariable
     | Resize Window.Size
+    | DragStart Position
+    | DragAt Position
+    | DragStop Position
 
 
 init : ( Model, Cmd Msg )
@@ -113,6 +125,7 @@ init =
         , width = 640
         , height = 640
         }
+    , drag = Nothing
     }
         ! [ Task.perform Resize Window.size ]
 
@@ -198,8 +211,50 @@ update msg model =
             }
                 ! []
 
+        DragStart position ->
+            { model
+                | drag = Just (Drag position position)
+            }
+                ! []
+
+        DragAt position ->
+            { model
+                | drag =
+                    model.drag |> Maybe.map (\{ start } -> Drag start position)
+            }
+                ! []
+
+        DragStop position ->
+            { model
+                | drag = Nothing
+                , viewPort = getViewPort model.viewPort model.drag
+            }
+                ! []
+
+
+getViewPort : ViewPort -> Maybe Drag -> ViewPort
+getViewPort oldViewPort drag =
+    case drag of
+        Nothing ->
+            oldViewPort
+
+        Just { start, current } ->
+            { oldViewPort
+                | x = oldViewPort.x - (current.x - start.x)
+                , y = oldViewPort.y - (current.y - start.y)
+            }
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch
-        [ Window.resizes Resize ]
+    case model.drag of
+        Nothing ->
+            Sub.batch
+                [ Window.resizes Resize ]
+
+        Just _ ->
+            Sub.batch
+                [ Window.resizes Resize
+                , Mouse.moves DragAt
+                , Mouse.ups DragStop
+                ]
