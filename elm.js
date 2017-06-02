@@ -19318,14 +19318,14 @@ var _kirchner$elm_pat$Tools_Relative$drawNewPoint = F4(
 					state.y)));
 	});
 var _kirchner$elm_pat$Tools_Relative$drawLines = F4(
-	function (variables, config, state, v) {
+	function (variables, config, state, anchorPosition) {
 		var horizontalLine = function (y) {
 			return _kirchner$elm_pat$Svg_Extra$drawHorizontalLine(
-				y + _elm_community$linear_algebra$Math_Vector2$getY(v));
+				y + _elm_community$linear_algebra$Math_Vector2$getY(anchorPosition));
 		};
 		var verticalLine = function (x) {
 			return _kirchner$elm_pat$Svg_Extra$drawVerticalLine(
-				x + _elm_community$linear_algebra$Math_Vector2$getX(v));
+				x + _elm_community$linear_algebra$Math_Vector2$getX(anchorPosition));
 		};
 		var _p19 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
 		if (((_p19.ctor === '_Tuple2') && (_p19._0.ctor === 'Just')) && (_p19._1.ctor === 'Just')) {
@@ -19364,7 +19364,7 @@ var _kirchner$elm_pat$Tools_Relative$drawLines = F4(
 		}
 	});
 var _kirchner$elm_pat$Tools_Relative$drawCursor = F5(
-	function (variables, config, state, v, p) {
+	function (variables, config, state, anchorPosition, mousePosition) {
 		var draw = F2(
 			function (x, y) {
 				return A2(
@@ -19382,7 +19382,7 @@ var _kirchner$elm_pat$Tools_Relative$drawCursor = F5(
 								ctor: '::',
 								_0: A2(
 									_kirchner$elm_pat$Svg_Extra$drawRectArrow,
-									v,
+									anchorPosition,
 									A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
 								_1: {ctor: '[]'}
 							}
@@ -19400,78 +19400,89 @@ var _kirchner$elm_pat$Tools_Relative$drawCursor = F5(
 				draw,
 				A2(
 					_elm_lang$core$Maybe$withDefault,
-					_elm_lang$core$Basics$toFloat(p.x),
+					_elm_lang$core$Basics$toFloat(mousePosition.x),
 					A2(
-						_elm_lang$core$Maybe$andThen,
-						_kirchner$elm_pat$Expr$compute(variables),
-						state.x)),
+						_elm_lang$core$Maybe$map,
+						function (x) {
+							return x + _elm_community$linear_algebra$Math_Vector2$getX(anchorPosition);
+						},
+						A2(
+							_elm_lang$core$Maybe$andThen,
+							_kirchner$elm_pat$Expr$compute(variables),
+							state.x))),
 				A2(
 					_elm_lang$core$Maybe$withDefault,
-					_elm_lang$core$Basics$toFloat(p.y),
+					_elm_lang$core$Basics$toFloat(mousePosition.y),
 					A2(
-						_elm_lang$core$Maybe$andThen,
-						_kirchner$elm_pat$Expr$compute(variables),
-						state.y)));
+						_elm_lang$core$Maybe$map,
+						function (y) {
+							return y + _elm_community$linear_algebra$Math_Vector2$getY(anchorPosition);
+						},
+						A2(
+							_elm_lang$core$Maybe$andThen,
+							_kirchner$elm_pat$Expr$compute(variables),
+							state.y))));
 		}
 	});
 var _kirchner$elm_pat$Tools_Relative$svg = F4(
 	function (config, state, store, variables) {
-		var anchorPosition = A2(
-			_elm_lang$core$Maybe$andThen,
-			A2(_kirchner$elm_pat$Types$position, store, variables),
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
 			A2(
-				_elm_lang$core$Maybe$andThen,
-				A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, store),
-				A2(
-					_elm_lang$core$Maybe$andThen,
-					function (_p21) {
-						return _elm_lang$core$Result$toMaybe(
-							_elm_lang$core$String$toInt(_p21));
-					},
-					state.anchor)));
-		var _p22 = anchorPosition;
-		if (_p22.ctor === 'Just') {
-			var _p24 = _p22._0;
-			return A2(
-				_elm_lang$svg$Svg$g,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: function () {
-						var _p23 = state.mouse;
-						if (_p23.ctor === 'Just') {
-							return A5(_kirchner$elm_pat$Tools_Relative$drawCursor, variables, config, state, _p24, _p23._0);
-						} else {
-							return A2(
-								_elm_lang$svg$Svg$g,
-								{ctor: '[]'},
-								{ctor: '[]'});
-						}
-					}(),
-					_1: {
-						ctor: '::',
-						_0: A4(_kirchner$elm_pat$Tools_Relative$drawLines, variables, config, state, _p24),
-						_1: {
-							ctor: '::',
-							_0: A4(_kirchner$elm_pat$Tools_Relative$drawNewPoint, variables, config, state, _p24),
-							_1: {
-								ctor: '::',
-								_0: A4(_kirchner$elm_pat$Tools_Relative$eventRect, config, state, store, variables),
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				});
-		} else {
-			return A2(
 				_elm_lang$svg$Svg$g,
 				{ctor: '[]'},
 				{
 					ctor: '::',
 					_0: A4(_kirchner$elm_pat$Tools_Relative$eventCircles, config, state, store, variables),
 					_1: {ctor: '[]'}
-				});
-		}
+				}),
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (anchorPosition) {
+					return A2(
+						_elm_lang$svg$Svg$g,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: function () {
+								var _p21 = state.mouse;
+								if (_p21.ctor === 'Just') {
+									return A5(_kirchner$elm_pat$Tools_Relative$drawCursor, variables, config, state, anchorPosition, _p21._0);
+								} else {
+									return A2(
+										_elm_lang$svg$Svg$g,
+										{ctor: '[]'},
+										{ctor: '[]'});
+								}
+							}(),
+							_1: {
+								ctor: '::',
+								_0: A4(_kirchner$elm_pat$Tools_Relative$drawLines, variables, config, state, anchorPosition),
+								_1: {
+									ctor: '::',
+									_0: A4(_kirchner$elm_pat$Tools_Relative$drawNewPoint, variables, config, state, anchorPosition),
+									_1: {
+										ctor: '::',
+										_0: A4(_kirchner$elm_pat$Tools_Relative$eventRect, config, state, store, variables),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						});
+				},
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					A2(_kirchner$elm_pat$Types$position, store, variables),
+					A2(
+						_elm_lang$core$Maybe$andThen,
+						A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, store),
+						A2(
+							_elm_lang$core$Maybe$andThen,
+							function (_p22) {
+								return _elm_lang$core$Result$toMaybe(
+									_elm_lang$core$String$toInt(_p22));
+							},
+							state.anchor)))));
 	});
 var _kirchner$elm_pat$Tools_Relative$init = {anchor: _elm_lang$core$Maybe$Nothing, x: _elm_lang$core$Maybe$Nothing, y: _elm_lang$core$Maybe$Nothing, focused: _elm_lang$core$Maybe$Nothing, id: _elm_lang$core$Maybe$Nothing, mouse: _elm_lang$core$Maybe$Nothing};
 var _kirchner$elm_pat$Tools_Relative$initWith = F4(
