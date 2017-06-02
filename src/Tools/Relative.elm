@@ -20,6 +20,7 @@ import Html.Attributes as Html
 import Html.Events as Html
 import Input.Float
 import Math.Vector2 exposing (..)
+import Styles.Colors exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
@@ -27,7 +28,6 @@ import Svg.Extra as Svg
 import Tools.Common exposing (..)
 import Tools.Styles exposing (..)
 import Types exposing (..)
-import Styles.Colors exposing (..)
 
 
 {- state -}
@@ -78,40 +78,42 @@ type alias Config msg =
 
 svg : Config msg -> State -> PointStore -> Dict String E -> Svg msg
 svg config state store variables =
-    let
-        anchorPosition =
-            state.anchor
-                |> Maybe.andThen (String.toInt >> Result.toMaybe)
-                |> Maybe.andThen (flip Dict.get store)
-                |> Maybe.andThen (position store variables)
-    in
-    case anchorPosition of
-        Just v ->
-            Svg.g []
-                [ case state.mouse of
-                    Just position ->
-                        drawCursor variables config state v position
+    state.anchor
+        |> Maybe.andThen (String.toInt >> Result.toMaybe)
+        |> Maybe.andThen (flip Dict.get store)
+        |> Maybe.andThen (position store variables)
+        |> Maybe.map
+            (\anchorPosition ->
+                Svg.g []
+                    [ case state.mouse of
+                        Just position ->
+                            drawCursor variables
+                                config
+                                state
+                                anchorPosition
+                                position
 
-                    Nothing ->
-                        Svg.g [] []
-                , drawLines variables config state v
-                , drawNewPoint variables config state v
-                , eventRect config state store variables
-                ]
-
-        Nothing ->
-            Svg.g []
+                        Nothing ->
+                            Svg.g [] []
+                    , drawLines variables config state anchorPosition
+                    , drawNewPoint variables config state anchorPosition
+                    , eventRect config state store variables
+                    ]
+            )
+        |> Maybe.withDefault
+            (Svg.g []
                 [ eventCircles config state store variables ]
+            )
 
 
 drawCursor : Dict String E -> Config msg -> State -> Vec2 -> Position -> Svg msg
-drawCursor variables config state v p =
+drawCursor variables config state anchorPosition mousePosition =
     let
         draw x y =
             Svg.g []
                 [ Svg.drawPoint (vec2 x y)
                 , Svg.drawSelector (vec2 x y)
-                , Svg.drawRectArrow v (vec2 x y)
+                , Svg.drawRectArrow anchorPosition (vec2 x y)
                 ]
     in
     case ( state.x, state.y ) of
@@ -122,22 +124,24 @@ drawCursor variables config state v p =
             draw
                 (state.x
                     |> Maybe.andThen (compute variables)
-                    |> Maybe.withDefault (toFloat p.x)
+                    |> Maybe.map (\x -> x + getX anchorPosition)
+                    |> Maybe.withDefault (toFloat mousePosition.x)
                 )
                 (state.y
                     |> Maybe.andThen (compute variables)
-                    |> Maybe.withDefault (toFloat p.y)
+                    |> Maybe.map (\y -> y + getY anchorPosition)
+                    |> Maybe.withDefault (toFloat mousePosition.y)
                 )
 
 
 drawLines : Dict String E -> Config msg -> State -> Vec2 -> Svg msg
-drawLines variables config state v =
+drawLines variables config state anchorPosition =
     let
         verticalLine x =
-            Svg.drawVerticalLine (x + getX v)
+            Svg.drawVerticalLine (x + getX anchorPosition)
 
         horizontalLine y =
-            Svg.drawHorizontalLine (y + getY v)
+            Svg.drawHorizontalLine (y + getY anchorPosition)
     in
     case ( state.x, state.y ) of
         ( Just x, Just y ) ->
