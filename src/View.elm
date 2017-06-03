@@ -25,6 +25,7 @@ import Styles.Editor
         )
 import Svg exposing (Svg)
 import Tools.Absolute as Absolute
+import Tools.Distance as Distance
 import Tools.Relative as Relative
 import Tools.Select as Select
 import Types
@@ -86,6 +87,12 @@ viewToolInfo viewPort variables store tool =
                     [ class [ Container, ContainerTopLeft ] ]
                     [ Relative.view (addRelativeConfig viewPort) state store ]
 
+        Distance state ->
+            Just <|
+                Html.div
+                    [ class [ Container, ContainerTopLeft ] ]
+                    [ Distance.view (addDistanceConfig viewPort) state store ]
+
         Select _ ->
             Nothing
 
@@ -116,6 +123,9 @@ drawTool viewPort variables store tool =
         Relative state ->
             Relative.svg (addRelativeConfig viewPort) state store variables
 
+        Distance state ->
+            Distance.svg (addDistanceConfig viewPort) state store variables
+
         Select state ->
             Select.svg (selectConfig viewPort) state store variables
 
@@ -141,6 +151,15 @@ addRelativeConfig viewPort =
     { addPoint = AddPoint
     , updatePoint = UpdatePoint
     , stateUpdated = UpdateTool << Relative
+    , viewPort = viewPort
+    }
+
+
+addDistanceConfig : ViewPort -> Distance.Config Msg
+addDistanceConfig viewPort =
+    { addPoint = AddPoint
+    , updatePoint = UpdatePoint
+    , stateUpdated = UpdateTool << Distance
     , viewPort = viewPort
     }
 
