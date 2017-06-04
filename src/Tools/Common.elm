@@ -65,6 +65,18 @@ type alias Config state msg =
 {- svgs -}
 
 
+drawCursor : Vec2 -> Svg msg
+drawCursor position =
+    let
+        ( x, y ) =
+            toTuple position
+    in
+    Svg.g []
+        [ Svg.drawPoint (vec2 x y)
+        , Svg.drawSelector (vec2 x y)
+        ]
+
+
 getPosition :
     Config (WithMouse state) msg
     -> WithMouse state

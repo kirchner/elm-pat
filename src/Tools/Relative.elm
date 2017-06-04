@@ -68,66 +68,38 @@ type alias Config msg =
 {- svg -}
 
 
-svg : Config msg -> State -> PointStore -> Dict String E -> Svg msg
+type alias Variables =
+    Dict String E
+
+
+svg : Config msg -> State -> PointStore -> Variables -> Svg msg
 svg config state store variables =
-    state.anchor
-        |> Maybe.andThen (String.toInt >> Result.toMaybe)
-        |> Maybe.andThen (flip Dict.get store)
-        |> Maybe.andThen (position store variables)
-        |> Maybe.map
-            (\anchorPosition ->
-                Svg.g []
-                    [ case state.mouse of
-                        Just position ->
-                            drawCursor variables
-                                config
-                                state
-                                anchorPosition
-                                position
+    case anchorPosition store variables state of
+        Just anchorPosition ->
+            [ pointPosition store variables state anchorPosition
+                |> Maybe.map (drawPoint anchorPosition)
+            , drawLines state variables anchorPosition
+            , eventRect config state store variables
+            ]
+                |> List.filterMap identity
+                |> Svg.g []
 
-                        Nothing ->
-                            Svg.g [] []
-                    , drawLines variables config state anchorPosition
-                    , drawNewPoint variables config state anchorPosition
-                    , eventRect config state store variables
-                    ]
-            )
-        |> Maybe.withDefault
-            (Svg.g []
-                [ selectAnchor config state store variables ]
-            )
+        Nothing ->
+            [ selectAnchor config state store variables ]
+                |> Svg.g []
 
 
-drawCursor : Dict String E -> Config msg -> State -> Vec2 -> Position -> Svg msg
-drawCursor variables config state anchorPosition mousePosition =
-    let
-        draw x y =
-            Svg.g []
-                [ Svg.drawPoint (vec2 x y)
-                , Svg.drawSelector (vec2 x y)
-                , Svg.drawRectArrow anchorPosition (vec2 x y)
-                ]
-    in
-    case ( state.x, state.y ) of
-        ( Just x, Just y ) ->
-            Svg.g [] []
-
-        _ ->
-            draw
-                (state.x
-                    |> Maybe.andThen (compute variables)
-                    |> Maybe.map (\x -> x + getX anchorPosition)
-                    |> Maybe.withDefault (toFloat mousePosition.x)
-                )
-                (state.y
-                    |> Maybe.andThen (compute variables)
-                    |> Maybe.map (\y -> y + getY anchorPosition)
-                    |> Maybe.withDefault (toFloat mousePosition.y)
-                )
+drawPoint : Vec2 -> Vec2 -> Svg msg
+drawPoint anchorPosition pointPosition =
+    Svg.g []
+        [ Svg.drawPoint pointPosition
+        , Svg.drawSelector pointPosition
+        , Svg.drawRectArrow anchorPosition pointPosition
+        ]
 
 
-drawLines : Dict String E -> Config msg -> State -> Vec2 -> Svg msg
-drawLines variables config state anchorPosition =
+drawLines : State -> Variables -> Vec2 -> Maybe (Svg msg)
+drawLines state variables anchorPosition =
     let
         verticalLine x =
             Svg.drawVerticalLine (x + getX anchorPosition)
@@ -137,37 +109,22 @@ drawLines variables config state anchorPosition =
     in
     case ( state.x, state.y ) of
         ( Just x, Just y ) ->
-            Svg.g [] []
+            Nothing
 
         _ ->
-            Svg.g [] <|
-                List.filterMap identity
-                    [ state.x
-                        |> Maybe.andThen (compute variables)
-                        |> Maybe.map verticalLine
-                    , state.y
-                        |> Maybe.andThen (compute variables)
-                        |> Maybe.map horizontalLine
-                    ]
+            Just <|
+                Svg.g [] <|
+                    List.filterMap identity
+                        [ state.x
+                            |> Maybe.andThen (compute variables)
+                            |> Maybe.map verticalLine
+                        , state.y
+                            |> Maybe.andThen (compute variables)
+                            |> Maybe.map horizontalLine
+                        ]
 
 
-drawNewPoint : Dict String E -> Config msg -> State -> Vec2 -> Svg msg
-drawNewPoint variables config state v =
-    let
-        draw x y =
-            Svg.g []
-                [ Svg.drawPoint (vec2 x y)
-                , Svg.drawSelector (vec2 x y)
-                , Svg.drawRectArrow v (vec2 x y)
-                ]
-    in
-    Maybe.map2 draw
-        (state.x |> Maybe.andThen (compute variables))
-        (state.y |> Maybe.andThen (compute variables))
-        |> Maybe.withDefault (Svg.g [] [])
-
-
-eventRect : Config msg -> State -> PointStore -> Dict String E -> Svg msg
+eventRect : Config msg -> State -> PointStore -> Variables -> Maybe (Svg msg)
 eventRect config state store variables =
     let
         callback =
@@ -180,10 +137,9 @@ eventRect config state store variables =
     in
     callback
         |> Maybe.map (getPosition config state)
-        |> Maybe.withDefault (Svg.g [] [])
 
 
-selectAnchor : Config msg -> State -> PointStore -> Dict String E -> Svg msg
+selectAnchor : Config msg -> State -> PointStore -> Variables -> Svg msg
 selectAnchor config state store variables =
     selectPoint config state store variables <|
         toString
@@ -275,7 +231,7 @@ addPoint :
     Config msg
     -> State
     -> PointStore
-    -> Dict String E
+    -> Variables
     -> Maybe (Position -> msg)
 addPoint config state store variables =
     let
@@ -303,7 +259,7 @@ updatePoint :
     Config msg
     -> State
     -> PointStore
-    -> Dict String E
+    -> Variables
     -> Id
     -> Maybe (Position -> msg)
 updatePoint config state store variables id =
@@ -326,6 +282,46 @@ updatePoint config state store variables id =
 
         _ ->
             Nothing
+
+
+
+{- compute position -}
+
+
+anchorPosition : PointStore -> Variables -> State -> Maybe Vec2
+anchorPosition store variables state =
+    state.anchor
+        |> Maybe.andThen (String.toInt >> Result.toMaybe)
+        |> Maybe.andThen (flip Dict.get store)
+        |> Maybe.andThen (position store variables)
+
+
+pointPosition : PointStore -> Variables -> State -> Vec2 -> Maybe Vec2
+pointPosition store variables state anchorPosition =
+    let
+        x =
+            state.x
+                |> Maybe.andThen (compute variables)
+                |> Maybe.map (\x -> x + getX anchorPosition)
+
+        y =
+            state.y
+                |> Maybe.andThen (compute variables)
+                |> Maybe.map (\y -> y + getY anchorPosition)
+    in
+    case state.mouse of
+        Just mousePosition ->
+            Just <|
+                vec2
+                    (x |> Maybe.withDefault (toFloat mousePosition.x))
+                    (y |> Maybe.withDefault (toFloat mousePosition.y))
+
+        Nothing ->
+            Maybe.map2 vec2 x y
+
+
+
+{- create point -}
 
 
 point : Config msg -> State -> Id -> Vec2 -> Position -> Point
