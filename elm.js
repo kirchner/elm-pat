@@ -11891,6 +11891,26 @@ var _kirchner$elm_pat$Types$position = F3(
 					lookUp(_p1._0),
 					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._1),
 					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._2));
+			case 'Distance':
+				var coords = F3(
+					function (anchorPosition, distance, angle) {
+						return A2(
+							_elm_community$linear_algebra$Math_Vector2$add,
+							anchorPosition,
+							A2(
+								_elm_community$linear_algebra$Math_Vector2$scale,
+								distance,
+								A2(
+									_elm_community$linear_algebra$Math_Vector2$vec2,
+									_elm_lang$core$Basics$cos(angle),
+									_elm_lang$core$Basics$sin(angle))));
+					});
+				return A4(
+					_elm_lang$core$Maybe$map3,
+					coords,
+					lookUp(_p1._0),
+					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._1),
+					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._2));
 			default:
 				return A3(
 					_elm_lang$core$Maybe$map2,
@@ -11934,6 +11954,10 @@ var _kirchner$elm_pat$Types$ViewPort = F4(
 var _kirchner$elm_pat$Types$Between = F3(
 	function (a, b, c) {
 		return {ctor: 'Between', _0: a, _1: b, _2: c};
+	});
+var _kirchner$elm_pat$Types$Distance = F3(
+	function (a, b, c) {
+		return {ctor: 'Distance', _0: a, _1: b, _2: c};
 	});
 var _kirchner$elm_pat$Types$Relative = F3(
 	function (a, b, c) {
@@ -18268,6 +18292,114 @@ var _kirchner$elm_pat$Tools_Common$exprInput = F3(
 				}
 			});
 	});
+var _kirchner$elm_pat$Tools_Common$drawCursor = function (position) {
+	var _p0 = _elm_community$linear_algebra$Math_Vector2$toTuple(position);
+	var x = _p0._0;
+	var y = _p0._1;
+	return A2(
+		_elm_lang$svg$Svg$g,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _kirchner$elm_pat$Svg_Extra$drawPoint(
+				A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
+			_1: {
+				ctor: '::',
+				_0: _kirchner$elm_pat$Svg_Extra$drawSelector(
+					A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _kirchner$elm_pat$Tools_Common$updateFocused = F3(
+	function (callback, state, newFocused) {
+		return callback(
+			_elm_lang$core$Native_Utils.update(
+				state,
+				{focused: newFocused}));
+	});
+var _kirchner$elm_pat$Tools_Common$pointSelector = F6(
+	function (config, state, store, variables, callback, _p1) {
+		var _p2 = _p1;
+		var _p3 = _p2._0;
+		var draw = function (v) {
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$svg$Svg$circle,
+						{
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$cx(
+								_elm_lang$core$Basics$toString(
+									_elm_community$linear_algebra$Math_Vector2$getX(v))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$cy(
+									_elm_lang$core$Basics$toString(
+										_elm_community$linear_algebra$Math_Vector2$getY(v))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$r('5'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$svg$Svg_Events$onClick(
+													callback(_p3)),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Events$onMouseOver(
+														A3(
+															_kirchner$elm_pat$Tools_Common$updateFocused,
+															config.stateUpdated,
+															state,
+															_elm_lang$core$Maybe$Just(_p3))),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Events$onMouseOut(
+															A3(_kirchner$elm_pat$Tools_Common$updateFocused, config.stateUpdated, state, _elm_lang$core$Maybe$Nothing)),
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(_kirchner$elm_pat$Types$equals, state.focused, _p3) ? _kirchner$elm_pat$Svg_Extra$drawSelector(v) : A2(
+							_elm_lang$svg$Svg$g,
+							{ctor: '[]'},
+							{ctor: '[]'}),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		return A2(
+			_elm_lang$core$Maybe$map,
+			draw,
+			A3(_kirchner$elm_pat$Types$position, store, variables, _p2._1));
+	});
+var _kirchner$elm_pat$Tools_Common$selectPoint = F5(
+	function (config, state, store, variables, callback) {
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$List$filterMap,
+				A5(_kirchner$elm_pat$Tools_Common$pointSelector, config, state, store, variables, callback),
+				_elm_lang$core$Dict$toList(store)));
+	});
 var _kirchner$elm_pat$Tools_Common$updateMouse = F4(
 	function (callback, state, viewPort, newMouse) {
 		return callback(
@@ -18279,6 +18411,66 @@ var _kirchner$elm_pat$Tools_Common$updateMouse = F4(
 						_kirchner$elm_pat$Types$svgToCanvas(viewPort),
 						newMouse)
 				}));
+	});
+var _kirchner$elm_pat$Tools_Common$getPosition = F3(
+	function (config, state, mouseClicked) {
+		return A2(
+			_elm_lang$svg$Svg$rect,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$x(
+					_elm_lang$core$Basics$toString(config.viewPort.x)),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$y(
+						_elm_lang$core$Basics$toString(config.viewPort.y)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$width(
+							_elm_lang$core$Basics$toString(config.viewPort.width)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$height(
+								_elm_lang$core$Basics$toString(config.viewPort.height)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
+									_1: {
+										ctor: '::',
+										_0: _kirchner$elm_pat$Events$onClick(mouseClicked),
+										_1: {
+											ctor: '::',
+											_0: _kirchner$elm_pat$Events$onMove(
+												function (_p4) {
+													return A4(
+														_kirchner$elm_pat$Tools_Common$updateMouse,
+														config.stateUpdated,
+														state,
+														config.viewPort,
+														_elm_lang$core$Maybe$Just(_p4));
+												}),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$svg$Svg_Events$onMouseOut(
+													A4(_kirchner$elm_pat$Tools_Common$updateMouse, config.stateUpdated, state, config.viewPort, _elm_lang$core$Maybe$Nothing)),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			{ctor: '[]'});
+	});
+var _kirchner$elm_pat$Tools_Common$Config = F4(
+	function (a, b, c, d) {
+		return {addPoint: a, updatePoint: b, stateUpdated: c, viewPort: d};
 	});
 
 var _kirchner$elm_pat$Tools_Absolute$updateY = F3(
@@ -18777,13 +18969,6 @@ var _kirchner$elm_pat$Dropdown$Options = F3(
 		return {items: a, emptyItem: b, onChange: c};
 	});
 
-var _kirchner$elm_pat$Tools_Relative$updateFocused = F3(
-	function (callback, state, newFocused) {
-		return callback(
-			_elm_lang$core$Native_Utils.update(
-				state,
-				{focused: newFocused}));
-	});
 var _kirchner$elm_pat$Tools_Relative$updateY = F3(
 	function (callback, state, s) {
 		return callback(
@@ -18809,6 +18994,75 @@ var _kirchner$elm_pat$Tools_Relative$updateAnchor = F3(
 				state,
 				{anchor: newAnchor, focused: _elm_lang$core$Maybe$Nothing}));
 	});
+var _kirchner$elm_pat$Tools_Relative$point = F5(
+	function (config, state, anchorId, anchorPosition, mousePosition) {
+		var p = A2(_kirchner$elm_pat$Types$svgToCanvas, config.viewPort, mousePosition);
+		var x = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_kirchner$elm_pat$Expr$Number(
+				_elm_lang$core$Basics$toFloat(p.x) - _elm_community$linear_algebra$Math_Vector2$getX(anchorPosition)),
+			state.x);
+		var y = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_kirchner$elm_pat$Expr$Number(
+				_elm_lang$core$Basics$toFloat(p.y) - _elm_community$linear_algebra$Math_Vector2$getY(anchorPosition)),
+			state.y);
+		return A3(_kirchner$elm_pat$Types$Relative, anchorId, x, y);
+	});
+var _kirchner$elm_pat$Tools_Relative$pointPosition = F4(
+	function (store, variables, state, anchorPosition) {
+		var y = A2(
+			_elm_lang$core$Maybe$map,
+			function (y) {
+				return y + _elm_community$linear_algebra$Math_Vector2$getY(anchorPosition);
+			},
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				_kirchner$elm_pat$Expr$compute(variables),
+				state.y));
+		var x = A2(
+			_elm_lang$core$Maybe$map,
+			function (x) {
+				return x + _elm_community$linear_algebra$Math_Vector2$getX(anchorPosition);
+			},
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				_kirchner$elm_pat$Expr$compute(variables),
+				state.x));
+		var _p0 = state.mouse;
+		if (_p0.ctor === 'Just') {
+			var _p1 = _p0._0;
+			return _elm_lang$core$Maybe$Just(
+				A2(
+					_elm_community$linear_algebra$Math_Vector2$vec2,
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						_elm_lang$core$Basics$toFloat(_p1.x),
+						x),
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						_elm_lang$core$Basics$toFloat(_p1.y),
+						y)));
+		} else {
+			return A3(_elm_lang$core$Maybe$map2, _elm_community$linear_algebra$Math_Vector2$vec2, x, y);
+		}
+	});
+var _kirchner$elm_pat$Tools_Relative$anchorPosition = F3(
+	function (store, variables, state) {
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			A2(_kirchner$elm_pat$Types$position, store, variables),
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, store),
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					function (_p2) {
+						return _elm_lang$core$Result$toMaybe(
+							_elm_lang$core$String$toInt(_p2));
+					},
+					state.anchor)));
+	});
 var _kirchner$elm_pat$Tools_Relative$updatePoint = F5(
 	function (config, state, store, variables, id) {
 		var anchorPosition = A2(
@@ -18819,38 +19073,26 @@ var _kirchner$elm_pat$Tools_Relative$updatePoint = F5(
 				A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, store),
 				A2(
 					_elm_lang$core$Maybe$andThen,
-					function (_p0) {
+					function (_p3) {
 						return _elm_lang$core$Result$toMaybe(
-							_elm_lang$core$String$toInt(_p0));
+							_elm_lang$core$String$toInt(_p3));
 					},
 					state.anchor)));
 		var anchorId = A2(
 			_elm_lang$core$Maybe$andThen,
-			function (_p1) {
+			function (_p4) {
 				return _elm_lang$core$Result$toMaybe(
-					_elm_lang$core$String$toInt(_p1));
+					_elm_lang$core$String$toInt(_p4));
 			},
 			state.anchor);
-		var _p2 = {ctor: '_Tuple2', _0: anchorId, _1: anchorPosition};
-		if (((_p2.ctor === '_Tuple2') && (_p2._0.ctor === 'Just')) && (_p2._1.ctor === 'Just')) {
-			var _p3 = _p2._1._0;
+		var _p5 = {ctor: '_Tuple2', _0: anchorId, _1: anchorPosition};
+		if (((_p5.ctor === '_Tuple2') && (_p5._0.ctor === 'Just')) && (_p5._1.ctor === 'Just')) {
 			return _elm_lang$core$Maybe$Just(
 				function (pos) {
-					var p = A2(_kirchner$elm_pat$Types$svgToCanvas, config.viewPort, pos);
-					var x = A2(
-						_elm_lang$core$Maybe$withDefault,
-						_kirchner$elm_pat$Expr$Number(
-							_elm_lang$core$Basics$toFloat(p.x) - _elm_community$linear_algebra$Math_Vector2$getX(_p3)),
-						state.x);
-					var y = A2(
-						_elm_lang$core$Maybe$withDefault,
-						_kirchner$elm_pat$Expr$Number(
-							_elm_lang$core$Basics$toFloat(p.y) - _elm_community$linear_algebra$Math_Vector2$getY(_p3)),
-						state.y);
 					return A2(
 						config.updatePoint,
 						id,
-						A3(_kirchner$elm_pat$Types$Relative, _p2._0._0, x, y));
+						A5(_kirchner$elm_pat$Tools_Relative$point, config, state, _p5._0._0, _p5._1._0, pos));
 				});
 		} else {
 			return _elm_lang$core$Maybe$Nothing;
@@ -18866,36 +19108,24 @@ var _kirchner$elm_pat$Tools_Relative$addPoint = F4(
 				A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, store),
 				A2(
 					_elm_lang$core$Maybe$andThen,
-					function (_p4) {
+					function (_p6) {
 						return _elm_lang$core$Result$toMaybe(
-							_elm_lang$core$String$toInt(_p4));
+							_elm_lang$core$String$toInt(_p6));
 					},
 					state.anchor)));
 		var anchorId = A2(
 			_elm_lang$core$Maybe$andThen,
-			function (_p5) {
+			function (_p7) {
 				return _elm_lang$core$Result$toMaybe(
-					_elm_lang$core$String$toInt(_p5));
+					_elm_lang$core$String$toInt(_p7));
 			},
 			state.anchor);
-		var _p6 = {ctor: '_Tuple2', _0: anchorId, _1: anchorPosition};
-		if (((_p6.ctor === '_Tuple2') && (_p6._0.ctor === 'Just')) && (_p6._1.ctor === 'Just')) {
-			var _p7 = _p6._1._0;
+		var _p8 = {ctor: '_Tuple2', _0: anchorId, _1: anchorPosition};
+		if (((_p8.ctor === '_Tuple2') && (_p8._0.ctor === 'Just')) && (_p8._1.ctor === 'Just')) {
 			return _elm_lang$core$Maybe$Just(
 				function (pos) {
-					var p = A2(_kirchner$elm_pat$Types$svgToCanvas, config.viewPort, pos);
-					var x = A2(
-						_elm_lang$core$Maybe$withDefault,
-						_kirchner$elm_pat$Expr$Number(
-							_elm_lang$core$Basics$toFloat(p.x) - _elm_community$linear_algebra$Math_Vector2$getX(_p7)),
-						state.x);
-					var y = A2(
-						_elm_lang$core$Maybe$withDefault,
-						_kirchner$elm_pat$Expr$Number(
-							_elm_lang$core$Basics$toFloat(p.y) - _elm_community$linear_algebra$Math_Vector2$getY(_p7)),
-						state.y);
 					return config.addPoint(
-						A3(_kirchner$elm_pat$Types$Relative, _p6._0._0, x, y));
+						A5(_kirchner$elm_pat$Tools_Relative$point, config, state, _p8._0._0, _p8._1._0, pos));
 				});
 		} else {
 			return _elm_lang$core$Maybe$Nothing;
@@ -18904,20 +19134,20 @@ var _kirchner$elm_pat$Tools_Relative$addPoint = F4(
 var _kirchner$elm_pat$Tools_Relative$action = F3(
 	function (state, title, callback) {
 		var attrs = function () {
-			var _p9 = {
+			var _p10 = {
 				ctor: '_Tuple3',
 				_0: A2(
 					_elm_lang$core$Maybe$andThen,
-					function (_p8) {
+					function (_p9) {
 						return _elm_lang$core$Result$toMaybe(
-							_elm_lang$core$String$toInt(_p8));
+							_elm_lang$core$String$toInt(_p9));
 					},
 					state.anchor),
 				_1: state.x,
 				_2: state.y
 			};
-			if ((((_p9.ctor === '_Tuple3') && (_p9._0.ctor === 'Just')) && (_p9._1.ctor === 'Just')) && (_p9._2.ctor === 'Just')) {
-				var point = A3(_kirchner$elm_pat$Types$Relative, _p9._0._0, _p9._1._0, _p9._2._0);
+			if ((((_p10.ctor === '_Tuple3') && (_p10._0.ctor === 'Just')) && (_p10._1.ctor === 'Just')) && (_p10._2.ctor === 'Just')) {
+				var point = A3(_kirchner$elm_pat$Types$Relative, _p10._0._0, _p10._1._0, _p10._2._0);
 				return {
 					ctor: '::',
 					_0: _elm_lang$html$Html_Events$onClick(
@@ -19040,13 +19270,13 @@ var _kirchner$elm_pat$Tools_Relative$view = F3(
 						_1: {
 							ctor: '::',
 							_0: function () {
-								var _p10 = state.id;
-								if (_p10.ctor === 'Just') {
+								var _p11 = state.id;
+								if (_p11.ctor === 'Just') {
 									return A3(
 										_kirchner$elm_pat$Tools_Relative$action,
 										state,
 										'update',
-										config.updatePoint(_p10._0));
+										config.updatePoint(_p11._0));
 								} else {
 									return A3(_kirchner$elm_pat$Tools_Relative$action, state, 'add', config.addPoint);
 								}
@@ -19057,268 +19287,40 @@ var _kirchner$elm_pat$Tools_Relative$view = F3(
 				}
 			});
 	});
-var _kirchner$elm_pat$Tools_Relative$eventCircle = F5(
-	function (config, state, store, variables, _p11) {
-		var _p12 = _p11;
-		var _p13 = _p12._0;
-		var draw = function (v) {
-			return A2(
-				_elm_lang$svg$Svg$g,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$svg$Svg$circle,
-						{
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$cx(
-								_elm_lang$core$Basics$toString(
-									_elm_community$linear_algebra$Math_Vector2$getX(v))),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$cy(
-									_elm_lang$core$Basics$toString(
-										_elm_community$linear_algebra$Math_Vector2$getY(v))),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$r('5'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$svg$Svg_Events$onClick(
-													A3(
-														_kirchner$elm_pat$Tools_Relative$updateAnchor,
-														config.stateUpdated,
-														state,
-														_elm_lang$core$Maybe$Just(
-															_elm_lang$core$Basics$toString(_p13)))),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$svg$Svg_Events$onMouseOver(
-														A3(
-															_kirchner$elm_pat$Tools_Relative$updateFocused,
-															config.stateUpdated,
-															state,
-															_elm_lang$core$Maybe$Just(_p13))),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$svg$Svg_Events$onMouseOut(
-															A3(_kirchner$elm_pat$Tools_Relative$updateFocused, config.stateUpdated, state, _elm_lang$core$Maybe$Nothing)),
-														_1: {ctor: '[]'}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						},
-						{ctor: '[]'}),
-					_1: {
-						ctor: '::',
-						_0: A2(_kirchner$elm_pat$Types$equals, state.focused, _p13) ? _kirchner$elm_pat$Svg_Extra$drawSelector(v) : A2(
-							_elm_lang$svg$Svg$g,
-							{ctor: '[]'},
-							{ctor: '[]'}),
-						_1: {ctor: '[]'}
-					}
-				});
-		};
-		return A2(
-			_elm_lang$core$Maybe$map,
-			draw,
-			A3(_kirchner$elm_pat$Types$position, store, variables, _p12._1));
-	});
-var _kirchner$elm_pat$Tools_Relative$eventCircles = F4(
+var _kirchner$elm_pat$Tools_Relative$selectAnchor = F4(
 	function (config, state, store, variables) {
-		return A2(
-			_elm_lang$svg$Svg$g,
-			{ctor: '[]'},
-			A2(
-				_elm_lang$core$List$filterMap,
-				A4(_kirchner$elm_pat$Tools_Relative$eventCircle, config, state, store, variables),
-				_elm_lang$core$Dict$toList(store)));
+		return A5(
+			_kirchner$elm_pat$Tools_Common$selectPoint,
+			config,
+			state,
+			store,
+			variables,
+			function (_p12) {
+				return A3(
+					_kirchner$elm_pat$Tools_Relative$updateAnchor,
+					config.stateUpdated,
+					state,
+					_elm_lang$core$Maybe$Just(
+						_elm_lang$core$Basics$toString(_p12)));
+			});
 	});
 var _kirchner$elm_pat$Tools_Relative$eventRect = F4(
 	function (config, state, store, variables) {
-		var _p14 = state.id;
-		if (_p14.ctor === 'Just') {
-			var _p15 = A5(_kirchner$elm_pat$Tools_Relative$updatePoint, config, state, store, variables, _p14._0);
-			if (_p15.ctor === 'Just') {
-				return A2(
-					_elm_lang$svg$Svg$rect,
-					{
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$x(
-							_elm_lang$core$Basics$toString(config.viewPort.x)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$y(
-								_elm_lang$core$Basics$toString(config.viewPort.y)),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$width(
-									_elm_lang$core$Basics$toString(config.viewPort.width)),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$height(
-										_elm_lang$core$Basics$toString(config.viewPort.height)),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
-											_1: {
-												ctor: '::',
-												_0: _kirchner$elm_pat$Events$onClick(_p15._0),
-												_1: {
-													ctor: '::',
-													_0: _kirchner$elm_pat$Events$onMove(
-														function (_p16) {
-															return A4(
-																_kirchner$elm_pat$Tools_Common$updateMouse,
-																config.stateUpdated,
-																state,
-																config.viewPort,
-																_elm_lang$core$Maybe$Just(_p16));
-														}),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$svg$Svg_Events$onMouseOut(
-															A4(_kirchner$elm_pat$Tools_Common$updateMouse, config.stateUpdated, state, config.viewPort, _elm_lang$core$Maybe$Nothing)),
-														_1: {ctor: '[]'}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					{ctor: '[]'});
+		var callback = function () {
+			var _p13 = state.id;
+			if (_p13.ctor === 'Just') {
+				return A5(_kirchner$elm_pat$Tools_Relative$updatePoint, config, state, store, variables, _p13._0);
 			} else {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{ctor: '[]'});
+				return A4(_kirchner$elm_pat$Tools_Relative$addPoint, config, state, store, variables);
 			}
-		} else {
-			var _p17 = A4(_kirchner$elm_pat$Tools_Relative$addPoint, config, state, store, variables);
-			if (_p17.ctor === 'Just') {
-				return A2(
-					_elm_lang$svg$Svg$rect,
-					{
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$x(
-							_elm_lang$core$Basics$toString(config.viewPort.x)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$y(
-								_elm_lang$core$Basics$toString(config.viewPort.y)),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$width(
-									_elm_lang$core$Basics$toString(config.viewPort.width)),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$height(
-										_elm_lang$core$Basics$toString(config.viewPort.height)),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
-											_1: {
-												ctor: '::',
-												_0: _kirchner$elm_pat$Events$onClick(_p17._0),
-												_1: {
-													ctor: '::',
-													_0: _kirchner$elm_pat$Events$onMove(
-														function (_p18) {
-															return A4(
-																_kirchner$elm_pat$Tools_Common$updateMouse,
-																config.stateUpdated,
-																state,
-																config.viewPort,
-																_elm_lang$core$Maybe$Just(_p18));
-														}),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$svg$Svg_Events$onMouseOut(
-															A4(_kirchner$elm_pat$Tools_Common$updateMouse, config.stateUpdated, state, config.viewPort, _elm_lang$core$Maybe$Nothing)),
-														_1: {ctor: '[]'}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					{ctor: '[]'});
-			} else {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{ctor: '[]'});
-			}
-		}
-	});
-var _kirchner$elm_pat$Tools_Relative$drawNewPoint = F4(
-	function (variables, config, state, v) {
-		var draw = F2(
-			function (x, y) {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _kirchner$elm_pat$Svg_Extra$drawPoint(
-							A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
-						_1: {
-							ctor: '::',
-							_0: _kirchner$elm_pat$Svg_Extra$drawSelector(
-								A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_kirchner$elm_pat$Svg_Extra$drawRectArrow,
-									v,
-									A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
-								_1: {ctor: '[]'}
-							}
-						}
-					});
-			});
+		}();
 		return A2(
-			_elm_lang$core$Maybe$withDefault,
-			A2(
-				_elm_lang$svg$Svg$g,
-				{ctor: '[]'},
-				{ctor: '[]'}),
-			A3(
-				_elm_lang$core$Maybe$map2,
-				draw,
-				A2(
-					_elm_lang$core$Maybe$andThen,
-					_kirchner$elm_pat$Expr$compute(variables),
-					state.x),
-				A2(
-					_elm_lang$core$Maybe$andThen,
-					_kirchner$elm_pat$Expr$compute(variables),
-					state.y)));
+			_elm_lang$core$Maybe$map,
+			A2(_kirchner$elm_pat$Tools_Common$getPosition, config, state),
+			callback);
 	});
-var _kirchner$elm_pat$Tools_Relative$drawLines = F4(
-	function (variables, config, state, anchorPosition) {
+var _kirchner$elm_pat$Tools_Relative$drawLines = F3(
+	function (state, variables, anchorPosition) {
 		var horizontalLine = function (y) {
 			return _kirchner$elm_pat$Svg_Extra$drawHorizontalLine(
 				y + _elm_community$linear_algebra$Math_Vector2$getY(anchorPosition));
@@ -19327,13 +19329,64 @@ var _kirchner$elm_pat$Tools_Relative$drawLines = F4(
 			return _kirchner$elm_pat$Svg_Extra$drawVerticalLine(
 				x + _elm_community$linear_algebra$Math_Vector2$getX(anchorPosition));
 		};
-		var _p19 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
-		if (((_p19.ctor === '_Tuple2') && (_p19._0.ctor === 'Just')) && (_p19._1.ctor === 'Just')) {
-			return A2(
-				_elm_lang$svg$Svg$g,
-				{ctor: '[]'},
-				{ctor: '[]'});
+		var _p14 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
+		if (((_p14.ctor === '_Tuple2') && (_p14._0.ctor === 'Just')) && (_p14._1.ctor === 'Just')) {
+			return _elm_lang$core$Maybe$Nothing;
 		} else {
+			return _elm_lang$core$Maybe$Just(
+				A2(
+					_elm_lang$svg$Svg$g,
+					{ctor: '[]'},
+					A2(
+						_elm_lang$core$List$filterMap,
+						_elm_lang$core$Basics$identity,
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$core$Maybe$map,
+								verticalLine,
+								A2(
+									_elm_lang$core$Maybe$andThen,
+									_kirchner$elm_pat$Expr$compute(variables),
+									state.x)),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$core$Maybe$map,
+									horizontalLine,
+									A2(
+										_elm_lang$core$Maybe$andThen,
+										_kirchner$elm_pat$Expr$compute(variables),
+										state.y)),
+								_1: {ctor: '[]'}
+							}
+						})));
+		}
+	});
+var _kirchner$elm_pat$Tools_Relative$drawPoint = F2(
+	function (anchorPosition, pointPosition) {
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Svg_Extra$drawPoint(pointPosition),
+				_1: {
+					ctor: '::',
+					_0: _kirchner$elm_pat$Svg_Extra$drawSelector(pointPosition),
+					_1: {
+						ctor: '::',
+						_0: A2(_kirchner$elm_pat$Svg_Extra$drawRectArrow, anchorPosition, pointPosition),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _kirchner$elm_pat$Tools_Relative$svg = F4(
+	function (config, state, store, variables) {
+		var _p15 = A3(_kirchner$elm_pat$Tools_Relative$anchorPosition, store, variables, state);
+		if (_p15.ctor === 'Just') {
+			var _p16 = _p15._0;
 			return A2(
 				_elm_lang$svg$Svg$g,
 				{ctor: '[]'},
@@ -19344,145 +19397,28 @@ var _kirchner$elm_pat$Tools_Relative$drawLines = F4(
 						ctor: '::',
 						_0: A2(
 							_elm_lang$core$Maybe$map,
-							verticalLine,
-							A2(
-								_elm_lang$core$Maybe$andThen,
-								_kirchner$elm_pat$Expr$compute(variables),
-								state.x)),
+							_kirchner$elm_pat$Tools_Relative$drawPoint(_p16),
+							A4(_kirchner$elm_pat$Tools_Relative$pointPosition, store, variables, state, _p16)),
 						_1: {
 							ctor: '::',
-							_0: A2(
-								_elm_lang$core$Maybe$map,
-								horizontalLine,
-								A2(
-									_elm_lang$core$Maybe$andThen,
-									_kirchner$elm_pat$Expr$compute(variables),
-									state.y)),
-							_1: {ctor: '[]'}
-						}
-					}));
-		}
-	});
-var _kirchner$elm_pat$Tools_Relative$drawCursor = F5(
-	function (variables, config, state, anchorPosition, mousePosition) {
-		var draw = F2(
-			function (x, y) {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _kirchner$elm_pat$Svg_Extra$drawPoint(
-							A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
-						_1: {
-							ctor: '::',
-							_0: _kirchner$elm_pat$Svg_Extra$drawSelector(
-								A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
+							_0: A3(_kirchner$elm_pat$Tools_Relative$drawLines, state, variables, _p16),
 							_1: {
 								ctor: '::',
-								_0: A2(
-									_kirchner$elm_pat$Svg_Extra$drawRectArrow,
-									anchorPosition,
-									A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
+								_0: A4(_kirchner$elm_pat$Tools_Relative$eventRect, config, state, store, variables),
 								_1: {ctor: '[]'}
 							}
 						}
-					});
-			});
-		var _p20 = {ctor: '_Tuple2', _0: state.x, _1: state.y};
-		if (((_p20.ctor === '_Tuple2') && (_p20._0.ctor === 'Just')) && (_p20._1.ctor === 'Just')) {
-			return A2(
-				_elm_lang$svg$Svg$g,
-				{ctor: '[]'},
-				{ctor: '[]'});
+					}));
 		} else {
 			return A2(
-				draw,
-				A2(
-					_elm_lang$core$Maybe$withDefault,
-					_elm_lang$core$Basics$toFloat(mousePosition.x),
-					A2(
-						_elm_lang$core$Maybe$map,
-						function (x) {
-							return x + _elm_community$linear_algebra$Math_Vector2$getX(anchorPosition);
-						},
-						A2(
-							_elm_lang$core$Maybe$andThen,
-							_kirchner$elm_pat$Expr$compute(variables),
-							state.x))),
-				A2(
-					_elm_lang$core$Maybe$withDefault,
-					_elm_lang$core$Basics$toFloat(mousePosition.y),
-					A2(
-						_elm_lang$core$Maybe$map,
-						function (y) {
-							return y + _elm_community$linear_algebra$Math_Vector2$getY(anchorPosition);
-						},
-						A2(
-							_elm_lang$core$Maybe$andThen,
-							_kirchner$elm_pat$Expr$compute(variables),
-							state.y))));
-		}
-	});
-var _kirchner$elm_pat$Tools_Relative$svg = F4(
-	function (config, state, store, variables) {
-		return A2(
-			_elm_lang$core$Maybe$withDefault,
-			A2(
 				_elm_lang$svg$Svg$g,
 				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: A4(_kirchner$elm_pat$Tools_Relative$eventCircles, config, state, store, variables),
+					_0: A4(_kirchner$elm_pat$Tools_Relative$selectAnchor, config, state, store, variables),
 					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$Maybe$map,
-				function (anchorPosition) {
-					return A2(
-						_elm_lang$svg$Svg$g,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: function () {
-								var _p21 = state.mouse;
-								if (_p21.ctor === 'Just') {
-									return A5(_kirchner$elm_pat$Tools_Relative$drawCursor, variables, config, state, anchorPosition, _p21._0);
-								} else {
-									return A2(
-										_elm_lang$svg$Svg$g,
-										{ctor: '[]'},
-										{ctor: '[]'});
-								}
-							}(),
-							_1: {
-								ctor: '::',
-								_0: A4(_kirchner$elm_pat$Tools_Relative$drawLines, variables, config, state, anchorPosition),
-								_1: {
-									ctor: '::',
-									_0: A4(_kirchner$elm_pat$Tools_Relative$drawNewPoint, variables, config, state, anchorPosition),
-									_1: {
-										ctor: '::',
-										_0: A4(_kirchner$elm_pat$Tools_Relative$eventRect, config, state, store, variables),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						});
-				},
-				A2(
-					_elm_lang$core$Maybe$andThen,
-					A2(_kirchner$elm_pat$Types$position, store, variables),
-					A2(
-						_elm_lang$core$Maybe$andThen,
-						A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, store),
-						A2(
-							_elm_lang$core$Maybe$andThen,
-							function (_p22) {
-								return _elm_lang$core$Result$toMaybe(
-									_elm_lang$core$String$toInt(_p22));
-							},
-							state.anchor)))));
+				});
+		}
 	});
 var _kirchner$elm_pat$Tools_Relative$init = {anchor: _elm_lang$core$Maybe$Nothing, x: _elm_lang$core$Maybe$Nothing, y: _elm_lang$core$Maybe$Nothing, focused: _elm_lang$core$Maybe$Nothing, id: _elm_lang$core$Maybe$Nothing, mouse: _elm_lang$core$Maybe$Nothing};
 var _kirchner$elm_pat$Tools_Relative$initWith = F4(
@@ -19496,10 +19432,6 @@ var _kirchner$elm_pat$Tools_Relative$initWith = F4(
 				y: _elm_lang$core$Maybe$Just(y),
 				id: _elm_lang$core$Maybe$Just(id)
 			});
-	});
-var _kirchner$elm_pat$Tools_Relative$Config = F4(
-	function (a, b, c, d) {
-		return {addPoint: a, updatePoint: b, stateUpdated: c, viewPort: d};
 	});
 
 var _kirchner$elm_pat$Tools_Select$updateFocused = F3(
@@ -19601,6 +19533,451 @@ var _kirchner$elm_pat$Tools_Select$Config = F3(
 		return {selectPoint: a, stateUpdated: b, viewPort: c};
 	});
 
+var _kirchner$elm_pat$Tools_Distance$updateFocused = F3(
+	function (callback, state, newFocused) {
+		return callback(
+			_elm_lang$core$Native_Utils.update(
+				state,
+				{focused: newFocused}));
+	});
+var _kirchner$elm_pat$Tools_Distance$updateAngle = F3(
+	function (callback, state, s) {
+		return callback(
+			_elm_lang$core$Native_Utils.update(
+				state,
+				{
+					angle: _kirchner$elm_pat$Expr$parse(s)
+				}));
+	});
+var _kirchner$elm_pat$Tools_Distance$updateDistance = F3(
+	function (callback, state, s) {
+		return callback(
+			_elm_lang$core$Native_Utils.update(
+				state,
+				{
+					distance: _kirchner$elm_pat$Expr$parse(s)
+				}));
+	});
+var _kirchner$elm_pat$Tools_Distance$updateAnchor = F3(
+	function (callback, state, newAnchor) {
+		return callback(
+			_elm_lang$core$Native_Utils.update(
+				state,
+				{anchor: newAnchor, focused: _elm_lang$core$Maybe$Nothing}));
+	});
+var _kirchner$elm_pat$Tools_Distance$point = F5(
+	function (config, state, anchorId, anchorPosition, mousePosition) {
+		var p = A2(_kirchner$elm_pat$Types$svgToCanvas, config.viewPort, mousePosition);
+		var delta = A2(
+			_elm_community$linear_algebra$Math_Vector2$sub,
+			A2(
+				_elm_community$linear_algebra$Math_Vector2$vec2,
+				_elm_lang$core$Basics$toFloat(p.x),
+				_elm_lang$core$Basics$toFloat(p.y)),
+			anchorPosition);
+		var distance = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_kirchner$elm_pat$Expr$Number(
+				_elm_community$linear_algebra$Math_Vector2$length(delta)),
+			state.distance);
+		var angle = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_kirchner$elm_pat$Expr$Number(
+				A2(
+					_elm_lang$core$Basics$atan2,
+					_elm_community$linear_algebra$Math_Vector2$getY(delta),
+					_elm_community$linear_algebra$Math_Vector2$getX(delta))),
+			state.angle);
+		return A3(_kirchner$elm_pat$Types$Distance, anchorId, distance, angle);
+	});
+var _kirchner$elm_pat$Tools_Distance$pointPosition = F4(
+	function (store, variables, state, anchorPosition) {
+		var _p0 = A2(_elm_lang$core$Debug$log, 'mouse', state.mouse);
+		var position = F2(
+			function (distance, angle) {
+				return A2(
+					_elm_community$linear_algebra$Math_Vector2$add,
+					anchorPosition,
+					A2(
+						_elm_community$linear_algebra$Math_Vector2$scale,
+						distance,
+						A2(
+							_elm_community$linear_algebra$Math_Vector2$vec2,
+							_elm_lang$core$Basics$cos(angle),
+							_elm_lang$core$Basics$sin(angle))));
+			});
+		var _p3 = A2(
+			_elm_lang$core$Maybe$map,
+			function (_p1) {
+				var _p2 = _p1;
+				return A2(
+					_elm_community$linear_algebra$Math_Vector2$vec2,
+					_elm_lang$core$Basics$toFloat(_p2.x),
+					_elm_lang$core$Basics$toFloat(_p2.y));
+			},
+			state.mouse);
+		if (_p3.ctor === 'Just') {
+			var delta = A2(_elm_community$linear_algebra$Math_Vector2$sub, _p3._0, anchorPosition);
+			return _elm_lang$core$Maybe$Just(
+				A2(
+					position,
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						_elm_community$linear_algebra$Math_Vector2$length(delta),
+						A2(
+							_elm_lang$core$Maybe$andThen,
+							_kirchner$elm_pat$Expr$compute(variables),
+							state.distance)),
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						A2(
+							_elm_lang$core$Basics$atan2,
+							_elm_community$linear_algebra$Math_Vector2$getY(delta),
+							_elm_community$linear_algebra$Math_Vector2$getX(delta)),
+						A2(
+							_elm_lang$core$Maybe$andThen,
+							_kirchner$elm_pat$Expr$compute(variables),
+							state.angle))));
+		} else {
+			return A3(
+				_elm_lang$core$Maybe$map2,
+				position,
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					_kirchner$elm_pat$Expr$compute(variables),
+					state.distance),
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					_kirchner$elm_pat$Expr$compute(variables),
+					state.angle));
+		}
+	});
+var _kirchner$elm_pat$Tools_Distance$anchorPosition = F3(
+	function (store, variables, state) {
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			A2(_kirchner$elm_pat$Types$position, store, variables),
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, store),
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					function (_p4) {
+						return _elm_lang$core$Result$toMaybe(
+							_elm_lang$core$String$toInt(_p4));
+					},
+					state.anchor)));
+	});
+var _kirchner$elm_pat$Tools_Distance$addPoint = F4(
+	function (config, state, store, variables) {
+		var anchorId = A2(
+			_elm_lang$core$Maybe$andThen,
+			function (_p5) {
+				return _elm_lang$core$Result$toMaybe(
+					_elm_lang$core$String$toInt(_p5));
+			},
+			state.anchor);
+		var _p6 = {
+			ctor: '_Tuple2',
+			_0: anchorId,
+			_1: A3(_kirchner$elm_pat$Tools_Distance$anchorPosition, store, variables, state)
+		};
+		if (((_p6.ctor === '_Tuple2') && (_p6._0.ctor === 'Just')) && (_p6._1.ctor === 'Just')) {
+			return _elm_lang$core$Maybe$Just(
+				function (pos) {
+					return config.addPoint(
+						A5(_kirchner$elm_pat$Tools_Distance$point, config, state, _p6._0._0, _p6._1._0, pos));
+				});
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _kirchner$elm_pat$Tools_Distance$updatePoint = F5(
+	function (config, state, store, variables, id) {
+		var anchorId = A2(
+			_elm_lang$core$Maybe$andThen,
+			function (_p7) {
+				return _elm_lang$core$Result$toMaybe(
+					_elm_lang$core$String$toInt(_p7));
+			},
+			state.anchor);
+		var _p8 = {
+			ctor: '_Tuple2',
+			_0: anchorId,
+			_1: A3(_kirchner$elm_pat$Tools_Distance$anchorPosition, store, variables, state)
+		};
+		if (((_p8.ctor === '_Tuple2') && (_p8._0.ctor === 'Just')) && (_p8._1.ctor === 'Just')) {
+			var _p9 = _p8._0._0;
+			return _elm_lang$core$Maybe$Just(
+				function (pos) {
+					return A2(
+						config.updatePoint,
+						_p9,
+						A5(_kirchner$elm_pat$Tools_Distance$point, config, state, _p9, _p8._1._0, pos));
+				});
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _kirchner$elm_pat$Tools_Distance$action = F3(
+	function (state, title, callback) {
+		var attrs = function () {
+			var _p11 = {
+				ctor: '_Tuple3',
+				_0: A2(
+					_elm_lang$core$Maybe$andThen,
+					function (_p10) {
+						return _elm_lang$core$Result$toMaybe(
+							_elm_lang$core$String$toInt(_p10));
+					},
+					state.anchor),
+				_1: state.distance,
+				_2: state.angle
+			};
+			if ((((_p11.ctor === '_Tuple3') && (_p11._0.ctor === 'Just')) && (_p11._1.ctor === 'Just')) && (_p11._2.ctor === 'Just')) {
+				var point = A3(_kirchner$elm_pat$Types$Distance, _p11._0._0, _p11._1._0, _p11._2._0);
+				return {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(
+						callback(point)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$disabled(false),
+						_1: {ctor: '[]'}
+					}
+				};
+			} else {
+				return {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$disabled(true),
+					_1: {ctor: '[]'}
+				};
+			}
+		}();
+		return A2(
+			_elm_lang$html$Html$div,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				{
+					ctor: '::',
+					_0: _kirchner$elm_pat$Tools_Styles$class(
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Tools_Styles$Button,
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				},
+				attrs),
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(title),
+				_1: {ctor: '[]'}
+			});
+	});
+var _kirchner$elm_pat$Tools_Distance$view = F3(
+	function (config, state, store) {
+		var items = A2(
+			_elm_lang$core$List$map,
+			function (id) {
+				return {
+					value: id,
+					text: A2(_elm_lang$core$Basics_ops['++'], 'point ', id),
+					enabled: true
+				};
+			},
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Basics$toString,
+				_elm_lang$core$Dict$keys(store)));
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Tools_Styles$class(
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Tools_Styles$ToolBox,
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('id:'),
+						_1: {
+							ctor: '::',
+							_0: A3(
+								_kirchner$elm_pat$Dropdown$dropdown,
+								{
+									items: items,
+									emptyItem: _elm_lang$core$Maybe$Just(
+										{value: '-1', text: 'select point', enabled: true}),
+									onChange: A2(_kirchner$elm_pat$Tools_Distance$updateAnchor, config.stateUpdated, state)
+								},
+								{ctor: '[]'},
+								state.anchor),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(
+											A3(_kirchner$elm_pat$Tools_Distance$updateAnchor, config.stateUpdated, state, _elm_lang$core$Maybe$Nothing)),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('clear'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A3(
+						_kirchner$elm_pat$Tools_Common$exprInput,
+						'd',
+						state.distance,
+						A2(_kirchner$elm_pat$Tools_Distance$updateDistance, config.stateUpdated, state)),
+					_1: {
+						ctor: '::',
+						_0: A3(
+							_kirchner$elm_pat$Tools_Common$exprInput,
+							'a',
+							state.angle,
+							A2(_kirchner$elm_pat$Tools_Distance$updateAngle, config.stateUpdated, state)),
+						_1: {
+							ctor: '::',
+							_0: function () {
+								var _p12 = state.id;
+								if (_p12.ctor === 'Just') {
+									return A3(
+										_kirchner$elm_pat$Tools_Distance$action,
+										state,
+										'update',
+										config.updatePoint(_p12._0));
+								} else {
+									return A3(_kirchner$elm_pat$Tools_Distance$action, state, 'add', config.addPoint);
+								}
+							}(),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			});
+	});
+var _kirchner$elm_pat$Tools_Distance$selectAnchor = F4(
+	function (config, state, store, variables) {
+		return A5(
+			_kirchner$elm_pat$Tools_Common$selectPoint,
+			config,
+			state,
+			store,
+			variables,
+			function (_p13) {
+				return A3(
+					_kirchner$elm_pat$Tools_Distance$updateAnchor,
+					config.stateUpdated,
+					state,
+					_elm_lang$core$Maybe$Just(
+						_elm_lang$core$Basics$toString(_p13)));
+			});
+	});
+var _kirchner$elm_pat$Tools_Distance$eventRect = F4(
+	function (config, state, store, variables) {
+		var callback = function () {
+			var _p14 = state.id;
+			if (_p14.ctor === 'Just') {
+				return A5(_kirchner$elm_pat$Tools_Distance$updatePoint, config, state, store, variables, _p14._0);
+			} else {
+				return A4(_kirchner$elm_pat$Tools_Distance$addPoint, config, state, store, variables);
+			}
+		}();
+		return A2(
+			_elm_lang$core$Maybe$map,
+			A2(_kirchner$elm_pat$Tools_Common$getPosition, config, state),
+			callback);
+	});
+var _kirchner$elm_pat$Tools_Distance$drawPoint = F2(
+	function (anchorPosition, pointPosition) {
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Svg_Extra$drawPoint(pointPosition),
+				_1: {
+					ctor: '::',
+					_0: _kirchner$elm_pat$Svg_Extra$drawSelector(pointPosition),
+					_1: {
+						ctor: '::',
+						_0: A2(_kirchner$elm_pat$Svg_Extra$drawArrow, anchorPosition, pointPosition),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _kirchner$elm_pat$Tools_Distance$svg = F4(
+	function (config, state, store, variables) {
+		var _p15 = A3(_kirchner$elm_pat$Tools_Distance$anchorPosition, store, variables, state);
+		if (_p15.ctor === 'Just') {
+			var _p16 = _p15._0;
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				A2(
+					_elm_lang$core$List$filterMap,
+					_elm_lang$core$Basics$identity,
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$core$Maybe$map,
+							_kirchner$elm_pat$Tools_Distance$drawPoint(_p16),
+							A4(_kirchner$elm_pat$Tools_Distance$pointPosition, store, variables, state, _p16)),
+						_1: {
+							ctor: '::',
+							_0: A4(_kirchner$elm_pat$Tools_Distance$eventRect, config, state, store, variables),
+							_1: {ctor: '[]'}
+						}
+					}));
+		} else {
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A4(_kirchner$elm_pat$Tools_Distance$selectAnchor, config, state, store, variables),
+					_1: {ctor: '[]'}
+				});
+		}
+	});
+var _kirchner$elm_pat$Tools_Distance$init = {anchor: _elm_lang$core$Maybe$Nothing, distance: _elm_lang$core$Maybe$Nothing, angle: _elm_lang$core$Maybe$Nothing, focused: _elm_lang$core$Maybe$Nothing, id: _elm_lang$core$Maybe$Nothing, mouse: _elm_lang$core$Maybe$Nothing};
+var _kirchner$elm_pat$Tools_Distance$initWith = F4(
+	function (id, anchor, distance, angle) {
+		return _elm_lang$core$Native_Utils.update(
+			_kirchner$elm_pat$Tools_Distance$init,
+			{
+				anchor: _elm_lang$core$Maybe$Just(
+					_elm_lang$core$Basics$toString(anchor)),
+				distance: _elm_lang$core$Maybe$Just(distance),
+				angle: _elm_lang$core$Maybe$Just(angle),
+				id: _elm_lang$core$Maybe$Just(id)
+			});
+	});
+var _kirchner$elm_pat$Tools_Distance$Config = F4(
+	function (a, b, c, d) {
+		return {addPoint: a, updatePoint: b, stateUpdated: c, viewPort: d};
+	});
+
 var _kirchner$elm_pat$Editor$getViewPort = F2(
 	function (oldViewPort, drag) {
 		var _p0 = drag;
@@ -19621,6 +19998,8 @@ var _kirchner$elm_pat$Editor$toolDescription = function (tool) {
 			return 'add a point given by absolute coordinates';
 		case 'Relative':
 			return 'relative';
+		case 'Distance':
+			return 'distance';
 		case 'Select':
 			return 'select';
 		default:
@@ -19634,6 +20013,8 @@ var _kirchner$elm_pat$Editor$toolName = function (tool) {
 			return 'absolute';
 		case 'Relative':
 			return 'relative';
+		case 'Distance':
+			return 'distance';
 		case 'Select':
 			return 'select';
 		default:
@@ -19652,6 +20033,9 @@ var _kirchner$elm_pat$Editor$None = {ctor: 'None'};
 var _kirchner$elm_pat$Editor$Select = function (a) {
 	return {ctor: 'Select', _0: a};
 };
+var _kirchner$elm_pat$Editor$Distance = function (a) {
+	return {ctor: 'Distance', _0: a};
+};
 var _kirchner$elm_pat$Editor$Relative = function (a) {
 	return {ctor: 'Relative', _0: a};
 };
@@ -19666,8 +20050,12 @@ var _kirchner$elm_pat$Editor$allTools = {
 		_0: _kirchner$elm_pat$Editor$Relative(_kirchner$elm_pat$Tools_Relative$init),
 		_1: {
 			ctor: '::',
-			_0: _kirchner$elm_pat$Editor$Select(_kirchner$elm_pat$Tools_Select$init),
-			_1: {ctor: '[]'}
+			_0: _kirchner$elm_pat$Editor$Distance(_kirchner$elm_pat$Tools_Distance$init),
+			_1: {
+				ctor: '::',
+				_0: _kirchner$elm_pat$Editor$Select(_kirchner$elm_pat$Tools_Select$init),
+				_1: {ctor: '[]'}
+			}
 		}
 	}
 };
@@ -20196,6 +20584,27 @@ var _kirchner$elm_pat$View_Canvas$point = F3(
 								_1: {
 									ctor: '::',
 									_0: A2(_kirchner$elm_pat$Svg_Extra$drawRectArrow, v, w),
+									_1: {ctor: '[]'}
+								}
+							});
+					});
+				return A3(
+					_elm_lang$core$Maybe$map2,
+					draw,
+					A3(_kirchner$elm_pat$Types$positionById, store, variables, _p0._0),
+					A3(_kirchner$elm_pat$Types$position, store, variables, point));
+			case 'Distance':
+				var draw = F2(
+					function (v, w) {
+						return A2(
+							_elm_lang$svg$Svg$g,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _kirchner$elm_pat$Svg_Extra$drawPoint(w),
+								_1: {
+									ctor: '::',
+									_0: A2(_kirchner$elm_pat$Svg_Extra$drawArrow, v, w),
 									_1: {ctor: '[]'}
 								}
 							});
@@ -20957,6 +21366,8 @@ var _kirchner$elm_pat$Views_PointTable$printPoint = F2(
 				return 'absolute';
 			case 'Relative':
 				return 'relative';
+			case 'Distance':
+				return 'distance';
 			default:
 				return _elm_lang$core$Basics$toString(point);
 		}
@@ -20973,14 +21384,26 @@ var _kirchner$elm_pat$Views_PointTable$viewPointEntry = F3(
 			A2(
 				_elm_lang$core$Maybe$map,
 				_elm_lang$core$Basics$toString,
-				A2(_elm_lang$core$Maybe$map, _elm_community$linear_algebra$Math_Vector2$getX, v)));
+				A2(
+					_elm_lang$core$Maybe$map,
+					function (x) {
+						return _elm_lang$core$Basics$toFloat(
+							_elm_lang$core$Basics$floor(100 * x)) / 100;
+					},
+					A2(_elm_lang$core$Maybe$map, _elm_community$linear_algebra$Math_Vector2$getX, v))));
 		var y = A2(
 			_elm_lang$core$Maybe$withDefault,
 			'',
 			A2(
 				_elm_lang$core$Maybe$map,
 				_elm_lang$core$Basics$toString,
-				A2(_elm_lang$core$Maybe$map, _elm_community$linear_algebra$Math_Vector2$getY, v)));
+				A2(
+					_elm_lang$core$Maybe$map,
+					function (y) {
+						return _elm_lang$core$Basics$toFloat(
+							_elm_lang$core$Basics$floor(100 * y)) / 100;
+					},
+					A2(_elm_lang$core$Maybe$map, _elm_community$linear_algebra$Math_Vector2$getY, v))));
 		return A2(
 			_elm_lang$html$Html$tr,
 			{ctor: '[]'},
@@ -22017,13 +22440,24 @@ var _kirchner$elm_pat$View$selectConfig = function (viewPort) {
 		viewPort: viewPort
 	};
 };
-var _kirchner$elm_pat$View$addRelativeConfig = function (viewPort) {
+var _kirchner$elm_pat$View$addDistanceConfig = function (viewPort) {
 	return {
 		addPoint: _kirchner$elm_pat$Editor$AddPoint,
 		updatePoint: _kirchner$elm_pat$Editor$UpdatePoint,
 		stateUpdated: function (_p1) {
 			return _kirchner$elm_pat$Editor$UpdateTool(
-				_kirchner$elm_pat$Editor$Relative(_p1));
+				_kirchner$elm_pat$Editor$Distance(_p1));
+		},
+		viewPort: viewPort
+	};
+};
+var _kirchner$elm_pat$View$addRelativeConfig = function (viewPort) {
+	return {
+		addPoint: _kirchner$elm_pat$Editor$AddPoint,
+		updatePoint: _kirchner$elm_pat$Editor$UpdatePoint,
+		stateUpdated: function (_p2) {
+			return _kirchner$elm_pat$Editor$UpdateTool(
+				_kirchner$elm_pat$Editor$Relative(_p2));
 		},
 		viewPort: viewPort
 	};
@@ -22032,35 +22466,42 @@ var _kirchner$elm_pat$View$addAbsoluteConfig = function (viewPort) {
 	return {
 		addPoint: _kirchner$elm_pat$Editor$AddPoint,
 		updatePoint: _kirchner$elm_pat$Editor$UpdatePoint,
-		stateUpdated: function (_p2) {
+		stateUpdated: function (_p3) {
 			return _kirchner$elm_pat$Editor$UpdateTool(
-				_kirchner$elm_pat$Editor$Absolute(_p2));
+				_kirchner$elm_pat$Editor$Absolute(_p3));
 		},
 		viewPort: viewPort
 	};
 };
 var _kirchner$elm_pat$View$drawTool = F4(
 	function (viewPort, variables, store, tool) {
-		var _p3 = tool;
-		switch (_p3.ctor) {
+		var _p4 = tool;
+		switch (_p4.ctor) {
 			case 'Absolute':
 				return A3(
 					_kirchner$elm_pat$Tools_Absolute$svg,
 					variables,
 					_kirchner$elm_pat$View$addAbsoluteConfig(viewPort),
-					_p3._0);
+					_p4._0);
 			case 'Relative':
 				return A4(
 					_kirchner$elm_pat$Tools_Relative$svg,
 					_kirchner$elm_pat$View$addRelativeConfig(viewPort),
-					_p3._0,
+					_p4._0,
+					store,
+					variables);
+			case 'Distance':
+				return A4(
+					_kirchner$elm_pat$Tools_Distance$svg,
+					_kirchner$elm_pat$View$addDistanceConfig(viewPort),
+					_p4._0,
 					store,
 					variables);
 			case 'Select':
 				return A4(
 					_kirchner$elm_pat$Tools_Select$svg,
 					_kirchner$elm_pat$View$selectConfig(viewPort),
-					_p3._0,
+					_p4._0,
 					store,
 					variables);
 			default:
@@ -22081,8 +22522,8 @@ var _kirchner$elm_pat$View$viewCanvas = function (model) {
 };
 var _kirchner$elm_pat$View$viewToolInfo = F4(
 	function (viewPort, variables, store, tool) {
-		var _p4 = tool;
-		switch (_p4.ctor) {
+		var _p5 = tool;
+		switch (_p5.ctor) {
 			case 'Absolute':
 				return _elm_lang$core$Maybe$Just(
 					A2(
@@ -22107,7 +22548,7 @@ var _kirchner$elm_pat$View$viewToolInfo = F4(
 								_kirchner$elm_pat$Tools_Absolute$view,
 								variables,
 								_kirchner$elm_pat$View$addAbsoluteConfig(viewPort),
-								_p4._0),
+								_p5._0),
 							_1: {ctor: '[]'}
 						}));
 			case 'Relative':
@@ -22133,7 +22574,34 @@ var _kirchner$elm_pat$View$viewToolInfo = F4(
 							_0: A3(
 								_kirchner$elm_pat$Tools_Relative$view,
 								_kirchner$elm_pat$View$addRelativeConfig(viewPort),
-								_p4._0,
+								_p5._0,
+								store),
+							_1: {ctor: '[]'}
+						}));
+			case 'Distance':
+				return _elm_lang$core$Maybe$Just(
+					A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Styles_Editor$class(
+								{
+									ctor: '::',
+									_0: _kirchner$elm_pat$Styles_Editor$Container,
+									_1: {
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_Editor$ContainerTopLeft,
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A3(
+								_kirchner$elm_pat$Tools_Distance$view,
+								_kirchner$elm_pat$View$addDistanceConfig(viewPort),
+								_p5._0,
 								store),
 							_1: {ctor: '[]'}
 						}));
