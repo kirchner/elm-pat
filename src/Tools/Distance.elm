@@ -74,165 +74,60 @@ type alias Config msg =
     }
 
 
-svg : Config msg -> State -> PointStore -> Dict String E -> Svg msg
+
+{- svg -}
+
+
+type alias Variables =
+    Dict String E
+
+
+svg : Config msg -> State -> PointStore -> Variables -> Svg msg
 svg config state store variables =
-    state.anchor
-        |> Maybe.andThen (String.toInt >> Result.toMaybe)
-        |> Maybe.andThen (flip Dict.get store)
-        |> Maybe.andThen (position store variables)
-        |> Maybe.map
-            (\anchorPosition ->
-                let
-                    _ =
-                        Debug.log "anchorPosition" anchorPosition
-
-                    _ =
-                        Debug.log "mouse" state.mouse
-                in
-                Svg.g []
-                    [ case state.mouse of
-                        Just position ->
-                            drawCursor variables
-                                config
-                                state
-                                anchorPosition
-                                (Debug.log "position" position)
-
-                        Nothing ->
-                            Svg.g [] []
-                    , eventRect config state store variables
-                    ]
-            )
-        |> Maybe.withDefault
-            (Svg.g []
-                [ eventCircles config state store variables ]
-            )
-
-
-drawCursor : Dict String E -> Config msg -> State -> Vec2 -> Position -> Svg msg
-drawCursor variables config state anchorPosition mousePosition =
-    let
-        draw x y =
-            Svg.g []
-                [ Svg.drawPoint (vec2 x y)
-                , Svg.drawSelector (vec2 x y)
-                , Svg.drawArrow anchorPosition (vec2 x y)
-                ]
-    in
-    case ( state.distance, state.angle ) of
-        ( Just distance, Just angle ) ->
-            Svg.g [] []
-
-        ( Nothing, Nothing ) ->
-            draw (toFloat mousePosition.x) (toFloat mousePosition.y)
-
-        _ ->
-            draw
-                (Nothing
-                    |> Maybe.andThen (compute variables)
-                    |> Maybe.map (\x -> x + getX anchorPosition)
-                    |> Maybe.withDefault (toFloat mousePosition.x)
-                )
-                (Nothing
-                    |> Maybe.andThen (compute variables)
-                    |> Maybe.map (\y -> y + getY anchorPosition)
-                    |> Maybe.withDefault (toFloat mousePosition.y)
-                )
-
-
-eventRect : Config msg -> State -> PointStore -> Dict String E -> Svg msg
-eventRect config state store variables =
-    case state.id of
-        Just id ->
-            case updatePoint config state store variables id of
-                Just callback ->
-                    Svg.rect
-                        [ Svg.x (toString config.viewPort.x)
-                        , Svg.y (toString config.viewPort.y)
-                        , Svg.width (toString config.viewPort.width)
-                        , Svg.height (toString config.viewPort.height)
-                        , Svg.fill "transparent"
-                        , Svg.strokeWidth "0"
-                        , Events.onClick callback
-                        , Events.onMove
-                            (updateMouse config.stateUpdated state config.viewPort << Just)
-                        , Svg.onMouseOut
-                            (updateMouse config.stateUpdated state config.viewPort Nothing)
-                        ]
-                        []
-
-                Nothing ->
-                    Svg.g [] []
+    case anchorPosition store variables state of
+        Just anchorPosition ->
+            [ pointPosition store variables state anchorPosition
+                |> Maybe.map (drawPoint anchorPosition)
+            , eventRect config state store variables
+            ]
+                |> List.filterMap identity
+                |> Svg.g []
 
         Nothing ->
-            case addPoint config state store variables of
-                Just callback ->
-                    Svg.rect
-                        [ Svg.x (toString config.viewPort.x)
-                        , Svg.y (toString config.viewPort.y)
-                        , Svg.width (toString config.viewPort.width)
-                        , Svg.height (toString config.viewPort.height)
-                        , Svg.fill "transparent"
-                        , Svg.strokeWidth "0"
-                        , Events.onClick callback
-                        , Events.onMove
-                            (updateMouse config.stateUpdated state config.viewPort << Just)
-                        , Svg.onMouseOut
-                            (updateMouse config.stateUpdated state config.viewPort Nothing)
-                        ]
-                        []
+            [ selectAnchor config state store variables ]
+                |> Svg.g []
+
+
+drawPoint : Vec2 -> Vec2 -> Svg msg
+drawPoint anchorPosition pointPosition =
+    Svg.g []
+        [ Svg.drawPoint pointPosition
+        , Svg.drawSelector pointPosition
+        , Svg.drawArrow anchorPosition pointPosition
+        ]
+
+
+eventRect : Config msg -> State -> PointStore -> Variables -> Maybe (Svg msg)
+eventRect config state store variables =
+    let
+        callback =
+            case state.id of
+                Just id ->
+                    updatePoint config state store variables id
 
                 Nothing ->
-                    Svg.g [] []
-
-
-eventCircles :
-    Config msg
-    -> State
-    -> PointStore
-    -> Dict String E
-    -> Svg msg
-eventCircles config state store variables =
-    Svg.g []
-        (List.filterMap
-            (eventCircle config state store variables)
-            (Dict.toList store)
-        )
-
-
-eventCircle :
-    Config msg
-    -> State
-    -> PointStore
-    -> Dict String E
-    -> ( Id, Point )
-    -> Maybe (Svg msg)
-eventCircle config state store variables ( id, point ) =
-    let
-        draw v =
-            Svg.g []
-                [ Svg.circle
-                    [ Svg.cx (toString (getX v))
-                    , Svg.cy (toString (getY v))
-                    , Svg.r "5"
-                    , Svg.fill "transparent"
-                    , Svg.strokeWidth "0"
-                    , Svg.onClick
-                        (updateAnchor config.stateUpdated state (Just (toString id)))
-                    , Svg.onMouseOver
-                        (updateFocused config.stateUpdated state (Just id))
-                    , Svg.onMouseOut
-                        (updateFocused config.stateUpdated state Nothing)
-                    ]
-                    []
-                , if id |> equals state.focused then
-                    Svg.drawSelector v
-                  else
-                    Svg.g [] []
-                ]
+                    addPoint config state store variables
     in
-    position store variables point
-        |> Maybe.map draw
+    callback
+        |> Maybe.map (getPosition config state)
+
+
+selectAnchor : Config msg -> State -> PointStore -> Variables -> Svg msg
+selectAnchor config state store variables =
+    selectPoint config state store variables <|
+        toString
+            >> Just
+            >> updateAnchor config.stateUpdated state
 
 
 
@@ -296,6 +191,52 @@ action state title callback =
 
 
 
+{- compute position -}
+
+
+anchorPosition : PointStore -> Variables -> State -> Maybe Vec2
+anchorPosition store variables state =
+    state.anchor
+        |> Maybe.andThen (String.toInt >> Result.toMaybe)
+        |> Maybe.andThen (flip Dict.get store)
+        |> Maybe.andThen (position store variables)
+
+
+pointPosition : PointStore -> Variables -> State -> Vec2 -> Maybe Vec2
+pointPosition store variables state anchorPosition =
+    let
+        position distance angle =
+            vec2 (cos angle) (sin angle)
+                |> scale distance
+                |> add anchorPosition
+
+        _ =
+            Debug.log "mouse" state.mouse
+    in
+    case state.mouse |> Maybe.map (\{ x, y } -> vec2 (toFloat x) (toFloat y)) of
+        Just mousePosition ->
+            let
+                delta =
+                    sub mousePosition anchorPosition
+            in
+            Just <|
+                position
+                    (state.distance
+                        |> Maybe.andThen (compute variables)
+                        |> Maybe.withDefault (length delta)
+                    )
+                    (state.angle
+                        |> Maybe.andThen (compute variables)
+                        |> Maybe.withDefault (atan2 (getY delta) (getX delta))
+                    )
+
+        Nothing ->
+            Maybe.map2 position
+                (state.distance |> Maybe.andThen (compute variables))
+                (state.angle |> Maybe.andThen (compute variables))
+
+
+
 {- events -}
 
 
@@ -303,21 +244,65 @@ addPoint :
     Config msg
     -> State
     -> PointStore
-    -> Dict String E
+    -> Variables
     -> Maybe (Position -> msg)
 addPoint config state store variables =
-    Nothing
+    let
+        anchorId =
+            state.anchor
+                |> Maybe.andThen (String.toInt >> Result.toMaybe)
+
+        anchorPosition =
+            state.anchor
+                |> Maybe.andThen (String.toInt >> Result.toMaybe)
+                |> Maybe.andThen (flip Dict.get store)
+                |> Maybe.andThen (position store variables)
+    in
+    case ( anchorId, anchorPosition ) of
+        ( Just id, Just v ) ->
+            Just <|
+                \pos ->
+                    config.addPoint (point config state id v pos)
+
+        _ ->
+            Nothing
 
 
 updatePoint :
     Config msg
     -> State
     -> PointStore
-    -> Dict String E
+    -> Variables
     -> Id
     -> Maybe (Position -> msg)
 updatePoint config state store variables id =
     Nothing
+
+
+
+{- create point -}
+
+
+point : Config msg -> State -> Id -> Vec2 -> Position -> Point
+point config state anchorId anchorPosition mousePosition =
+    let
+        p =
+            svgToCanvas config.viewPort mousePosition
+
+        delta =
+            sub (vec2 (toFloat p.x) (toFloat p.y)) anchorPosition
+
+        distance =
+            state.distance
+                |> Maybe.withDefault
+                    (Number (length delta))
+
+        angle =
+            state.angle
+                |> Maybe.withDefault
+                    (Number (atan2 (getY delta) (getX delta)))
+    in
+    Distance anchorId distance angle
 
 
 updateAnchor : (State -> msg) -> State -> Maybe String -> msg

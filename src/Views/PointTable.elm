@@ -61,12 +61,14 @@ viewPointEntry variables store ( id, point ) =
         x =
             v
                 |> Maybe.map getX
+                |> Maybe.map (\x -> toFloat (floor (100 * x)) / 100)
                 |> Maybe.map toString
                 |> Maybe.withDefault ""
 
         y =
             v
                 |> Maybe.map getY
+                |> Maybe.map (\y -> toFloat (floor (100 * y)) / 100)
                 |> Maybe.map toString
                 |> Maybe.withDefault ""
     in
@@ -100,6 +102,9 @@ printPoint variables point =
 
         Types.Relative _ _ _ ->
             "relative"
+
+        Types.Distance _ _ _ ->
+            "distance"
 
         _ ->
             toString point

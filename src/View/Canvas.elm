@@ -110,5 +110,18 @@ point store variables point =
                 (positionById store variables id)
                 (position store variables point)
 
+        Distance id _ _ ->
+            let
+                draw v w =
+                    Svg.g []
+                        [ Svg.drawPoint w
+                        , Svg.drawArrow v w
+                        ]
+            in
+            Maybe.map2
+                draw
+                (positionById store variables id)
+                (position store variables point)
+
         Between idA idB _ ->
             Just (Svg.g [] [])

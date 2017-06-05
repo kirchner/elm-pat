@@ -42,6 +42,7 @@ toVec p =
 type Point
     = Absolute E E
     | Relative Id E E
+    | Distance Id E E
     | Between Id Id Ratio
 
 
@@ -109,6 +110,18 @@ position store variables point =
                 (lookUp id)
                 (compute variables p)
                 (compute variables q)
+
+        Distance id distance angle ->
+            let
+                coords anchorPosition distance angle =
+                    vec2 (cos angle) (sin angle)
+                        |> scale distance
+                        |> add anchorPosition
+            in
+            Maybe.map3 coords
+                (lookUp id)
+                (compute variables distance)
+                (compute variables angle)
 
         Between idA idB ratio ->
             Maybe.map2
