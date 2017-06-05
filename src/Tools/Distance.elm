@@ -185,8 +185,28 @@ view config state store =
 
 action : State -> String -> (Point -> msg) -> Html msg
 action state title callback =
+    let
+        attrs =
+            case
+                ( Maybe.andThen (Result.toMaybe << String.toInt) state.anchor
+                , state.distance
+                , state.angle
+                )
+            of
+                ( Just id, Just distance, Just angle ) ->
+                    let
+                        point =
+                            Distance id distance angle
+                    in
+                    [ Html.onClick (callback point)
+                    , Html.disabled False
+                    ]
+
+                _ ->
+                    [ Html.disabled True ]
+    in
     Html.div
-        [ class [ Button ] ]
+        ([ class [ Button ] ] ++ attrs)
         [ Html.text title ]
 
 
@@ -251,14 +271,8 @@ addPoint config state store variables =
         anchorId =
             state.anchor
                 |> Maybe.andThen (String.toInt >> Result.toMaybe)
-
-        anchorPosition =
-            state.anchor
-                |> Maybe.andThen (String.toInt >> Result.toMaybe)
-                |> Maybe.andThen (flip Dict.get store)
-                |> Maybe.andThen (position store variables)
     in
-    case ( anchorId, anchorPosition ) of
+    case ( anchorId, anchorPosition store variables state ) of
         ( Just id, Just v ) ->
             Just <|
                 \pos ->
@@ -276,7 +290,19 @@ updatePoint :
     -> Id
     -> Maybe (Position -> msg)
 updatePoint config state store variables id =
-    Nothing
+    let
+        anchorId =
+            state.anchor
+                |> Maybe.andThen (String.toInt >> Result.toMaybe)
+    in
+    case ( anchorId, anchorPosition store variables state ) of
+        ( Just id, Just v ) ->
+            Just <|
+                \pos ->
+                    config.updatePoint id (point config state id v pos)
+
+        _ ->
+            Nothing
 
 
 
