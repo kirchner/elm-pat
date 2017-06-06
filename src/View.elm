@@ -33,6 +33,7 @@ import Types
         ( Id
         , Point
         , PointStore
+        , Position
         , ViewPort
         )
 import View.Canvas as Canvas
@@ -50,7 +51,11 @@ view model =
         Html.div
             [ class [ Container, ContainerTopLeftLeft ] ]
             [ ToolBox.view ]
-    , viewToolInfo model.viewPort model.variables model.store model.tool
+    , viewToolInfo model.viewPort
+        model.variables
+        model.store
+        model.cursorPosition
+        model.tool
     , Just <|
         Html.div
             [ class [ Container, ContainerBottomLeft ] ]
@@ -72,14 +77,29 @@ view model =
 {- tool box -}
 
 
-viewToolInfo : ViewPort -> Dict String E -> PointStore -> Tool -> Maybe (Html Msg)
-viewToolInfo viewPort variables store tool =
+viewToolInfo : ViewPort -> Dict String E -> PointStore -> Maybe Position -> Tool -> Maybe (Html Msg)
+viewToolInfo viewPort variables store cursorPosition tool =
+    let
+        data =
+            { store = store
+            , variables = variables
+            , viewPort = viewPort
+            , cursorPosition = cursorPosition
+            , focusedPoint = Nothing
+            }
+
+        callbacks =
+            { addPoint = AddPoint
+            , updateCursorPosition = UpdateCursorPosition
+            , focusPoint = FocusPoint
+            }
+    in
     case tool of
         Absolute state ->
             Just <|
                 Html.div
                     [ class [ Container, ContainerTopLeft ] ]
-                    [ Absolute.view variables (addAbsoluteConfig viewPort) state ]
+                    [ Absolute.view callbacks (UpdateTool << Absolute) data state ]
 
         Relative state ->
             Just <|
@@ -107,18 +127,44 @@ viewToolInfo viewPort variables store tool =
 viewCanvas : Model -> Html Msg
 viewCanvas model =
     Canvas.view
-        (drawTool model.viewPort model.variables model.store model.tool)
+        (drawTool model.viewPort
+            model.variables
+            model.store
+            model.cursorPosition
+            model.tool
+        )
         DragStart
         (getViewPort model.viewPort model.drag)
         model.store
         model.variables
 
 
-drawTool : ViewPort -> Dict String E -> PointStore -> Tool -> Svg Msg
-drawTool viewPort variables store tool =
+drawTool :
+    ViewPort
+    -> Dict String E
+    -> PointStore
+    -> Maybe Position
+    -> Tool
+    -> Svg Msg
+drawTool viewPort variables store cursorPosition tool =
+    let
+        data =
+            { store = store
+            , variables = variables
+            , viewPort = viewPort
+            , cursorPosition = cursorPosition
+            , focusedPoint = Nothing
+            }
+
+        callbacks =
+            { addPoint = AddPoint
+            , updateCursorPosition = UpdateCursorPosition
+            , focusPoint = FocusPoint
+            }
+    in
     case tool of
         Absolute state ->
-            Absolute.svg variables (addAbsoluteConfig viewPort) state
+            Absolute.svg callbacks (UpdateTool << Absolute) data state
 
         Relative state ->
             Relative.svg (addRelativeConfig viewPort) state store variables
@@ -135,15 +181,6 @@ drawTool viewPort variables store tool =
 
 
 {- tool configurations -}
-
-
-addAbsoluteConfig : ViewPort -> Absolute.Config Msg
-addAbsoluteConfig viewPort =
-    { addPoint = AddPoint
-    , updatePoint = UpdatePoint
-    , stateUpdated = UpdateTool << Absolute
-    , viewPort = viewPort
-    }
 
 
 addRelativeConfig : ViewPort -> Relative.Config Msg

@@ -119,7 +119,7 @@ eventRect config state store variables =
                     addPoint config state store variables
     in
     callback
-        |> Maybe.map (getPosition config state)
+        |> Maybe.map (getPosition config.viewPort config.stateUpdated state)
 
 
 selectAnchor : Config msg -> State -> PointStore -> Variables -> Svg msg

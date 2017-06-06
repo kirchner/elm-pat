@@ -4,12 +4,12 @@ module Editor
         , Msg(..)
         , Tool(..)
         , allTools
+        , getViewPort
         , init
         , subscriptions
         , toolDescription
         , toolName
         , update
-        , getViewPort
         )
 
 {- internal -}
@@ -25,9 +25,9 @@ import Math.Vector2 exposing (..)
 import Mouse
 import Task
 import Tools.Absolute as Absolute
+import Tools.Distance as Distance
 import Tools.Relative as Relative
 import Tools.Select as Select
-import Tools.Distance as Distance
 import Types exposing (..)
 import Window
 
@@ -41,6 +41,7 @@ type alias Model =
     , tool : Tool
     , viewPort : ViewPort
     , drag : Maybe Drag
+    , cursorPosition : Maybe Position
     }
 
 
@@ -118,6 +119,8 @@ type Msg
     | DragStart Position
     | DragAt Position
     | DragStop Position
+    | UpdateCursorPosition (Maybe Position)
+    | FocusPoint (Maybe Id)
 
 
 init : ( Model, Cmd Msg )
@@ -135,6 +138,7 @@ init =
         , height = 640
         }
     , drag = Nothing
+    , cursorPosition = Nothing
     }
         ! [ Task.perform Resize Window.size ]
 
@@ -239,6 +243,17 @@ update msg model =
                 , viewPort = getViewPort model.viewPort model.drag
             }
                 ! []
+
+        UpdateCursorPosition position ->
+            { model
+                | cursorPosition =
+                    position |> Maybe.map (svgToCanvas model.viewPort)
+            }
+                ! []
+
+        FocusPoint id ->
+            -- TODO: implement
+            model ! []
 
 
 getViewPort : ViewPort -> Maybe Drag -> ViewPort

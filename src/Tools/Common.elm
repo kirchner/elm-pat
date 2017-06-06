@@ -1,6 +1,8 @@
 module Tools.Common
     exposing
-        ( Config
+        ( Callbacks
+        , Config
+        , Data
         , WithFocused
         , WithMouse
         , exprInput
@@ -8,6 +10,7 @@ module Tools.Common
         , selectPoint
         , updateFocused
         , updateMouse
+        , svgUpdateMouse
         )
 
 import Dict exposing (Dict)
@@ -18,6 +21,7 @@ import Html.Attributes as Html
 import Html.Events as Html
 import Input.Float
 import Math.Vector2 exposing (..)
+import Maybe.Extra as Maybe
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
@@ -61,8 +65,44 @@ type alias Config state msg =
     }
 
 
+type alias Data =
+    { store : PointStore
+    , variables : Dict String E
+    , viewPort : ViewPort
+    , cursorPosition : Maybe Position
+    , focusedPoint : Maybe Id
+    }
+
+
+type alias Callbacks msg =
+    { addPoint : Point -> msg
+    , updateCursorPosition : Maybe Position -> msg
+    , focusPoint : Maybe Id -> msg
+    }
+
+
 
 {- svgs -}
+
+
+svgUpdateMouse : Maybe msg -> (Maybe Position -> msg) -> Data -> Svg msg
+svgUpdateMouse mouseClicked updateCursorPosition data =
+    Svg.rect
+        ([ Svg.x (toString data.viewPort.x)
+         , Svg.y (toString data.viewPort.y)
+         , Svg.width (toString data.viewPort.width)
+         , Svg.height (toString data.viewPort.height)
+         , Svg.fill "transparent"
+         , Svg.strokeWidth "0"
+         , Events.onMove (updateCursorPosition << Just)
+         , Svg.onMouseOut (updateCursorPosition Nothing)
+         ]
+            ++ (mouseClicked
+                    |> Maybe.map Svg.onClick
+                    |> Maybe.toList
+               )
+        )
+        []
 
 
 drawCursor : Vec2 -> Svg msg
@@ -78,23 +118,24 @@ drawCursor position =
 
 
 getPosition :
-    Config (WithMouse state) msg
-    -> WithMouse state
+    ViewPort
+    -> (WithMouse a -> msg)
+    -> WithMouse a
     -> (Position -> msg)
     -> Svg msg
-getPosition config state mouseClicked =
+getPosition viewPort updateState state mouseClicked =
     Svg.rect
-        [ Svg.x (toString config.viewPort.x)
-        , Svg.y (toString config.viewPort.y)
-        , Svg.width (toString config.viewPort.width)
-        , Svg.height (toString config.viewPort.height)
+        [ Svg.x (toString viewPort.x)
+        , Svg.y (toString viewPort.y)
+        , Svg.width (toString viewPort.width)
+        , Svg.height (toString viewPort.height)
         , Svg.fill "transparent"
         , Svg.strokeWidth "0"
         , Events.onClick mouseClicked
         , Events.onMove
-            (updateMouse config.stateUpdated state config.viewPort << Just)
+            (updateMouse updateState state viewPort << Just)
         , Svg.onMouseOut
-            (updateMouse config.stateUpdated state config.viewPort Nothing)
+            (updateMouse updateState state viewPort Nothing)
         ]
         []
 
@@ -178,6 +219,11 @@ exprInput name e callback =
         input =
             Html.input
                 [ Html.onInput callback
+                , Html.placeholder
+                    (e
+                        |> Maybe.map print
+                        |> Maybe.withDefault ""
+                    )
                 , class [ Textfield ]
                 ]
                 []

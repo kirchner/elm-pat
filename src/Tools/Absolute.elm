@@ -1,7 +1,6 @@
 module Tools.Absolute
     exposing
-        ( Config
-        , State
+        ( State
         , init
         , initWith
         , svg
@@ -16,6 +15,8 @@ import Html.Attributes as Html
 import Html.Events as Html
 import Input.Float
 import Math.Vector2 exposing (..)
+import Maybe.Extra as Maybe
+import Styles.Colors exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
@@ -23,30 +24,13 @@ import Svg.Extra as Svg
 import Tools.Common exposing (..)
 import Tools.Styles exposing (..)
 import Types exposing (..)
-import Styles.Colors exposing (..)
-
-
-{- TODO: rename these in Types -}
-
-
-absolute =
-    Types.absolute
-
-
-position =
-    Types.position
-
-
-
-{- state -}
 
 
 type alias State =
-    WithMouse
-        { x : Maybe E
-        , y : Maybe E
-        , id : Maybe Id
-        }
+    { x : Maybe E
+    , y : Maybe E
+    , id : Maybe Id
+    }
 
 
 init : State
@@ -54,225 +38,133 @@ init =
     { x = Nothing
     , y = Nothing
     , id = Nothing
-    , mouse = Nothing
     }
 
 
 initWith : Id -> E -> E -> State
 initWith id x y =
-    { init
-        | x = Just x
-        , y = Just y
-        , id = Just id
+    { x = Just x
+    , y = Just y
+    , id = Just id
     }
 
 
+point : Data -> State -> Maybe Point
+point data state =
+    let
+        xCursor =
+            data.cursorPosition
+                |> Maybe.map (\{ x, y } -> Number (toFloat x))
 
-{- config -}
+        yCursor =
+            data.cursorPosition
+                |> Maybe.map (\{ x, y } -> Number (toFloat y))
 
+        x =
+            xCursor |> Maybe.or state.x
 
-type alias Config msg =
-    { addPoint : Point -> msg
-    , updatePoint : Id -> Point -> msg
-    , stateUpdated : State -> msg
-    , viewPort : ViewPort
-    }
+        y =
+            yCursor |> Maybe.or state.y
+    in
+    Maybe.map2 Absolute x y
 
 
 
 {- canvas -}
 
 
-svg : Dict String E -> Config msg -> State -> Svg msg
-svg variables config state =
-    Svg.g []
-        [ case state.mouse of
-            Just position ->
-                drawCursor variables config state position
-
-            Nothing ->
-                Svg.g [] []
-        , drawLines variables config state
-        , drawNewPoint variables config state
-        , eventRect variables config state
-        ]
-
-
-drawCursor : Dict String E -> Config msg -> State -> Position -> Svg msg
-drawCursor variables config state p =
+svg : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
+svg callbacks updateState data state =
     let
-        x =
-            state.x
-                |> Maybe.andThen (compute variables)
-                |> Maybe.withDefault (toFloat p.x)
-
-        y =
-            state.y
-                |> Maybe.andThen (compute variables)
-                |> Maybe.withDefault (toFloat p.y)
+        addPoint =
+            point data state |> Maybe.map callbacks.addPoint
     in
-    case ( state.x, state.y ) of
-        ( Just x, Just y ) ->
-            Svg.g [] []
-
-        _ ->
-            Svg.g []
-                [ Svg.drawPoint (vec2 x y)
-                , Svg.drawSelector (vec2 x y)
-                ]
+    [ newPoint data state
+    , horizontalLine data state
+    , verticalLine data state
+    , Just (svgUpdateMouse addPoint callbacks.updateCursorPosition data)
+    ]
+        |> List.filterMap identity
+        |> Svg.g []
 
 
-drawLines : Dict String E -> Config msg -> State -> Svg msg
-drawLines variables config state =
-    case ( state.x, state.y ) of
-        ( Just x, Just y ) ->
-            Svg.g [] []
-
-        _ ->
-            Svg.g [] <|
-                List.filterMap identity
-                    [ state.x
-                        |> Maybe.andThen (compute variables)
-                        |> Maybe.map Svg.drawVerticalLine
-                    , state.x
-                        |> Maybe.andThen (compute variables)
-                        |> Maybe.map Svg.drawVerticalLine
-                    ]
-
-
-drawNewPoint : Dict String E -> Config msg -> State -> Svg msg
-drawNewPoint variables config state =
+newPoint : Data -> State -> Maybe (Svg msg)
+newPoint data state =
     let
         draw x y =
             Svg.g []
                 [ Svg.drawPoint (vec2 x y)
                 , Svg.drawSelector (vec2 x y)
                 ]
+
+        xState =
+            state.x |> Maybe.andThen (compute data.variables)
+
+        yState =
+            state.y |> Maybe.andThen (compute data.variables)
+
+        xCursor =
+            data.cursorPosition
+                |> Maybe.map (\{ x, y } -> toFloat x)
+
+        yCursor =
+            data.cursorPosition
+                |> Maybe.map (\{ x, y } -> toFloat y)
+
+        x =
+            xCursor |> Maybe.or xState
+
+        y =
+            yCursor |> Maybe.or yState
     in
-    Maybe.map2 draw
-        (state.x |> Maybe.andThen (compute variables))
-        (state.y |> Maybe.andThen (compute variables))
-        |> Maybe.withDefault (Svg.g [] [])
+    Maybe.map2 draw x y
 
 
-eventRect : Dict String E -> Config msg -> State -> Svg msg
-eventRect variables config state =
-    Svg.rect
-        [ Svg.x (toString config.viewPort.x)
-        , Svg.y (toString config.viewPort.y)
-        , Svg.width (toString config.viewPort.width)
-        , Svg.height (toString config.viewPort.height)
-        , Svg.fill "transparent"
-        , Svg.strokeWidth "0"
-        , case state.id of
-            Just id ->
-                Events.onClick (updatePoint variables config state id)
+horizontalLine : Data -> State -> Maybe (Svg msg)
+horizontalLine data state =
+    state.y
+        |> Maybe.andThen (compute data.variables)
+        |> Maybe.map Svg.drawHorizontalLine
 
-            Nothing ->
-                Events.onClick (addPoint variables config state)
-        , Events.onMove
-            (updateMouse config.stateUpdated state config.viewPort << Just)
-        , Svg.onMouseOut
-            (updateMouse config.stateUpdated state config.viewPort Nothing)
-        ]
-        []
+
+verticalLine : Data -> State -> Maybe (Svg msg)
+verticalLine data state =
+    state.x
+        |> Maybe.andThen (compute data.variables)
+        |> Maybe.map Svg.drawVerticalLine
 
 
 
 {- view -}
 
 
-view : Dict String E -> Config msg -> State -> Html msg
-view variables config state =
+view : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
+view callbacks updateState data state =
+    let
+        addPoint =
+            point data state |> Maybe.map callbacks.addPoint
+
+        updateX =
+            (\s -> { state | x = parse s }) >> updateState
+
+        updateY =
+            (\s -> { state | y = parse s }) >> updateState
+
+        attr =
+            case addPoint of
+                Just callback ->
+                    Html.onClick callback
+
+                Nothing ->
+                    Html.disabled True
+    in
     Html.div
         [ class [ ToolBox ] ]
-        [ exprInput "x" state.x (updateX config.stateUpdated state)
-        , exprInput "y" state.y (updateY config.stateUpdated state)
-        , case state.id of
-            Just id ->
-                action variables state "update" (config.updatePoint id)
-
-            Nothing ->
-                action variables state "add" config.addPoint
+        [ exprInput "x" state.x updateX
+        , exprInput "y" state.y updateY
+        , Html.div
+            [ class [ Button ]
+            , attr
+            ]
+            [ Html.text "add" ]
         ]
-
-
-action : Dict String E -> State -> String -> (Point -> msg) -> Html msg
-action variables state title callback =
-    let
-        attrs =
-            Maybe.map2 Absolute state.x state.y
-                |> Maybe.map
-                    (\point ->
-                        [ Html.onClick (callback point)
-                        , Html.disabled False
-                        ]
-                    )
-                |> Maybe.withDefault
-                    [ Html.disabled True ]
-    in
-    Html.div
-        ([ class [ Button ] ] ++ attrs)
-        [ Html.text title ]
-
-
-
-{- events -}
-
-
-addPoint : Dict String E -> Config msg -> State -> Position -> msg
-addPoint variables config state position =
-    let
-        x =
-            state.x
-                |> Maybe.withDefault
-                    (svgToCanvas config.viewPort position
-                        |> .x
-                        |> toFloat
-                        |> Number
-                    )
-
-        y =
-            state.y
-                |> Maybe.withDefault
-                    (svgToCanvas config.viewPort position
-                        |> .y
-                        |> toFloat
-                        |> Number
-                    )
-    in
-    config.addPoint (Absolute x y)
-
-
-updatePoint : Dict String E -> Config msg -> State -> Id -> Position -> msg
-updatePoint variables config state id position =
-    let
-        x =
-            state.x
-                |> Maybe.withDefault
-                    (svgToCanvas config.viewPort position
-                        |> .x
-                        |> toFloat
-                        |> Number
-                    )
-
-        y =
-            state.y
-                |> Maybe.withDefault
-                    (svgToCanvas config.viewPort position
-                        |> .y
-                        |> toFloat
-                        |> Number
-                    )
-    in
-    config.updatePoint id (Absolute x y)
-
-
-updateX : (State -> msg) -> State -> String -> msg
-updateX callback state s =
-    callback { state | x = parse s }
-
-
-updateY : (State -> msg) -> State -> String -> msg
-updateY callback state s =
-    callback { state | y = parse s }
