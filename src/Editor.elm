@@ -27,7 +27,6 @@ import Task
 import Tools.Absolute as Absolute
 import Tools.Distance as Distance
 import Tools.Relative as Relative
-import Tools.Select as Select
 import Types exposing (..)
 import Window
 
@@ -50,7 +49,6 @@ type Tool
     = Absolute Absolute.State
     | Relative Relative.State
     | Distance Distance.State
-    | Select Select.State
     | None
 
 
@@ -65,9 +63,6 @@ toolName tool =
 
         Distance _ ->
             "distance"
-
-        Select _ ->
-            "select"
 
         None ->
             "none"
@@ -85,9 +80,6 @@ toolDescription tool =
         Distance _ ->
             "distance"
 
-        Select _ ->
-            "select"
-
         None ->
             "none"
 
@@ -97,7 +89,6 @@ allTools =
     [ Absolute Absolute.init
     , Relative Relative.init
     , Distance Distance.init
-    , Select Select.init
     ]
 
 

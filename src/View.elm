@@ -27,7 +27,6 @@ import Svg exposing (Svg)
 import Tools.Absolute as Absolute
 import Tools.Distance as Distance
 import Tools.Relative as Relative
-import Tools.Select as Select
 import Types
     exposing
         ( Id
@@ -105,16 +104,13 @@ viewToolInfo viewPort variables store cursorPosition tool =
             Just <|
                 Html.div
                     [ class [ Container, ContainerTopLeft ] ]
-                    [ Relative.view callbacks (UpdateTool << Relative) data state]
+                    [ Relative.view callbacks (UpdateTool << Relative) data state ]
 
         Distance state ->
             Just <|
                 Html.div
                     [ class [ Container, ContainerTopLeft ] ]
                     [ Distance.view callbacks (UpdateTool << Distance) data state ]
-
-        Select _ ->
-            Nothing
 
         None ->
             Nothing
@@ -174,20 +170,5 @@ drawTool viewPort variables store cursorPosition focusedPoint tool =
         Distance state ->
             Distance.svg callbacks (UpdateTool << Distance) data state
 
-        Select state ->
-            Select.svg (selectConfig viewPort) state store variables
-
         None ->
             Svg.g [] []
-
-
-
-{- tool configurations -}
-
-
-selectConfig : ViewPort -> Select.Config Msg
-selectConfig viewPort =
-    { selectPoint = SelectPoint
-    , stateUpdated = UpdateTool << Select
-    , viewPort = viewPort
-    }
