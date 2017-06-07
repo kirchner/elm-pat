@@ -42,6 +42,7 @@ type alias Model =
     , viewPort : ViewPort
     , drag : Maybe Drag
     , cursorPosition : Maybe Position
+    , focusedPoint : Maybe Id
     }
 
 
@@ -139,6 +140,7 @@ init =
         }
     , drag = Nothing
     , cursorPosition = Nothing
+    , focusedPoint = Nothing
     }
         ! [ Task.perform Resize Window.size ]
 
@@ -154,6 +156,8 @@ update msg model =
                 | store = Dict.insert model.nextId point model.store
                 , nextId = model.nextId + 1
                 , tool = None
+                , cursorPosition = Nothing
+                , focusedPoint = Nothing
             }
                 ! []
 
@@ -252,8 +256,7 @@ update msg model =
                 ! []
 
         FocusPoint id ->
-            -- TODO: implement
-            model ! []
+            { model | focusedPoint = id } ! []
 
 
 getViewPort : ViewPort -> Maybe Drag -> ViewPort

@@ -111,7 +111,7 @@ viewToolInfo viewPort variables store cursorPosition tool =
             Just <|
                 Html.div
                     [ class [ Container, ContainerTopLeft ] ]
-                    [ Distance.view (addDistanceConfig viewPort) state store ]
+                    [ Distance.view callbacks (UpdateTool << Distance) data state ]
 
         Select _ ->
             Nothing
@@ -131,6 +131,7 @@ viewCanvas model =
             model.variables
             model.store
             model.cursorPosition
+            model.focusedPoint
             model.tool
         )
         DragStart
@@ -144,16 +145,17 @@ drawTool :
     -> Dict String E
     -> PointStore
     -> Maybe Position
+    -> Maybe Id
     -> Tool
     -> Svg Msg
-drawTool viewPort variables store cursorPosition tool =
+drawTool viewPort variables store cursorPosition focusedPoint tool =
     let
         data =
             { store = store
             , variables = variables
             , viewPort = viewPort
             , cursorPosition = cursorPosition
-            , focusedPoint = Nothing
+            , focusedPoint = focusedPoint
             }
 
         callbacks =
@@ -170,7 +172,7 @@ drawTool viewPort variables store cursorPosition tool =
             Relative.svg (addRelativeConfig viewPort) state store variables
 
         Distance state ->
-            Distance.svg (addDistanceConfig viewPort) state store variables
+            Distance.svg callbacks (UpdateTool << Distance) data state
 
         Select state ->
             Select.svg (selectConfig viewPort) state store variables
@@ -188,15 +190,6 @@ addRelativeConfig viewPort =
     { addPoint = AddPoint
     , updatePoint = UpdatePoint
     , stateUpdated = UpdateTool << Relative
-    , viewPort = viewPort
-    }
-
-
-addDistanceConfig : ViewPort -> Distance.Config Msg
-addDistanceConfig viewPort =
-    { addPoint = AddPoint
-    , updatePoint = UpdatePoint
-    , stateUpdated = UpdateTool << Distance
     , viewPort = viewPort
     }
 

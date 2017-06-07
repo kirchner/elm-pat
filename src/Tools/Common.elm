@@ -8,9 +8,10 @@ module Tools.Common
         , exprInput
         , getPosition
         , selectPoint
+        , svgUpdateMouse
+        , svgSelectPoint
         , updateFocused
         , updateMouse
-        , svgUpdateMouse
         )
 
 import Dict exposing (Dict)
@@ -103,6 +104,44 @@ svgUpdateMouse mouseClicked updateCursorPosition data =
                )
         )
         []
+
+
+svgSelectPoint : (Maybe Id -> msg) -> (Maybe Id -> msg) -> Data -> Svg msg
+svgSelectPoint focusPoint selectPoint data =
+    Dict.toList data.store
+        |> List.filterMap (pointSelector_ focusPoint selectPoint data)
+        |> Svg.g []
+
+
+pointSelector_ :
+    (Maybe Id -> msg)
+    -> (Maybe Id -> msg)
+    -> Data
+    -> ( Id, Point )
+    -> Maybe (Svg msg)
+pointSelector_ focusPoint selectPoint data ( id, point ) =
+    let
+        draw v =
+            Svg.g []
+                [ Svg.circle
+                    [ Svg.cx (toString (getX v))
+                    , Svg.cy (toString (getY v))
+                    , Svg.r "5"
+                    , Svg.fill "transparent"
+                    , Svg.strokeWidth "0"
+                    , Svg.onClick (selectPoint (Just id))
+                    , Svg.onMouseOver (focusPoint (Just id))
+                    , Svg.onMouseOut (focusPoint Nothing)
+                    ]
+                    []
+                , if id |> equals data.focusedPoint then
+                    Svg.drawSelector v
+                  else
+                    Svg.g [] []
+                ]
+    in
+    position data.store data.variables point
+        |> Maybe.map draw
 
 
 drawCursor : Vec2 -> Svg msg
