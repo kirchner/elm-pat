@@ -1,7 +1,0 @@
-[submodule "elm-agenda"]
-	path = elm-agenda
-	url = https://github.com/kirchner/elm-agenda
-[submodule "elm-input-extra"]
-	path = elm-input-extra
-	url = https://github.com/kirchner/elm-input-extra
-	branch = input-float

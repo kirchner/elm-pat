@@ -14,7 +14,6 @@ import Expr exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.Events as Html
-import Input.Float
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
 import Styles.Colors as Colors exposing (..)
