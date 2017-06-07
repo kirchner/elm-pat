@@ -58,7 +58,7 @@ type alias Data =
 In this case, `start` and `end` have to be given (and we are able to compute
 their positions) but `ratio` is not necessary if we have a the current cursor
 position, in which case we can compute it using the positions of `start` and
-`end`.  Note that we need to provide
+`end`.
 
 We also need to provide a rendering function for the canvas:
 
@@ -83,10 +83,10 @@ svgUpdateMouse mouseClicked updateCursorPosition data =
     ...
 ```
 
-to indicate that you want the cursor position be updated in the state and to
-add a callback for mouse click events.  In our example, we will only draw
-`svgUpdateMouse` when `start` and `end` are selected.  The mouseClicked
-callback will then use the `point` function to create a new point.
+to indicate that you want the cursor position be updated and to add a callback
+for mouse click events.  In our example, we will only draw `svgUpdateMouse`
+when `start` and `end` are selected.  The mouseClicked callback will then use
+the `point` function to create a new point.
 
 To be able to select `start` or `end` by clicking on existing points in the
 canvas, you can use the function
@@ -118,6 +118,6 @@ view callbacks updateState data state =
 The module `Tools.Common` provides helper view functions for often used input
 elements.
 
-Now you have to extend the `Tool` type in `Editor` add the tool to `allTools`.
-The compiler errors should then guide you through the remaining necessary
-changes.
+Now you have to extend the `Tool` type in `Editor` and add the tool to
+`allTools`. The compiler errors should then guide you through the remaining
+necessary changes.
