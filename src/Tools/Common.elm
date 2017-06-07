@@ -7,14 +7,17 @@ module Tools.Common
         , WithMouse
         , exprInput
         , getPosition
+        , idDropdown
         , selectPoint
-        , svgUpdateMouse
         , svgSelectPoint
+        , svgUpdateMouse
         , updateFocused
         , updateMouse
+        , view
         )
 
 import Dict exposing (Dict)
+import Dropdown
 import Events
 import Expr exposing (..)
 import Html exposing (Html)
@@ -233,6 +236,38 @@ pointSelector config state store variables callback ( id, point ) =
 {- views -}
 
 
+view :
+    Callbacks msg
+    -> Data
+    -> state
+    -> (Data -> state -> Maybe Point)
+    -> List (Html msg)
+    -> Html msg
+view callbacks data state point elements =
+    let
+        addPoint =
+            point data state |> Maybe.map callbacks.addPoint
+
+        attr =
+            case addPoint of
+                Just callback ->
+                    Html.onClick callback
+
+                Nothing ->
+                    Html.disabled True
+    in
+    Html.div
+        [ class [ ToolBox ] ]
+        (elements
+            ++ [ Html.div
+                    [ class [ Button ]
+                    , attr
+                    ]
+                    [ Html.text "add" ]
+               ]
+        )
+
+
 exprInput : String -> Maybe E -> (String -> msg) -> Html msg
 exprInput name e callback =
     let
@@ -275,4 +310,38 @@ exprInput name e callback =
             , input
             ]
         , icon "delete"
+        ]
+
+
+idDropdown : Data -> Maybe String -> (Maybe String -> msg) -> Html msg
+idDropdown data anchor updateAnchor =
+    let
+        items =
+            Dict.keys data.store
+                |> List.map toString
+                |> List.map
+                    (\id ->
+                        { value = id
+                        , text = "point " ++ id
+                        , enabled = True
+                        }
+                    )
+    in
+    Html.div []
+        [ Html.text "id:"
+        , Dropdown.dropdown
+            { items = items
+            , emptyItem =
+                Just
+                    { value = "-1"
+                    , text = "select point"
+                    , enabled = True
+                    }
+            , onChange = updateAnchor
+            }
+            []
+            anchor
+        , Html.button
+            [ Html.onClick (updateAnchor Nothing) ]
+            [ Html.text "clear" ]
         ]

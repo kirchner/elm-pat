@@ -9,7 +9,6 @@ module Tools.Distance
 
 import Css
 import Dict exposing (Dict)
-import Dropdown
 import Events
 import Expr exposing (..)
 import Html exposing (Html)
@@ -23,7 +22,15 @@ import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
 import Svg.Extra as Svg
-import Tools.Common exposing (..)
+import Tools.Common as Tools
+    exposing
+        ( Callbacks
+        , Data
+        , exprInput
+        , idDropdown
+        , svgSelectPoint
+        , svgUpdateMouse
+        )
 import Tools.Styles exposing (..)
 import Types exposing (..)
 
@@ -192,26 +199,14 @@ line data state =
 view : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
 view callbacks updateState data state =
     let
-        addPoint =
-            point data state |> Maybe.map callbacks.addPoint
-
         updateAnchor =
-            (\id -> { state | anchor = id })
-                >> updateState
+            (\id -> { state | anchor = id }) >> updateState
 
         updateDistance =
             (\s -> { state | distance = parse s }) >> updateState
 
         updateAngle =
             (\s -> { state | angle = parse s }) >> updateState
-
-        attr =
-            case addPoint of
-                Just callback ->
-                    Html.onClick callback
-
-                Nothing ->
-                    Html.disabled True
 
         items =
             Dict.keys data.store
@@ -224,34 +219,11 @@ view callbacks updateState data state =
                         }
                     )
     in
-    Html.div
-        [ class [ ToolBox ] ]
-        [ Html.div []
-            [ Html.text "id:"
-            , Dropdown.dropdown
-                { items = items
-                , emptyItem =
-                    Just
-                        { value = "-1"
-                        , text = "select point"
-                        , enabled = True
-                        }
-                , onChange = updateAnchor
-                }
-                []
-                state.anchor
-            , Html.button
-                [ Html.onClick (updateAnchor Nothing) ]
-                [ Html.text "clear" ]
-            ]
-        , exprInput "d" state.distance updateDistance
-        , exprInput "a" state.angle updateAngle
-        , Html.div
-            [ class [ Button ]
-            , attr
-            ]
-            [ Html.text "add" ]
-        ]
+    [ idDropdown data state.anchor updateAnchor
+    , exprInput "d" state.distance updateDistance
+    , exprInput "a" state.angle updateAngle
+    ]
+        |> Tools.view callbacks data state point
 
 
 

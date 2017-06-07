@@ -21,7 +21,13 @@ import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
 import Svg.Extra as Svg
-import Tools.Common exposing (..)
+import Tools.Common as Tools
+    exposing
+        ( Callbacks
+        , Data
+        , exprInput
+        , svgUpdateMouse
+        )
 import Tools.Styles exposing (..)
 import Types exposing (..)
 
@@ -141,30 +147,13 @@ verticalLine data state =
 view : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
 view callbacks updateState data state =
     let
-        addPoint =
-            point data state |> Maybe.map callbacks.addPoint
-
         updateX =
             (\s -> { state | x = parse s }) >> updateState
 
         updateY =
             (\s -> { state | y = parse s }) >> updateState
-
-        attr =
-            case addPoint of
-                Just callback ->
-                    Html.onClick callback
-
-                Nothing ->
-                    Html.disabled True
     in
-    Html.div
-        [ class [ ToolBox ] ]
-        [ exprInput "x" state.x updateX
-        , exprInput "y" state.y updateY
-        , Html.div
-            [ class [ Button ]
-            , attr
-            ]
-            [ Html.text "add" ]
-        ]
+    [ exprInput "x" state.x updateX
+    , exprInput "y" state.y updateY
+    ]
+        |> Tools.view callbacks data state point
