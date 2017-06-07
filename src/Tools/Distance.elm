@@ -207,17 +207,6 @@ view callbacks updateState data state =
 
         updateAngle =
             (\s -> { state | angle = parse s }) >> updateState
-
-        items =
-            Dict.keys data.store
-                |> List.map toString
-                |> List.map
-                    (\id ->
-                        { value = id
-                        , text = "point " ++ id
-                        , enabled = True
-                        }
-                    )
     in
     [ idDropdown data state.anchor updateAnchor
     , exprInput "d" state.distance updateDistance

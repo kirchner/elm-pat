@@ -105,7 +105,7 @@ viewToolInfo viewPort variables store cursorPosition tool =
             Just <|
                 Html.div
                     [ class [ Container, ContainerTopLeft ] ]
-                    [ Relative.view (addRelativeConfig viewPort) state store ]
+                    [ Relative.view callbacks (UpdateTool << Relative) data state]
 
         Distance state ->
             Just <|
@@ -169,7 +169,7 @@ drawTool viewPort variables store cursorPosition focusedPoint tool =
             Absolute.svg callbacks (UpdateTool << Absolute) data state
 
         Relative state ->
-            Relative.svg (addRelativeConfig viewPort) state store variables
+            Relative.svg callbacks (UpdateTool << Relative) data state
 
         Distance state ->
             Distance.svg callbacks (UpdateTool << Distance) data state
@@ -183,15 +183,6 @@ drawTool viewPort variables store cursorPosition focusedPoint tool =
 
 
 {- tool configurations -}
-
-
-addRelativeConfig : ViewPort -> Relative.Config Msg
-addRelativeConfig viewPort =
-    { addPoint = AddPoint
-    , updatePoint = UpdatePoint
-    , stateUpdated = UpdateTool << Relative
-    , viewPort = viewPort
-    }
 
 
 selectConfig : ViewPort -> Select.Config Msg
