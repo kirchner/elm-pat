@@ -1,10 +1,11 @@
 # elm-pat
 
 Create sewing patterns in your browser. [Live
-Demo](http://kirchner.github.io/elm-pat)  Note, that this is in a very early
-development state.  Nevertheless, I appreciate any questions or feedback. :)
-The remaining part of this document tries to explain some parts the
-architecture and how to extend it.
+Demo](http://kirchner.github.io/elm-pat)
+
+Note, that this is in a very early development state.  Nevertheless,
+I appreciate any questions or feedback. :) The remaining part of this document
+tries to explain some parts the architecture and how to extend it.
 
 
 ## What is this all about?
