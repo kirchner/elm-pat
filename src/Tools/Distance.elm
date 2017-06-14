@@ -208,8 +208,8 @@ view callbacks updateState data state =
             (\s -> { state | angle = parse s }) >> updateState
     in
     [ idDropdown data state.anchor updateAnchor
-    , exprInput "d" state.distance updateDistance
-    , exprInput "a" state.angle updateAngle
+    , exprInput "distance" state.distance updateDistance
+    , exprInput "angle" state.angle updateAngle
     ]
         |> Tools.view callbacks data state point
 

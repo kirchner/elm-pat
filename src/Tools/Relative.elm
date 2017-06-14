@@ -181,8 +181,8 @@ view callbacks updateState data state =
             (\s -> { state | y = parse s }) >> updateState
     in
     [ idDropdown data state.anchor updateAnchor
-    , exprInput "x" state.x updateX
-    , exprInput "y" state.y updateY
+    , exprInput "horizontal distance" state.x updateX
+    , exprInput "vertical distance" state.y updateY
     ]
         |> Tools.view callbacks data state point
 

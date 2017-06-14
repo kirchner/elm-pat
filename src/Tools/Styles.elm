@@ -11,90 +11,66 @@ import Styles.Colors exposing (..)
 
 type Class
     = ToolBox
-    | Row
-    | Column
-    | IconButton
-    | Icon
+    | ValueContainer
     | Textfield
+    | IconContainer
     | Button
-    | VariableName
 
 
 { id, class, classList } =
-    withNamespace "absolute"
+    withNamespace "tool__"
 
 
 css =
-    (stylesheet << namespace "absolute")
+    (stylesheet << namespace "tool__")
         [ Css.class ToolBox
-            [ Css.backgroundColor (Css.hex base2)
-            , Css.width (Css.rem 10)
-            , Css.property "pointer-events" "auto"
+            [ backgroundColor (hex base2)
+            , property "pointer-events" "auto"
+            , displayFlex
+            ]
+        , Css.class ValueContainer
+            [ position relative
+            , displayFlex
+            , paddingLeft (rem 0.3)
+            , paddingRight (rem 0.3)
+            , margin (px 2)
+            , border zero
+            , hover
+                [ margin zero
+                , border3 (px 2) solid (hex base3)
+                ]
+            ]
+        , Css.class Textfield
+            [ borderColor transparent
+            , fontFamily monospace
+            , fontSize (rem 1)
+            , lineHeight (rem 1)
+            , width (rem 20)
+            , backgroundColor transparent
+            , focus
+                [ outline none ]
+            ]
+        , Css.class IconContainer
+            [ position absolute
+            , right (rem 0.3)
+            , height (pct 100)
+            , displayFlex
+            , flexFlow1 column
+            , justifyContent spaceAround
             ]
         , Css.class Button
             [ textAlign center
-            , width (Css.rem 10)
-            , height (Css.rem 2)
-            , lineHeight (Css.rem 2)
+            , width (rem 10)
+            , height (rem 2)
+            , lineHeight (rem 2)
             , color (hex base0)
             , backgroundColor (hex base03)
             , cursor pointer
             , hover
                 [ backgroundColor (hex base02) ]
             ]
-        , Css.class Textfield
-            [ borderColor transparent
-            , fontFamily monospace
-            , fontSize (Css.rem 1)
-            , lineHeight (Css.rem 1)
-            , width (Css.rem 4.8)
-            , backgroundColor transparent
-            , focus
-                [ outline none
-                , borderColor (hex base02)
-                ]
-            ]
-        , Css.class Row
-            [ displayFlex
-            , flexFlow1 row
-
-            --, justifyContent flexStart
-            , width (Css.rem 10)
-            , alignItems stretch
-            ]
-        , Css.class Column
-            [ displayFlex
-            , alignItems baseline
-            , padding (Css.rem 0.2)
-            , fontFamily monospace
-            , fontSize (Css.rem 1)
-            , lineHeight (Css.rem 1)
-            ]
-        , Css.class IconButton
-            [ fontSize (Css.rem 1)
-            , lineHeight (Css.rem 1)
-            , width (Css.rem 1.5)
-            , height (Css.rem 1.5)
-            , borderRadius (pct 50)
-            , color (hex base0)
-            , backgroundColor transparent
-            , cursor pointer
-            , hover
-                [ backgroundColor (hex base02)
-                ]
-            , Css.position Css.relative
-            ]
-        , Css.class Icon
-            [ Css.fontSize (Css.rem 0.9)
-            , Css.lineHeight (Css.rem 0.9)
-            , Css.position Css.absolute
-            , Css.top (Css.pct 50)
-            , Css.left (Css.pct 50)
-            , Css.transform (Css.translate2 (Css.pct -50) (Css.pct -50))
-            ]
-        , Css.class VariableName
-            [ Css.fontSize (Css.rem 1)
-            , Css.lineHeight (Css.rem 1)
-            , Css.paddingRight (Css.rem 0.4)
-            ]
         ]
+
+
+rem =
+    Css.rem

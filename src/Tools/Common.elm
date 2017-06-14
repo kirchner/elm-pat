@@ -24,6 +24,7 @@ import Svg.Events as Svg
 import Svg.Extra as Svg
 import Tools.Styles exposing (..)
 import Types exposing (..)
+import Views.Common exposing (iconSmall)
 
 
 type alias Data =
@@ -132,69 +133,46 @@ view callbacks data state point elements =
         addPoint =
             point data state |> Maybe.map callbacks.addPoint
 
-        attr =
+        button =
             case addPoint of
                 Just callback ->
-                    Html.onClick callback
+                    [ iconSmall "add" callback ]
 
                 Nothing ->
-                    Html.disabled True
+                    []
     in
     Html.div
         [ class [ ToolBox ] ]
-        (elements
-            ++ [ Html.div
-                    [ class [ Button ]
-                    , attr
-                    ]
-                    [ Html.text "add" ]
-               ]
-        )
+        elements
 
 
 exprInput : String -> Maybe E -> (String -> msg) -> Html msg
 exprInput name e callback =
     let
-        row attrs nodes =
-            Html.div ([ class [ Row ] ] ++ attrs) nodes
-
-        cell attrs nodes =
-            Html.div ([ class [ Column ] ] ++ attrs) nodes
-
-        icon name =
-            cell []
+        deleteIcon =
+            if e /= Nothing then
                 [ Html.div
-                    [ class [ IconButton ] ]
-                    [ Html.i
-                        [ Html.class "material-icons"
-                        , Html.onClick (callback "")
-                        , class [ Icon ]
-                        ]
-                        [ Html.text name ]
-                    ]
+                    [ class [ IconContainer ] ]
+                    [ iconSmall "delete" (callback "") ]
                 ]
-
-        input =
-            Html.input
-                [ Html.onInput callback
-                , Html.placeholder
-                    (e
-                        |> Maybe.map print
-                        |> Maybe.withDefault ""
-                    )
-                , class [ Textfield ]
-                ]
+            else
                 []
     in
-    row []
-        [ cell []
-            [ Html.div
-                [ class [ VariableName ] ]
-                [ Html.text (name ++ " =") ]
-            , input
+    Html.div
+        [ class [ ValueContainer ] ]
+        ([ Html.input
+            [ Html.onInput callback
+            , Html.placeholder
+                (e
+                    |> Maybe.map print
+                    |> Maybe.withDefault name
+                )
+            , class [ Textfield ]
             ]
-        , icon "delete"
-        ]
+            []
+         ]
+            ++ deleteIcon
+        )
 
 
 idDropdown : Data -> Maybe String -> (Maybe String -> msg) -> Html msg

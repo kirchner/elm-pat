@@ -152,7 +152,7 @@ view callbacks updateState data state =
         updateY =
             (\s -> { state | y = parse s }) >> updateState
     in
-    [ exprInput "x" state.x updateX
-    , exprInput "y" state.y updateY
+    [ exprInput "x-coordinate" state.x updateX
+    , exprInput "y-coordinate" state.y updateY
     ]
         |> Tools.view callbacks data state point
