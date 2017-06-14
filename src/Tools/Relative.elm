@@ -7,7 +7,6 @@ module Tools.Relative
         , view
         )
 
-import Autocomplete
 import Css
 import Dict exposing (Dict)
 import Dropdown
@@ -16,7 +15,6 @@ import Expr exposing (..)
 import Html exposing (Html, map)
 import Html.Attributes as Html
 import Html.Events as Html
-import Json.Decode as Json
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
 import Styles.Colors exposing (..)
@@ -32,6 +30,9 @@ import Tools.Common as Tools
         , idDropdown
         , svgSelectPoint
         , svgUpdateMouse
+        , updateDropdownState
+        , viewPointSelect
+        , selectedPoint
         )
 import Tools.Styles exposing (..)
 import Types exposing (..)
@@ -42,14 +43,8 @@ type alias State =
     , x : Maybe E
     , y : Maybe E
     , id : Maybe Id
-
-    -- autocomplete:
-    -- we have to provide List Point from outside
-    , autoState : Autocomplete.State
-    , howManyToShow : Int
-    , query : String
+    , dropdownState : Tools.DropdownState
     , selectedPoint : Maybe ( Int, Point )
-    , showMenu : Bool
     }
 
 
@@ -59,310 +54,15 @@ init =
     , x = Nothing
     , y = Nothing
     , id = Nothing
-
-    -- autocomplete:
-    , autoState = Autocomplete.empty
-    , howManyToShow = 5
-    , query = ""
+    , dropdownState = Tools.initDropdownState
     , selectedPoint = Nothing
-    , showMenu = False
     }
 
 
 
 -- autocomplete
-
-
-type AutoMsg
-    = SetQuery String
-    | SetAutoState Autocomplete.Msg
-    | SelectPoint String
-    | Reset
-    | OnFocus
-    | HandleEscape
-    | NoOp
-
-
-updateState : Data -> AutoMsg -> State -> State
-updateState data autoMsg state =
-    case autoMsg of
-        SetQuery newQuery ->
-            let
-                showMenu =
-                    not (List.isEmpty (filteredPoints newQuery data))
-            in
-            { state
-                | query = newQuery
-                , showMenu = showMenu
-                , selectedPoint = Nothing
-            }
-
-        SetAutoState autoMsg ->
-            let
-                ( newAutoState, maybeMsg ) =
-                    filteredPoints state.query data
-                        |> Autocomplete.update
-                            updateConfig
-                            autoMsg
-                            state.howManyToShow
-                            state.autoState
-
-                newState =
-                    { state | autoState = newAutoState }
-            in
-            case maybeMsg of
-                Nothing ->
-                    newState
-
-                Just updateMsg ->
-                    updateState data updateMsg newState
-
-        SelectPoint id ->
-            let
-                newState =
-                    setQuery data state id
-                        |> resetMenu
-            in
-            newState
-
-        Reset ->
-            { state
-                | autoState =
-                    Autocomplete.reset updateConfig state.autoState
-                , selectedPoint = Nothing
-            }
-
-        OnFocus ->
-            { state | showMenu = not state.showMenu }
-
-        HandleEscape ->
-            let
-                validOptions =
-                    not (List.isEmpty (filteredPoints state.query data))
-
-                handleEscape =
-                    if validOptions then
-                        state
-                            |> removeSelection
-                            |> resetMenu
-                    else
-                        state
-                            |> resetInput
-
-                escapedState =
-                    case state.selectedPoint of
-                        Just ( id, point ) ->
-                            if state.query == toString id then
-                                state
-                                    |> resetInput
-                            else
-                                handleEscape
-
-                        Nothing ->
-                            handleEscape
-            in
-            escapedState
-
-        NoOp ->
-            state
-
-
-updateConfig : Autocomplete.UpdateConfig AutoMsg ( Int, Point )
-updateConfig =
-    Autocomplete.updateConfig
-        { toId = Tuple.first >> toString
-        , onKeyDown =
-            \code maybeId ->
-                if code == 38 || code == 40 then
-                    --Maybe.map PreviewPerson maybeId
-                    Maybe.map SelectPoint maybeId
-                else if code == 13 then
-                    --Maybe.map SelectPersonKeyboard maybeId
-                    Maybe.map SelectPoint maybeId
-                else
-                    Just <| Reset
-        , onTooLow = Nothing --Just <| Wrap False
-        , onTooHigh = Nothing --Just <| Wrap True
-        , onMouseEnter = \_ -> Nothing --\id -> Just <| PreviewPerson id
-        , onMouseLeave = \_ -> Nothing
-        , onMouseClick = \id -> Just <| SelectPoint id --SelectPersonMouse id
-        , separateSelections = False
-        }
-
-
-
 -- view code
-
-
-viewPointSelect : Data -> State -> Html AutoMsg
-viewPointSelect data state =
-    let
-        options =
-            { preventDefault = True, stopPropagation = False }
-
-        dec =
-            Json.map
-                (\code ->
-                    if code == 38 || code == 40 then
-                        Ok NoOp
-                    else if code == 27 then
-                        Ok HandleEscape
-                    else
-                        Err "not handling that key"
-                )
-                Html.keyCode
-                |> Json.andThen
-                    fromResult
-
-        fromResult : Result String a -> Json.Decoder a
-        fromResult result =
-            case result of
-                Ok val ->
-                    Json.succeed val
-
-                Err reason ->
-                    Json.fail reason
-
-        query =
-            case state.selectedPoint of
-                Just ( id, point ) ->
-                    toString id
-
-                Nothing ->
-                    state.query
-
-        menu =
-            if state.showMenu then
-                [ viewMenu data state ]
-            else
-                []
-    in
-    Html.div
-        [ Html.class "tool__ValueContainer"
-        ]
-        [ List.append
-            [ Html.input
-                [ Html.onInput SetQuery
-                , Html.onFocus OnFocus
-                , Html.onWithOptions "keydown" options dec
-                , Html.value query
-                , Html.placeholder "anchor point"
-                , Html.autocomplete False
-                , Html.style
-                    [ ( "border-color", "transparent" )
-                    , ( "font-family", "monospace" )
-                    , ( "font-size", "1rem" )
-                    , ( "line-height", "1rem" )
-                    , ( "width", "10rem" )
-                    , ( "background-color", "transparent" )
-                    ]
-                ]
-                []
-            ]
-            menu
-            |> Html.div []
-        ]
-
-
-viewMenu : Data -> State -> Html AutoMsg
-viewMenu data state =
-    Html.div
-        [ Html.style
-            [ ( "position", "relative" )
-            , ( "width", "100%" )
-            ]
-        ]
-        [ filteredPoints state.query data
-            |> Autocomplete.view
-                viewConfig
-                state.howManyToShow
-                state.autoState
-            |> map SetAutoState
-        ]
-
-
-viewConfig : Autocomplete.ViewConfig ( Int, Point )
-viewConfig =
-    Autocomplete.viewConfig
-        { toId = Tuple.first >> toString
-        , ul =
-            [ Html.style
-                [ ( "position", "absolute" )
-                , ( "width", "100%" )
-                , ( "background-color", "#999" )
-                , ( "list-style", "none" )
-                , ( "padding", "0" )
-                , ( "margin", "0" )
-                ]
-            ]
-        , li =
-            \_ _ ( id, point ) ->
-                { attributes =
-                    [ Html.style
-                        []
-                    ]
-                , children =
-                    [ Html.text ("point " ++ toString id) ]
-                }
-        }
-
-
-
 -- helpers
-
-
-setQuery : Data -> State -> String -> State
-setQuery data state id =
-    { state
-        | query = id
-        , selectedPoint =
-            id
-                |> String.toInt
-                |> Result.toMaybe
-                |> Maybe.andThen
-                    (\id ->
-                        Dict.get id data.store
-                            |> Maybe.map (\point -> ( id, point ))
-                    )
-    }
-
-
-resetInput : State -> State
-resetInput state =
-    { state | query = "" }
-        |> removeSelection
-        |> resetMenu
-
-
-removeSelection : State -> State
-removeSelection state =
-    { state | selectedPoint = Nothing }
-
-
-resetMenu : State -> State
-resetMenu state =
-    { state
-        | autoState = Autocomplete.empty
-        , showMenu = False
-    }
-
-
-filteredPoints : String -> Data -> List ( Int, Point )
-filteredPoints query data =
-    let
-        lowerQuery =
-            String.toLower query
-
-        keepPoint ( id, point ) =
-            toString id
-                |> String.contains lowerQuery
-    in
-    data.store
-        |> Dict.toList
-        |> List.filter keepPoint
-
-
-
 --
 
 
@@ -496,12 +196,14 @@ view callbacks updateStateCallback data state =
             (\s -> { state | y = parse s }) >> updateStateCallback
 
         updateAutoState autoMsg =
-            updateStateCallback (updateState data autoMsg state)
+            updateStateCallback
+                { state
+                    | dropdownState =
+                        updateDropdownState data autoMsg state.dropdownState
+                }
     in
-    [ viewPointSelect data state
+    [ viewPointSelect data state.dropdownState
         |> map updateAutoState
-
-    --idDropdown data state.anchor updateAnchor
     , exprInput "horizontal distance" state.x updateX
     , exprInput "vertical distance" state.y updateY
     ]
