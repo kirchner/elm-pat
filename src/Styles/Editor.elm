@@ -35,7 +35,9 @@ css =
     in
     (stylesheet << namespace "editor__")
         [ body
-            [ margin zero ]
+            [ margin zero
+            , overflow hidden
+            ]
         , class Main
             [ position relative ]
         , class MouseMove
