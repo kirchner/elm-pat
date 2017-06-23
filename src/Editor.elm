@@ -295,7 +295,11 @@ update msg model =
                 Just id ->
                     if List.member Keyboard.Shift model.pressedKeys then
                         { model
-                            | selectedPoints = id :: model.selectedPoints
+                            | selectedPoints =
+                                  if List.member id model.selectedPoints then
+                                          List.filter ((/=) id) model.selectedPoints
+                                      else
+                                          id :: model.selectedPoints
                         }
                             ! []
                     else
