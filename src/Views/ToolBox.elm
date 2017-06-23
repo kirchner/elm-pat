@@ -14,11 +14,12 @@ import Styles.ToolBox
         ( Class(..)
         , class
         )
+import Tools.Common exposing (Data)
 import Views.Common exposing (iconBig)
 
 
-view : Html Msg
-view =
+view : Data -> Html Msg
+view data =
     let
         button tool =
             iconBig "edit" (UpdateTool tool)
@@ -36,4 +37,4 @@ view =
     in
     Html.div
         [ class [ Container ] ]
-        (allTools |> List.map button)
+        (allTools data |> List.map button)

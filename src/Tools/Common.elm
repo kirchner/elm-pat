@@ -42,7 +42,7 @@ type alias Data =
     , cursorPosition : Maybe Position
     , focusedPoint : Maybe Id
     , pressedKeys : List Key
-    , selectedPoints : Set Id
+    , selectedPoints : List Id
     }
 
 

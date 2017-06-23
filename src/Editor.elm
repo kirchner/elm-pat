@@ -53,7 +53,7 @@ type alias Model =
     , cursorPosition : Maybe Position
     , focusedPoint : Maybe Id
     , pressedKeys : List Key
-    , selectedPoints : Set Id
+    , selectedPoints : List Id
     }
 
 
@@ -118,10 +118,10 @@ toolDescription tool =
             "select"
 
 
-allTools : List Tool
-allTools =
+allTools : Data -> List Tool
+allTools data =
     [ Absolute Absolute.init
-    , Relative Relative.init
+    , Relative (Relative.init data)
     , Distance Distance.init
     ]
 
@@ -169,7 +169,7 @@ init =
     , cursorPosition = Nothing
     , focusedPoint = Nothing
     , pressedKeys = []
-    , selectedPoints = Set.empty
+    , selectedPoints = []
     }
         ! [ Task.perform Resize Window.size ]
 
@@ -282,17 +282,17 @@ update msg model =
                 Just id ->
                     if List.member Keyboard.Shift model.pressedKeys then
                         { model
-                            | selectedPoints = Set.insert id model.selectedPoints
+                            | selectedPoints = id :: model.selectedPoints
                         }
                             ! []
                     else
-                        { model | selectedPoints = Set.singleton id } ! []
+                        { model | selectedPoints = [ id ] } ! []
 
                 Nothing ->
                     model ! []
 
         ClearSelection ->
-            { model | selectedPoints = Set.empty } ! []
+            { model | selectedPoints = [] } ! []
 
 
 getViewPort : ViewPort -> Maybe Drag -> ViewPort

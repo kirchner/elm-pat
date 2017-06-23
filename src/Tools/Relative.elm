@@ -38,8 +38,7 @@ import Types exposing (..)
 
 
 type alias State =
-    { anchor : Maybe String
-    , x : Maybe E
+    { x : Maybe E
     , y : Maybe E
     , id : Maybe Id
     , dropdownState : Tools.DropdownState
@@ -47,24 +46,34 @@ type alias State =
     }
 
 
-init : State
-init =
-    { anchor = Nothing
-    , x = Nothing
+init : Data -> State
+init data =
+    { x = Nothing
     , y = Nothing
     , id = Nothing
     , dropdownState = Tools.initDropdownState
-    , selectedPoint = Nothing
+    , selectedPoint =
+        case List.head data.selectedPoints of
+            Just id ->
+                case Dict.get id data.store of
+                    Just point ->
+                        Just ( id, point )
+
+                    Nothing ->
+                        Nothing
+
+            Nothing ->
+                Nothing
     }
 
 
 initWith : Id -> Id -> E -> E -> State
 initWith id anchor x y =
-    { init
-        | anchor = Just (toString anchor)
-        , x = Just x
-        , y = Just y
-        , id = Just id
+    { x = Just x
+    , y = Just y
+    , id = Just id
+    , dropdownState = Tools.initDropdownState
+    , selectedPoint = Nothing
     }
 
 
@@ -130,8 +139,18 @@ svg callbacks updateState data state =
         Nothing ->
             let
                 selectPoint =
-                    -- TODO use selectedPoint instead of anchor
-                    (\id -> { state | anchor = id |> Maybe.map toString })
+                    (\maybeId ->
+                        { state
+                            | selectedPoint =
+                                case maybeId of
+                                    Just id ->
+                                        Dict.get id data.store
+                                            |> Maybe.map (\point -> ( id, point ))
+
+                                    Nothing ->
+                                        Nothing
+                        }
+                    )
                         >> updateState
             in
             [ svgSelectPoint callbacks.focusPoint selectPoint data ]

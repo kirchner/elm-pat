@@ -59,7 +59,7 @@ view model =
     [ Just <|
         Html.div
             [ class [ Container, ContainerTopLeftLeft ] ]
-            [ ToolBox.view ]
+            [ ToolBox.view (data model) ]
     , viewToolInfo callbacks (data model) model.tool
     , Just <|
         Html.div

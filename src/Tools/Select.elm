@@ -32,7 +32,6 @@ svg callbacks data =
 viewSelectedPoints : Data -> Svg msg
 viewSelectedPoints data =
     data.selectedPoints
-        |> Set.toList
         |> List.filterMap (viewSelectedPoint data)
         |> Svg.g []
 
