@@ -134,7 +134,7 @@ allTools : Data -> List Tool
 allTools data =
     [ Absolute Absolute.init
     , Relative (Relative.init data)
-    , Distance Distance.init
+    , Distance (Distance.init data)
     ]
 
 
@@ -190,8 +190,14 @@ init =
         ! [ Task.perform Resize Window.size ]
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+type alias Ports =
+    { autofocus : () -> Cmd Msg
+    }
+
+
+update : Ports -> Msg -> Model -> ( Model, Cmd Msg )
+update ports msg model =
+    updateAutoFocus ports model <|
     case msg of
         UpdateTool tool ->
             { model | tool = tool } ! []
@@ -337,7 +343,7 @@ update msg model =
 
                                 Keyboard.CharE ->
                                     if List.member Keyboard.Shift model.pressedKeys then
-                                        Distance Distance.init
+                                        Distance (Distance.init (data model))
                                     else
                                         Relative (Relative.init (data model))
 
@@ -391,6 +397,15 @@ update msg model =
 
                 Nothing ->
                     { model | tool = None } ! []
+
+
+updateAutoFocus ports oldModel ( model, cmd ) =
+    ( model ,
+      if (oldModel.tool == None) && (model.tool /= None) then
+          Cmd.batch [ ports.autofocus (), cmd ]
+      else
+          cmd
+    )
 
 
 getViewPort : ViewPort -> Maybe Drag -> ViewPort

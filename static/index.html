@@ -28,6 +28,15 @@
 
     <script type="text/javascript">
       var app = Elm.App.embed(document.getElementById("elm-landing-pad"));
+
+      app.ports.autofocus.subscribe(function() {
+        window.requestAnimationFrame(function() {
+          var node = document.querySelector('[autofocus]');
+          if (node && (node != document.activeElement)) {
+              document.querySelector('[autofocus]').focus();
+          }
+        });
+      });
     </script>
   </body>
 </html>

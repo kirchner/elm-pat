@@ -4,6 +4,7 @@ module Tools.Common
         , Data
         , DropdownState
         , exprInput
+        , exprInput_
         , idDropdown
         , initDropdownState
         , svgSelectPoint
@@ -183,6 +184,36 @@ exprInput name e callback =
                     |> Maybe.map print
                     |> Maybe.withDefault name
                 )
+            , class [ Textfield ]
+            ]
+            []
+         ]
+            ++ deleteIcon
+        )
+
+
+exprInput_ : Bool -> String -> Maybe E -> (String -> msg) -> Html msg
+exprInput_ autoFocus name e callback =
+    let
+        deleteIcon =
+            if e /= Nothing then
+                [ Html.div
+                    [ class [ IconContainer ] ]
+                    [ iconSmall "delete" (callback "") ]
+                ]
+            else
+                []
+    in
+    Html.div
+        [ class [ ValueContainer ] ]
+        ([ Html.input
+            [ Html.onInput callback
+            , Html.placeholder
+                (e
+                    |> Maybe.map print
+                    |> Maybe.withDefault name
+                )
+            , Html.autofocus autoFocus
             , class [ Textfield ]
             ]
             []

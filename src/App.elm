@@ -1,4 +1,4 @@
-module App exposing (main)
+port module App exposing (main)
 
 import Html exposing (Html)
 
@@ -20,7 +20,14 @@ main : Program Never Model Msg
 main =
     Html.program
         { init = init
-        , update = update
+        , update = update ports
         , subscriptions = subscriptions
         , view = view
         }
+
+
+ports =
+    { autofocus = autofocus }
+
+
+port autofocus : () -> Cmd msg

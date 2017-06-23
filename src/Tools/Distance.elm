@@ -27,6 +27,7 @@ import Tools.Common as Tools
         ( Callbacks
         , Data
         , exprInput
+        , exprInput_
         , idDropdown
         , svgSelectPoint
         , svgUpdateMouse
@@ -43,9 +44,9 @@ type alias State =
     }
 
 
-init : State
-init =
-    { anchor = Nothing
+init : Data -> State
+init data =
+    { anchor = Maybe.map toString (List.head data.selectedPoints)
     , distance = Nothing
     , angle = Nothing
     , id = Nothing
@@ -225,7 +226,7 @@ view callbacks updateState data state =
             (\s -> { state | angle = parse s }) >> updateState
     in
     [ idDropdown data state.anchor updateAnchor
-    , exprInput "distance" state.distance updateDistance
+    , exprInput_ True "distance" state.distance updateDistance
     , exprInput "angle" state.angle updateAngle
     ]
         |> Tools.view callbacks data state point
