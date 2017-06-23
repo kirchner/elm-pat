@@ -65,12 +65,10 @@ css =
                     ]
                 ]
             , class RowSelected
-                [ backgroundColor (hex green)
-                , color (hex base02)
+                [ color (hex yellow)
                 ]
             , class RowSelectedLast
-                [ backgroundColor (hex green)
-                , color (hex base03)
+                [ color (hex orange)
                 ]
             , class CellId
                 [ width (rem 1)
