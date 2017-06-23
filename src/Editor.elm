@@ -146,6 +146,7 @@ type Msg
     | UpdateCursorPosition (Maybe Position)
     | FocusPoint (Maybe Id)
     | KeyMsg Keyboard.Msg
+    | KeyDown Keyboard.Key
     | SelectPoint (Maybe Id)
     | ClearSelection
 
@@ -290,6 +291,28 @@ update msg model =
             }
                 ! []
 
+        KeyDown key ->
+            { model
+                | tool =
+                      case key of
+
+                        Keyboard.CharA ->
+                          Absolute Absolute.init
+
+                        Keyboard.CharE ->
+                          if List.member Keyboard.Shift model.pressedKeys then
+                              Distance Distance.init
+                          else
+                              Relative (Relative.init (data model))
+
+                        Keyboard.Escape ->
+                          None
+
+                        _ ->
+                          model.tool
+            }
+                ! []
+
         SelectPoint maybeId ->
             case maybeId of
                 Just id ->
@@ -333,6 +356,7 @@ subscriptions model =
                 [ Window.resizes Resize
                 , Keyboard.subscriptions
                     |> Sub.map KeyMsg
+                , Keyboard.downs KeyDown
                 ]
 
         Just _ ->
