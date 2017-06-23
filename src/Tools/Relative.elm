@@ -32,7 +32,6 @@ import Tools.Common as Tools
         , svgUpdateMouse
         , updateDropdownState
         , viewPointSelect
-        , selectedPoint
         )
 import Tools.Styles exposing (..)
 import Types exposing (..)
@@ -59,13 +58,6 @@ init =
     }
 
 
-
--- autocomplete
--- view code
--- helpers
---
-
-
 initWith : Id -> Id -> E -> E -> State
 initWith id anchor x y =
     { init
@@ -80,8 +72,8 @@ point : Data -> State -> Maybe Point
 point data state =
     let
         anchorId =
-            state.anchor
-                |> Maybe.andThen (String.toInt >> Result.toMaybe)
+            state.selectedPoint
+                |> Maybe.map Tuple.first
 
         anchorPosition =
             anchorId
@@ -138,6 +130,7 @@ svg callbacks updateState data state =
         Nothing ->
             let
                 selectPoint =
+                    -- TODO use selectedPoint instead of anchor
                     (\id -> { state | anchor = id |> Maybe.map toString })
                         >> updateState
             in
@@ -186,9 +179,6 @@ verticalLine data state anchorPosition =
 view : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
 view callbacks updateStateCallback data state =
     let
-        updateAnchor =
-            (\id -> { state | anchor = id }) >> updateStateCallback
-
         updateX =
             (\s -> { state | x = parse s }) >> updateStateCallback
 
@@ -196,13 +186,21 @@ view callbacks updateStateCallback data state =
             (\s -> { state | y = parse s }) >> updateStateCallback
 
         updateAutoState autoMsg =
+            let
+                ( newDropdownState, newSelectedPoint ) =
+                    updateDropdownState
+                        state.selectedPoint
+                        data
+                        autoMsg
+                        state.dropdownState
+            in
             updateStateCallback
                 { state
-                    | dropdownState =
-                        updateDropdownState data autoMsg state.dropdownState
+                    | dropdownState = newDropdownState
+                    , selectedPoint = newSelectedPoint
                 }
     in
-    [ viewPointSelect data state.dropdownState
+    [ viewPointSelect state.selectedPoint data state.dropdownState
         |> map updateAutoState
     , exprInput "horizontal distance" state.x updateX
     , exprInput "vertical distance" state.y updateY
@@ -216,8 +214,8 @@ view callbacks updateStateCallback data state =
 
 anchorPosition : Data -> State -> Maybe Vec2
 anchorPosition data state =
-    state.anchor
-        |> Maybe.andThen (String.toInt >> Result.toMaybe)
+    state.selectedPoint
+        |> Maybe.map Tuple.first
         |> Maybe.andThen (flip Dict.get data.store)
         |> Maybe.andThen (position data.store data.variables)
 

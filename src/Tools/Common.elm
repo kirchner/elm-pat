@@ -11,7 +11,6 @@ module Tools.Common
         , updateDropdownState
         , view
         , viewPointSelect
-        , selectedPoint
         )
 
 import Autocomplete
@@ -191,13 +190,7 @@ type alias DropdownState =
     , howManyToShow : Int
     , query : String
     , showMenu : Bool
-    , selectedPoint : Maybe ( Int, Point )
     }
-
-
-selectedPoint : DropdownState -> Maybe ( Int, Point )
-selectedPoint dropdownState =
-    dropdownState.selectedPoint
 
 
 initDropdownState : DropdownState
@@ -206,36 +199,29 @@ initDropdownState =
     , howManyToShow = 5
     , query = ""
     , showMenu = False
-    , selectedPoint = Nothing
     }
 
 
-setQuery : Data -> DropdownState -> String -> DropdownState
+setQuery : Data -> DropdownState -> String -> ( DropdownState, Maybe ( Int, Point ) )
 setQuery data state id =
-    { state
-        | query = id
-        , selectedPoint =
-            id
-                |> String.toInt
-                |> Result.toMaybe
-                |> Maybe.andThen
-                    (\id ->
-                        Dict.get id data.store
-                            |> Maybe.map (\point -> ( id, point ))
-                    )
-    }
+    ( { state | query = id }
+    , id
+        |> String.toInt
+        |> Result.toMaybe
+        |> Maybe.andThen
+            (\id ->
+                Dict.get id data.store
+                    |> Maybe.map (\point -> ( id, point ))
+            )
+    )
 
 
-resetInput : DropdownState -> DropdownState
+resetInput : DropdownState -> ( DropdownState, Maybe ( Int, Point ) )
 resetInput state =
-    { state | query = "" }
-        |> removeSelection
+    ( { state | query = "" }
         |> resetMenu
-
-
-removeSelection : DropdownState -> DropdownState
-removeSelection state =
-    { state | selectedPoint = Nothing }
+    , Nothing
+    )
 
 
 resetMenu : DropdownState -> DropdownState
@@ -271,19 +257,25 @@ type DropdownMsg
     | NoOp
 
 
-updateDropdownState : Data -> DropdownMsg -> DropdownState -> DropdownState
-updateDropdownState data autoMsg state =
+updateDropdownState :
+    Maybe ( Int, Point )
+    -> Data
+    -> DropdownMsg
+    -> DropdownState
+    -> ( DropdownState, Maybe ( Int, Point ) )
+updateDropdownState selectedPoint data autoMsg state =
     case autoMsg of
         SetQuery newQuery ->
             let
                 showMenu =
                     not (List.isEmpty (filteredPoints newQuery data))
             in
-            { state
+            ( { state
                 | query = newQuery
                 , showMenu = showMenu
-                , selectedPoint = Nothing
-            }
+              }
+            , Nothing
+            )
 
         SetAutoState autoMsg ->
             let
@@ -300,28 +292,28 @@ updateDropdownState data autoMsg state =
             in
             case maybeMsg of
                 Nothing ->
-                    newState
+                    ( newState, Nothing )
 
                 Just updateMsg ->
-                    updateDropdownState data updateMsg newState
+                    updateDropdownState selectedPoint data updateMsg newState
 
         SelectPoint id ->
             let
-                newState =
+                ( dirtyState, selection ) =
                     setQuery data state id
-                        |> resetMenu
             in
-            newState
+            ( dirtyState |> resetMenu, selection )
 
         Reset ->
-            { state
+            ( { state
                 | autoState =
                     Autocomplete.reset updateConfig state.autoState
-                , selectedPoint = Nothing
-            }
+              }
+            , Nothing
+            )
 
         OnFocus ->
-            { state | showMenu = not state.showMenu }
+            ( { state | showMenu = not state.showMenu }, Nothing )
 
         HandleEscape ->
             let
@@ -330,15 +322,16 @@ updateDropdownState data autoMsg state =
 
                 handleEscape =
                     if validOptions then
-                        state
-                            |> removeSelection
+                        ( state
                             |> resetMenu
+                        , Nothing
+                        )
                     else
                         state
                             |> resetInput
 
                 escapedState =
-                    case state.selectedPoint of
+                    case selectedPoint of
                         Just ( id, point ) ->
                             if state.query == toString id then
                                 state
@@ -352,7 +345,7 @@ updateDropdownState data autoMsg state =
             escapedState
 
         NoOp ->
-            state
+            ( state, selectedPoint )
 
 
 updateConfig : Autocomplete.UpdateConfig DropdownMsg ( Int, Point )
@@ -378,8 +371,8 @@ updateConfig =
         }
 
 
-viewPointSelect : Data -> DropdownState -> Html DropdownMsg
-viewPointSelect data state =
+viewPointSelect : Maybe ( Int, Point ) -> Data -> DropdownState -> Html DropdownMsg
+viewPointSelect selectedPoint data state =
     let
         options =
             { preventDefault = True, stopPropagation = False }
@@ -408,7 +401,7 @@ viewPointSelect data state =
                     Json.fail reason
 
         query =
-            case state.selectedPoint of
+            case selectedPoint of
                 Just ( id, point ) ->
                     toString id
 
