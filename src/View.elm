@@ -36,7 +36,6 @@ import Tools.Common
         )
 import Tools.Distance as Distance
 import Tools.Relative as Relative
-import Tools.Select as Select
 import Types
     exposing
         ( Id
@@ -103,7 +102,7 @@ viewToolInfo callbacks data tool =
                     [ class [ Container, ContainerTopLeft ] ]
                     [ Distance.view callbacks (UpdateTool << Distance) data state ]
 
-        Select ->
+        None ->
             Nothing
 
 
@@ -116,9 +115,9 @@ viewCanvas model =
     Canvas.view
         (drawTool callbacks (data model) model.tool)
         DragStart
-        (getViewPort model.viewPort model.drag)
-        model.store
-        model.variables
+        FocusPoint
+        SelectPoint
+        (data model)
 
 
 drawTool : Callbacks Msg -> Data -> Tool -> Svg Msg
@@ -133,5 +132,5 @@ drawTool callbacks data tool =
         Distance state ->
             Distance.svg callbacks (UpdateTool << Distance) data state
 
-        Select ->
-            Select.svg callbacks data
+        None ->
+            Svg.g [] []

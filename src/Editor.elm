@@ -36,7 +36,6 @@ import Tools.Common
         )
 import Tools.Distance as Distance
 import Tools.Relative as Relative
-import Tools.Select as Select
 import Types exposing (..)
 import Window
 
@@ -61,7 +60,7 @@ data : Model -> Data
 data model =
     { store = model.store
     , variables = model.variables
-    , viewPort = model.viewPort
+    , viewPort = getViewPort model.viewPort model.drag
     , cursorPosition = model.cursorPosition
     , focusedPoint = model.focusedPoint
     , pressedKeys = model.pressedKeys
@@ -83,7 +82,7 @@ type Tool
     = Absolute Absolute.State
     | Relative Relative.State
     | Distance Distance.State
-    | Select
+    | None
 
 
 toolName : Tool -> String
@@ -98,8 +97,8 @@ toolName tool =
         Distance _ ->
             "distance"
 
-        Select ->
-            "select"
+        None ->
+            "none"
 
 
 toolDescription : Tool -> String
@@ -114,8 +113,8 @@ toolDescription tool =
         Distance _ ->
             "distance"
 
-        Select ->
-            "select"
+        None ->
+            "none"
 
 
 allTools : Data -> List Tool
@@ -158,7 +157,7 @@ init =
     , variables = Dict.empty
     , newName = Nothing
     , newValue = Nothing
-    , tool = Select
+    , tool = None
     , viewPort =
         { x = -320
         , y = -320
@@ -184,7 +183,7 @@ update msg model =
             { model
                 | store = Dict.insert model.nextId point model.store
                 , nextId = model.nextId + 1
-                , tool = Select
+                , tool = None
                 , cursorPosition = Nothing
                 , focusedPoint = Nothing
             }
@@ -193,7 +192,7 @@ update msg model =
         UpdatePoint id point ->
             { model
                 | store = Dict.update id (\_ -> Just point) model.store
-                , tool = Select
+                , tool = None
             }
                 ! []
 
@@ -254,9 +253,22 @@ update msg model =
                 ! []
 
         DragStop position ->
+            let
+                selectedPoints =
+                    case model.drag of
+                        Just drag ->
+                            if drag.start == drag.current then
+                                []
+                            else
+                                model.selectedPoints
+
+                        Nothing ->
+                            model.selectedPoints
+            in
             { model
                 | drag = Nothing
                 , viewPort = getViewPort model.viewPort model.drag
+                , selectedPoints = selectedPoints
             }
                 ! []
 

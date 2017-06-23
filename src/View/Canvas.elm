@@ -11,37 +11,44 @@ import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
 import Svg.Extra as Svg
+import Tools.Common
+    exposing
+        ( Data
+        , svgSelectPoint
+        )
 import Types exposing (..)
 
 
 view :
     Svg msg
     -> (Position -> msg)
-    -> ViewPort
-    -> PointStore
-    -> Dict String E
+    -> (Maybe Id -> msg)
+    -> (Maybe Id -> msg)
+    -> Data
     -> Html msg
-view tool startDrag viewPort store variables =
+view tool startDrag focusPoint selectPoint data =
     let
         viewBoxString =
             String.join " "
-                [ toString viewPort.x
-                , toString viewPort.y
-                , toString viewPort.width
-                , toString viewPort.height
+                [ toString data.viewPort.x
+                , toString data.viewPort.y
+                , toString data.viewPort.width
+                , toString data.viewPort.height
                 ]
     in
     Svg.svg
         [ Svg.viewBox viewBoxString
         , Html.style
             [ ( "background-color", Colors.base3 )
-            , ( "width", toString viewPort.width )
-            , ( "height", toString viewPort.height )
+            , ( "width", toString data.viewPort.width )
+            , ( "height", toString data.viewPort.height )
             ]
         ]
-        [ dragArea startDrag viewPort
-        , origin
-        , Svg.g [] (points store variables)
+        [ origin
+        , Svg.g [] (points data)
+        , viewSelectedPoints data
+        , dragArea startDrag data.viewPort
+        , svgSelectPoint focusPoint selectPoint data
         , tool
         ]
 
@@ -58,6 +65,32 @@ dragArea startDrag viewPort =
         , Events.onMouseDown startDrag
         ]
         []
+
+
+viewSelectedPoints : Data -> Svg msg
+viewSelectedPoints data =
+    data.selectedPoints
+        |> List.filterMap (viewSelectedPoint data)
+        |> Svg.g []
+
+
+viewSelectedPoint : Data -> Id -> Maybe (Svg msg)
+viewSelectedPoint data id =
+    let
+        pointPosition =
+            Dict.get id data.store
+                |> Maybe.andThen (position data.store data.variables)
+    in
+    case pointPosition of
+        Just position ->
+            Just <|
+                Svg.g []
+                    [ Svg.drawPoint position
+                    , Svg.drawSelector position
+                    ]
+
+        Nothing ->
+            Nothing
 
 
 origin : Svg msg
@@ -84,17 +117,17 @@ origin =
         ]
 
 
-points : PointStore -> Dict String E -> List (Svg msg)
-points store variables =
-    Dict.values store
-        |> List.filterMap (point store variables)
+points : Data -> List (Svg msg)
+points data =
+    Dict.values data.store
+        |> List.filterMap (point data)
 
 
-point : PointStore -> Dict String E -> Point -> Maybe (Svg msg)
-point store variables point =
+point : Data -> Point -> Maybe (Svg msg)
+point data point =
     case point of
         Absolute _ _ ->
-            position store variables point
+            position data.store data.variables point
                 |> Maybe.map Svg.drawPoint
 
         Relative id _ _ ->
@@ -107,8 +140,8 @@ point store variables point =
             in
             Maybe.map2
                 draw
-                (positionById store variables id)
-                (position store variables point)
+                (positionById data.store data.variables id)
+                (position data.store data.variables point)
 
         Distance id _ _ ->
             let
@@ -120,8 +153,8 @@ point store variables point =
             in
             Maybe.map2
                 draw
-                (positionById store variables id)
-                (position store variables point)
+                (positionById data.store data.variables id)
+                (position data.store data.variables point)
 
         Between idA idB _ ->
             Just (Svg.g [] [])
