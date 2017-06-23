@@ -17,7 +17,7 @@ import Html.Attributes as Html
 import Html.Events as Html
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
-import Styles.Colors exposing (..)
+import Styles.Colors as Colors exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
@@ -165,8 +165,8 @@ newPoint data state =
                 |> Maybe.map
                     (\pointPosition ->
                         Svg.g []
-                            [ Svg.drawPoint pointPosition
-                            , Svg.drawSelector pointPosition
+                            [ Svg.drawPoint Colors.red pointPosition
+                            , Svg.drawSelector Svg.Solid Colors.red pointPosition
                             , Svg.drawRectArrow anchorPosition pointPosition
                             ]
                     )

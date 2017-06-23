@@ -1,6 +1,7 @@
 module Svg.Extra
     exposing
-        ( drawArrow
+        ( StrokeStyle(..)
+        , drawArrow
         , drawHorizontalLine
         , drawPoint
         , drawRectArrow
@@ -14,27 +15,38 @@ import Svg exposing (Svg)
 import Svg.Attributes as Svg
 
 
-drawPoint : Vec2 -> Svg msg
-drawPoint v =
+drawPoint : String -> Vec2 -> Svg msg
+drawPoint color v =
     Svg.circle
         [ Svg.cx (toString (getX v))
         , Svg.cy (toString (getY v))
         , Svg.r "3.5"
         , Svg.strokeWidth "0"
-        , Svg.fill Colors.base0
+        , Svg.fill color
         ]
         []
 
 
-drawSelector : Vec2 -> Svg msg
-drawSelector v =
+type StrokeStyle
+    = Dashed
+    | Solid
+
+
+drawSelector : StrokeStyle -> String -> Vec2 -> Svg msg
+drawSelector strokeStyle color v =
     Svg.circle
         [ Svg.cx (toString (getX v))
         , Svg.cy (toString (getY v))
         , Svg.r "7"
         , Svg.strokeWidth "1"
-        , Svg.stroke Colors.base1
+        , Svg.stroke color
         , Svg.fill "none"
+        , case strokeStyle of
+            Dashed ->
+                Svg.strokeDasharray "5, 5"
+
+            Solid ->
+                Svg.strokeDasharray "none"
         ]
         []
 

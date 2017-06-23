@@ -136,8 +136,8 @@ newPoint data state =
                 |> Maybe.map
                     (\pointPosition ->
                         Svg.g []
-                            [ Svg.drawPoint pointPosition
-                            , Svg.drawSelector pointPosition
+                            [ Svg.drawPoint Colors.red pointPosition
+                            , Svg.drawSelector Svg.Solid Colors.red pointPosition
                             , Svg.drawArrow anchorPosition pointPosition
                             ]
                     )

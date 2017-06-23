@@ -13,7 +13,6 @@ module Tools.Common
         , viewPointSelect
         )
 
-import Set exposing (Set)
 import Autocomplete
 import Dict exposing (Dict)
 import Dropdown
@@ -26,6 +25,8 @@ import Json.Decode as Json
 import Keyboard.Extra exposing (Key)
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
+import Set exposing (Set)
+import Styles.Colors as Colors
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
@@ -108,7 +109,7 @@ pointSelector_ focusPoint selectPoint data ( id, point ) =
                     ]
                     []
                 , if id |> equals data.focusedPoint then
-                    Svg.drawSelector v
+                    Svg.drawSelector Svg.Solid Colors.red v
                   else
                     Svg.g [] []
                 ]
@@ -124,8 +125,8 @@ drawCursor position =
             toTuple position
     in
     Svg.g []
-        [ Svg.drawPoint (vec2 x y)
-        , Svg.drawSelector (vec2 x y)
+        [ Svg.drawPoint Colors.base0 (vec2 x y)
+        , Svg.drawSelector Svg.Solid Colors.base1 (vec2 x y)
         ]
 
 

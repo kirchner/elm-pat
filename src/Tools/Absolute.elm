@@ -15,7 +15,7 @@ import Html.Attributes as Html
 import Html.Events as Html
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
-import Styles.Colors exposing (..)
+import Styles.Colors as Colors exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
@@ -98,8 +98,8 @@ newPoint data state =
     let
         draw x y =
             Svg.g []
-                [ Svg.drawPoint (vec2 x y)
-                , Svg.drawSelector (vec2 x y)
+                [ Svg.drawPoint Colors.red (vec2 x y)
+                , Svg.drawSelector Svg.Solid Colors.red (vec2 x y)
                 ]
 
         xState =

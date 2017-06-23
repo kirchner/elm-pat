@@ -194,13 +194,28 @@ dragArea startDrag viewPort =
 
 viewSelectedPoints : Data -> Svg msg
 viewSelectedPoints data =
-    data.selectedPoints
-        |> List.filterMap (viewSelectedPoint data)
+    let
+        tail list =
+            case List.tail list of
+                Just rest ->
+                    rest
+
+                Nothing ->
+                    []
+    in
+    (List.head data.selectedPoints
+        |> Maybe.andThen (viewSelectedPoint data True)
+    )
+        :: (data.selectedPoints
+                |> tail
+                |> List.map (viewSelectedPoint data False)
+           )
+        |> List.filterMap identity
         |> Svg.g []
 
 
-viewSelectedPoint : Data -> Id -> Maybe (Svg msg)
-viewSelectedPoint data id =
+viewSelectedPoint : Data -> Bool -> Id -> Maybe (Svg msg)
+viewSelectedPoint data first id =
     let
         pointPosition =
             Dict.get id data.store
@@ -210,9 +225,15 @@ viewSelectedPoint data id =
         Just position ->
             Just <|
                 Svg.g []
-                    [ Svg.drawPoint position
-                    , Svg.drawSelector position
-                    ]
+                    (if first then
+                        [ Svg.drawPoint Colors.red position
+                        , Svg.drawSelector Svg.Solid Colors.red position
+                        ]
+                     else
+                        [ Svg.drawPoint Colors.yellow position
+                        , Svg.drawSelector Svg.Solid Colors.yellow position
+                        ]
+                    )
 
         Nothing ->
             Nothing
@@ -253,13 +274,13 @@ point data point =
     case point of
         Absolute _ _ ->
             position data.store data.variables point
-                |> Maybe.map Svg.drawPoint
+                |> Maybe.map (Svg.drawPoint Colors.base0)
 
         Relative id _ _ ->
             let
                 draw v w =
                     Svg.g []
-                        [ Svg.drawPoint w
+                        [ Svg.drawPoint Colors.base0 w
                         , Svg.drawRectArrow v w
                         ]
             in
@@ -272,7 +293,7 @@ point data point =
             let
                 draw v w =
                     Svg.g []
-                        [ Svg.drawPoint w
+                        [ Svg.drawPoint Colors.base0 w
                         , Svg.drawArrow v w
                         ]
             in
