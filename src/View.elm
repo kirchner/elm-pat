@@ -15,6 +15,7 @@ import Expr exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.Events as Events
+import Keyboard.Extra exposing (Key)
 import Math.Vector2 exposing (..)
 import Styles.Colors exposing (..)
 import Styles.Editor
@@ -27,6 +28,7 @@ import Svg exposing (Svg)
 import Tools.Absolute as Absolute
 import Tools.Distance as Distance
 import Tools.Relative as Relative
+import Tools.Select as Select
 import Types
     exposing
         ( Id
@@ -54,6 +56,7 @@ view model =
         model.variables
         model.store
         model.cursorPosition
+        model.pressedKeys
         model.tool
     , Just <|
         Html.div
@@ -76,8 +79,8 @@ view model =
 {- tool box -}
 
 
-viewToolInfo : ViewPort -> Dict String E -> PointStore -> Maybe Position -> Tool -> Maybe (Html Msg)
-viewToolInfo viewPort variables store cursorPosition tool =
+viewToolInfo : ViewPort -> Dict String E -> PointStore -> Maybe Position -> List Key -> Tool -> Maybe (Html Msg)
+viewToolInfo viewPort variables store cursorPosition pressedKeys tool =
     let
         data =
             { store = store
@@ -85,6 +88,7 @@ viewToolInfo viewPort variables store cursorPosition tool =
             , viewPort = viewPort
             , cursorPosition = cursorPosition
             , focusedPoint = Nothing
+            , pressedKeys = pressedKeys
             }
 
         callbacks =
@@ -112,7 +116,7 @@ viewToolInfo viewPort variables store cursorPosition tool =
                     [ class [ Container, ContainerTopLeft ] ]
                     [ Distance.view callbacks (UpdateTool << Distance) data state ]
 
-        None ->
+        Select _ ->
             Nothing
 
 
@@ -128,6 +132,7 @@ viewCanvas model =
             model.store
             model.cursorPosition
             model.focusedPoint
+            model.pressedKeys
             model.tool
         )
         DragStart
@@ -142,9 +147,10 @@ drawTool :
     -> PointStore
     -> Maybe Position
     -> Maybe Id
+    -> List Key
     -> Tool
     -> Svg Msg
-drawTool viewPort variables store cursorPosition focusedPoint tool =
+drawTool viewPort variables store cursorPosition focusedPoint pressedKeys tool =
     let
         data =
             { store = store
@@ -152,6 +158,7 @@ drawTool viewPort variables store cursorPosition focusedPoint tool =
             , viewPort = viewPort
             , cursorPosition = cursorPosition
             , focusedPoint = focusedPoint
+            , pressedKeys = pressedKeys
             }
 
         callbacks =
@@ -170,5 +177,5 @@ drawTool viewPort variables store cursorPosition focusedPoint tool =
         Distance state ->
             Distance.svg callbacks (UpdateTool << Distance) data state
 
-        None ->
-            Svg.g [] []
+        Select state ->
+            Select.svg callbacks (UpdateTool << Select) data state

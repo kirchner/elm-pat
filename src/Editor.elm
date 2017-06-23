@@ -21,12 +21,15 @@ import Expr
         , parse
         , parseVariable
         )
+import Keyboard.Extra exposing (Key)
 import Math.Vector2 exposing (..)
 import Mouse
+import Set
 import Task
 import Tools.Absolute as Absolute
 import Tools.Distance as Distance
 import Tools.Relative as Relative
+import Tools.Select as Select
 import Types exposing (..)
 import Window
 
@@ -42,6 +45,7 @@ type alias Model =
     , drag : Maybe Drag
     , cursorPosition : Maybe Position
     , focusedPoint : Maybe Id
+    , pressedKeys : List Key
     }
 
 
@@ -49,7 +53,7 @@ type Tool
     = Absolute Absolute.State
     | Relative Relative.State
     | Distance Distance.State
-    | None
+    | Select Select.State
 
 
 toolName : Tool -> String
@@ -64,8 +68,8 @@ toolName tool =
         Distance _ ->
             "distance"
 
-        None ->
-            "none"
+        Select _ ->
+            "select"
 
 
 toolDescription : Tool -> String
@@ -80,8 +84,8 @@ toolDescription tool =
         Distance _ ->
             "distance"
 
-        None ->
-            "none"
+        Select _ ->
+            "select"
 
 
 allTools : List Tool
@@ -101,7 +105,6 @@ type alias Drag =
 type Msg
     = UpdateTool Tool
     | AddPoint Point
-    | SelectPoint Id
     | UpdatePoint Id Point
     | DeletePoint Id
     | ValueUpdated String
@@ -113,6 +116,7 @@ type Msg
     | DragStop Position
     | UpdateCursorPosition (Maybe Position)
     | FocusPoint (Maybe Id)
+    | KeyMsg Keyboard.Extra.Msg
 
 
 init : ( Model, Cmd Msg )
@@ -122,7 +126,7 @@ init =
     , variables = Dict.empty
     , newName = Nothing
     , newValue = Nothing
-    , tool = None
+    , tool = Select (Select.init Set.empty)
     , viewPort =
         { x = -320
         , y = -320
@@ -132,6 +136,7 @@ init =
     , drag = Nothing
     , cursorPosition = Nothing
     , focusedPoint = Nothing
+    , pressedKeys = []
     }
         ! [ Task.perform Resize Window.size ]
 
@@ -146,33 +151,16 @@ update msg model =
             { model
                 | store = Dict.insert model.nextId point model.store
                 , nextId = model.nextId + 1
-                , tool = None
+                , tool = Select (Select.init Set.empty)
                 , cursorPosition = Nothing
                 , focusedPoint = Nothing
             }
                 ! []
 
-        SelectPoint id ->
-            case Dict.get id model.store of
-                Just (Types.Absolute x y) ->
-                    { model
-                        | tool = Absolute (Absolute.initWith id x y)
-                    }
-                        ! []
-
-                Just (Types.Relative anchor p q) ->
-                    { model
-                        | tool = Relative (Relative.initWith id anchor p q)
-                    }
-                        ! []
-
-                _ ->
-                    { model | tool = None } ! []
-
         UpdatePoint id point ->
             { model
                 | store = Dict.update id (\_ -> Just point) model.store
-                , tool = None
+                , tool = Select (Select.init Set.empty)
             }
                 ! []
 
@@ -249,6 +237,13 @@ update msg model =
         FocusPoint id ->
             { model | focusedPoint = id } ! []
 
+        KeyMsg keyMsg ->
+            { model
+                | pressedKeys =
+                    Keyboard.Extra.update keyMsg model.pressedKeys
+            }
+                ! []
+
 
 getViewPort : ViewPort -> Maybe Drag -> ViewPort
 getViewPort oldViewPort drag =
@@ -268,11 +263,16 @@ subscriptions model =
     case model.drag of
         Nothing ->
             Sub.batch
-                [ Window.resizes Resize ]
+                [ Window.resizes Resize
+                , Keyboard.Extra.subscriptions
+                    |> Sub.map KeyMsg
+                ]
 
         Just _ ->
             Sub.batch
                 [ Window.resizes Resize
                 , Mouse.moves DragAt
                 , Mouse.ups DragStop
+                , Keyboard.Extra.subscriptions
+                    |> Sub.map KeyMsg
                 ]

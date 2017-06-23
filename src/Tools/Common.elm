@@ -22,6 +22,7 @@ import Html exposing (Html, map)
 import Html.Attributes as Html
 import Html.Events as Html
 import Json.Decode as Json
+import Keyboard.Extra exposing (Key)
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
 import Svg exposing (Svg)
@@ -39,6 +40,7 @@ type alias Data =
     , viewPort : ViewPort
     , cursorPosition : Maybe Position
     , focusedPoint : Maybe Id
+    , pressedKeys : List Key
     }
 
 

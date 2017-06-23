@@ -38,9 +38,10 @@ view variables store =
             , th
                 [ class [ CellType ] ]
                 []
-            , th
-                [ class [ CellAction ] ]
-                []
+
+            --, th
+            --    [ class [ CellAction ] ]
+            --    []
             , th
                 [ class [ CellAction ] ]
                 []
@@ -85,9 +86,10 @@ viewPointEntry variables store ( id, point ) =
         , td
             [ class [ CellType ] ]
             [ text (printPoint variables point) ]
-        , td
-            [ class [ CellAction ] ]
-            [ iconSmall "edit" (SelectPoint id) ]
+
+        --, td
+        --    [ class [ CellAction ] ]
+        --    [ iconSmall "edit" (SelectPoint id) ]
         , td
             [ class [ CellAction ] ]
             [ iconSmall "delete" (DeletePoint id) ]
