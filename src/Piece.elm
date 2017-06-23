@@ -4,6 +4,7 @@ module Piece
         , fromList
         , insertAfter
         , insertBefore
+        , next
         , toList
         )
 
@@ -38,9 +39,45 @@ toList (Piece piece) =
     piece.points
 
 
+next : Id -> Piece -> Maybe Id
+next id (Piece piece) =
+    nextHelper firstId id piece.points
+
+
+nextHelper : Id -> Id -> List Id -> Maybe Id
+nextHelper firstId id points =
+    case points of
+        first :: second :: rest ->
+            if id == first then
+                Just second
+            else
+                nextHelper firstId id (second :: rest)
+
+        last :: [] ->
+            if id == last then
+                Just firstId
+            else
+                Nothing
+
+        _ ->
+            Nothing
+
+
 insertAfter : PointStore -> Dict String E -> Id -> Id -> Piece -> Piece
-insertAfter store variables new reference piece =
-    Debug.crash "implement insertAfter"
+insertAfter store variables new reference (Piece piece) =
+    -- TODO: check for self intersections
+    let
+        newPoints =
+            piece.points
+                |> List.foldl insert []
+
+        insert id list =
+            if id == reference then
+                new :: id :: list
+            else
+                id :: list
+    in
+    Piece { points = newPoints }
 
 
 insertBefore : PointStore -> Dict String E -> Id -> Id -> Piece -> Piece

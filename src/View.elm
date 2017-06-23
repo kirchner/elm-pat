@@ -35,6 +35,7 @@ import Tools.Common
         , Data
         )
 import Tools.Distance as Distance
+import Tools.ExtendPiece as ExtendPiece
 import Tools.Relative as Relative
 import Types
     exposing
@@ -59,26 +60,26 @@ view model =
         data =
             Editor.data model
     in
-        [ Just <|
-            Html.div
-                [ class [ Container, ContainerTopLeftLeft ] ]
-                [ ToolBox.view data ]
-        , viewToolInfo callbacks data model.tool
-        , Just <|
-            Html.div
-                [ class [ Container, ContainerBottomLeft ] ]
-                [ PointTable.view data ]
-        , Just <|
-            Html.div
-                [ class [ Container, ContainerBottomRight ] ]
-                [ VariableTable.view model.variables model.newName model.newValue ]
-        , Just <| viewCanvas model
-        ]
-            |> List.filterMap identity
-            |> Html.div
-                [ class [ Main ]
-                , classList [ ( MouseMove, model.drag /= Nothing ) ]
-                ]
+    [ Just <|
+        Html.div
+            [ class [ Container, ContainerTopLeftLeft ] ]
+            [ ToolBox.view data ]
+    , viewToolInfo callbacks data model.tool
+    , Just <|
+        Html.div
+            [ class [ Container, ContainerBottomLeft ] ]
+            [ PointTable.view data ]
+    , Just <|
+        Html.div
+            [ class [ Container, ContainerBottomRight ] ]
+            [ VariableTable.view model.variables model.newName model.newValue ]
+    , Just <| viewCanvas model
+    ]
+        |> List.filterMap identity
+        |> Html.div
+            [ class [ Main ]
+            , classList [ ( MouseMove, model.drag /= Nothing ) ]
+            ]
 
 
 
@@ -106,6 +107,9 @@ viewToolInfo callbacks data tool =
                     [ class [ Container, ContainerTopLeft ] ]
                     [ Distance.view callbacks (UpdateTool << Distance) data state ]
 
+        ExtendPiece _ ->
+            Nothing
+
         None ->
             Nothing
 
@@ -121,6 +125,14 @@ viewCanvas model =
         DragStart
         FocusPoint
         SelectPoint
+        (\id segment ->
+            UpdateTool
+                (ExtendPiece
+                    (ExtendPiece.init id
+                        segment
+                    )
+                )
+        )
         (data model)
         model.pieceStore
 
@@ -136,6 +148,9 @@ drawTool callbacks data tool =
 
         Distance state ->
             Distance.svg callbacks (UpdateTool << Distance) data state
+
+        ExtendPiece state ->
+            ExtendPiece.svg callbacks data state
 
         None ->
             Svg.g [] []

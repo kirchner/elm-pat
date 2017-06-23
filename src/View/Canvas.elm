@@ -5,6 +5,7 @@ import Events
 import Expr exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
+import List.Extra as List
 import Math.Vector2 exposing (..)
 import Piece exposing (..)
 import Styles.Colors as Colors
@@ -25,10 +26,11 @@ view :
     -> (Position -> msg)
     -> (Maybe Id -> msg)
     -> (Maybe Id -> msg)
+    -> (Int -> Int -> msg)
     -> Data
     -> Dict Int Piece
     -> Html msg
-view tool startDrag focusPoint selectPoint data pieceStore =
+view tool startDrag focusPoint selectPoint extendPiece data pieceStore =
     let
         viewBoxString =
             String.join " "
@@ -51,9 +53,9 @@ view tool startDrag focusPoint selectPoint data pieceStore =
         [ grid defaultGridConfig data.viewPort
         , origin
         , Svg.g [] (points data)
-        , Svg.g [] (pieces data pieceStore)
         , viewSelectedPoints data
         , dragArea startDrag data.viewPort
+        , Svg.g [] (pieces extendPiece data)
         , svgSelectPoint focusPoint selectPoint data
         , tool
         ]
@@ -309,34 +311,41 @@ point data point =
             Just (Svg.g [] [])
 
 
-pieces : Data -> Dict Int Piece -> List (Svg msg)
-pieces data pieceStore =
-    Dict.values pieceStore
-        |> List.map (piece data)
+pieces : (Int -> Int -> msg) -> Data -> List (Svg msg)
+pieces extendPiece data =
+    Dict.toList data.pieceStore
+        |> List.map (piece extendPiece data)
         |> List.map (Svg.g [])
 
 
-piece : Data -> Piece -> List (Svg msg)
-piece data piece =
+piece : (Int -> Int -> msg) -> Data -> ( Int, Piece ) -> List (Svg msg)
+piece extendPiece data ( id, piece ) =
     let
-        positions =
+        segments =
             Piece.toList piece
                 |> List.filterMap (positionById data.store data.variables)
+                |> List.zip (Piece.toList piece)
     in
-    case positions of
+    case segments of
         first :: rest ->
-            pieceHelper first rest first []
+            pieceHelper (extendPiece id) first rest first []
 
         [] ->
             []
 
 
-pieceHelper : Vec2 -> List Vec2 -> Vec2 -> List (Svg msg) -> List (Svg msg)
-pieceHelper first rest veryFirst drawn =
+pieceHelper :
+    (Int -> msg)
+    -> ( Int, Vec2 )
+    -> List ( Int, Vec2 )
+    -> ( Int, Vec2 )
+    -> List (Svg msg)
+    -> List (Svg msg)
+pieceHelper extendPiece ( firstId, first ) rest veryFirst drawn =
     case rest of
-        second :: veryRest ->
-            (Svg.drawLineSegment first second :: drawn)
-                |> pieceHelper second veryRest veryFirst
+        ( secondId, second ) :: veryRest ->
+            (Svg.drawLineSegmentWith (extendPiece firstId) first second :: drawn)
+                |> pieceHelper extendPiece ( secondId, second ) veryRest veryFirst
 
         [] ->
-            Svg.drawLineSegment first veryFirst :: drawn
+            Svg.drawLineSegmentWith (extendPiece firstId) first (Tuple.second veryFirst) :: drawn

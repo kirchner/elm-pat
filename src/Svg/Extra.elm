@@ -1,27 +1,29 @@
 module Svg.Extra
     exposing
-        ( StrokeStyle(..)
+        ( ArcConfig
+        , StrokeStyle(..)
+        , defaultArcConfig
+        , drawAngleArc
         , drawArrow
         , drawHorizontalLine
         , drawLineSegment
+        , drawLineSegmentWith
         , drawPoint
         , drawRectArrow
         , drawSelector
         , drawVerticalLine
+        , label
         , translate
         , translate2
-        , ArcConfig
-        , defaultArcConfig
-        , drawAngleArc
-        , label
         )
 
+import FormatNumber
 import Math.Vector2 exposing (..)
 import Styles.Colors as Colors
-import Svg exposing (Svg)
 import Svg as Svg_
+import Svg exposing (Svg)
 import Svg.Attributes as Svg
-import FormatNumber
+import Svg.Events as Svg
 
 
 drawPoint : String -> Vec2 -> Svg msg
@@ -85,6 +87,31 @@ drawLineSegment v w =
         , Svg.stroke Colors.blue
         ]
         []
+
+
+drawLineSegmentWith : msg -> Vec2 -> Vec2 -> Svg msg
+drawLineSegmentWith callback v w =
+    Svg.g []
+        [ Svg.line
+            [ Svg.x1 (toString (getX v))
+            , Svg.y1 (toString (getY v))
+            , Svg.x2 (toString (getX w))
+            , Svg.y2 (toString (getY w))
+            , Svg.strokeWidth "1"
+            , Svg.stroke Colors.blue
+            ]
+            []
+        , Svg.line
+            [ Svg.x1 (toString (getX v))
+            , Svg.y1 (toString (getY v))
+            , Svg.x2 (toString (getX w))
+            , Svg.y2 (toString (getY w))
+            , Svg.strokeWidth "4"
+            , Svg.stroke "transparent"
+            , Svg.onClick callback
+            ]
+            []
+        ]
 
 
 drawRectArrow : Vec2 -> Vec2 -> Svg msg
@@ -153,52 +180,51 @@ drawAngleArc config anchorPosition pointPosition =
             -(atan2 (getY v) (getX v))
 
         a =
-            vec2 (cos radians) (-(sin radians))
-            |> scale config.radius
+            vec2 (cos radians) -(sin radians)
+                |> scale config.radius
 
         ( x, y ) =
-            (getX a, getY a)
+            ( getX a, getY a )
 
         format =
             FormatNumber.format
-            { decimals = 2
-            , thousandSeparator = " "
-            , decimalSeparator = "."
-            }
+                { decimals = 2
+                , thousandSeparator = " "
+                , decimalSeparator = "."
+                }
     in
     Svg.g
-    [ Svg.transform (translate anchorPosition)
-    ]
-    [ Svg_.path
-      [ Svg.d <|
-          String.join " "
-          [ "M0,0"
-          , "h" ++ toString config.radius
-          , "A" ++ toString config.radius ++ "," ++ toString config.radius
-          , if radians < 0 then
-                "0 0,1"
-            else
-                "0 0,0"
-          , toString (floor x) ++ "," ++ toString (floor y)
-          , "z"
-          ]
-      , Svg.stroke Colors.base0
-      , Svg.fill "transparent"
-      ]
-      [
-      ]
-    , label
-      [ Svg.transform (translate (vec2 10 (-10)))
-      ]
-      [ Svg.text (format (180 * radians / 3.14))
-      ]
-    ]
+        [ Svg.transform (translate anchorPosition)
+        ]
+        [ Svg_.path
+            [ Svg.d <|
+                String.join " "
+                    [ "M0,0"
+                    , "h" ++ toString config.radius
+                    , "A" ++ toString config.radius ++ "," ++ toString config.radius
+                    , if radians < 0 then
+                        "0 0,1"
+                      else
+                        "0 0,0"
+                    , toString (floor x) ++ "," ++ toString (floor y)
+                    , "z"
+                    ]
+            , Svg.stroke Colors.base0
+            , Svg.fill "transparent"
+            ]
+            []
+        , label
+            [ Svg.transform (translate (vec2 10 -10))
+            ]
+            [ Svg.text (format (180 * radians / 3.14))
+            ]
+        ]
 
 
 label : List (Svg.Attribute m) -> List (Svg m) -> Svg m
 label options =
     Svg.text_
-    ( Svg.fontSize "14px"
-    :: Svg.color Colors.base0
-    :: options
-    )
+        (Svg.fontSize "14px"
+            :: Svg.color Colors.base0
+            :: options
+        )

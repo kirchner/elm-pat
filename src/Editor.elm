@@ -36,6 +36,7 @@ import Tools.Common
         , Data
         )
 import Tools.Distance as Distance
+import Tools.ExtendPiece as ExtendPiece
 import Tools.Relative as Relative
 import Types exposing (..)
 import Window
@@ -62,6 +63,7 @@ type alias Model =
 data : Model -> Data
 data model =
     { store = model.store
+    , pieceStore = model.pieceStore
     , variables = model.variables
     , viewPort = getViewPort model.viewPort model.drag
     , cursorPosition = model.cursorPosition
@@ -78,6 +80,7 @@ callbacks =
     , focusPoint = FocusPoint
     , selectPoint = SelectPoint
     , clearSelection = ClearSelection
+    , extendPiece = ExtendPieceMsg
     }
 
 
@@ -85,6 +88,7 @@ type Tool
     = Absolute Absolute.State
     | Relative Relative.State
     | Distance Distance.State
+    | ExtendPiece ExtendPiece.State
     | None
 
 
@@ -99,6 +103,9 @@ toolName tool =
 
         Distance _ ->
             "distance"
+
+        ExtendPiece _ ->
+            "extend piece"
 
         None ->
             "none"
@@ -115,6 +122,9 @@ toolDescription tool =
 
         Distance _ ->
             "distance"
+
+        ExtendPiece _ ->
+            "extend piece"
 
         None ->
             "none"
@@ -152,6 +162,7 @@ type Msg
     | KeyDown Keyboard.Key
     | SelectPoint (Maybe Id)
     | ClearSelection
+    | ExtendPieceMsg Int Id (Maybe Id)
 
 
 init : ( Model, Cmd Msg )
@@ -358,6 +369,28 @@ update msg model =
 
         ClearSelection ->
             { model | selectedPoints = [] } ! []
+
+        ExtendPieceMsg pieceId id maybeNewId ->
+            case maybeNewId of
+                Just newId ->
+                    let
+                        updatePiece =
+                            Maybe.map <|
+                                Piece.insertAfter
+                                    model.store
+                                    model.variables
+                                    newId
+                                    id
+                    in
+                    { model
+                        | pieceStore =
+                            Dict.update pieceId updatePiece model.pieceStore
+                        , tool = None
+                    }
+                        ! []
+
+                Nothing ->
+                    { model | tool = None } ! []
 
 
 getViewPort : ViewPort -> Maybe Drag -> ViewPort

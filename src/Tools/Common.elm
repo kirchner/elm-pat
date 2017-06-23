@@ -25,6 +25,7 @@ import Json.Decode as Json
 import Keyboard.Extra exposing (Key)
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
+import Piece exposing (..)
 import Set exposing (Set)
 import Styles.Colors as Colors
 import Svg exposing (Svg)
@@ -38,6 +39,7 @@ import Views.Common exposing (iconSmall)
 
 type alias Data =
     { store : PointStore
+    , pieceStore : Dict Int Piece
     , variables : Dict String E
     , viewPort : ViewPort
     , cursorPosition : Maybe Position
@@ -53,6 +55,7 @@ type alias Callbacks msg =
     , focusPoint : Maybe Id -> msg
     , selectPoint : Maybe Id -> msg
     , clearSelection : msg
+    , extendPiece : Int -> Id -> Maybe Id -> msg
     }
 
 
