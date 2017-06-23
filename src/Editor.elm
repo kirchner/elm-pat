@@ -186,6 +186,7 @@ update msg model =
                 , tool = None
                 , cursorPosition = Nothing
                 , focusedPoint = Nothing
+                , selectedPoints = [ model.nextId ]
             }
                 ! []
 
