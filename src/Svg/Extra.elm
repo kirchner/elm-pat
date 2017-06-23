@@ -8,12 +8,20 @@ module Svg.Extra
         , drawRectArrow
         , drawSelector
         , drawVerticalLine
+        , translate
+        , translate2
+        , ArcConfig
+        , defaultArcConfig
+        , drawAngleArc
+        , label
         )
 
 import Math.Vector2 exposing (..)
 import Styles.Colors as Colors
 import Svg exposing (Svg)
+import Svg as Svg_
 import Svg.Attributes as Svg
+import FormatNumber
 
 
 drawPoint : String -> Vec2 -> Svg msg
@@ -113,3 +121,84 @@ drawVerticalLine x =
         , Svg.strokeDasharray "5, 5"
         ]
         []
+
+
+translate u =
+    translate2 (getX u) (getY u)
+
+
+translate2 x y =
+    "translate(" ++ toString x ++ "," ++ toString y ++ ")"
+
+
+type alias ArcConfig =
+    { radius : Float
+    , label : Bool
+    }
+
+
+defaultArcConfig =
+    { radius = 65
+    , label = True
+    }
+
+
+drawAngleArc : ArcConfig -> Vec2 -> Vec2 -> Svg msg
+drawAngleArc config anchorPosition pointPosition =
+    let
+        v =
+            sub pointPosition anchorPosition
+
+        radians =
+            -(atan2 (getY v) (getX v))
+
+        a =
+            vec2 (cos radians) (-(sin radians))
+            |> scale config.radius
+
+        ( x, y ) =
+            (getX a, getY a)
+
+        format =
+            FormatNumber.format
+            { decimals = 2
+            , thousandSeparator = " "
+            , decimalSeparator = "."
+            }
+    in
+    Svg.g
+    [ Svg.transform (translate anchorPosition)
+    ]
+    [ Svg_.path
+      [ Svg.d <|
+          String.join " "
+          [ "M0,0"
+          , "h" ++ toString config.radius
+          , "A" ++ toString config.radius ++ "," ++ toString config.radius
+          , if radians < 0 then
+                "0 0,1"
+            else
+                "0 0,0"
+          , toString (floor x) ++ "," ++ toString (floor y)
+          , "z"
+          ]
+      , Svg.stroke Colors.base0
+      , Svg.fill "transparent"
+      ]
+      [
+      ]
+    , label
+      [ Svg.transform (translate (vec2 10 (-10)))
+      ]
+      [ Svg.text (format (180 * radians / 3.14))
+      ]
+    ]
+
+
+label : List (Svg.Attribute m) -> List (Svg m) -> Svg m
+label options =
+    Svg.text_
+    ( Svg.fontSize "14px"
+    :: Svg.color Colors.base0
+    :: options
+    )

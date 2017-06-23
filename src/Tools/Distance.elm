@@ -21,6 +21,7 @@ import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
 import Svg.Extra as Svg
+import FormatNumber
 import Tools.Common as Tools
     exposing
         ( Callbacks
@@ -131,6 +132,16 @@ svg callbacks updateState data state =
 newPoint : Data -> State -> Maybe (Svg msg)
 newPoint data state =
     let
+        lerp t u v =
+            add (scale (1 - t) u) (scale t v)
+
+        format =
+          FormatNumber.format
+              { decimals = 2
+              , thousandSeparator = " "
+              , decimalSeparator = "."
+              }
+
         draw anchorPosition =
             pointPosition data state anchorPosition
                 |> Maybe.map
@@ -139,6 +150,12 @@ newPoint data state =
                             [ Svg.drawPoint Colors.red pointPosition
                             , Svg.drawSelector Svg.Solid Colors.red pointPosition
                             , Svg.drawArrow anchorPosition pointPosition
+                            , Svg.drawAngleArc Svg.defaultArcConfig anchorPosition pointPosition
+                            , Svg.label
+                              [ Svg.transform (Svg.translate (lerp 0.5 anchorPosition pointPosition))
+                              ]
+                              [ Svg.text (format (length (sub pointPosition anchorPosition)))
+                              ]
                             ]
                     )
     in
