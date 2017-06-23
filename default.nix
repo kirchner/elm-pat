@@ -1,6 +1,6 @@
 let
 
-  pkgs = import /nix/var/nix/profiles/per-user/root/channels/unstable {};
+  pkgs = import <nixpkgs> {};
 
   stdenv = pkgs.stdenv;
   git    = pkgs.git;
@@ -13,9 +13,15 @@ let
 
 in rec {
 
+  elm-css =
+    (import elm-css/default.nix {}).package;
+
+  node2nix =
+    pkgs.nodePackages.node2nix;
+
   env = pkgs.buildEnv rec {
     name = "elm-pat";
-    paths = [ stdenv git elm-compiler elm-make elm-package elm-format elm-repl ];
+    paths = [ stdenv git elm-compiler elm-make elm-package elm-format elm-repl elm-css ];
     buildInputs = paths;
   };
 
