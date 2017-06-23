@@ -19,7 +19,7 @@ drawPoint v =
     Svg.circle
         [ Svg.cx (toString (getX v))
         , Svg.cy (toString (getY v))
-        , Svg.r "1"
+        , Svg.r "3.5"
         , Svg.strokeWidth "0"
         , Svg.fill Colors.base0
         ]
@@ -31,7 +31,7 @@ drawSelector v =
     Svg.circle
         [ Svg.cx (toString (getX v))
         , Svg.cy (toString (getY v))
-        , Svg.r "5"
+        , Svg.r "7"
         , Svg.strokeWidth "1"
         , Svg.stroke Colors.base1
         , Svg.fill "none"

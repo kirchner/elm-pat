@@ -57,123 +57,125 @@ view tool startDrag focusPoint selectPoint data =
 
 
 defaultGridConfig =
-  { offset = 50
-  , unit = "mm"
-  , color1 = "rgba(0,0,0,0.08)"
-  , color2 = "rgba(0,0,0,0.24)"
-  , highlight = 5
-  }
+    { offset = 50
+    , unit = "mm"
+    , color1 = "rgba(0,0,0,0.08)"
+    , color2 = "rgba(0,0,0,0.24)"
+    , highlight = 5
+    }
 
 
 grid config viewPort =
-  let
-    line color u v =
-      Svg.line
-        [ Svg.x1 (toString (getX u))
-        , Svg.y1 (toString (getY u))
-        , Svg.x2 (toString (getX v))
-        , Svg.y2 (toString (getY v))
-        , Svg.stroke color
-        ]
-        []
+    let
+        line color u v =
+            Svg.line
+                [ Svg.x1 (toString (getX u))
+                , Svg.y1 (toString (getY u))
+                , Svg.x2 (toString (getX v))
+                , Svg.y2 (toString (getY v))
+                , Svg.stroke color
+                ]
+                []
 
-    x =
-      toFloat (viewPort.width + 2 * config.offset)/ 2
+        x =
+            toFloat (viewPort.width + 2 * config.offset) / 2
 
-    y =
-      toFloat (viewPort.height + 2  * config.offset) / 2
+        y =
+            toFloat (viewPort.height + 2 * config.offset) / 2
 
-    -- n satisfies:
-    --    2 * n * config.offset > ((max viewPort.height viewPort.width) / 2)
-    n =
-      (max viewPort.height viewPort.width) // config.offset
-      |> (+) 4 -- for good measure
+        -- n satisfies:
+        --    2 * n * config.offset > ((max viewPort.height viewPort.width) / 2)
+        n =
+            max viewPort.height viewPort.width
+                // config.offset
+                |> (+) 4
 
-    nh =
-      n // 2
+        -- for good measure
+        nh =
+            n // 2
 
-    dx =
-      viewPort.x + (viewPort.width // 2)
+        dx =
+            viewPort.x + (viewPort.width // 2)
 
-    dy =
-      viewPort.y + (viewPort.height // 2)
+        dy =
+            viewPort.y + (viewPort.height // 2)
 
-    -- so that the grid does not translate
-    translationOffset =
-      vec2 (toFloat dx) (toFloat dy)
+        -- so that the grid does not translate
+        translationOffset =
+            vec2 (toFloat dx) (toFloat dy)
 
-    -- so that it appears like it does:
-    -- (note that this affects computation of highlight colors k)
-    correctionOffset =
-      vec2 (toFloat (-dx % config.offset))
-           (toFloat (-dy % config.offset))
+        -- so that it appears like it does:
+        -- (note that this affects computation of highlight colors k)
+        correctionOffset =
+            vec2 (toFloat (-dx % config.offset))
+                (toFloat (-dy % config.offset))
 
-    pr u =
-      u
-      |> add translationOffset
-      |> add correctionOffset
+        pr u =
+            u
+                |> add translationOffset
+                |> add correctionOffset
 
-    translation =
-      pr (vec2 0 0)
+        translation =
+            pr (vec2 0 0)
 
-    tx =
-      (getX translation)
+        tx =
+            getX translation
 
-    ty =
-      (getY translation)
+        ty =
+            getY translation
 
-    color k =
-      if k % config.highlight == 0 then
-          config.color2
-        else
-          config.color1
-  in
+        color k =
+            if k % config.highlight == 0 then
+                config.color2
+            else
+                config.color1
+    in
     Svg.g
-    [ Svg.transform ("translate(" ++ toString tx ++ "," ++ toString ty ++ ")")
-    ]
-    ( List.concat
-      [
-        List.map
-        ( \k_ ->
-          let
-            y =
-              (k_ - nh) * config.offset
-              |> toFloat
+        [ Svg.transform ("translate(" ++ toString tx ++ "," ++ toString ty ++ ")")
+        ]
+        (List.concat
+            [ List.map
+                (\k_ ->
+                    let
+                        y =
+                            (k_ - nh)
+                                * config.offset
+                                |> toFloat
 
-            u =
-              vec2 (-x) y
+                        u =
+                            vec2 -x y
 
-            v =
-              vec2 x y
+                        v =
+                            vec2 x y
 
-            k =
-              floor (getY (pr u)) // config.offset
-          in
-            line (color k) u v
+                        k =
+                            floor (getY (pr u)) // config.offset
+                    in
+                    line (color k) u v
+                )
+                (List.range 0 n)
+            , List.map
+                (\k_ ->
+                    let
+                        x =
+                            (k_ - nh)
+                                * config.offset
+                                |> toFloat
+
+                        u =
+                            vec2 x -y
+
+                        v =
+                            vec2 x y
+
+                        k =
+                            floor (getX (pr u)) // config.offset
+                    in
+                    line (color k) u v
+                )
+                (List.range 0 n)
+            ]
         )
-        (List.range 0 n)
-
-      , List.map
-        ( \k_ ->
-          let
-            x =
-              (k_ - nh) * config.offset
-              |> toFloat
-
-            u =
-              vec2 x (-y)
-
-            v =
-              vec2 x y
-
-            k =
-              floor (getX (pr u)) // config.offset
-          in
-            line (color k) u v
-        )
-        (List.range 0 n)
-      ]
-    )
 
 
 dragArea : (Position -> msg) -> ViewPort -> Svg msg
