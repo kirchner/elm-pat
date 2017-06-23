@@ -26,6 +26,7 @@ import Expr
 import Keyboard.Extra as Keyboard exposing (Key)
 import Math.Vector2 exposing (..)
 import Mouse
+import Piece exposing (Piece)
 import Set exposing (Set)
 import Task
 import Tools.Absolute as Absolute
