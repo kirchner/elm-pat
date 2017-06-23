@@ -13,6 +13,7 @@ module Tools.Common
         , viewPointSelect
         )
 
+import Set exposing (Set)
 import Autocomplete
 import Dict exposing (Dict)
 import Dropdown
@@ -41,6 +42,7 @@ type alias Data =
     , cursorPosition : Maybe Position
     , focusedPoint : Maybe Id
     , pressedKeys : List Key
+    , selectedPoints : Set Id
     }
 
 
@@ -48,6 +50,8 @@ type alias Callbacks msg =
     { addPoint : Point -> msg
     , updateCursorPosition : Maybe Position -> msg
     , focusPoint : Maybe Id -> msg
+    , selectPoint : Maybe Id -> msg
+    , clearSelection : msg
     }
 
 

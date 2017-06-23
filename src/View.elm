@@ -7,6 +7,8 @@ import Editor
         , Msg(..)
         , Tool(..)
         , allTools
+        , callbacks
+        , data
         , getViewPort
         , toolDescription
         , toolName
@@ -17,6 +19,7 @@ import Html.Attributes as Html
 import Html.Events as Events
 import Keyboard.Extra exposing (Key)
 import Math.Vector2 exposing (..)
+import Set exposing (Set)
 import Styles.Colors exposing (..)
 import Styles.Editor
     exposing
@@ -26,6 +29,11 @@ import Styles.Editor
         )
 import Svg exposing (Svg)
 import Tools.Absolute as Absolute
+import Tools.Common
+    exposing
+        ( Callbacks
+        , Data
+        )
 import Tools.Distance as Distance
 import Tools.Relative as Relative
 import Tools.Select as Select
@@ -52,12 +60,7 @@ view model =
         Html.div
             [ class [ Container, ContainerTopLeftLeft ] ]
             [ ToolBox.view ]
-    , viewToolInfo model.viewPort
-        model.variables
-        model.store
-        model.cursorPosition
-        model.pressedKeys
-        model.tool
+    , viewToolInfo callbacks (data model) model.tool
     , Just <|
         Html.div
             [ class [ Container, ContainerBottomLeft ] ]
@@ -79,24 +82,8 @@ view model =
 {- tool box -}
 
 
-viewToolInfo : ViewPort -> Dict String E -> PointStore -> Maybe Position -> List Key -> Tool -> Maybe (Html Msg)
-viewToolInfo viewPort variables store cursorPosition pressedKeys tool =
-    let
-        data =
-            { store = store
-            , variables = variables
-            , viewPort = viewPort
-            , cursorPosition = cursorPosition
-            , focusedPoint = Nothing
-            , pressedKeys = pressedKeys
-            }
-
-        callbacks =
-            { addPoint = AddPoint
-            , updateCursorPosition = UpdateCursorPosition
-            , focusPoint = FocusPoint
-            }
-    in
+viewToolInfo : Callbacks Msg -> Data -> Tool -> Maybe (Html Msg)
+viewToolInfo callbacks data tool =
     case tool of
         Absolute state ->
             Just <|
@@ -116,7 +103,7 @@ viewToolInfo viewPort variables store cursorPosition pressedKeys tool =
                     [ class [ Container, ContainerTopLeft ] ]
                     [ Distance.view callbacks (UpdateTool << Distance) data state ]
 
-        Select _ ->
+        Select ->
             Nothing
 
 
@@ -127,46 +114,15 @@ viewToolInfo viewPort variables store cursorPosition pressedKeys tool =
 viewCanvas : Model -> Html Msg
 viewCanvas model =
     Canvas.view
-        (drawTool model.viewPort
-            model.variables
-            model.store
-            model.cursorPosition
-            model.focusedPoint
-            model.pressedKeys
-            model.tool
-        )
+        (drawTool callbacks (data model) model.tool)
         DragStart
         (getViewPort model.viewPort model.drag)
         model.store
         model.variables
 
 
-drawTool :
-    ViewPort
-    -> Dict String E
-    -> PointStore
-    -> Maybe Position
-    -> Maybe Id
-    -> List Key
-    -> Tool
-    -> Svg Msg
-drawTool viewPort variables store cursorPosition focusedPoint pressedKeys tool =
-    let
-        data =
-            { store = store
-            , variables = variables
-            , viewPort = viewPort
-            , cursorPosition = cursorPosition
-            , focusedPoint = focusedPoint
-            , pressedKeys = pressedKeys
-            }
-
-        callbacks =
-            { addPoint = AddPoint
-            , updateCursorPosition = UpdateCursorPosition
-            , focusPoint = FocusPoint
-            }
-    in
+drawTool : Callbacks Msg -> Data -> Tool -> Svg Msg
+drawTool callbacks data tool =
     case tool of
         Absolute state ->
             Absolute.svg callbacks (UpdateTool << Absolute) data state
@@ -177,5 +133,5 @@ drawTool viewPort variables store cursorPosition focusedPoint pressedKeys tool =
         Distance state ->
             Distance.svg callbacks (UpdateTool << Distance) data state
 
-        Select state ->
-            Select.svg callbacks (UpdateTool << Select) data state
+        Select ->
+            Select.svg callbacks data

@@ -4,6 +4,8 @@ module Editor
         , Msg(..)
         , Tool(..)
         , allTools
+        , callbacks
+        , data
         , getViewPort
         , init
         , subscriptions
@@ -21,12 +23,17 @@ import Expr
         , parse
         , parseVariable
         )
-import Keyboard.Extra exposing (Key)
+import Keyboard.Extra as Keyboard exposing (Key)
 import Math.Vector2 exposing (..)
 import Mouse
-import Set
+import Set exposing (Set)
 import Task
 import Tools.Absolute as Absolute
+import Tools.Common
+    exposing
+        ( Callbacks
+        , Data
+        )
 import Tools.Distance as Distance
 import Tools.Relative as Relative
 import Tools.Select as Select
@@ -46,6 +53,29 @@ type alias Model =
     , cursorPosition : Maybe Position
     , focusedPoint : Maybe Id
     , pressedKeys : List Key
+    , selectedPoints : Set Id
+    }
+
+
+data : Model -> Data
+data model =
+    { store = model.store
+    , variables = model.variables
+    , viewPort = model.viewPort
+    , cursorPosition = model.cursorPosition
+    , focusedPoint = model.focusedPoint
+    , pressedKeys = model.pressedKeys
+    , selectedPoints = model.selectedPoints
+    }
+
+
+callbacks : Callbacks Msg
+callbacks =
+    { addPoint = AddPoint
+    , updateCursorPosition = UpdateCursorPosition
+    , focusPoint = FocusPoint
+    , selectPoint = SelectPoint
+    , clearSelection = ClearSelection
     }
 
 
@@ -53,7 +83,7 @@ type Tool
     = Absolute Absolute.State
     | Relative Relative.State
     | Distance Distance.State
-    | Select Select.State
+    | Select
 
 
 toolName : Tool -> String
@@ -68,7 +98,7 @@ toolName tool =
         Distance _ ->
             "distance"
 
-        Select _ ->
+        Select ->
             "select"
 
 
@@ -84,7 +114,7 @@ toolDescription tool =
         Distance _ ->
             "distance"
 
-        Select _ ->
+        Select ->
             "select"
 
 
@@ -116,7 +146,9 @@ type Msg
     | DragStop Position
     | UpdateCursorPosition (Maybe Position)
     | FocusPoint (Maybe Id)
-    | KeyMsg Keyboard.Extra.Msg
+    | KeyMsg Keyboard.Msg
+    | SelectPoint (Maybe Id)
+    | ClearSelection
 
 
 init : ( Model, Cmd Msg )
@@ -126,7 +158,7 @@ init =
     , variables = Dict.empty
     , newName = Nothing
     , newValue = Nothing
-    , tool = Select (Select.init Set.empty)
+    , tool = Select
     , viewPort =
         { x = -320
         , y = -320
@@ -137,6 +169,7 @@ init =
     , cursorPosition = Nothing
     , focusedPoint = Nothing
     , pressedKeys = []
+    , selectedPoints = Set.empty
     }
         ! [ Task.perform Resize Window.size ]
 
@@ -151,7 +184,7 @@ update msg model =
             { model
                 | store = Dict.insert model.nextId point model.store
                 , nextId = model.nextId + 1
-                , tool = Select (Select.init Set.empty)
+                , tool = Select
                 , cursorPosition = Nothing
                 , focusedPoint = Nothing
             }
@@ -160,7 +193,7 @@ update msg model =
         UpdatePoint id point ->
             { model
                 | store = Dict.update id (\_ -> Just point) model.store
-                , tool = Select (Select.init Set.empty)
+                , tool = Select
             }
                 ! []
 
@@ -240,9 +273,26 @@ update msg model =
         KeyMsg keyMsg ->
             { model
                 | pressedKeys =
-                    Keyboard.Extra.update keyMsg model.pressedKeys
+                    Keyboard.update keyMsg model.pressedKeys
             }
                 ! []
+
+        SelectPoint maybeId ->
+            case maybeId of
+                Just id ->
+                    if List.member Keyboard.Shift model.pressedKeys then
+                        { model
+                            | selectedPoints = Set.insert id model.selectedPoints
+                        }
+                            ! []
+                    else
+                        { model | selectedPoints = Set.singleton id } ! []
+
+                Nothing ->
+                    model ! []
+
+        ClearSelection ->
+            { model | selectedPoints = Set.empty } ! []
 
 
 getViewPort : ViewPort -> Maybe Drag -> ViewPort
@@ -264,7 +314,7 @@ subscriptions model =
         Nothing ->
             Sub.batch
                 [ Window.resizes Resize
-                , Keyboard.Extra.subscriptions
+                , Keyboard.subscriptions
                     |> Sub.map KeyMsg
                 ]
 
@@ -273,6 +323,6 @@ subscriptions model =
                 [ Window.resizes Resize
                 , Mouse.moves DragAt
                 , Mouse.ups DragStop
-                , Keyboard.Extra.subscriptions
+                , Keyboard.subscriptions
                     |> Sub.map KeyMsg
                 ]

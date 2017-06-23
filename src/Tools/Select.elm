@@ -17,55 +17,21 @@ import Tools.Common as Tools
 import Types exposing (..)
 
 
-type alias State =
-    { selectedPoints : Set Id
-    }
-
-
-init : Set Id -> State
-init selectedPoints =
-    { selectedPoints = selectedPoints
-    }
-
-
-
 {- svg -}
 
 
-svg : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
-svg callbacks updateState data state =
-    let
-        selectPoint maybeId =
-            case maybeId of
-                Just id ->
-                    if List.member Keyboard.Shift data.pressedKeys then
-                        { state
-                            | selectedPoints = Set.insert id state.selectedPoints
-                        }
-                            |> updateState
-                    else
-                        { state
-                            | selectedPoints = Set.singleton id
-                        }
-                            |> updateState
-
-                Nothing ->
-                    updateState state
-
-        clearSelection =
-            { state | selectedPoints = Set.empty }
-                |> updateState
-    in
+svg : Callbacks msg -> Data -> Svg msg
+svg callbacks data =
     Svg.g []
-        [ viewSelectedPoints data state
-        , svgClearSelection clearSelection data state
-        , svgSelectPoint callbacks.focusPoint selectPoint data
+        [ viewSelectedPoints data
+        , svgClearSelection callbacks.clearSelection data
+        , svgSelectPoint callbacks.focusPoint callbacks.selectPoint data
         ]
 
 
-viewSelectedPoints : Data -> State -> Svg msg
-viewSelectedPoints data state =
-    state.selectedPoints
+viewSelectedPoints : Data -> Svg msg
+viewSelectedPoints data =
+    data.selectedPoints
         |> Set.toList
         |> List.filterMap (viewSelectedPoint data)
         |> Svg.g []
@@ -90,8 +56,8 @@ viewSelectedPoint data id =
             Nothing
 
 
-svgClearSelection : msg -> Data -> State -> Svg msg
-svgClearSelection clearSelection data state =
+svgClearSelection : msg -> Data -> Svg msg
+svgClearSelection clearSelection data =
     Svg.rect
         [ Svg.x (toString data.viewPort.x)
         , Svg.y (toString data.viewPort.y)
