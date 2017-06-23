@@ -216,7 +216,7 @@ drawAngleArc config anchorPosition pointPosition =
         , label
             [ Svg.transform (translate (vec2 10 -10))
             ]
-            [ Svg.text (format (180 * radians / 3.14))
+            [ Svg.text (format (180 * radians / Basics.pi))
             ]
         ]
 
