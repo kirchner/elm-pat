@@ -122,6 +122,7 @@ viewCanvas model =
         FocusPoint
         SelectPoint
         (data model)
+        model.pieceStore
 
 
 drawTool : Callbacks Msg -> Data -> Tool -> Svg Msg

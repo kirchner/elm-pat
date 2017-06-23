@@ -3,6 +3,7 @@ module Svg.Extra
         ( StrokeStyle(..)
         , drawArrow
         , drawHorizontalLine
+        , drawLineSegment
         , drawPoint
         , drawRectArrow
         , drawSelector
@@ -61,6 +62,19 @@ drawArrow v w =
         , Svg.strokeWidth "1"
         , Svg.stroke Colors.base1
         , Svg.strokeDasharray "5, 5"
+        ]
+        []
+
+
+drawLineSegment : Vec2 -> Vec2 -> Svg msg
+drawLineSegment v w =
+    Svg.line
+        [ Svg.x1 (toString (getX v))
+        , Svg.y1 (toString (getY v))
+        , Svg.x2 (toString (getX w))
+        , Svg.y2 (toString (getY w))
+        , Svg.strokeWidth "1"
+        , Svg.stroke Colors.blue
         ]
         []
 

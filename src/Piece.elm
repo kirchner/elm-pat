@@ -1,4 +1,11 @@
-module Piece exposing (Piece)
+module Piece
+    exposing
+        ( Piece
+        , fromList
+        , insertAfter
+        , insertBefore
+        , toList
+        )
 
 import Dict exposing (Dict)
 import Expr exposing (..)
@@ -15,16 +22,20 @@ fromList store variables points =
         positions =
             points
                 |> List.filterMap (positionById store variables)
+
+        pointCount =
+            List.length points
     in
-    if List.length positions < List.length points then
+    if (pointCount == 0) || (List.length positions < pointCount) then
         Nothing
     else
-        Debug.crash "implement fromList"
+        -- TODO: check for self intersections
+        Just <| Piece { points = points }
 
 
 toList : Piece -> List Id
-toList piece =
-    Debug.crash "implement toList"
+toList (Piece piece) =
+    piece.points
 
 
 insertAfter : PointStore -> Dict String E -> Id -> Id -> Piece -> Piece

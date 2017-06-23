@@ -44,6 +44,8 @@ import Window
 type alias Model =
     { store : PointStore
     , nextId : Id
+    , pieceStore : Dict Int Piece
+    , nextPieceId : Int
     , variables : Dict String E
     , newName : Maybe String
     , newValue : Maybe E
@@ -156,6 +158,8 @@ init : ( Model, Cmd Msg )
 init =
     { store = emptyStore
     , nextId = firstId
+    , pieceStore = Dict.empty
+    , nextPieceId = 0
     , variables = Dict.empty
     , newName = Nothing
     , newValue = Nothing
@@ -293,26 +297,46 @@ update msg model =
                 ! []
 
         KeyDown key ->
-            { model
-                | tool =
-                      case key of
+            case key of
+                Keyboard.CharP ->
+                    case
+                        model.selectedPoints
+                            |> Piece.fromList model.store model.variables
+                            |> Maybe.map
+                                (\piece ->
+                                    Dict.insert model.nextPieceId piece model.pieceStore
+                                )
+                    of
+                        Just pieceStore ->
+                            { model
+                                | pieceStore = pieceStore
+                                , nextPieceId = model.nextPieceId + 1
+                            }
+                                ! []
 
-                        Keyboard.CharA ->
-                          Absolute Absolute.init
+                        Nothing ->
+                            model ! []
 
-                        Keyboard.CharE ->
-                          if List.member Keyboard.Shift model.pressedKeys then
-                              Distance Distance.init
-                          else
-                              Relative (Relative.init (data model))
+                _ ->
+                    { model
+                        | tool =
+                            case key of
+                                Keyboard.CharA ->
+                                    Absolute Absolute.init
 
-                        Keyboard.Escape ->
-                          None
+                                Keyboard.CharE ->
+                                    if List.member Keyboard.Shift model.pressedKeys then
+                                        Distance Distance.init
+                                    else
+                                        Relative (Relative.init (data model))
 
-                        _ ->
-                          model.tool
-            }
-                ! []
+                                Keyboard.Escape ->
+                                    None
+
+                                _ ->
+                                    model.tool
+                    }
+                        ! []
 
         SelectPoint maybeId ->
             case maybeId of
@@ -320,10 +344,10 @@ update msg model =
                     if List.member Keyboard.Shift model.pressedKeys then
                         { model
                             | selectedPoints =
-                                  if List.member id model.selectedPoints then
-                                          List.filter ((/=) id) model.selectedPoints
-                                      else
-                                          id :: model.selectedPoints
+                                if List.member id model.selectedPoints then
+                                    List.filter ((/=) id) model.selectedPoints
+                                else
+                                    id :: model.selectedPoints
                         }
                             ! []
                     else

@@ -6,6 +6,7 @@ import Expr exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Math.Vector2 exposing (..)
+import Piece exposing (..)
 import Styles.Colors as Colors
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
@@ -25,8 +26,9 @@ view :
     -> (Maybe Id -> msg)
     -> (Maybe Id -> msg)
     -> Data
+    -> Dict Int Piece
     -> Html msg
-view tool startDrag focusPoint selectPoint data =
+view tool startDrag focusPoint selectPoint data pieceStore =
     let
         viewBoxString =
             String.join " "
@@ -49,6 +51,7 @@ view tool startDrag focusPoint selectPoint data =
         [ grid defaultGridConfig data.viewPort
         , origin
         , Svg.g [] (points data)
+        , Svg.g [] (pieces data pieceStore)
         , viewSelectedPoints data
         , dragArea startDrag data.viewPort
         , svgSelectPoint focusPoint selectPoint data
@@ -304,3 +307,36 @@ point data point =
 
         Between idA idB _ ->
             Just (Svg.g [] [])
+
+
+pieces : Data -> Dict Int Piece -> List (Svg msg)
+pieces data pieceStore =
+    Dict.values pieceStore
+        |> List.map (piece data)
+        |> List.map (Svg.g [])
+
+
+piece : Data -> Piece -> List (Svg msg)
+piece data piece =
+    let
+        positions =
+            Piece.toList piece
+                |> List.filterMap (positionById data.store data.variables)
+    in
+    case positions of
+        first :: rest ->
+            pieceHelper first rest first []
+
+        [] ->
+            []
+
+
+pieceHelper : Vec2 -> List Vec2 -> Vec2 -> List (Svg msg) -> List (Svg msg)
+pieceHelper first rest veryFirst drawn =
+    case rest of
+        second :: veryRest ->
+            (Svg.drawLineSegment first second :: drawn)
+                |> pieceHelper second veryRest veryFirst
+
+        [] ->
+            Svg.drawLineSegment first veryFirst :: drawn
