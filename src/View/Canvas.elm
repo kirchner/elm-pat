@@ -46,7 +46,7 @@ view tool startDrag focusPoint selectPoint data =
             , ( "-moz-user-select", "none" )
             ]
         ]
-        [ grid defaultGridConfig viewPort
+        [ grid defaultGridConfig data.viewPort
         , origin
         , Svg.g [] (points data)
         , viewSelectedPoints data
