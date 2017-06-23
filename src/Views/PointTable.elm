@@ -19,13 +19,15 @@ import Types
         , PointStore
         )
 import Views.Common exposing (iconSmall)
+import Tools.Common exposing (Data)
 
 
-view : Dict String E -> PointStore -> Html Msg
-view variables store =
+view : Data -> Html Msg
+view data =
     table
         [ class [ Table ] ]
-        (tr []
+        (tr
+            []
             [ th
                 [ class [ CellId ] ]
                 [ text "#" ]
@@ -38,26 +40,25 @@ view variables store =
             , th
                 [ class [ CellType ] ]
                 []
-
-            --, th
-            --    [ class [ CellAction ] ]
-            --    []
+              --, th
+              --    [ class [ CellAction ] ]
+              --    []
             , th
                 [ class [ CellAction ] ]
                 []
             ]
-            :: (store
+            :: (data.store
                     |> Dict.toList
-                    |> List.map (viewPointEntry variables store)
+                    |> List.map (viewPointEntry data)
                )
         )
 
 
-viewPointEntry : Dict String E -> PointStore -> ( Id, Point ) -> Html Msg
-viewPointEntry variables store ( id, point ) =
+viewPointEntry : Data -> ( Id, Point ) -> Html Msg
+viewPointEntry data ( id, point ) =
     let
         v =
-            Types.position store variables point
+            Types.position data.store data.variables point
 
         x =
             v
@@ -72,28 +73,47 @@ viewPointEntry variables store ( id, point ) =
                 |> Maybe.map (\y -> toFloat (floor (100 * y)) / 100)
                 |> Maybe.map toString
                 |> Maybe.withDefault ""
-    in
-    tr []
-        [ td
-            [ class [ CellId ] ]
-            [ text (toString id) ]
-        , td
-            [ class [ CellCoordinate ] ]
-            [ text x ]
-        , td
-            [ class [ CellCoordinate ] ]
-            [ text y ]
-        , td
-            [ class [ CellType ] ]
-            [ text (printPoint variables point) ]
 
-        --, td
-        --    [ class [ CellAction ] ]
-        --    [ iconSmall "edit" (SelectPoint id) ]
-        , td
-            [ class [ CellAction ] ]
-            [ iconSmall "delete" (DeletePoint id) ]
-        ]
+        isSelected =
+            List.member id data.selectedPoints
+
+        isSelectedLast =
+            Just id == List.head data.selectedPoints
+    in
+        tr
+            [ class
+                ([ Just Row
+                 , if isSelected then
+                    Just RowSelected
+                   else
+                    Nothing
+                 , if isSelectedLast then
+                    Just RowSelectedLast
+                   else
+                    Nothing
+                 ]
+                    |> List.filterMap identity
+                )
+            ]
+            [ td
+                [ class [ CellId ] ]
+                [ text (toString id) ]
+            , td
+                [ class [ CellCoordinate ] ]
+                [ text x ]
+            , td
+                [ class [ CellCoordinate ] ]
+                [ text y ]
+            , td
+                [ class [ CellType ] ]
+                [ text (printPoint data.variables point) ]
+              --, td
+              --    [ class [ CellAction ] ]
+              --    [ iconSmall "edit" (SelectPoint id) ]
+            , td
+                [ class [ CellAction ] ]
+                [ iconSmall "delete" (DeletePoint id) ]
+            ]
 
 
 printPoint : Dict String E -> Point -> String

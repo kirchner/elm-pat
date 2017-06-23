@@ -55,26 +55,30 @@ import Views.VariableTable as VariableTable
 
 view : Model -> Html Msg
 view model =
-    [ Just <|
-        Html.div
-            [ class [ Container, ContainerTopLeftLeft ] ]
-            [ ToolBox.view (data model) ]
-    , viewToolInfo callbacks (data model) model.tool
-    , Just <|
-        Html.div
-            [ class [ Container, ContainerBottomLeft ] ]
-            [ PointTable.view model.variables model.store ]
-    , Just <|
-        Html.div
-            [ class [ Container, ContainerBottomRight ] ]
-            [ VariableTable.view model.variables model.newName model.newValue ]
-    , Just <| viewCanvas model
-    ]
-        |> List.filterMap identity
-        |> Html.div
-            [ class [ Main ]
-            , classList [ ( MouseMove, model.drag /= Nothing ) ]
-            ]
+    let
+        data =
+            Editor.data model
+    in
+        [ Just <|
+            Html.div
+                [ class [ Container, ContainerTopLeftLeft ] ]
+                [ ToolBox.view data ]
+        , viewToolInfo callbacks data model.tool
+        , Just <|
+            Html.div
+                [ class [ Container, ContainerBottomLeft ] ]
+                [ PointTable.view data ]
+        , Just <|
+            Html.div
+                [ class [ Container, ContainerBottomRight ] ]
+                [ VariableTable.view model.variables model.newName model.newValue ]
+        , Just <| viewCanvas model
+        ]
+            |> List.filterMap identity
+            |> Html.div
+                [ class [ Main ]
+                , classList [ ( MouseMove, model.drag /= Nothing ) ]
+                ]
 
 
 
