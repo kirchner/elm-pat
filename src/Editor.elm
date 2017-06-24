@@ -175,9 +175,16 @@ update ports msg model =
                 let
                     ( id, newStore ) =
                         Store.insert point model.store
+
+                    name =
+                        "point #" ++ (id |> Store.toInt |> toString)
+
+                    storeWithNamedPoint =
+                        newStore
+                            |> Store.update id (Maybe.map (Point.setName name))
                 in
                 { model
-                    | store = newStore
+                    | store = storeWithNamedPoint
                     , tool = None
                     , cursorPosition = Nothing
                     , focusedPoint = Nothing

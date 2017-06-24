@@ -5,22 +5,23 @@ module Point
         , Ratio
         , absolute
         , between
+        , decode
         , dispatch
         , distance
+        , encode
         , name
         , position
         , positionById
         , relative
-        , encode
-        , decode
+        , setName
         )
 
 import Dict exposing (Dict)
 import Expr exposing (E(..), compute)
-import Math.Vector2 exposing (..)
-import Store exposing (Id, Store)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
+import Math.Vector2 exposing (..)
+import Store exposing (Id, Store)
 
 
 {- point -}
@@ -47,6 +48,12 @@ type alias Ratio =
 name : Point -> String
 name (Point point) =
     point.name
+
+
+setName : String -> Point -> Point
+setName name (Point point) =
+    Point
+        { point | name = name }
 
 
 
@@ -161,58 +168,91 @@ position store variables (Point { name, data }) =
                 (lookUp idB)
 
 
+
 -- SERIALIZATION
 
 
 encode : Point -> Value
-encode point =
+encode (Point point) =
     let
         def tag e0 e1 id id0 id1 ratio =
             Encode.object
-            [ ("tag", Encode.string tag)
-            , ("e0", Expr.encode e0)
-            , ("e1", Expr.encode e1)
-            , ("id", Store.encodeId id)
-            , ("id0", Store.encodeId id0)
-            , ("id1", Store.encodeId id1)
-            , ("ratio", Encode.float ratio)
-            ]
+                [ ( "tag", Encode.string tag )
+                , ( "e0", Expr.encode e0 )
+                , ( "e1", Expr.encode e1 )
+                , ( "id", Store.encodeId id )
+                , ( "id0", Store.encodeId id0 )
+                , ( "id1", Store.encodeId id1 )
+                , ( "ratio", Encode.float ratio )
+                ]
+
+        encodeName =
+            Encode.string point.name
+
+        encodeData =
+            case point.data of
+                Absolute e0 e1 ->
+                    def "absolute" e0 e1 (Store.idUnsafe 0) (Store.idUnsafe 0) (Store.idUnsafe 0) 0.0
+
+                Relative id e0 e1 ->
+                    def "relative" e0 e1 id (Store.idUnsafe 0) (Store.idUnsafe 0) 0.0
+
+                Distance id e0 e1 ->
+                    def "distance" e0 e1 id (Store.idUnsafe 0) (Store.idUnsafe 0) 0.0
+
+                Between id0 id1 ratio ->
+                    def "between" (Expr.Number 0.0) (Expr.Number 0.0) (Store.idUnsafe 0) id0 id1 ratio
     in
-    case point of
-        Absolute e0 e1 ->
-            def "absolute" e0 e1 (Store.idUnsafe 0) (Store.idUnsafe 0) (Store.idUnsafe 0) 0.0
-        Relative id e0 e1 ->
-            def "relative" e0 e1 id (Store.idUnsafe 0) (Store.idUnsafe 0) 0.0
-        Distance id e0 e1 ->
-            def "distance" e0 e1 id (Store.idUnsafe 0) (Store.idUnsafe 0) 0.0
-        Between id0 id1 ratio ->
-            def "between" (Expr.Number 0.0) (Expr.Number 0.0) (Store.idUnsafe 0) id0 id1 ratio
+    Encode.object
+        [ ( "name", encodeName )
+        , ( "data", encodeData )
+        ]
 
 
 decode : Decoder Point
 decode =
-    Decode.at [ "tag" ] Decode.string
-    |> Decode.andThen (\tag ->
-           case tag of
-               "absolute" ->
-                   Decode.map2 Absolute
-                       (Decode.at [ "e0" ] Expr.decode)
-                       (Decode.at [ "e1" ] Expr.decode)
-               "relative" ->
-                   Decode.map3 Relative
-                       (Decode.at [ "id" ] Store.decodeId)
-                       (Decode.at [ "e0" ] Expr.decode)
-                       (Decode.at [ "e1" ] Expr.decode)
-               "distance" ->
-                   Decode.map3 Distance
-                       (Decode.at [ "id" ] Store.decodeId)
-                       (Decode.at [ "e0" ] Expr.decode)
-                       (Decode.at [ "e1" ] Expr.decode)
-               "between" ->
-                   Decode.map3 Between
-                       (Decode.at [ "id0" ] Store.decodeId)
-                       (Decode.at [ "id1" ] Store.decodeId)
-                       (Decode.at [ "ratio" ] Decode.float)
-               _ ->
-                   Decode.fail "decodePoint: mailformed input"
-       )
+    let
+        dataDecoder =
+            Decode.at [ "tag" ] Decode.string
+                |> Decode.andThen
+                    (\tag ->
+                        case tag of
+                            "absolute" ->
+                                Decode.map2 Absolute
+                                    (Decode.at [ "e0" ] Expr.decode)
+                                    (Decode.at [ "e1" ] Expr.decode)
+
+                            "relative" ->
+                                Decode.map3 Relative
+                                    (Decode.at [ "id" ] Store.decodeId)
+                                    (Decode.at [ "e0" ] Expr.decode)
+                                    (Decode.at [ "e1" ] Expr.decode)
+
+                            "distance" ->
+                                Decode.map3 Distance
+                                    (Decode.at [ "id" ] Store.decodeId)
+                                    (Decode.at [ "e0" ] Expr.decode)
+                                    (Decode.at [ "e1" ] Expr.decode)
+
+                            "between" ->
+                                Decode.map3 Between
+                                    (Decode.at [ "id0" ] Store.decodeId)
+                                    (Decode.at [ "id1" ] Store.decodeId)
+                                    (Decode.at [ "ratio" ] Decode.float)
+
+                            _ ->
+                                Decode.fail "decodePoint: mailformed input"
+                    )
+
+        nameDecoder =
+            Decode.string
+    in
+    Decode.map2
+        (\name data ->
+            Point
+                { name = name
+                , data = data
+                }
+        )
+        (Decode.at [ "name" ] nameDecoder)
+        (Decode.at [ "data" ] dataDecoder)
