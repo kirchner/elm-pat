@@ -11,9 +11,11 @@ import Css
 import Dict exposing (Dict)
 import Events
 import Expr exposing (..)
+import FormatNumber
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.Events as Html
+import Keyboard.Extra as Keyboard
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
 import Styles.Colors as Colors exposing (..)
@@ -21,7 +23,6 @@ import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
 import Svg.Extra as Svg
-import FormatNumber
 import Tools.Common as Tools
     exposing
         ( Callbacks
@@ -89,7 +90,14 @@ point data state =
         angleCursor =
             deltaCursor
                 |> Maybe.map (\delta -> atan2 (getY delta) (getX delta))
+                |> Maybe.map snap
                 |> Maybe.map Number
+
+        snap angle =
+            if List.member Keyboard.Control data.pressedKeys then
+                snapAngle 8 angle
+            else
+                angle
 
         distance =
             distanceCursor |> Maybe.or state.distance
@@ -137,11 +145,11 @@ newPoint data state =
             add (scale (1 - t) u) (scale t v)
 
         format =
-          FormatNumber.format
-              { decimals = 2
-              , thousandSeparator = " "
-              , decimalSeparator = "."
-              }
+            FormatNumber.format
+                { decimals = 2
+                , thousandSeparator = " "
+                , decimalSeparator = "."
+                }
 
         draw anchorPosition =
             pointPosition data state anchorPosition
@@ -153,10 +161,10 @@ newPoint data state =
                             , Svg.drawArrow anchorPosition pointPosition
                             , Svg.drawAngleArc Svg.defaultArcConfig anchorPosition pointPosition
                             , Svg.label
-                              [ Svg.transform (Svg.translate (lerp 0.5 anchorPosition pointPosition))
-                              ]
-                              [ Svg.text (format (length (sub pointPosition anchorPosition)))
-                              ]
+                                [ Svg.transform (Svg.translate (lerp 0.5 anchorPosition pointPosition))
+                                ]
+                                [ Svg.text (format (length (sub pointPosition anchorPosition)))
+                                ]
                             ]
                     )
     in
@@ -248,9 +256,15 @@ pointPosition : Data -> State -> Vec2 -> Maybe Vec2
 pointPosition data state anchorPosition =
     let
         position distance angle =
-            vec2 (cos angle) (sin angle)
+            vec2 (cos (snap angle)) (sin (snap angle))
                 |> scale distance
                 |> add anchorPosition
+
+        snap angle =
+            if List.member Keyboard.Control data.pressedKeys then
+                snapAngle 8 angle
+            else
+                angle
     in
     case
         data.cursorPosition
@@ -276,3 +290,12 @@ pointPosition data state anchorPosition =
             Maybe.map2 position
                 (state.distance |> Maybe.andThen (compute data.variables))
                 (state.angle |> Maybe.andThen (compute data.variables))
+
+
+snapAngle : Int -> Float -> Float
+snapAngle count angle =
+    let
+        divisor =
+            2 * pi / toFloat count
+    in
+    toFloat (round (angle / divisor)) * divisor
