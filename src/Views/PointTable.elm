@@ -7,19 +7,14 @@ import Html exposing (..)
 import Html.Attributes as Html
 import Html.Events exposing (..)
 import Math.Vector2 exposing (..)
+import Point exposing (Point)
 import Styles.PointTable
     exposing
         ( Class(..)
         , class
         )
-import Types
-    exposing
-        ( Id
-        , Point
-        , PointStore
-        )
-import Views.Common exposing (iconSmall)
 import Tools.Common exposing (Data)
+import Views.Common exposing (iconSmall)
 
 
 view : Data -> Html Msg
@@ -40,9 +35,10 @@ view data =
             , th
                 [ class [ CellType ] ]
                 []
-              --, th
-              --    [ class [ CellAction ] ]
-              --    []
+
+            --, th
+            --    [ class [ CellAction ] ]
+            --    []
             , th
                 [ class [ CellAction ] ]
                 []
@@ -54,11 +50,11 @@ view data =
         )
 
 
-viewPointEntry : Data -> ( Id, Point ) -> Html Msg
+viewPointEntry : Data -> ( Point.Id, Point ) -> Html Msg
 viewPointEntry data ( id, point ) =
     let
         v =
-            Types.position data.store data.variables point
+            Point.position data.store data.variables point
 
         x =
             v
@@ -80,52 +76,53 @@ viewPointEntry data ( id, point ) =
         isSelectedLast =
             Just id == List.head data.selectedPoints
     in
-        tr
-            [ class
-                ([ Just Row
-                 , if isSelected then
-                    Just RowSelected
-                   else
-                    Nothing
-                 , if isSelectedLast then
-                    Just RowSelectedLast
-                   else
-                    Nothing
-                 ]
-                    |> List.filterMap identity
-                )
-            ]
-            [ td
-                [ class [ CellId ] ]
-                [ text (toString id) ]
-            , td
-                [ class [ CellCoordinate ] ]
-                [ text x ]
-            , td
-                [ class [ CellCoordinate ] ]
-                [ text y ]
-            , td
-                [ class [ CellType ] ]
-                [ text (printPoint data.variables point) ]
-              --, td
-              --    [ class [ CellAction ] ]
-              --    [ iconSmall "edit" (SelectPoint id) ]
-            , td
-                [ class [ CellAction ] ]
-                [ iconSmall "delete" (DeletePoint id) ]
-            ]
+    tr
+        [ class
+            ([ Just Row
+             , if isSelected then
+                Just RowSelected
+               else
+                Nothing
+             , if isSelectedLast then
+                Just RowSelectedLast
+               else
+                Nothing
+             ]
+                |> List.filterMap identity
+            )
+        ]
+        [ td
+            [ class [ CellId ] ]
+            [ text (toString id) ]
+        , td
+            [ class [ CellCoordinate ] ]
+            [ text x ]
+        , td
+            [ class [ CellCoordinate ] ]
+            [ text y ]
+        , td
+            [ class [ CellType ] ]
+            [ text (printPoint data.variables point) ]
+
+        --, td
+        --    [ class [ CellAction ] ]
+        --    [ iconSmall "edit" (SelectPoint id) ]
+        , td
+            [ class [ CellAction ] ]
+            [ iconSmall "delete" (DeletePoint id) ]
+        ]
 
 
 printPoint : Dict String E -> Point -> String
 printPoint variables point =
     case point of
-        Types.Absolute _ _ ->
+        Point.Absolute _ _ ->
             "absolute"
 
-        Types.Relative _ _ _ ->
+        Point.Relative _ _ _ ->
             "relative"
 
-        Types.Distance _ _ _ ->
+        Point.Distance _ _ _ ->
             "distance"
 
         _ ->

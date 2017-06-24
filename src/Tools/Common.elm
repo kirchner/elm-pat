@@ -36,27 +36,28 @@ import Svg.Extra as Svg
 import Tools.Styles exposing (..)
 import Types exposing (..)
 import Views.Common exposing (iconSmall)
+import Point exposing (Point)
 
 
 type alias Data =
-    { store : PointStore
+    { store : Point.Store
     , pieceStore : Dict Int Piece
     , variables : Dict String E
     , viewPort : ViewPort
     , cursorPosition : Maybe Position
-    , focusedPoint : Maybe Id
+    , focusedPoint : Maybe Point.Id
     , pressedKeys : List Key
-    , selectedPoints : List Id
+    , selectedPoints : List Point.Id
     }
 
 
 type alias Callbacks msg =
     { addPoint : Point -> msg
     , updateCursorPosition : Maybe Position -> msg
-    , focusPoint : Maybe Id -> msg
-    , selectPoint : Maybe Id -> msg
+    , focusPoint : Maybe Point.Id -> msg
+    , selectPoint : Maybe Point.Id -> msg
     , clearSelection : msg
-    , extendPiece : Int -> Id -> Maybe Id -> msg
+    , extendPiece : Int -> Point.Id -> Maybe Point.Id -> msg
     }
 
 
@@ -84,7 +85,7 @@ svgUpdateMouse mouseClicked updateCursorPosition data =
         []
 
 
-svgSelectPoint : (Maybe Id -> msg) -> (Maybe Id -> msg) -> Data -> Svg msg
+svgSelectPoint : (Maybe Point.Id -> msg) -> (Maybe Point.Id -> msg) -> Data -> Svg msg
 svgSelectPoint focusPoint selectPoint data =
     Dict.toList data.store
         |> List.filterMap (pointSelector_ focusPoint selectPoint data)
@@ -92,10 +93,10 @@ svgSelectPoint focusPoint selectPoint data =
 
 
 pointSelector_ :
-    (Maybe Id -> msg)
-    -> (Maybe Id -> msg)
+    (Maybe Point.Id -> msg)
+    -> (Maybe Point.Id -> msg)
     -> Data
-    -> ( Id, Point )
+    -> ( Point.Id, Point )
     -> Maybe (Svg msg)
 pointSelector_ focusPoint selectPoint data ( id, point ) =
     let
@@ -118,7 +119,7 @@ pointSelector_ focusPoint selectPoint data ( id, point ) =
                     Svg.g [] []
                 ]
     in
-    position data.store data.variables point
+    Point.position data.store data.variables point
         |> Maybe.map draw
 
 

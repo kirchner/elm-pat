@@ -7,6 +7,7 @@ module Tools.ExtendPiece
 
 import Dict
 import Piece exposing (..)
+import Point exposing (Point)
 import Styles.Colors as Colors
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
@@ -53,7 +54,7 @@ lineSegments data state =
     case
         ( data.cursorPosition
         , data.focusedPoint
-            |> Maybe.andThen (positionById data.store data.variables)
+            |> Maybe.andThen (Point.positionById data.store data.variables)
         , Dict.get state.piece data.pieceStore
             |> Maybe.andThen (Piece.next state.segment)
         )
@@ -61,13 +62,13 @@ lineSegments data state =
         ( Just position, _, Just next ) ->
             let
                 a =
-                    positionById data.store data.variables state.segment
+                    Point.positionById data.store data.variables state.segment
 
                 b =
                     toVec position
 
                 c =
-                    positionById data.store data.variables next
+                    Point.positionById data.store data.variables next
             in
             case ( a, c ) of
                 ( Just a, Just c ) ->
@@ -83,10 +84,10 @@ lineSegments data state =
         ( Nothing, Just b, Just next ) ->
             let
                 a =
-                    positionById data.store data.variables state.segment
+                    Point.positionById data.store data.variables state.segment
 
                 c =
-                    positionById data.store data.variables next
+                    Point.positionById data.store data.variables next
             in
             case ( a, c ) of
                 ( Just a, Just c ) ->

@@ -35,13 +35,14 @@ import Tools.Common as Tools
         )
 import Tools.Styles exposing (..)
 import Types exposing (..)
+import Point exposing (Point)
 
 
 type alias State =
     { anchor : Maybe String
     , distance : Maybe E
     , angle : Maybe E
-    , id : Maybe Id
+    , id : Maybe Point.Id
     }
 
 
@@ -54,7 +55,7 @@ init data =
     }
 
 
-initWith : Id -> Id -> E -> E -> State
+initWith : Point.Id -> Point.Id -> E -> E -> State
 initWith id anchor distance angle =
     { anchor = Just (toString anchor)
     , distance = Just distance
@@ -77,7 +78,7 @@ point data state =
         anchorPosition =
             anchorId
                 |> Maybe.andThen (flip Dict.get data.store)
-                |> Maybe.andThen (position data.store data.variables)
+                |> Maybe.andThen (Point.position data.store data.variables)
 
         deltaCursor =
             Maybe.map2 sub cursorPosition anchorPosition
@@ -105,7 +106,7 @@ point data state =
         angle =
             angleCursor |> Maybe.or state.angle
     in
-    Maybe.map3 Distance anchorId distance angle
+    Maybe.map3 Point.Distance anchorId distance angle
 
 
 
@@ -270,7 +271,7 @@ anchorPosition data state =
     state.anchor
         |> Maybe.andThen (String.toInt >> Result.toMaybe)
         |> Maybe.andThen (flip Dict.get data.store)
-        |> Maybe.andThen (position data.store data.variables)
+        |> Maybe.andThen (Point.position data.store data.variables)
 
 
 pointPosition : Data -> State -> Vec2 -> Maybe Vec2

@@ -19,13 +19,14 @@ import Tools.Common
         , svgSelectPoint
         )
 import Types exposing (..)
+import Point exposing (Point)
 
 
 view :
     Svg msg
     -> (Position -> msg)
-    -> (Maybe Id -> msg)
-    -> (Maybe Id -> msg)
+    -> (Maybe Point.Id -> msg)
+    -> (Maybe Point.Id -> msg)
     -> (Int -> Int -> msg)
     -> Data
     -> Dict Int Piece
@@ -219,14 +220,14 @@ viewSelectedPoints data =
         |> Svg.g []
 
 
-viewSelectedPoint : Data -> Bool -> Id -> Maybe (Svg msg)
+viewSelectedPoint : Data -> Bool -> Point.Id -> Maybe (Svg msg)
 viewSelectedPoint data first id =
     let
-        pointPosition =
+        position =
             Dict.get id data.store
-                |> Maybe.andThen (position data.store data.variables)
+                |> Maybe.andThen (Point.position data.store data.variables)
     in
-    case pointPosition of
+    case position of
         Just position ->
             Just <|
                 Svg.g []
@@ -277,11 +278,11 @@ points data =
 point : Data -> Point -> Maybe (Svg msg)
 point data point =
     case point of
-        Absolute _ _ ->
-            position data.store data.variables point
+        Point.Absolute _ _ ->
+            Point.position data.store data.variables point
                 |> Maybe.map (Svg.drawPoint Colors.base0)
 
-        Relative id _ _ ->
+        Point.Relative id _ _ ->
             let
                 draw v w =
                     Svg.g []
@@ -291,10 +292,10 @@ point data point =
             in
             Maybe.map2
                 draw
-                (positionById data.store data.variables id)
-                (position data.store data.variables point)
+                (Point.positionById data.store data.variables id)
+                (Point.position data.store data.variables point)
 
-        Distance id _ _ ->
+        Point.Distance id _ _ ->
             let
                 draw v w =
                     Svg.g []
@@ -304,10 +305,10 @@ point data point =
             in
             Maybe.map2
                 draw
-                (positionById data.store data.variables id)
-                (position data.store data.variables point)
+                (Point.positionById data.store data.variables id)
+                (Point.position data.store data.variables point)
 
-        Between idA idB _ ->
+        Point.Between idA idB _ ->
             Just (Svg.g [] [])
 
 
@@ -323,7 +324,7 @@ piece extendPiece data ( id, piece ) =
     let
         segments =
             Piece.toList piece
-                |> List.filterMap (positionById data.store data.variables)
+                |> List.filterMap (Point.positionById data.store data.variables)
                 |> List.zip (Piece.toList piece)
     in
     case segments of

@@ -27,6 +27,7 @@ import Keyboard.Extra as Keyboard exposing (Key)
 import Math.Vector2 exposing (..)
 import Mouse
 import Piece exposing (Piece)
+import Point exposing (Point)
 import Set exposing (Set)
 import Task
 import Tools.Absolute as Absolute
@@ -43,8 +44,8 @@ import Window
 
 
 type alias Model =
-    { store : PointStore
-    , nextId : Id
+    { store : Point.Store
+    , nextId : Point.Id
     , pieceStore : Dict Int Piece
     , nextPieceId : Int
     , variables : Dict String E
@@ -54,9 +55,9 @@ type alias Model =
     , viewPort : ViewPort
     , drag : Maybe Drag
     , cursorPosition : Maybe Position
-    , focusedPoint : Maybe Id
+    , focusedPoint : Maybe Point.Id
     , pressedKeys : List Key
-    , selectedPoints : List Id
+    , selectedPoints : List Point.Id
     }
 
 
@@ -147,8 +148,8 @@ type alias Drag =
 type Msg
     = UpdateTool Tool
     | AddPoint Point
-    | UpdatePoint Id Point
-    | DeletePoint Id
+    | UpdatePoint Point.Id Point
+    | DeletePoint Point.Id
     | ValueUpdated String
     | NameUpdated String
     | AddVariable
@@ -157,18 +158,18 @@ type Msg
     | DragAt Position
     | DragStop Position
     | UpdateCursorPosition (Maybe Position)
-    | FocusPoint (Maybe Id)
+    | FocusPoint (Maybe Point.Id)
     | KeyMsg Keyboard.Msg
     | KeyDown Keyboard.Key
-    | SelectPoint (Maybe Id)
+    | SelectPoint (Maybe Point.Id)
     | ClearSelection
-    | ExtendPieceMsg Int Id (Maybe Id)
+    | ExtendPieceMsg Int Point.Id (Maybe Point.Id)
 
 
 init : ( Model, Cmd Msg )
 init =
-    { store = emptyStore
-    , nextId = firstId
+    { store = Point.emptyStore
+    , nextId = Point.firstId
     , pieceStore = Dict.empty
     , nextPieceId = 0
     , variables = Dict.empty

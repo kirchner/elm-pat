@@ -15,6 +15,7 @@ import Html.Attributes as Html
 import Html.Events as Html
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
+import Point exposing (Point)
 import Styles.Colors as Colors exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
@@ -34,7 +35,7 @@ import Types exposing (..)
 type alias State =
     { x : Maybe E
     , y : Maybe E
-    , id : Maybe Id
+    , id : Maybe Point.Id
     }
 
 
@@ -46,7 +47,7 @@ init =
     }
 
 
-initWith : Id -> E -> E -> State
+initWith : Point.Id -> E -> E -> State
 initWith id x y =
     { x = Just x
     , y = Just y
@@ -71,7 +72,7 @@ point data state =
         y =
             yCursor |> Maybe.or state.y
     in
-    Maybe.map2 Absolute x y
+    Maybe.map2 Point.Absolute x y
 
 
 

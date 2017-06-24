@@ -13,13 +13,8 @@ import Styles.VariableTable
         , class
         , classList
         )
-import Types
-    exposing
-        ( Id
-        , Point
-        , PointStore
-        )
 import Views.Common exposing (iconSmall)
+import Point
 
 
 view : Dict String E -> Maybe String -> Maybe E -> Html Msg

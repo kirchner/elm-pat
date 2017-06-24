@@ -35,12 +35,13 @@ import Tools.Common as Tools
         )
 import Tools.Styles exposing (..)
 import Types exposing (..)
+import Point exposing (Point)
 
 
 type alias State =
     { x : Maybe E
     , y : Maybe E
-    , id : Maybe Id
+    , id : Maybe Point.Id
     , dropdownState : Tools.DropdownState
     , selectedPoint : Maybe ( Int, Point )
     }
@@ -67,7 +68,7 @@ init data =
     }
 
 
-initWith : Id -> Id -> E -> E -> State
+initWith : Point.Id -> Point.Id -> E -> E -> State
 initWith id anchor x y =
     { x = Just x
     , y = Just y
@@ -87,7 +88,7 @@ point data state =
         anchorPosition =
             anchorId
                 |> Maybe.andThen (flip Dict.get data.store)
-                |> Maybe.andThen (position data.store data.variables)
+                |> Maybe.andThen (Point.position data.store data.variables)
 
         xCursor =
             data.cursorPosition
@@ -113,7 +114,7 @@ point data state =
         yOffset =
             yOffsetCursor |> Maybe.or state.y
     in
-    Maybe.map3 Relative anchorId xOffset yOffset
+    Maybe.map3 Point.Relative anchorId xOffset yOffset
 
 
 
@@ -236,7 +237,7 @@ anchorPosition data state =
     state.selectedPoint
         |> Maybe.map Tuple.first
         |> Maybe.andThen (flip Dict.get data.store)
-        |> Maybe.andThen (position data.store data.variables)
+        |> Maybe.andThen (Point.position data.store data.variables)
 
 
 pointPosition : Data -> State -> Vec2 -> Maybe Vec2

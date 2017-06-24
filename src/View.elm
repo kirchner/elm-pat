@@ -39,10 +39,7 @@ import Tools.ExtendPiece as ExtendPiece
 import Tools.Relative as Relative
 import Types
     exposing
-        ( Id
-        , Point
-        , PointStore
-        , Position
+        ( Position
         , ViewPort
         )
 import View.Canvas as Canvas

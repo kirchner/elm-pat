@@ -11,18 +11,19 @@ module Piece
 import Dict exposing (Dict)
 import Expr exposing (..)
 import Types exposing (..)
+import Point
 
 
 type Piece
-    = Piece { points : List Id }
+    = Piece { points : List Point.Id }
 
 
-fromList : PointStore -> Dict String E -> List Id -> Maybe Piece
+fromList : Point.Store -> Dict String E -> List Point.Id -> Maybe Piece
 fromList store variables points =
     let
         positions =
             points
-                |> List.filterMap (positionById store variables)
+                |> List.filterMap (Point.positionById store variables)
 
         pointCount =
             List.length points
@@ -34,17 +35,17 @@ fromList store variables points =
         Just <| Piece { points = points }
 
 
-toList : Piece -> List Id
+toList : Piece -> List Point.Id
 toList (Piece piece) =
     piece.points
 
 
-next : Id -> Piece -> Maybe Id
+next : Point.Id -> Piece -> Maybe Point.Id
 next id (Piece piece) =
-    nextHelper firstId id piece.points
+    nextHelper Point.firstId id piece.points
 
 
-nextHelper : Id -> Id -> List Id -> Maybe Id
+nextHelper : Point.Id -> Point.Id -> List Point.Id -> Maybe Point.Id
 nextHelper firstId id points =
     case points of
         first :: second :: rest ->
@@ -63,7 +64,7 @@ nextHelper firstId id points =
             Nothing
 
 
-insertAfter : PointStore -> Dict String E -> Id -> Id -> Piece -> Piece
+insertAfter : Point.Store -> Dict String E -> Point.Id -> Point.Id -> Piece -> Piece
 insertAfter store variables new reference (Piece piece) =
     -- TODO: check for self intersections
     let
@@ -80,6 +81,6 @@ insertAfter store variables new reference (Piece piece) =
     Piece { points = newPoints }
 
 
-insertBefore : PointStore -> Dict String E -> Id -> Id -> Piece -> Piece
+insertBefore : Point.Store -> Dict String E -> Point.Id -> Point.Id -> Piece -> Piece
 insertBefore store variables new reference piece =
     Debug.crash "implement insertBefore"
