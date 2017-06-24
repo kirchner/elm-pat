@@ -32,9 +32,22 @@ view :
 view tool startDrag focusPoint selectPoint extendPiece data pieceStore =
     let
         viewBoxString =
+            let
+                wh =
+                    data.viewPort.width//2
+
+                hh =
+                    data.viewPort.height//2
+
+                dx =
+                    data.viewPort.offset.x
+
+                dy =
+                    data.viewPort.offset.y
+            in
             String.join " "
-                [ toString data.viewPort.x
-                , toString data.viewPort.y
+                [ toString (dx-wh)
+                , toString (dy-hh)
                 , toString data.viewPort.width
                 , toString data.viewPort.height
                 ]
@@ -110,10 +123,10 @@ grid config viewPort =
             n // 2
 
         dx =
-            viewPort.x + (viewPort.width // 2)
+            viewPort.offset.x
 
         dy =
-            viewPort.y + (viewPort.height // 2)
+            viewPort.offset.y
 
         -- so that the grid does not translate
         translationOffset =
@@ -123,7 +136,7 @@ grid config viewPort =
         -- (note that this affects computation of highlight colors k)
         correctionOffset =
             vec2 (toFloat (-dx % config.offset))
-                (toFloat (-dy % config.offset))
+                 (toFloat (-dy % config.offset))
 
         pr u =
             u
@@ -196,8 +209,8 @@ grid config viewPort =
 dragArea : (Position -> msg) -> ViewPort -> Svg msg
 dragArea startDrag viewPort =
     Svg.rect
-        [ Svg.x (toString viewPort.x)
-        , Svg.y (toString viewPort.y)
+        [ Svg.x (toString (viewPort.offset.x - (viewPort.width // 2)))
+        , Svg.y (toString (viewPort.offset.y - (viewPort.height // 2)))
         , Svg.width (toString viewPort.width)
         , Svg.height (toString viewPort.height)
         , Svg.fill "transparent"

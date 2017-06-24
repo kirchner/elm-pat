@@ -282,10 +282,13 @@ update ports msg model =
             Resize size ->
                 { model
                     | viewPort =
-                        { x = size.width // -2
-                        , y = size.height // -2
-                        , width = size.width
-                        , height = size.height
+                        let
+                            def =
+                                model.viewPort
+                        in
+                        { def
+                          | width = size.width
+                          , height = size.height
                         }
                 }
                     ! []
@@ -450,10 +453,13 @@ getViewPort oldViewPort drag =
             oldViewPort
 
         Just { start, current } ->
-            { oldViewPort
-                | x = oldViewPort.x - (current.x - start.x)
-                , y = oldViewPort.y - (current.y - start.y)
-            }
+            let
+                offset =
+                  { x = oldViewPort.offset.x - (current.x - start.x)
+                  , y = oldViewPort.offset.y - (current.y - start.y)
+                  }
+            in
+            { oldViewPort | offset = offset }
 
 
 subscriptions : Model -> Sub Msg

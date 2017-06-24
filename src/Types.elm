@@ -24,24 +24,24 @@ toVec p =
 
 
 type alias ViewPort =
-    { x : Int
-    , y : Int
+    { offset : { x  : Int, y : Int }
     , width : Int
     , height : Int
+    , zoom : Float
     }
 
 
 canvasToSvg : ViewPort -> Position -> Position
 canvasToSvg viewPort p =
-    { x = p.x - viewPort.x
-    , y = p.y - viewPort.y
+    { x = p.x - viewPort.offset.x + (viewPort.width // 2)
+    , y = p.y - viewPort.offset.y + (viewPort.height // 2)
     }
 
 
 svgToCanvas : ViewPort -> Position -> Position
 svgToCanvas viewPort p =
-    { x = p.x + viewPort.x
-    , y = p.y + viewPort.y
+    { x = p.x + viewPort.offset.x - (viewPort.width // 2)
+    , y = p.y + viewPort.offset.y - (viewPort.height // 2)
     }
 
 

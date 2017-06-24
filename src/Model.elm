@@ -54,10 +54,11 @@ defaultModel =
     , newValue = Nothing
     , tool = None
     , viewPort =
-        { x = -320
-        , y = -320
+        { offset =
+            { x = 0, y = 0 }
         , width = 640
         , height = 640
+        , zoom = 1
         }
     , drag = Nothing
     , cursorPosition = Nothing

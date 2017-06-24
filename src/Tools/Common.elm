@@ -59,11 +59,15 @@ type alias Callbacks msg =
 
 svgUpdateMouse : Maybe msg -> (Maybe Position -> msg) -> Data -> Svg msg
 svgUpdateMouse mouseClicked updateCursorPosition data =
+    let
+        viewPort =
+            data.viewPort
+    in
     Svg.rect
-        ([ Svg.x (toString data.viewPort.x)
-         , Svg.y (toString data.viewPort.y)
-         , Svg.width (toString data.viewPort.width)
-         , Svg.height (toString data.viewPort.height)
+        ([ Svg.x (toString (viewPort.offset.x - (viewPort.width // 2)))
+         , Svg.y (toString (viewPort.offset.y - (viewPort.height // 2)))
+         , Svg.width (toString viewPort.width)
+         , Svg.height (toString viewPort.height)
          , Svg.fill "transparent"
          , Svg.strokeWidth "0"
          , Events.onMove (updateCursorPosition << Just)
