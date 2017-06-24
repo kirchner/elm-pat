@@ -1,6 +1,5 @@
 module View exposing (view)
 
-import Dict exposing (Dict)
 import Editor
     exposing
         ( Msg(..)
@@ -11,15 +10,9 @@ import Editor
         , toolDescription
         , toolName
         )
-import Model exposing (Model, Tool(..))
-import Expr exposing (..)
+import FileBrowser exposing (FileBrowser)
 import Html exposing (Html)
-import Html.Attributes as Html
-import Html.Events as Events
-import Keyboard.Extra exposing (Key)
-import Math.Vector2 exposing (..)
-import Set exposing (Set)
-import Styles.Colors exposing (..)
+import Model exposing (Model, Tool(..))
 import Styles.Editor
     exposing
         ( Class(..)
@@ -36,16 +29,10 @@ import Tools.Common
 import Tools.Distance as Distance
 import Tools.ExtendPiece as ExtendPiece
 import Tools.Relative as Relative
-import Types
-    exposing
-        ( Position
-        , ViewPort
-        )
 import View.Canvas as Canvas
 import Views.PointTable as PointTable
 import Views.ToolBox as ToolBox
 import Views.VariableTable as VariableTable
-import FileBrowser exposing (FileBrowser)
 
 
 {- main view -}
@@ -65,11 +52,11 @@ view model =
         Html.div
             [ class [ Container, ContainerTopRight ] ]
             [ FileBrowser.view
-                  { lift = FileBrowserMsg
-                  , clearSession = Just ClearSession
-                  , loadRemoteFile = Just LoadRemoteFile
-                  }
-                  data
+                { lift = FileBrowserMsg
+                , clearSession = Just ClearSession
+                , loadRemoteFile = Just LoadRemoteFile
+                }
+                data
             ]
     , viewToolInfo callbacks data model.tool
     , Just <|

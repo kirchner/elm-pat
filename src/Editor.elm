@@ -1,6 +1,7 @@
 module Editor
     exposing
         ( Msg(..)
+        , Ports
         , Flags
         , allTools
         , callbacks

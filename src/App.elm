@@ -1,21 +1,20 @@
 port module App exposing (main)
 
-import Html exposing (Html)
-
-
 {- internal -}
 
-import Model exposing (Model)
 import Editor
     exposing
-        ( Msg
-        , Flags
+        ( Flags
+        , Msg
+        , Ports
         , init
-        , update
         , subscriptions
+        , update
         )
-import View exposing (view)
+import Html exposing (Html)
 import Json.Decode exposing (Value)
+import Model exposing (Model)
+import View exposing (view)
 
 
 main : Program Flags Model Msg
@@ -28,6 +27,7 @@ main =
         }
 
 
+ports : Ports
 ports =
     { autofocus = autofocus
     , serialize = serialize
@@ -35,5 +35,6 @@ ports =
 
 
 port autofocus : () -> Cmd msg
+
 
 port serialize : Value -> Cmd msg
