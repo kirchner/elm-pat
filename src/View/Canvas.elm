@@ -34,10 +34,10 @@ view tool startDrag focusPoint selectPoint extendPiece data pieceStore =
         viewBoxString =
             let
                 wh =
-                    data.viewPort.width//2
+                    data.viewPort.width // 2
 
                 hh =
-                    data.viewPort.height//2
+                    data.viewPort.height // 2
 
                 dx =
                     data.viewPort.offset.x
@@ -46,8 +46,8 @@ view tool startDrag focusPoint selectPoint extendPiece data pieceStore =
                     data.viewPort.offset.y
             in
             String.join " "
-                [ toString (dx-wh)
-                , toString (dy-hh)
+                [ toString (dx - wh)
+                , toString (dy - hh)
                 , toString data.viewPort.width
                 , toString data.viewPort.height
                 ]
@@ -136,7 +136,7 @@ grid config viewPort =
         -- (note that this affects computation of highlight colors k)
         correctionOffset =
             vec2 (toFloat (-dx % config.offset))
-                 (toFloat (-dy % config.offset))
+                (toFloat (-dy % config.offset))
 
         pr u =
             u
