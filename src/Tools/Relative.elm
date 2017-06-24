@@ -29,12 +29,10 @@ import Tools.Common as Tools
         ( Callbacks
         , Data
         , exprInput
-        , idDropdown
         , svgSelectPoint
         , svgUpdateMouse
-        , updateDropdownState
-        , viewPointSelect
         )
+import Tools.Dropdown as Dropdown
 import Tools.Styles exposing (..)
 import Types exposing (..)
 
@@ -43,7 +41,7 @@ type alias State =
     { x : Maybe E
     , y : Maybe E
     , id : Maybe (Id Point)
-    , dropdownState : Tools.DropdownState
+    , dropdownState : Dropdown.State
     , selectedPoint : Maybe ( Id Point, Point )
     }
 
@@ -53,7 +51,7 @@ init data =
     { x = Nothing
     , y = Nothing
     , id = Nothing
-    , dropdownState = Tools.initDropdownState
+    , dropdownState = Dropdown.init
     , selectedPoint =
         case List.head data.selectedPoints of
             Just id ->
@@ -74,7 +72,7 @@ initWith id anchor x y =
     { x = Just x
     , y = Just y
     , id = Just id
-    , dropdownState = Tools.initDropdownState
+    , dropdownState = Dropdown.init
     , selectedPoint = Nothing
     }
 
@@ -209,11 +207,8 @@ view callbacks updateStateCallback data state =
         updateAutoState autoMsg =
             let
                 ( newDropdownState, newSelectedPoint ) =
-                    updateDropdownState
-                        state.selectedPoint
-                        data
-                        autoMsg
-                        state.dropdownState
+                    state.dropdownState
+                        |> Dropdown.update state.selectedPoint data autoMsg
             in
             updateStateCallback
                 { state
@@ -221,7 +216,7 @@ view callbacks updateStateCallback data state =
                     , selectedPoint = newSelectedPoint
                 }
     in
-    [ viewPointSelect state.selectedPoint data state.dropdownState
+    [ Dropdown.view state.selectedPoint data state.dropdownState
         |> map updateAutoState
     , exprInput "horizontal distance" state.x updateX
     , exprInput "vertical distance" state.y updateY

@@ -31,10 +31,10 @@ import Tools.Common as Tools
         , Data
         , exprInput
         , exprInput_
-        , idDropdown
         , svgSelectPoint
         , svgUpdateMouse
         )
+import Tools.Dropdown
 import Tools.Styles exposing (..)
 import Types exposing (..)
 
@@ -257,8 +257,8 @@ view callbacks updateState data state =
                 _ ->
                     ( "distance", "angle" )
     in
-    [ idDropdown data state.anchor updateAnchor
-    , exprInput_ True distancePlaceholder state.distance updateDistance
+    [-- idDropdown data state.anchor updateAnchor
+     exprInput_ True distancePlaceholder state.distance updateDistance
     , exprInput anglePlaceholder state.angle updateAngle
     ]
         |> Tools.view callbacks data state point
