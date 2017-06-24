@@ -69,11 +69,15 @@ css =
             [ position absolute
             , bottom (rem 1)
             , left (rem 1)
+            , maxHeight (rem 13)
+            , overflowY auto
             ]
         , class ContainerBottomRight
             [ position absolute
             , bottom (rem 1)
             , right (rem 1)
+            , maxHeight (rem 13)
+            , overflowY auto
             ]
         ]
 

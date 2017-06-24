@@ -41,7 +41,7 @@ css =
             [ class Table
                 [ property "pointer-events" "auto"
                 , fontFamily monospace
-                , fontSize (px 16)
+                , fontSize (px 12)
                 , lineHeight (rem 1)
                 , borderCollapse collapse
                 , children

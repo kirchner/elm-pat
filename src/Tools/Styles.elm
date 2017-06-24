@@ -51,7 +51,7 @@ css =
         , Css.class Textfield
             [ borderColor transparent
             , fontFamily monospace
-            , fontSize (rem 1)
+            , fontSize (px 12)
             , lineHeight (rem 1)
             , width (rem 20)
             , backgroundColor transparent

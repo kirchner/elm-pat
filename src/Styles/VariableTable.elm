@@ -40,7 +40,7 @@ css =
         [ class Table
             [ property "pointer-events" "auto"
             , fontFamily monospace
-            , fontSize (px 16)
+            , fontSize (px 12)
             , lineHeight (rem 1)
             , borderCollapse collapse
             , children
@@ -58,7 +58,7 @@ css =
                             , paddingRight (rem 0.3)
                             , paddingTop (rem 0.5)
                             , paddingBottom (rem 0.5)
-                            , verticalAlign top
+                            , verticalAlign middle
                             ]
                         ]
                     ]
@@ -108,7 +108,7 @@ css =
             , borderColor transparent
             , border zero
             , fontFamily monospace
-            , fontSize (px 16)
+            , fontSize (px 12)
             , lineHeight (rem 1)
             , width (rem 6)
             , backgroundColor transparent
