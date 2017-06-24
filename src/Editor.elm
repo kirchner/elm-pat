@@ -29,6 +29,7 @@ import Mouse
 import Piece exposing (Piece)
 import Point exposing (Point)
 import Set exposing (Set)
+import Store exposing (Id, Store)
 import Task
 import Tools.Absolute as Absolute
 import Tools.Common
@@ -46,8 +47,7 @@ import Window
 type alias Model =
     { store : Point.Store
     , nextId : Point.Id
-    , pieceStore : Dict Int Piece
-    , nextPieceId : Int
+    , pieceStore : Store Piece
     , variables : Dict String E
     , newName : Maybe String
     , newValue : Maybe E
@@ -163,15 +163,14 @@ type Msg
     | KeyDown Keyboard.Key
     | SelectPoint (Maybe Point.Id)
     | ClearSelection
-    | ExtendPieceMsg Int Point.Id (Maybe Point.Id)
+    | ExtendPieceMsg (Id Piece) Point.Id (Maybe Point.Id)
 
 
 init : ( Model, Cmd Msg )
 init =
     { store = Point.emptyStore
     , nextId = Point.firstId
-    , pieceStore = Dict.empty
-    , nextPieceId = 0
+    , pieceStore = Store.empty
     , variables = Dict.empty
     , newName = Nothing
     , newValue = Nothing
@@ -322,15 +321,11 @@ update ports msg model =
                                 |> Piece.fromList model.store model.variables
                                 |> Maybe.map
                                     (\piece ->
-                                        Dict.insert model.nextPieceId piece model.pieceStore
+                                        Store.insert piece model.pieceStore
                                     )
                         of
                             Just pieceStore ->
-                                { model
-                                    | pieceStore = pieceStore
-                                    , nextPieceId = model.nextPieceId + 1
-                                }
-                                    ! []
+                                { model | pieceStore = pieceStore } ! []
 
                             Nothing ->
                                 model ! []
@@ -393,7 +388,7 @@ update ports msg model =
                         in
                         { model
                             | pieceStore =
-                                Dict.update pieceId updatePiece model.pieceStore
+                                Store.update pieceId updatePiece model.pieceStore
                             , tool = None
                         }
                             ! []

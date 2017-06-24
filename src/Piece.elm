@@ -10,8 +10,8 @@ module Piece
 
 import Dict exposing (Dict)
 import Expr exposing (..)
-import Types exposing (..)
 import Point
+import Types exposing (..)
 
 
 type Piece

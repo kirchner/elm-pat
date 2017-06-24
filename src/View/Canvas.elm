@@ -8,6 +8,8 @@ import Html.Attributes as Html
 import List.Extra as List
 import Math.Vector2 exposing (..)
 import Piece exposing (..)
+import Point exposing (Point)
+import Store exposing (Store, Id)
 import Styles.Colors as Colors
 import Svg exposing (Svg, path)
 import Svg.Attributes as Svg
@@ -19,7 +21,6 @@ import Tools.Common
         , svgSelectPoint
         )
 import Types exposing (..)
-import Point exposing (Point)
 
 
 view :
@@ -27,9 +28,9 @@ view :
     -> (Position -> msg)
     -> (Maybe Point.Id -> msg)
     -> (Maybe Point.Id -> msg)
-    -> (Int -> Int -> msg)
+    -> (Id Piece -> Int -> msg)
     -> Data
-    -> Dict Int Piece
+    -> Store Piece
     -> Html msg
 view tool startDrag focusPoint selectPoint extendPiece data pieceStore =
     let
@@ -312,14 +313,14 @@ point data point =
             Just (Svg.g [] [])
 
 
-pieces : (Int -> Int -> msg) -> Data -> List (Svg msg)
+pieces : (Id Piece -> Int -> msg) -> Data -> List (Svg msg)
 pieces extendPiece data =
-    Dict.toList data.pieceStore
+    Store.toList data.pieceStore
         |> List.map (piece extendPiece data)
         |> List.map (Svg.g [])
 
 
-piece : (Int -> Int -> msg) -> Data -> ( Int, Piece ) -> List (Svg msg)
+piece : (Id Piece -> Int -> msg) -> Data -> ( Id Piece, Piece ) -> List (Svg msg)
 piece extendPiece data ( id, piece ) =
     let
         segments =

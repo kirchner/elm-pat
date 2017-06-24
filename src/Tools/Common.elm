@@ -37,11 +37,12 @@ import Tools.Styles exposing (..)
 import Types exposing (..)
 import Views.Common exposing (iconSmall)
 import Point exposing (Point)
+import Store exposing (Store, Id)
 
 
 type alias Data =
     { store : Point.Store
-    , pieceStore : Dict Int Piece
+    , pieceStore : Store Piece
     , variables : Dict String E
     , viewPort : ViewPort
     , cursorPosition : Maybe Position
@@ -57,7 +58,7 @@ type alias Callbacks msg =
     , focusPoint : Maybe Point.Id -> msg
     , selectPoint : Maybe Point.Id -> msg
     , clearSelection : msg
-    , extendPiece : Int -> Point.Id -> Maybe Point.Id -> msg
+    , extendPiece : Id Piece -> Point.Id -> Maybe Point.Id -> msg
     }
 
 

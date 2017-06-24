@@ -8,6 +8,7 @@ module Tools.ExtendPiece
 import Dict
 import Piece exposing (..)
 import Point exposing (Point)
+import Store exposing (Id, Store)
 import Styles.Colors as Colors
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
@@ -24,12 +25,12 @@ import Types exposing (..)
 
 
 type alias State =
-    { piece : Int
+    { piece : Id Piece
     , segment : Int
     }
 
 
-init : Int -> Int -> State
+init : Id Piece -> Int -> State
 init piece segment =
     { piece = piece
     , segment = segment
@@ -55,7 +56,7 @@ lineSegments data state =
         ( data.cursorPosition
         , data.focusedPoint
             |> Maybe.andThen (Point.positionById data.store data.variables)
-        , Dict.get state.piece data.pieceStore
+        , Store.get state.piece data.pieceStore
             |> Maybe.andThen (Piece.next state.segment)
         )
     of
