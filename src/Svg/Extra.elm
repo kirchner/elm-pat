@@ -223,7 +223,7 @@ drawAngleArc config anchorPosition pointPosition =
                         "0 0,1"
                       else
                         "0 0,0"
-                    , toString (floor x) ++ "," ++ toString (floor y)
+                    , toString x ++ "," ++ toString y
                     , "z"
                     ]
             , Svg.stroke Colors.base0
