@@ -58,6 +58,7 @@ view callbacks data =
                     ]
                     [ fileLink (github "demo-demo.json") "demo-demo"
                     , fileLink (github "basic_bodice.json") "basic bodice"
+                    , fileLink (github "sample_pattern.json") "sample pattern"
                     ]
               ]
             , [ iconBig "close" <|
