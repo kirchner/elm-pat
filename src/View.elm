@@ -134,6 +134,7 @@ viewCanvas model =
                     )
                 )
         )
+        Zoom
         (data model)
         model.pieceStore
 

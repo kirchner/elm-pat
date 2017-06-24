@@ -7,6 +7,8 @@ module Types
         , svgToCanvas
         , toVec
         , vec
+        , virtualHeight
+        , virtualWidth
         )
 
 import Math.Vector2 exposing (..)
@@ -24,11 +26,21 @@ toVec p =
 
 
 type alias ViewPort =
-    { offset : { x  : Int, y : Int }
+    { offset : { x : Int, y : Int }
     , width : Int
     , height : Int
     , zoom : Float
     }
+
+
+virtualWidth : ViewPort -> Int
+virtualWidth viewPort =
+    toFloat viewPort.width * viewPort.zoom |> floor
+
+
+virtualHeight : ViewPort -> Int
+virtualHeight viewPort =
+    toFloat viewPort.height * viewPort.zoom |> floor
 
 
 canvasToSvg : ViewPort -> Position -> Position
@@ -40,8 +52,15 @@ canvasToSvg viewPort p =
 
 svgToCanvas : ViewPort -> Position -> Position
 svgToCanvas viewPort p =
-    { x = p.x + viewPort.offset.x - (viewPort.width // 2)
-    , y = p.y + viewPort.offset.y - (viewPort.height // 2)
+    let
+        px =
+            viewPort.zoom * toFloat p.x |> floor
+
+        py =
+            viewPort.zoom * toFloat p.y |> floor
+    in
+    { x = px + viewPort.offset.x - (virtualWidth viewPort // 2)
+    , y = py + viewPort.offset.y - (virtualHeight viewPort // 2)
     }
 
 

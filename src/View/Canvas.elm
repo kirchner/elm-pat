@@ -26,18 +26,19 @@ view :
     -> (Maybe (Id Point) -> msg)
     -> (Maybe (Id Point) -> msg)
     -> (Id Piece -> Id Point -> msg)
+    -> (Float -> msg)
     -> Data
     -> Store Piece
     -> Html msg
-view tool startDrag focusPoint selectPoint extendPiece data pieceStore =
+view tool startDrag focusPoint selectPoint extendPiece updateZoom data pieceStore =
     let
         viewBoxString =
             let
                 wh =
-                    data.viewPort.width // 2
+                    virtualWidth data.viewPort // 2
 
                 hh =
-                    data.viewPort.height // 2
+                    virtualHeight data.viewPort // 2
 
                 dx =
                     data.viewPort.offset.x
@@ -48,19 +49,18 @@ view tool startDrag focusPoint selectPoint extendPiece data pieceStore =
             String.join " "
                 [ toString (dx - wh)
                 , toString (dy - hh)
-                , toString data.viewPort.width
-                , toString data.viewPort.height
+                , toString (virtualWidth data.viewPort)
+                , toString (virtualHeight data.viewPort)
                 ]
     in
     Svg.svg
         [ Svg.viewBox viewBoxString
         , Html.style
             [ ( "background-color", Colors.base3 )
-            , ( "width", toString data.viewPort.width )
-            , ( "height", toString data.viewPort.height )
             , ( "user-select", "none" ) -- TODO: add browser-prefixes
             , ( "-moz-user-select", "none" )
             ]
+        , Events.onWheel updateZoom
         ]
         [ grid defaultGridConfig data.viewPort
         , origin
@@ -106,15 +106,15 @@ grid config viewPort =
                 []
 
         x =
-            toFloat (viewPort.width + 2 * config.offset) / 2
+            toFloat (virtualWidth viewPort + 2 * config.offset) / 2
 
         y =
-            toFloat (viewPort.height + 2 * config.offset) / 2
+            toFloat (virtualHeight viewPort + 2 * config.offset) / 2
 
         -- n satisfies:
         --    2 * n * config.offset > ((max viewPort.height viewPort.width) / 2)
         n =
-            max viewPort.height viewPort.width
+            max (virtualHeight viewPort) (virtualWidth viewPort)
                 // config.offset
                 |> (+) 4
 
@@ -209,10 +209,10 @@ grid config viewPort =
 dragArea : (Position -> msg) -> ViewPort -> Svg msg
 dragArea startDrag viewPort =
     Svg.rect
-        [ Svg.x (toString (viewPort.offset.x - (viewPort.width // 2)))
-        , Svg.y (toString (viewPort.offset.y - (viewPort.height // 2)))
-        , Svg.width (toString viewPort.width)
-        , Svg.height (toString viewPort.height)
+        [ Svg.x (toString (viewPort.offset.x - (virtualWidth viewPort // 2)))
+        , Svg.y (toString (viewPort.offset.y - (virtualHeight viewPort // 2)))
+        , Svg.width (toString (virtualWidth viewPort))
+        , Svg.height (toString (virtualHeight viewPort))
         , Svg.fill "transparent"
         , Svg.strokeWidth "0"
         , Events.onMouseDown startDrag

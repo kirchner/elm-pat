@@ -136,6 +136,7 @@ type Msg
     | NameUpdated String
     | AddVariable
     | Resize Window.Size
+    | Zoom Float
     | DragStart Position
     | DragAt Position
     | DragStop Position
@@ -287,11 +288,26 @@ update ports msg model =
                                 model.viewPort
                         in
                         { def
-                          | width = size.width
-                          , height = size.height
+                            | width = size.width
+                            , height = size.height
                         }
                 }
                     ! []
+
+            Zoom factor ->
+                let
+                    newZoom =
+                        model.viewPort.zoom
+                            |> (+) (factor * 0.005)
+                            |> clamp 0.5 5
+
+                    newViewPort =
+                        model.viewPort
+                            |> (\viewPort ->
+                                    { viewPort | zoom = newZoom }
+                               )
+                in
+                { model | viewPort = newViewPort } ! []
 
             DragStart position ->
                 { model
@@ -454,10 +470,16 @@ getViewPort oldViewPort drag =
 
         Just { start, current } ->
             let
+                deltaX =
+                    oldViewPort.zoom * toFloat (current.x - start.x) |> floor
+
+                deltaY =
+                    oldViewPort.zoom * toFloat (current.y - start.y) |> floor
+
                 offset =
-                  { x = oldViewPort.offset.x - (current.x - start.x)
-                  , y = oldViewPort.offset.y - (current.y - start.y)
-                  }
+                    { x = oldViewPort.offset.x - deltaX
+                    , y = oldViewPort.offset.y - deltaY
+                    }
             in
             { oldViewPort | offset = offset }
 

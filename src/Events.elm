@@ -3,6 +3,7 @@ module Events
         ( onClick
         , onMouseDown
         , onMove
+        , onWheel
         )
 
 {- internal -}
@@ -32,3 +33,15 @@ positionDecoder =
     map2 Position
         (field "offsetX" int)
         (field "offsetY" int)
+
+
+onWheel : (Float -> msg) -> VirtualDom.Property msg
+onWheel onZoom =
+    let
+        ignoreDefaults =
+            VirtualDom.Options True True
+    in
+    VirtualDom.onWithOptions
+        "wheel"
+        ignoreDefaults
+        (map onZoom <| field "deltaY" float)

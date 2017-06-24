@@ -64,10 +64,10 @@ svgUpdateMouse mouseClicked updateCursorPosition data =
             data.viewPort
     in
     Svg.rect
-        ([ Svg.x (toString (viewPort.offset.x - (viewPort.width // 2)))
-         , Svg.y (toString (viewPort.offset.y - (viewPort.height // 2)))
-         , Svg.width (toString viewPort.width)
-         , Svg.height (toString viewPort.height)
+        ([ Svg.x (toString (viewPort.offset.x - (virtualWidth viewPort // 2)))
+         , Svg.y (toString (viewPort.offset.y - (virtualHeight viewPort // 2)))
+         , Svg.width (toString (virtualWidth viewPort))
+         , Svg.height (toString (virtualHeight viewPort))
          , Svg.fill "transparent"
          , Svg.strokeWidth "0"
          , Events.onMove (updateCursorPosition << Just)
