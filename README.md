@@ -101,7 +101,7 @@ The last bit is a `view` function which displays a form in which one can input
 the different values for the tool:
 
 ```elm
-view : Callbacks msg -> (State -> msg) Data -> State -> Svg msg
+view : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
 view callbacks updateState data state =
     let
         updateRatio =
