@@ -1,8 +1,7 @@
 module Editor
     exposing
-        ( Model
-        , Msg(..)
-        , Tool(..)
+        ( Msg(..)
+        , Flags
         , allTools
         , callbacks
         , data
@@ -32,6 +31,8 @@ import Set exposing (Set)
 import Store exposing (Id, Store)
 import Task
 import Tools.Absolute as Absolute
+import Model exposing (..)
+import File exposing (File)
 import Tools.Common
     exposing
         ( Callbacks
@@ -42,23 +43,10 @@ import Tools.ExtendPiece as ExtendPiece
 import Tools.Relative as Relative
 import Types exposing (..)
 import Window
+import Json.Decode exposing (Value)
 
 
-type alias Model =
-    { store : Store Point
-    , pieceStore : Store Piece
-    , variables : Dict String E
-    , newName : Maybe String
-    , newValue : Maybe E
-    , tool : Tool
-    , viewPort : ViewPort
-    , drag : Maybe Drag
-    , cursorPosition : Maybe Position
-    , focusedPoint : Maybe (Id Point)
-    , pressedKeys : List Key
-    , selectedPoints : List (Id Point)
-    }
-
+-- TODO: move most? of this to Model:
 
 data : Model -> Data
 data model =
@@ -82,14 +70,6 @@ callbacks =
     , clearSelection = ClearSelection
     , extendPiece = ExtendPieceMsg
     }
-
-
-type Tool
-    = Absolute Absolute.State
-    | Relative Relative.State
-    | Distance Distance.State
-    | ExtendPiece ExtendPiece.State
-    | None
 
 
 toolName : Tool -> String
@@ -138,12 +118,6 @@ allTools data =
     ]
 
 
-type alias Drag =
-    { start : Position
-    , current : Position
-    }
-
-
 type Msg
     = UpdateTool Tool
     | AddPoint Point
@@ -165,37 +139,34 @@ type Msg
     | ExtendPieceMsg (Id Piece) (Id Point) (Maybe (Id Point))
 
 
-init : ( Model, Cmd Msg )
-init =
-    { store = Store.empty
-    , pieceStore = Store.empty
-    , variables = Dict.empty
-    , newName = Nothing
-    , newValue = Nothing
-    , tool = None
-    , viewPort =
-        { x = -320
-        , y = -320
-        , width = 640
-        , height = 640
-        }
-    , drag = Nothing
-    , cursorPosition = Nothing
-    , focusedPoint = Nothing
-    , pressedKeys = []
-    , selectedPoints = []
-    }
-        ! [ Task.perform Resize Window.size ]
+type alias Flags =
+  { file0 : Maybe Value
+  }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    let
+        restoredModel =
+            case flags.file0 of
+                Just file ->
+                    File.restore file defaultModel
+                Nothing ->
+                    defaultModel
+    in
+    restoredModel ! [ Task.perform Resize Window.size ]
 
 
 type alias Ports =
     { autofocus : () -> Cmd Msg
+    , serialize : Value -> Cmd Msg
     }
 
 
 update : Ports -> Msg -> Model -> ( Model, Cmd Msg )
 update ports msg model =
-    updateAutoFocus ports model <|
+    updateAutoFocus ports model
+    >> updateStorage ports model <|
         case msg of
             UpdateTool tool ->
                 { model | tool = tool } ! []
@@ -406,6 +377,11 @@ updateAutoFocus ports oldModel ( model, cmd ) =
       else
         cmd
     )
+
+
+updateStorage : Ports -> Model -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+updateStorage ports _ ( model, cmds ) =
+    ( model, Cmd.batch [ ports.serialize (File.store model), cmds ] )
 
 
 getViewPort : ViewPort -> Maybe Drag -> ViewPort

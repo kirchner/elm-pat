@@ -6,6 +6,9 @@ module Piece
         , insertBefore
         , next
         , toList
+
+        , encode
+        , decode
         )
 
 import Dict exposing (Dict)
@@ -13,6 +16,8 @@ import Expr exposing (..)
 import Point exposing (Point)
 import Store exposing (Id, Store)
 import Types exposing (..)
+import Json.Encode as Encode exposing (Value)
+import Json.Decode as Decode exposing (Decoder)
 
 
 type Piece
@@ -85,3 +90,16 @@ insertAfter store variables new reference (Piece piece) =
 insertBefore : Store Point -> Dict String E -> Id Point -> Id Point -> Piece -> Piece
 insertBefore store variables new reference piece =
     Debug.crash "implement insertBefore"
+
+
+-- SERIALIZATION
+
+
+encode : Piece -> Value
+encode piece =
+    Encode.list (List.map Store.encodeId (toList piece))
+
+
+decode : Decoder Piece
+decode =
+    Decode.map (\points -> Piece { points = points }) (Decode.list Store.decodeId)

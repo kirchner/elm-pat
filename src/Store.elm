@@ -1,6 +1,7 @@
 module Store
     exposing
         ( Id
+        , idUnsafe
         , Store
         , empty
         , fromInt
@@ -13,9 +14,16 @@ module Store
         , toList
         , update
         , values
+
+        , encode
+        , decode
+        , encodeId
+        , decodeId
         )
 
 import Dict exposing (Dict)
+import Json.Encode as Encode exposing (Value)
+import Json.Decode as Decode exposing (Decoder)
 
 
 type Store a
@@ -27,6 +35,11 @@ type Store a
 
 type Id a
     = Id Int
+
+
+idUnsafe : Int -> Id a
+idUnsafe =
+    Id
 
 
 empty : Store a
@@ -98,3 +111,50 @@ toList : Store a -> List ( Id a, a )
 toList (Store store) =
     Dict.toList store.data
         |> List.map (\( id, element ) -> ( Id id, element ))
+
+
+-- SERIALIZATION
+
+
+encode : (a -> Value) -> Store a -> Value
+encode encodeElement (Store model) =
+    let
+        encodeDict dict =
+            dict
+            |> Dict.toList
+            |> List.map ( \(id , a) ->
+                   Encode.object
+                   [ ("k", Encode.int id)
+                   , ("v", encodeElement a)
+                   ]
+               )
+            |> Encode.list
+    in
+    Encode.object
+    [ ("data", encodeDict model.data)
+    , ("nextId", Encode.int model.nextId)
+    ]
+
+
+decode : Decoder a -> Decoder (Store a)
+decode decodeElement =
+    let
+        decodeDict =
+            Decode.list
+                (Decode.map2 (,) (Decode.at ["k"] Decode.int) (Decode.at ["v"] decodeElement))
+            |> Decode.map Dict.fromList
+    in
+    Decode.map2
+        (\data nextId -> Store { data = data, nextId = nextId })
+        (Decode.at ["data"] decodeDict)
+        (Decode.at ["nextId"] Decode.int)
+
+
+encodeId : Id a -> Value
+encodeId (Id int) =
+    Encode.int int
+
+
+decodeId : Decoder (Id a)
+decodeId =
+    Decode.map Id Decode.int

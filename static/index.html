@@ -31,7 +31,14 @@
         e.preventDefault();
       });
 
-      var app = Elm.App.embed(document.getElementById("elm-landing-pad"));
+      var flags =
+        { file0: JSON.parse(localStorage.getItem('file0'))
+        };
+      var app = Elm.App.embed(document.getElementById("elm-landing-pad"), flags);
+
+      app.ports.serialize.subscribe(function(file) {
+          localStorage.setItem('file0', JSON.stringify(file));
+      });
 
       app.ports.autofocus.subscribe(function() {
         window.requestAnimationFrame(function() {

@@ -3,9 +3,7 @@ module View exposing (view)
 import Dict exposing (Dict)
 import Editor
     exposing
-        ( Model
-        , Msg(..)
-        , Tool(..)
+        ( Msg(..)
         , allTools
         , callbacks
         , data
@@ -13,6 +11,7 @@ import Editor
         , toolDescription
         , toolName
         )
+import Model exposing (Model, Tool(..))
 import Expr exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html

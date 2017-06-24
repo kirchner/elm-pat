@@ -5,6 +5,8 @@ module Expr
         , parse
         , parseVariable
         , print
+        , encode
+        , decode
         )
 
 import Char
@@ -12,6 +14,8 @@ import Dict exposing (Dict)
 import Parser exposing (..)
 import Parser.LanguageKit exposing (..)
 import Set
+import Json.Decode as Decode exposing (Decoder)
+import Json.Encode as Encode exposing (Value)
 
 
 {-
@@ -209,6 +213,9 @@ atom =
     oneOf
         [ succeed Number
             |= float
+        , succeed (\float -> Number (-float))
+            |. symbol "-"
+            |= float
         , succeed Symbol
             |= variable Char.isLower isVarChar Set.empty
         ]
@@ -224,3 +231,17 @@ isVarChar char =
 spaces : Parser ()
 spaces =
     ignore zeroOrMore (\c -> c == ' ')
+
+
+-- SERIALIZATION
+
+
+encode : E -> Value
+encode expr =
+    Encode.string (print expr)
+
+
+decode : Decoder E
+decode =
+    Decode.string
+    |> Decode.map (parse >> Maybe.withDefault (Number 0.0))

@@ -5,20 +5,22 @@ import Html exposing (Html)
 
 {- internal -}
 
+import Model exposing (Model)
 import Editor
     exposing
-        ( Model
-        , Msg
+        ( Msg
+        , Flags
         , init
         , update
         , subscriptions
         )
 import View exposing (view)
+import Json.Decode exposing (Value)
 
 
-main : Program Never Model Msg
+main : Program Flags Model Msg
 main =
-    Html.program
+    Html.programWithFlags
         { init = init
         , update = update ports
         , subscriptions = subscriptions
@@ -27,7 +29,11 @@ main =
 
 
 ports =
-    { autofocus = autofocus }
+    { autofocus = autofocus
+    , serialize = serialize
+    }
 
 
 port autofocus : () -> Cmd msg
+
+port serialize : Value -> Cmd msg
