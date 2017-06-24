@@ -198,213 +198,215 @@ type alias Ports =
 update : Ports -> Msg -> Model -> ( Model, Cmd Msg )
 update ports msg model =
     updateAutoFocus ports model <|
-    case msg of
-        UpdateTool tool ->
-            { model | tool = tool } ! []
+        case msg of
+            UpdateTool tool ->
+                { model | tool = tool } ! []
 
-        AddPoint point ->
-            { model
-                | store = Dict.insert model.nextId point model.store
-                , nextId = model.nextId + 1
-                , tool = None
-                , cursorPosition = Nothing
-                , focusedPoint = Nothing
-                , selectedPoints = [ model.nextId ]
-            }
-                ! []
+            AddPoint point ->
+                { model
+                    | store = Dict.insert model.nextId point model.store
+                    , nextId = model.nextId + 1
+                    , tool = None
+                    , cursorPosition = Nothing
+                    , focusedPoint = Nothing
+                    , selectedPoints = [ model.nextId ]
+                }
+                    ! []
 
-        UpdatePoint id point ->
-            { model
-                | store = Dict.update id (\_ -> Just point) model.store
-                , tool = None
-            }
-                ! []
+            UpdatePoint id point ->
+                { model
+                    | store = Dict.update id (\_ -> Just point) model.store
+                    , tool = None
+                }
+                    ! []
 
-        DeletePoint id ->
-            { model
-                | store = Dict.remove id model.store
-            }
-                ! []
+            DeletePoint id ->
+                { model
+                    | store = Dict.remove id model.store
+                }
+                    ! []
 
-        NameUpdated s ->
-            { model
-                | newName = parseVariable s
-            }
-                ! []
+            NameUpdated s ->
+                { model
+                    | newName = parseVariable s
+                }
+                    ! []
 
-        ValueUpdated s ->
-            { model
-                | newValue = parse s
-            }
-                ! []
+            ValueUpdated s ->
+                { model
+                    | newValue = parse s
+                }
+                    ! []
 
-        AddVariable ->
-            case ( model.newName, model.newValue ) of
-                ( Just name, Just value ) ->
-                    { model
-                        | variables =
-                            Dict.insert name value model.variables
-                        , newName = Nothing
-                        , newValue = Nothing
-                    }
-                        ! []
-
-                _ ->
-                    model ! []
-
-        Resize size ->
-            { model
-                | viewPort =
-                    { x = size.width // -2
-                    , y = size.height // -2
-                    , width = size.width
-                    , height = size.height
-                    }
-            }
-                ! []
-
-        DragStart position ->
-            { model
-                | drag = Just (Drag position position)
-            }
-                ! []
-
-        DragAt position ->
-            { model
-                | drag =
-                    model.drag |> Maybe.map (\{ start } -> Drag start position)
-            }
-                ! []
-
-        DragStop position ->
-            let
-                selectedPoints =
-                    case model.drag of
-                        Just drag ->
-                            if drag.start == drag.current then
-                                []
-                            else
-                                model.selectedPoints
-
-                        Nothing ->
-                            model.selectedPoints
-            in
-            { model
-                | drag = Nothing
-                , viewPort = getViewPort model.viewPort model.drag
-                , selectedPoints = selectedPoints
-            }
-                ! []
-
-        UpdateCursorPosition position ->
-            { model
-                | cursorPosition =
-                    position |> Maybe.map (svgToCanvas model.viewPort)
-            }
-                ! []
-
-        FocusPoint id ->
-            { model | focusedPoint = id } ! []
-
-        KeyMsg keyMsg ->
-            { model
-                | pressedKeys =
-                    Keyboard.update keyMsg model.pressedKeys
-            }
-                ! []
-
-        KeyDown key ->
-            case key of
-                Keyboard.CharP ->
-                    case
-                        model.selectedPoints
-                            |> Piece.fromList model.store model.variables
-                            |> Maybe.map
-                                (\piece ->
-                                    Dict.insert model.nextPieceId piece model.pieceStore
-                                )
-                    of
-                        Just pieceStore ->
-                            { model
-                                | pieceStore = pieceStore
-                                , nextPieceId = model.nextPieceId + 1
-                            }
-                                ! []
-
-                        Nothing ->
-                            model ! []
-
-                _ ->
-                    { model
-                        | tool =
-                            case key of
-                                Keyboard.CharA ->
-                                    Absolute Absolute.init
-
-                                Keyboard.CharE ->
-                                    if List.member Keyboard.Shift model.pressedKeys then
-                                        Distance (Distance.init (data model))
-                                    else
-                                        Relative (Relative.init (data model))
-
-                                Keyboard.Escape ->
-                                    None
-
-                                _ ->
-                                    model.tool
-                    }
-                        ! []
-
-        SelectPoint maybeId ->
-            case maybeId of
-                Just id ->
-                    if List.member Keyboard.Shift model.pressedKeys then
+            AddVariable ->
+                case ( model.newName, model.newValue ) of
+                    ( Just name, Just value ) ->
                         { model
-                            | selectedPoints =
-                                if List.member id model.selectedPoints then
-                                    List.filter ((/=) id) model.selectedPoints
-                                else
-                                    id :: model.selectedPoints
+                            | variables =
+                                Dict.insert name value model.variables
+                            , newName = Nothing
+                            , newValue = Nothing
                         }
                             ! []
-                    else
-                        { model | selectedPoints = [ id ] } ! []
 
-                Nothing ->
-                    model ! []
+                    _ ->
+                        model ! []
 
-        ClearSelection ->
-            { model | selectedPoints = [] } ! []
+            Resize size ->
+                { model
+                    | viewPort =
+                        { x = size.width // -2
+                        , y = size.height // -2
+                        , width = size.width
+                        , height = size.height
+                        }
+                }
+                    ! []
 
-        ExtendPieceMsg pieceId id maybeNewId ->
-            case maybeNewId of
-                Just newId ->
-                    let
-                        updatePiece =
-                            Maybe.map <|
-                                Piece.insertAfter
-                                    model.store
-                                    model.variables
-                                    newId
-                                    id
-                    in
-                    { model
-                        | pieceStore =
-                            Dict.update pieceId updatePiece model.pieceStore
-                        , tool = None
-                    }
-                        ! []
+            DragStart position ->
+                { model
+                    | drag = Just (Drag position position)
+                }
+                    ! []
 
-                Nothing ->
-                    { model | tool = None } ! []
+            DragAt position ->
+                { model
+                    | drag =
+                        model.drag |> Maybe.map (\{ start } -> Drag start position)
+                }
+                    ! []
+
+            DragStop position ->
+                let
+                    selectedPoints =
+                        case model.drag of
+                            Just drag ->
+                                if drag.start == drag.current then
+                                    []
+                                else
+                                    model.selectedPoints
+
+                            Nothing ->
+                                model.selectedPoints
+                in
+                { model
+                    | drag = Nothing
+                    , viewPort = getViewPort model.viewPort model.drag
+                    , selectedPoints = selectedPoints
+                }
+                    ! []
+
+            UpdateCursorPosition position ->
+                { model
+                    | cursorPosition =
+                        position |> Maybe.map (svgToCanvas model.viewPort)
+                }
+                    ! []
+
+            FocusPoint id ->
+                { model | focusedPoint = id } ! []
+
+            KeyMsg keyMsg ->
+                { model
+                    | pressedKeys =
+                        Keyboard.update keyMsg model.pressedKeys
+                }
+                    ! []
+
+            KeyDown key ->
+                case key of
+                    Keyboard.CharP ->
+                        case
+                            model.selectedPoints
+                                |> Piece.fromList model.store model.variables
+                                |> Maybe.map
+                                    (\piece ->
+                                        Dict.insert model.nextPieceId piece model.pieceStore
+                                    )
+                        of
+                            Just pieceStore ->
+                                { model
+                                    | pieceStore = pieceStore
+                                    , nextPieceId = model.nextPieceId + 1
+                                }
+                                    ! []
+
+                            Nothing ->
+                                model ! []
+
+                    Keyboard.CharA ->
+                        { model | tool = Absolute Absolute.init } ! []
+
+                    Keyboard.CharE ->
+                        { model
+                            | tool =
+                                if List.member Keyboard.Shift model.pressedKeys then
+                                    Distance (Distance.init (data model))
+                                else
+                                    Relative (Relative.init (data model))
+                        }
+                            ! []
+
+                    Keyboard.Escape ->
+                        { model
+                            | tool = None
+                            , cursorPosition = Nothing
+                        }
+                            ! []
+
+                    _ ->
+                        model ! []
+
+            SelectPoint maybeId ->
+                case maybeId of
+                    Just id ->
+                        if List.member Keyboard.Shift model.pressedKeys then
+                            { model
+                                | selectedPoints =
+                                    if List.member id model.selectedPoints then
+                                        List.filter ((/=) id) model.selectedPoints
+                                    else
+                                        id :: model.selectedPoints
+                            }
+                                ! []
+                        else
+                            { model | selectedPoints = [ id ] } ! []
+
+                    Nothing ->
+                        model ! []
+
+            ClearSelection ->
+                { model | selectedPoints = [] } ! []
+
+            ExtendPieceMsg pieceId id maybeNewId ->
+                case maybeNewId of
+                    Just newId ->
+                        let
+                            updatePiece =
+                                Maybe.map <|
+                                    Piece.insertAfter
+                                        model.store
+                                        model.variables
+                                        newId
+                                        id
+                        in
+                        { model
+                            | pieceStore =
+                                Dict.update pieceId updatePiece model.pieceStore
+                            , tool = None
+                        }
+                            ! []
+
+                    Nothing ->
+                        { model | tool = None } ! []
 
 
 updateAutoFocus ports oldModel ( model, cmd ) =
-    ( model ,
-      if (oldModel.tool == None) && (model.tool /= None) then
-          Cmd.batch [ ports.autofocus (), cmd ]
+    ( model
+    , if (oldModel.tool == None) && (model.tool /= None) then
+        Cmd.batch [ ports.autofocus (), cmd ]
       else
-          cmd
+        cmd
     )
 
 
