@@ -46,6 +46,7 @@ view callbacks data =
               [ class [ FileBrowserFileLinkWrapper ]
               ]
               [ fileLink (github "demo-demo.json") "demo-demo"
+              , fileLink (github "basic_bodices.json") "basic bodices"
               ]
             ]
           , [ iconBig "close" <|
