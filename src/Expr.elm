@@ -2,20 +2,20 @@ module Expr
     exposing
         ( E(..)
         , compute
+        , decode
+        , encode
         , parse
         , parseVariable
         , print
-        , encode
-        , decode
         )
 
 import Char
 import Dict exposing (Dict)
+import Json.Decode as Decode exposing (Decoder)
+import Json.Encode as Encode exposing (Value)
 import Parser exposing (..)
 import Parser.LanguageKit exposing (..)
 import Set
-import Json.Decode as Decode exposing (Decoder)
-import Json.Encode as Encode exposing (Value)
 
 
 {-
@@ -213,7 +213,7 @@ atom =
     oneOf
         [ succeed Number
             |= float
-        , succeed (\float -> Number (-float))
+        , succeed (\float -> Number -float)
             |. symbol "-"
             |= float
         , succeed Symbol
@@ -226,11 +226,13 @@ isVarChar char =
     Char.isLower char
         || Char.isUpper char
         || Char.isDigit char
+        || (char == '_')
 
 
 spaces : Parser ()
 spaces =
     ignore zeroOrMore (\c -> c == ' ')
+
 
 
 -- SERIALIZATION
@@ -244,4 +246,4 @@ encode expr =
 decode : Decoder E
 decode =
     Decode.string
-    |> Decode.map (parse >> Maybe.withDefault (Number 0.0))
+        |> Decode.map (parse >> Maybe.withDefault (Number 0.0))
