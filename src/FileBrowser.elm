@@ -4,6 +4,7 @@ import Html exposing (Html)
 import Html.Events as Html
 import Styles.FileBrowser exposing (Class(..), class, classList)
 import Views.Common exposing (iconBig)
+import UndoList exposing (UndoList)
 
 
 type alias FileBrowser =
@@ -24,19 +25,27 @@ update msg model =
     model
 
 
-type alias Callbacks msg =
+type alias Callbacks a msg =
     { clearSession : Maybe msg
     , lift : Msg -> msg
     , loadRemoteFile : Maybe (String -> msg)
+    , restoreSession : Maybe (a -> msg)
+    , undo : Maybe msg
+    , redo : Maybe msg
     }
 
 
-view : Callbacks msg -> a -> Html msg
-view callbacks data =
+view : Callbacks a msg -> UndoList a -> Html msg
+view callbacks undoList =
     let
-        onClick url =
+        loadRemoteFile url =
             callbacks.loadRemoteFile
                 |> Maybe.map (\loadRemoteFile -> loadRemoteFile url)
+                |> Maybe.withDefault (callbacks.lift NoOp)
+
+        restoreSession file =
+            callbacks.restoreSession
+                |> Maybe.map (\restoreSession -> restoreSession file)
                 |> Maybe.withDefault (callbacks.lift NoOp)
 
         fileLink url label =
@@ -44,7 +53,17 @@ view callbacks data =
                 [ class
                     [ FileBrowserFileLink
                     ]
-                , Html.onClick (onClick url)
+                , Html.onClick (loadRemoteFile url)
+                ]
+                [ Html.text label
+                ]
+
+        historyLink file label =
+            Html.a
+                [ class
+                    [ FileBrowserFileLink
+                    ]
+                , Html.onClick (restoreSession file)
                 ]
                 [ Html.text label
                 ]
@@ -63,6 +82,34 @@ view callbacks data =
               ]
             , [ iconBig "close" <|
                     Maybe.withDefault (callbacks.lift NoOp) callbacks.clearSession
+              ]
+            , [ Html.div
+                    [ class [ FileBrowserFileLinkWrapper ]
+                    ]
+                    ( List.map (\(label, file) ->
+                        historyLink file label
+                      )
+                      ( List.concat
+                        [ List.indexedMap (\i r ->
+                              ("future " ++ toString i, r)
+                          )
+                          (List.reverse undoList.future)
+
+                        , [("current", undoList.present)]
+
+                        , List.indexedMap (\i r ->
+                              ("past " ++ toString i, r)
+                          )
+                          undoList.past
+                        ]
+                      )
+                    )
+              ]
+            , [ iconBig "undo" <|
+                    Maybe.withDefault (callbacks.lift NoOp) callbacks.undo
+              ]
+            , [ iconBig "redo" <|
+                    Maybe.withDefault (callbacks.lift NoOp) callbacks.redo
               ]
             ]
         )

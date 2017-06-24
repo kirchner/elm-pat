@@ -1,6 +1,5 @@
 module File exposing
-    ( File
-    , defaultFile
+    ( empty
     , load
     , load_
     , save
@@ -20,16 +19,8 @@ import Point exposing (Point)
 import Store exposing (Id, Store)
 
 
-type alias File =
-    { store : Store Point
-    , pieceStore : Store Piece
-    , variables : Dict String E
-    , selectedPoints : List (Id Point)
-    }
-
-
-defaultFile : File
-defaultFile =
+empty : File
+empty =
     { store = Store.empty
     , pieceStore = Store.empty
     , variables = Dict.empty

@@ -54,6 +54,8 @@ css =
             , flexFlow1 column
             , alignItems stretch
             , width (rem 16)
+            , maxHeight (rem 16)
+            , overflowY auto
             ]
         ]
 

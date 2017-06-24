@@ -23,7 +23,7 @@ import Expr
         , parse
         , parseVariable
         )
-import File exposing (File)
+import File
 import FileBrowser exposing (FileBrowser)
 import Http
 import Json.Decode exposing (Value)
@@ -45,6 +45,7 @@ import Tools.Distance as Distance
 import Tools.Relative as Relative
 import Types exposing (..)
 import Window
+import UndoList exposing (UndoList)
 
 
 -- TODO: move most? of this to Model:
@@ -152,6 +153,8 @@ type Msg
     | RestoreSession File
     | LoadRemoteFile String
     | LoadRemoteFileError Http.Error
+    | Undo
+    | Redo
 
 
 type alias Flags =
@@ -181,10 +184,15 @@ type alias Ports =
 
 update : Ports -> Msg -> Model -> ( Model, Cmd Msg )
 update ports msg model =
-    updateAutoFocus ports model
+    updateUndoList ports model msg
+        >> updateAutoFocus ports model
         >> updateStorage ports model
     <|
         case msg of
+            Undo ->
+                { model | undoList = UndoList.undo model.undoList } ! []
+            Redo ->
+                { model | undoList = UndoList.redo model.undoList } ! []
             LoadRemoteFile url ->
                 let
                     handle =
@@ -212,7 +220,7 @@ update ports msg model =
                 model ! []
 
             ClearSession ->
-                update ports (RestoreSession File.defaultFile) model
+                update ports (RestoreSession File.empty) model
 
             FileBrowserMsg fileBrowserMsg ->
                 { model | fileBrowser = FileBrowser.update fileBrowserMsg model.fileBrowser } ! []
@@ -460,6 +468,30 @@ updateAutoFocus ports oldModel ( model, cmd ) =
 updateStorage : Ports -> Model -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 updateStorage ports _ ( model, cmds ) =
     ( model, Cmd.batch [ ports.serialize (File.store model), cmds ] )
+
+
+updateUndoList : Ports -> Model -> Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+updateUndoList ports _ msg ( model, cmds ) =
+    let
+        blacklist msg =
+            case msg of
+                Undo -> True
+                Redo -> True
+                RestoreSession _ -> True
+                _ -> False
+    in
+    ( { model
+      | undoList =
+          let
+              file =
+                  File.save model
+          in
+          if not (blacklist msg) && (model.undoList.present /= file) then
+              UndoList.new file model.undoList
+          else
+              model.undoList
+    },
+        cmds )
 
 
 getViewPort : ViewPort -> Maybe Drag -> ViewPort

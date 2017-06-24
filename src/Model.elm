@@ -2,6 +2,7 @@ module Model
     exposing
         ( Drag
         , Model
+        , File
         , Tool(..)
         , defaultModel
         )
@@ -26,6 +27,7 @@ import Tools.Distance as Distance
 import Tools.ExtendPiece as ExtendPiece
 import Tools.Relative as Relative
 import Types exposing (..)
+import UndoList exposing (UndoList)
 
 
 type alias Model =
@@ -42,6 +44,15 @@ type alias Model =
     , pressedKeys : List Key
     , selectedPoints : List (Id Point)
     , fileBrowser : FileBrowser
+    , undoList : UndoList File
+    }
+
+
+type alias File =
+    { store : Store Point
+    , pieceStore : Store Piece
+    , variables : Dict String E
+    , selectedPoints : List (Id Point)
     }
 
 
@@ -66,6 +77,13 @@ defaultModel =
     , pressedKeys = []
     , selectedPoints = []
     , fileBrowser = FileBrowser.defaultModel
+    , undoList =
+          UndoList.fresh
+          { store = Store.empty
+          , pieceStore = Store.empty
+          , variables = Dict.empty
+          , selectedPoints = []
+          }
     }
 
 

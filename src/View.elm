@@ -56,8 +56,11 @@ view model =
                 { lift = FileBrowserMsg
                 , clearSession = Just ClearSession
                 , loadRemoteFile = Just LoadRemoteFile
+                , restoreSession = Just RestoreSession
+                , undo = Just Undo
+                , redo = Just Redo
                 }
-                data
+                model.undoList
             ]
     , viewToolInfo callbacks data model.tool
     , Just <|
