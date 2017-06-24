@@ -210,7 +210,11 @@ update ports msg model =
                 model ! [ Http.send handle (Http.get url File.decode) ]
 
             RestoreSession file ->
-                File.load_ file model ! []
+                let
+                    newModel =
+                        File.load_ file model
+                in
+                { newModel | undoList = UndoList.fresh (File.save newModel) } ! []
 
             LoadRemoteFileError httpError ->
                 let
@@ -473,11 +477,22 @@ updateStorage ports _ ( model, cmds ) =
 updateUndoList : Ports -> Model -> Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 updateUndoList ports _ msg ( model, cmds ) =
     let
+        -- messages that definitely do not affect undoList
         blacklist msg =
             case msg of
+                UpdateTool _ -> True
+                Resize _ -> True
+                Zoom _ -> True
+                DragStart _ -> True
+                DragAt _ -> True
+                DragStop _ -> True
+                FocusPoint _ -> True
+                FileBrowserMsg _ -> True
+                ClearSession -> True
+                RestoreSession _ -> True
+                LoadRemoteFile _ -> True
                 Undo -> True
                 Redo -> True
-                RestoreSession _ -> True
                 _ -> False
     in
     ( { model
