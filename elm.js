@@ -8260,113 +8260,6 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
-var _abadi199$elm_input_extra$Dropdown$onChange = F2(
-	function (emptyItem, tagger) {
-		var textToMaybe = function (string) {
-			return A2(
-				_elm_lang$core$Maybe$withDefault,
-				false,
-				A2(
-					_elm_lang$core$Maybe$map,
-					function (_p0) {
-						return A2(
-							F2(
-								function (x, y) {
-									return _elm_lang$core$Native_Utils.eq(x, y);
-								}),
-							string,
-							function (_) {
-								return _.value;
-							}(_p0));
-					},
-					emptyItem)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(string);
-		};
-		return A2(
-			_elm_lang$html$Html_Events$on,
-			'change',
-			A2(
-				_elm_lang$core$Json_Decode$map,
-				function (_p1) {
-					return tagger(
-						textToMaybe(_p1));
-				},
-				_elm_lang$html$Html_Events$targetValue));
-	});
-var _abadi199$elm_input_extra$Dropdown$dropdown = F3(
-	function (options, attributes, currentValue) {
-		var itemsWithEmptyItems = function () {
-			var _p2 = options.emptyItem;
-			if (_p2.ctor === 'Just') {
-				return {ctor: '::', _0: _p2._0, _1: options.items};
-			} else {
-				return options.items;
-			}
-		}();
-		var isSelected = function (value) {
-			return A2(
-				_elm_lang$core$Maybe$withDefault,
-				false,
-				A2(
-					_elm_lang$core$Maybe$map,
-					F2(
-						function (x, y) {
-							return _elm_lang$core$Native_Utils.eq(x, y);
-						})(value),
-					currentValue));
-		};
-		var toOption = function (_p3) {
-			var _p4 = _p3;
-			var _p5 = _p4.value;
-			return A2(
-				_elm_lang$html$Html$option,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(_p5),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$selected(
-							isSelected(_p5)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$disabled(!_p4.enabled),
-							_1: {ctor: '[]'}
-						}
-					}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p4.text),
-					_1: {ctor: '[]'}
-				});
-		};
-		return A2(
-			_elm_lang$html$Html$select,
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				attributes,
-				{
-					ctor: '::',
-					_0: A2(_abadi199$elm_input_extra$Dropdown$onChange, options.emptyItem, options.onChange),
-					_1: {ctor: '[]'}
-				}),
-			A2(_elm_lang$core$List$map, toOption, itemsWithEmptyItems));
-	});
-var _abadi199$elm_input_extra$Dropdown$defaultOptions = function (onChange) {
-	return {
-		items: {ctor: '[]'},
-		emptyItem: _elm_lang$core$Maybe$Nothing,
-		onChange: onChange
-	};
-};
-var _abadi199$elm_input_extra$Dropdown$Item = F3(
-	function (a, b, c) {
-		return {value: a, text: b, enabled: c};
-	});
-var _abadi199$elm_input_extra$Dropdown$Options = F3(
-	function (a, b, c) {
-		return {items: a, emptyItem: b, onChange: c};
-	});
-
 //import Maybe, Native.List //
 
 var _elm_lang$core$Native_Regex = function() {
@@ -8633,6 +8526,1520 @@ var _elm_lang$core$Set$partition = F2(
 			_0: _elm_lang$core$Set$Set_elm_builtin(p1),
 			_1: _elm_lang$core$Set$Set_elm_builtin(p2)
 		};
+	});
+
+var _elm_community$list_extra$List_Extra$greedyGroupsOfWithStep = F3(
+	function (size, step, xs) {
+		var okayXs = _elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$List$length(xs),
+			0) > 0;
+		var okayArgs = (_elm_lang$core$Native_Utils.cmp(size, 0) > 0) && (_elm_lang$core$Native_Utils.cmp(step, 0) > 0);
+		var xs_ = A2(_elm_lang$core$List$drop, step, xs);
+		var group = A2(_elm_lang$core$List$take, size, xs);
+		return (okayArgs && okayXs) ? {
+			ctor: '::',
+			_0: group,
+			_1: A3(_elm_community$list_extra$List_Extra$greedyGroupsOfWithStep, size, step, xs_)
+		} : {ctor: '[]'};
+	});
+var _elm_community$list_extra$List_Extra$greedyGroupsOf = F2(
+	function (size, xs) {
+		return A3(_elm_community$list_extra$List_Extra$greedyGroupsOfWithStep, size, size, xs);
+	});
+var _elm_community$list_extra$List_Extra$groupsOfWithStep = F3(
+	function (size, step, xs) {
+		var okayArgs = (_elm_lang$core$Native_Utils.cmp(size, 0) > 0) && (_elm_lang$core$Native_Utils.cmp(step, 0) > 0);
+		var xs_ = A2(_elm_lang$core$List$drop, step, xs);
+		var group = A2(_elm_lang$core$List$take, size, xs);
+		var okayLength = _elm_lang$core$Native_Utils.eq(
+			size,
+			_elm_lang$core$List$length(group));
+		return (okayArgs && okayLength) ? {
+			ctor: '::',
+			_0: group,
+			_1: A3(_elm_community$list_extra$List_Extra$groupsOfWithStep, size, step, xs_)
+		} : {ctor: '[]'};
+	});
+var _elm_community$list_extra$List_Extra$groupsOf = F2(
+	function (size, xs) {
+		return A3(_elm_community$list_extra$List_Extra$groupsOfWithStep, size, size, xs);
+	});
+var _elm_community$list_extra$List_Extra$zip5 = _elm_lang$core$List$map5(
+	F5(
+		function (v0, v1, v2, v3, v4) {
+			return {ctor: '_Tuple5', _0: v0, _1: v1, _2: v2, _3: v3, _4: v4};
+		}));
+var _elm_community$list_extra$List_Extra$zip4 = _elm_lang$core$List$map4(
+	F4(
+		function (v0, v1, v2, v3) {
+			return {ctor: '_Tuple4', _0: v0, _1: v1, _2: v2, _3: v3};
+		}));
+var _elm_community$list_extra$List_Extra$zip3 = _elm_lang$core$List$map3(
+	F3(
+		function (v0, v1, v2) {
+			return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
+		}));
+var _elm_community$list_extra$List_Extra$zip = _elm_lang$core$List$map2(
+	F2(
+		function (v0, v1) {
+			return {ctor: '_Tuple2', _0: v0, _1: v1};
+		}));
+var _elm_community$list_extra$List_Extra$isPrefixOf = function (prefix) {
+	return function (_p0) {
+		return A2(
+			_elm_lang$core$List$all,
+			_elm_lang$core$Basics$identity,
+			A3(
+				_elm_lang$core$List$map2,
+				F2(
+					function (x, y) {
+						return _elm_lang$core$Native_Utils.eq(x, y);
+					}),
+				prefix,
+				_p0));
+	};
+};
+var _elm_community$list_extra$List_Extra$isSuffixOf = F2(
+	function (suffix, xs) {
+		return A2(
+			_elm_community$list_extra$List_Extra$isPrefixOf,
+			_elm_lang$core$List$reverse(suffix),
+			_elm_lang$core$List$reverse(xs));
+	});
+var _elm_community$list_extra$List_Extra$selectSplit = function (xs) {
+	var _p1 = xs;
+	if (_p1.ctor === '[]') {
+		return {ctor: '[]'};
+	} else {
+		var _p5 = _p1._1;
+		var _p4 = _p1._0;
+		return {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple3',
+				_0: {ctor: '[]'},
+				_1: _p4,
+				_2: _p5
+			},
+			_1: A2(
+				_elm_lang$core$List$map,
+				function (_p2) {
+					var _p3 = _p2;
+					return {
+						ctor: '_Tuple3',
+						_0: {ctor: '::', _0: _p4, _1: _p3._0},
+						_1: _p3._1,
+						_2: _p3._2
+					};
+				},
+				_elm_community$list_extra$List_Extra$selectSplit(_p5))
+		};
+	}
+};
+var _elm_community$list_extra$List_Extra$select = function (xs) {
+	var _p6 = xs;
+	if (_p6.ctor === '[]') {
+		return {ctor: '[]'};
+	} else {
+		var _p10 = _p6._1;
+		var _p9 = _p6._0;
+		return {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: _p9, _1: _p10},
+			_1: A2(
+				_elm_lang$core$List$map,
+				function (_p7) {
+					var _p8 = _p7;
+					return {
+						ctor: '_Tuple2',
+						_0: _p8._0,
+						_1: {ctor: '::', _0: _p9, _1: _p8._1}
+					};
+				},
+				_elm_community$list_extra$List_Extra$select(_p10))
+		};
+	}
+};
+var _elm_community$list_extra$List_Extra$tailsHelp = F2(
+	function (e, list) {
+		var _p11 = list;
+		if (_p11.ctor === '::') {
+			var _p12 = _p11._0;
+			return {
+				ctor: '::',
+				_0: {ctor: '::', _0: e, _1: _p12},
+				_1: {ctor: '::', _0: _p12, _1: _p11._1}
+			};
+		} else {
+			return {ctor: '[]'};
+		}
+	});
+var _elm_community$list_extra$List_Extra$tails = A2(
+	_elm_lang$core$List$foldr,
+	_elm_community$list_extra$List_Extra$tailsHelp,
+	{
+		ctor: '::',
+		_0: {ctor: '[]'},
+		_1: {ctor: '[]'}
+	});
+var _elm_community$list_extra$List_Extra$isInfixOf = F2(
+	function (infix, xs) {
+		return A2(
+			_elm_lang$core$List$any,
+			_elm_community$list_extra$List_Extra$isPrefixOf(infix),
+			_elm_community$list_extra$List_Extra$tails(xs));
+	});
+var _elm_community$list_extra$List_Extra$inits = A2(
+	_elm_lang$core$List$foldr,
+	F2(
+		function (e, acc) {
+			return {
+				ctor: '::',
+				_0: {ctor: '[]'},
+				_1: A2(
+					_elm_lang$core$List$map,
+					F2(
+						function (x, y) {
+							return {ctor: '::', _0: x, _1: y};
+						})(e),
+					acc)
+			};
+		}),
+	{
+		ctor: '::',
+		_0: {ctor: '[]'},
+		_1: {ctor: '[]'}
+	});
+var _elm_community$list_extra$List_Extra$groupWhileTransitively = F2(
+	function (cmp, xs_) {
+		var _p13 = xs_;
+		if (_p13.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			if (_p13._1.ctor === '[]') {
+				return {
+					ctor: '::',
+					_0: {
+						ctor: '::',
+						_0: _p13._0,
+						_1: {ctor: '[]'}
+					},
+					_1: {ctor: '[]'}
+				};
+			} else {
+				var _p15 = _p13._0;
+				var _p14 = A2(_elm_community$list_extra$List_Extra$groupWhileTransitively, cmp, _p13._1);
+				if (_p14.ctor === '::') {
+					return A2(cmp, _p15, _p13._1._0) ? {
+						ctor: '::',
+						_0: {ctor: '::', _0: _p15, _1: _p14._0},
+						_1: _p14._1
+					} : {
+						ctor: '::',
+						_0: {
+							ctor: '::',
+							_0: _p15,
+							_1: {ctor: '[]'}
+						},
+						_1: _p14
+					};
+				} else {
+					return {ctor: '[]'};
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$stripPrefix = F2(
+	function (prefix, xs) {
+		var step = F2(
+			function (e, m) {
+				var _p16 = m;
+				if (_p16.ctor === 'Nothing') {
+					return _elm_lang$core$Maybe$Nothing;
+				} else {
+					if (_p16._0.ctor === '[]') {
+						return _elm_lang$core$Maybe$Nothing;
+					} else {
+						return _elm_lang$core$Native_Utils.eq(e, _p16._0._0) ? _elm_lang$core$Maybe$Just(_p16._0._1) : _elm_lang$core$Maybe$Nothing;
+					}
+				}
+			});
+		return A3(
+			_elm_lang$core$List$foldl,
+			step,
+			_elm_lang$core$Maybe$Just(xs),
+			prefix);
+	});
+var _elm_community$list_extra$List_Extra$dropWhileRight = function (p) {
+	return A2(
+		_elm_lang$core$List$foldr,
+		F2(
+			function (x, xs) {
+				return (p(x) && _elm_lang$core$List$isEmpty(xs)) ? {ctor: '[]'} : {ctor: '::', _0: x, _1: xs};
+			}),
+		{ctor: '[]'});
+};
+var _elm_community$list_extra$List_Extra$takeWhileRight = function (p) {
+	var step = F2(
+		function (x, _p17) {
+			var _p18 = _p17;
+			var _p19 = _p18._0;
+			return (p(x) && _p18._1) ? {
+				ctor: '_Tuple2',
+				_0: {ctor: '::', _0: x, _1: _p19},
+				_1: true
+			} : {ctor: '_Tuple2', _0: _p19, _1: false};
+		});
+	return function (_p20) {
+		return _elm_lang$core$Tuple$first(
+			A3(
+				_elm_lang$core$List$foldr,
+				step,
+				{
+					ctor: '_Tuple2',
+					_0: {ctor: '[]'},
+					_1: true
+				},
+				_p20));
+	};
+};
+var _elm_community$list_extra$List_Extra$splitAt = F2(
+	function (n, xs) {
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_elm_lang$core$List$take, n, xs),
+			_1: A2(_elm_lang$core$List$drop, n, xs)
+		};
+	});
+var _elm_community$list_extra$List_Extra$groupsOfVarying_ = F3(
+	function (listOflengths, list, accu) {
+		groupsOfVarying_:
+		while (true) {
+			var _p21 = {ctor: '_Tuple2', _0: listOflengths, _1: list};
+			if (((_p21.ctor === '_Tuple2') && (_p21._0.ctor === '::')) && (_p21._1.ctor === '::')) {
+				var _p22 = A2(_elm_community$list_extra$List_Extra$splitAt, _p21._0._0, list);
+				var head = _p22._0;
+				var tail = _p22._1;
+				var _v10 = _p21._0._1,
+					_v11 = tail,
+					_v12 = {ctor: '::', _0: head, _1: accu};
+				listOflengths = _v10;
+				list = _v11;
+				accu = _v12;
+				continue groupsOfVarying_;
+			} else {
+				return _elm_lang$core$List$reverse(accu);
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$groupsOfVarying = F2(
+	function (listOflengths, list) {
+		return A3(
+			_elm_community$list_extra$List_Extra$groupsOfVarying_,
+			listOflengths,
+			list,
+			{ctor: '[]'});
+	});
+var _elm_community$list_extra$List_Extra$unfoldr = F2(
+	function (f, seed) {
+		var _p23 = f(seed);
+		if (_p23.ctor === 'Nothing') {
+			return {ctor: '[]'};
+		} else {
+			return {
+				ctor: '::',
+				_0: _p23._0._0,
+				_1: A2(_elm_community$list_extra$List_Extra$unfoldr, f, _p23._0._1)
+			};
+		}
+	});
+var _elm_community$list_extra$List_Extra$scanr1 = F2(
+	function (f, xs_) {
+		var _p24 = xs_;
+		if (_p24.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			if (_p24._1.ctor === '[]') {
+				return {
+					ctor: '::',
+					_0: _p24._0,
+					_1: {ctor: '[]'}
+				};
+			} else {
+				var _p25 = A2(_elm_community$list_extra$List_Extra$scanr1, f, _p24._1);
+				if (_p25.ctor === '::') {
+					return {
+						ctor: '::',
+						_0: A2(f, _p24._0, _p25._0),
+						_1: _p25
+					};
+				} else {
+					return {ctor: '[]'};
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$scanr = F3(
+	function (f, acc, xs_) {
+		var _p26 = xs_;
+		if (_p26.ctor === '[]') {
+			return {
+				ctor: '::',
+				_0: acc,
+				_1: {ctor: '[]'}
+			};
+		} else {
+			var _p27 = A3(_elm_community$list_extra$List_Extra$scanr, f, acc, _p26._1);
+			if (_p27.ctor === '::') {
+				return {
+					ctor: '::',
+					_0: A2(f, _p26._0, _p27._0),
+					_1: _p27
+				};
+			} else {
+				return {ctor: '[]'};
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$scanl1 = F2(
+	function (f, xs_) {
+		var _p28 = xs_;
+		if (_p28.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			return A3(_elm_lang$core$List$scanl, f, _p28._0, _p28._1);
+		}
+	});
+var _elm_community$list_extra$List_Extra$indexedFoldr = F3(
+	function (func, acc, list) {
+		var step = F2(
+			function (x, _p29) {
+				var _p30 = _p29;
+				var _p31 = _p30._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _p31 - 1,
+					_1: A3(func, _p31, x, _p30._1)
+				};
+			});
+		return _elm_lang$core$Tuple$second(
+			A3(
+				_elm_lang$core$List$foldr,
+				step,
+				{
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$List$length(list) - 1,
+					_1: acc
+				},
+				list));
+	});
+var _elm_community$list_extra$List_Extra$indexedFoldl = F3(
+	function (func, acc, list) {
+		var step = F2(
+			function (x, _p32) {
+				var _p33 = _p32;
+				var _p34 = _p33._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _p34 + 1,
+					_1: A3(func, _p34, x, _p33._1)
+				};
+			});
+		return _elm_lang$core$Tuple$second(
+			A3(
+				_elm_lang$core$List$foldl,
+				step,
+				{ctor: '_Tuple2', _0: 0, _1: acc},
+				list));
+	});
+var _elm_community$list_extra$List_Extra$foldr1 = F2(
+	function (f, xs) {
+		var mf = F2(
+			function (x, m) {
+				return _elm_lang$core$Maybe$Just(
+					function () {
+						var _p35 = m;
+						if (_p35.ctor === 'Nothing') {
+							return x;
+						} else {
+							return A2(f, x, _p35._0);
+						}
+					}());
+			});
+		return A3(_elm_lang$core$List$foldr, mf, _elm_lang$core$Maybe$Nothing, xs);
+	});
+var _elm_community$list_extra$List_Extra$foldl1 = F2(
+	function (f, xs) {
+		var mf = F2(
+			function (x, m) {
+				return _elm_lang$core$Maybe$Just(
+					function () {
+						var _p36 = m;
+						if (_p36.ctor === 'Nothing') {
+							return x;
+						} else {
+							return A2(f, _p36._0, x);
+						}
+					}());
+			});
+		return A3(_elm_lang$core$List$foldl, mf, _elm_lang$core$Maybe$Nothing, xs);
+	});
+var _elm_community$list_extra$List_Extra$interweaveHelp = F3(
+	function (l1, l2, acc) {
+		interweaveHelp:
+		while (true) {
+			var _p37 = {ctor: '_Tuple2', _0: l1, _1: l2};
+			_v23_1:
+			do {
+				if (_p37._0.ctor === '::') {
+					if (_p37._1.ctor === '::') {
+						var _v24 = _p37._0._1,
+							_v25 = _p37._1._1,
+							_v26 = A2(
+							_elm_lang$core$Basics_ops['++'],
+							acc,
+							{
+								ctor: '::',
+								_0: _p37._0._0,
+								_1: {
+									ctor: '::',
+									_0: _p37._1._0,
+									_1: {ctor: '[]'}
+								}
+							});
+						l1 = _v24;
+						l2 = _v25;
+						acc = _v26;
+						continue interweaveHelp;
+					} else {
+						break _v23_1;
+					}
+				} else {
+					if (_p37._1.ctor === '[]') {
+						break _v23_1;
+					} else {
+						return A2(_elm_lang$core$Basics_ops['++'], acc, _p37._1);
+					}
+				}
+			} while(false);
+			return A2(_elm_lang$core$Basics_ops['++'], acc, _p37._0);
+		}
+	});
+var _elm_community$list_extra$List_Extra$interweave = F2(
+	function (l1, l2) {
+		return A3(
+			_elm_community$list_extra$List_Extra$interweaveHelp,
+			l1,
+			l2,
+			{ctor: '[]'});
+	});
+var _elm_community$list_extra$List_Extra$permutations = function (xs_) {
+	var _p38 = xs_;
+	if (_p38.ctor === '[]') {
+		return {
+			ctor: '::',
+			_0: {ctor: '[]'},
+			_1: {ctor: '[]'}
+		};
+	} else {
+		var f = function (_p39) {
+			var _p40 = _p39;
+			return A2(
+				_elm_lang$core$List$map,
+				F2(
+					function (x, y) {
+						return {ctor: '::', _0: x, _1: y};
+					})(_p40._0),
+				_elm_community$list_extra$List_Extra$permutations(_p40._1));
+		};
+		return A2(
+			_elm_lang$core$List$concatMap,
+			f,
+			_elm_community$list_extra$List_Extra$select(_p38));
+	}
+};
+var _elm_community$list_extra$List_Extra$isPermutationOf = F2(
+	function (permut, xs) {
+		return A2(
+			_elm_lang$core$List$member,
+			permut,
+			_elm_community$list_extra$List_Extra$permutations(xs));
+	});
+var _elm_community$list_extra$List_Extra$subsequencesNonEmpty = function (xs) {
+	var _p41 = xs;
+	if (_p41.ctor === '[]') {
+		return {ctor: '[]'};
+	} else {
+		var _p42 = _p41._0;
+		var f = F2(
+			function (ys, r) {
+				return {
+					ctor: '::',
+					_0: ys,
+					_1: {
+						ctor: '::',
+						_0: {ctor: '::', _0: _p42, _1: ys},
+						_1: r
+					}
+				};
+			});
+		return {
+			ctor: '::',
+			_0: {
+				ctor: '::',
+				_0: _p42,
+				_1: {ctor: '[]'}
+			},
+			_1: A3(
+				_elm_lang$core$List$foldr,
+				f,
+				{ctor: '[]'},
+				_elm_community$list_extra$List_Extra$subsequencesNonEmpty(_p41._1))
+		};
+	}
+};
+var _elm_community$list_extra$List_Extra$subsequences = function (xs) {
+	return {
+		ctor: '::',
+		_0: {ctor: '[]'},
+		_1: _elm_community$list_extra$List_Extra$subsequencesNonEmpty(xs)
+	};
+};
+var _elm_community$list_extra$List_Extra$isSubsequenceOf = F2(
+	function (subseq, xs) {
+		return A2(
+			_elm_lang$core$List$member,
+			subseq,
+			_elm_community$list_extra$List_Extra$subsequences(xs));
+	});
+var _elm_community$list_extra$List_Extra$transpose = function (ll) {
+	transpose:
+	while (true) {
+		var _p43 = ll;
+		if (_p43.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			if (_p43._0.ctor === '[]') {
+				var _v31 = _p43._1;
+				ll = _v31;
+				continue transpose;
+			} else {
+				var _p44 = _p43._1;
+				var tails = A2(_elm_lang$core$List$filterMap, _elm_lang$core$List$tail, _p44);
+				var heads = A2(_elm_lang$core$List$filterMap, _elm_lang$core$List$head, _p44);
+				return {
+					ctor: '::',
+					_0: {ctor: '::', _0: _p43._0._0, _1: heads},
+					_1: _elm_community$list_extra$List_Extra$transpose(
+						{ctor: '::', _0: _p43._0._1, _1: tails})
+				};
+			}
+		}
+	}
+};
+var _elm_community$list_extra$List_Extra$intercalate = function (xs) {
+	return function (_p45) {
+		return _elm_lang$core$List$concat(
+			A2(_elm_lang$core$List$intersperse, xs, _p45));
+	};
+};
+var _elm_community$list_extra$List_Extra$filterNot = F2(
+	function (pred, list) {
+		return A2(
+			_elm_lang$core$List$filter,
+			function (_p46) {
+				return !pred(_p46);
+			},
+			list);
+	});
+var _elm_community$list_extra$List_Extra$removeAt = F2(
+	function (index, l) {
+		if (_elm_lang$core$Native_Utils.cmp(index, 0) < 0) {
+			return l;
+		} else {
+			var tail = _elm_lang$core$List$tail(
+				A2(_elm_lang$core$List$drop, index, l));
+			var head = A2(_elm_lang$core$List$take, index, l);
+			var _p47 = tail;
+			if (_p47.ctor === 'Nothing') {
+				return l;
+			} else {
+				return A2(_elm_lang$core$List$append, head, _p47._0);
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$singleton = function (x) {
+	return {
+		ctor: '::',
+		_0: x,
+		_1: {ctor: '[]'}
+	};
+};
+var _elm_community$list_extra$List_Extra$stableSortWith = F2(
+	function (pred, list) {
+		var predWithIndex = F2(
+			function (_p49, _p48) {
+				var _p50 = _p49;
+				var _p51 = _p48;
+				var result = A2(pred, _p50._0, _p51._0);
+				var _p52 = result;
+				if (_p52.ctor === 'EQ') {
+					return A2(_elm_lang$core$Basics$compare, _p50._1, _p51._1);
+				} else {
+					return result;
+				}
+			});
+		var listWithIndex = A2(
+			_elm_lang$core$List$indexedMap,
+			F2(
+				function (i, a) {
+					return {ctor: '_Tuple2', _0: a, _1: i};
+				}),
+			list);
+		return A2(
+			_elm_lang$core$List$map,
+			_elm_lang$core$Tuple$first,
+			A2(_elm_lang$core$List$sortWith, predWithIndex, listWithIndex));
+	});
+var _elm_community$list_extra$List_Extra$setAt = F3(
+	function (index, value, l) {
+		if (_elm_lang$core$Native_Utils.cmp(index, 0) < 0) {
+			return _elm_lang$core$Maybe$Nothing;
+		} else {
+			var tail = _elm_lang$core$List$tail(
+				A2(_elm_lang$core$List$drop, index, l));
+			var head = A2(_elm_lang$core$List$take, index, l);
+			var _p53 = tail;
+			if (_p53.ctor === 'Nothing') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				return _elm_lang$core$Maybe$Just(
+					A2(
+						_elm_lang$core$List$append,
+						head,
+						{ctor: '::', _0: value, _1: _p53._0}));
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$remove = F2(
+	function (x, xs) {
+		var _p54 = xs;
+		if (_p54.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			var _p56 = _p54._1;
+			var _p55 = _p54._0;
+			return _elm_lang$core$Native_Utils.eq(x, _p55) ? _p56 : {
+				ctor: '::',
+				_0: _p55,
+				_1: A2(_elm_community$list_extra$List_Extra$remove, x, _p56)
+			};
+		}
+	});
+var _elm_community$list_extra$List_Extra$updateIfIndex = F3(
+	function (predicate, update, list) {
+		return A2(
+			_elm_lang$core$List$indexedMap,
+			F2(
+				function (i, x) {
+					return predicate(i) ? update(x) : x;
+				}),
+			list);
+	});
+var _elm_community$list_extra$List_Extra$updateAt = F3(
+	function (index, update, list) {
+		return ((_elm_lang$core$Native_Utils.cmp(index, 0) < 0) || (_elm_lang$core$Native_Utils.cmp(
+			index,
+			_elm_lang$core$List$length(list)) > -1)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
+			A3(
+				_elm_community$list_extra$List_Extra$updateIfIndex,
+				F2(
+					function (x, y) {
+						return _elm_lang$core$Native_Utils.eq(x, y);
+					})(index),
+				update,
+				list));
+	});
+var _elm_community$list_extra$List_Extra$updateIf = F3(
+	function (predicate, update, list) {
+		return A2(
+			_elm_lang$core$List$map,
+			function (item) {
+				return predicate(item) ? update(item) : item;
+			},
+			list);
+	});
+var _elm_community$list_extra$List_Extra$replaceIf = F3(
+	function (predicate, replacement, list) {
+		return A3(
+			_elm_community$list_extra$List_Extra$updateIf,
+			predicate,
+			_elm_lang$core$Basics$always(replacement),
+			list);
+	});
+var _elm_community$list_extra$List_Extra$findIndices = function (p) {
+	return function (_p57) {
+		return A2(
+			_elm_lang$core$List$map,
+			_elm_lang$core$Tuple$first,
+			A2(
+				_elm_lang$core$List$filter,
+				function (_p58) {
+					var _p59 = _p58;
+					return p(_p59._1);
+				},
+				A2(
+					_elm_lang$core$List$indexedMap,
+					F2(
+						function (v0, v1) {
+							return {ctor: '_Tuple2', _0: v0, _1: v1};
+						}),
+					_p57)));
+	};
+};
+var _elm_community$list_extra$List_Extra$findIndex = function (p) {
+	return function (_p60) {
+		return _elm_lang$core$List$head(
+			A2(_elm_community$list_extra$List_Extra$findIndices, p, _p60));
+	};
+};
+var _elm_community$list_extra$List_Extra$elemIndices = function (x) {
+	return _elm_community$list_extra$List_Extra$findIndices(
+		F2(
+			function (x, y) {
+				return _elm_lang$core$Native_Utils.eq(x, y);
+			})(x));
+};
+var _elm_community$list_extra$List_Extra$elemIndex = function (x) {
+	return _elm_community$list_extra$List_Extra$findIndex(
+		F2(
+			function (x, y) {
+				return _elm_lang$core$Native_Utils.eq(x, y);
+			})(x));
+};
+var _elm_community$list_extra$List_Extra$find = F2(
+	function (predicate, list) {
+		find:
+		while (true) {
+			var _p61 = list;
+			if (_p61.ctor === '[]') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				var _p62 = _p61._0;
+				if (predicate(_p62)) {
+					return _elm_lang$core$Maybe$Just(_p62);
+				} else {
+					var _v40 = predicate,
+						_v41 = _p61._1;
+					predicate = _v40;
+					list = _v41;
+					continue find;
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$notMember = function (x) {
+	return function (_p63) {
+		return !A2(_elm_lang$core$List$member, x, _p63);
+	};
+};
+var _elm_community$list_extra$List_Extra$andThen = _elm_lang$core$List$concatMap;
+var _elm_community$list_extra$List_Extra$lift2 = F3(
+	function (f, la, lb) {
+		return A2(
+			_elm_community$list_extra$List_Extra$andThen,
+			function (a) {
+				return A2(
+					_elm_community$list_extra$List_Extra$andThen,
+					function (b) {
+						return {
+							ctor: '::',
+							_0: A2(f, a, b),
+							_1: {ctor: '[]'}
+						};
+					},
+					lb);
+			},
+			la);
+	});
+var _elm_community$list_extra$List_Extra$lift3 = F4(
+	function (f, la, lb, lc) {
+		return A2(
+			_elm_community$list_extra$List_Extra$andThen,
+			function (a) {
+				return A2(
+					_elm_community$list_extra$List_Extra$andThen,
+					function (b) {
+						return A2(
+							_elm_community$list_extra$List_Extra$andThen,
+							function (c) {
+								return {
+									ctor: '::',
+									_0: A3(f, a, b, c),
+									_1: {ctor: '[]'}
+								};
+							},
+							lc);
+					},
+					lb);
+			},
+			la);
+	});
+var _elm_community$list_extra$List_Extra$lift4 = F5(
+	function (f, la, lb, lc, ld) {
+		return A2(
+			_elm_community$list_extra$List_Extra$andThen,
+			function (a) {
+				return A2(
+					_elm_community$list_extra$List_Extra$andThen,
+					function (b) {
+						return A2(
+							_elm_community$list_extra$List_Extra$andThen,
+							function (c) {
+								return A2(
+									_elm_community$list_extra$List_Extra$andThen,
+									function (d) {
+										return {
+											ctor: '::',
+											_0: A4(f, a, b, c, d),
+											_1: {ctor: '[]'}
+										};
+									},
+									ld);
+							},
+							lc);
+					},
+					lb);
+			},
+			la);
+	});
+var _elm_community$list_extra$List_Extra$andMap = F2(
+	function (fl, l) {
+		return A3(
+			_elm_lang$core$List$map2,
+			F2(
+				function (x, y) {
+					return x(y);
+				}),
+			fl,
+			l);
+	});
+var _elm_community$list_extra$List_Extra$uniqueHelp = F3(
+	function (f, existing, remaining) {
+		uniqueHelp:
+		while (true) {
+			var _p64 = remaining;
+			if (_p64.ctor === '[]') {
+				return {ctor: '[]'};
+			} else {
+				var _p66 = _p64._1;
+				var _p65 = _p64._0;
+				var computedFirst = f(_p65);
+				if (A2(_elm_lang$core$Set$member, computedFirst, existing)) {
+					var _v43 = f,
+						_v44 = existing,
+						_v45 = _p66;
+					f = _v43;
+					existing = _v44;
+					remaining = _v45;
+					continue uniqueHelp;
+				} else {
+					return {
+						ctor: '::',
+						_0: _p65,
+						_1: A3(
+							_elm_community$list_extra$List_Extra$uniqueHelp,
+							f,
+							A2(_elm_lang$core$Set$insert, computedFirst, existing),
+							_p66)
+					};
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$uniqueBy = F2(
+	function (f, list) {
+		return A3(_elm_community$list_extra$List_Extra$uniqueHelp, f, _elm_lang$core$Set$empty, list);
+	});
+var _elm_community$list_extra$List_Extra$allDifferentBy = F2(
+	function (f, list) {
+		return _elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$List$length(list),
+			_elm_lang$core$List$length(
+				A2(_elm_community$list_extra$List_Extra$uniqueBy, f, list)));
+	});
+var _elm_community$list_extra$List_Extra$unique = function (list) {
+	return A3(_elm_community$list_extra$List_Extra$uniqueHelp, _elm_lang$core$Basics$identity, _elm_lang$core$Set$empty, list);
+};
+var _elm_community$list_extra$List_Extra$allDifferent = function (list) {
+	return _elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$List$length(list),
+		_elm_lang$core$List$length(
+			_elm_community$list_extra$List_Extra$unique(list)));
+};
+var _elm_community$list_extra$List_Extra$dropWhile = F2(
+	function (predicate, list) {
+		dropWhile:
+		while (true) {
+			var _p67 = list;
+			if (_p67.ctor === '[]') {
+				return {ctor: '[]'};
+			} else {
+				if (predicate(_p67._0)) {
+					var _v47 = predicate,
+						_v48 = _p67._1;
+					predicate = _v47;
+					list = _v48;
+					continue dropWhile;
+				} else {
+					return list;
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$takeWhile = F2(
+	function (predicate, list) {
+		var _p68 = list;
+		if (_p68.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			var _p69 = _p68._0;
+			return predicate(_p69) ? {
+				ctor: '::',
+				_0: _p69,
+				_1: A2(_elm_community$list_extra$List_Extra$takeWhile, predicate, _p68._1)
+			} : {ctor: '[]'};
+		}
+	});
+var _elm_community$list_extra$List_Extra$span = F2(
+	function (p, xs) {
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_elm_community$list_extra$List_Extra$takeWhile, p, xs),
+			_1: A2(_elm_community$list_extra$List_Extra$dropWhile, p, xs)
+		};
+	});
+var _elm_community$list_extra$List_Extra$break = function (p) {
+	return _elm_community$list_extra$List_Extra$span(
+		function (_p70) {
+			return !p(_p70);
+		});
+};
+var _elm_community$list_extra$List_Extra$groupWhile = F2(
+	function (eq, xs_) {
+		var _p71 = xs_;
+		if (_p71.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			var _p73 = _p71._0;
+			var _p72 = A2(
+				_elm_community$list_extra$List_Extra$span,
+				eq(_p73),
+				_p71._1);
+			var ys = _p72._0;
+			var zs = _p72._1;
+			return {
+				ctor: '::',
+				_0: {ctor: '::', _0: _p73, _1: ys},
+				_1: A2(_elm_community$list_extra$List_Extra$groupWhile, eq, zs)
+			};
+		}
+	});
+var _elm_community$list_extra$List_Extra$group = _elm_community$list_extra$List_Extra$groupWhile(
+	F2(
+		function (x, y) {
+			return _elm_lang$core$Native_Utils.eq(x, y);
+		}));
+var _elm_community$list_extra$List_Extra$minimumBy = F2(
+	function (f, ls) {
+		var minBy = F2(
+			function (x, _p74) {
+				var _p75 = _p74;
+				var _p76 = _p75._1;
+				var fx = f(x);
+				return (_elm_lang$core$Native_Utils.cmp(fx, _p76) < 0) ? {ctor: '_Tuple2', _0: x, _1: fx} : {ctor: '_Tuple2', _0: _p75._0, _1: _p76};
+			});
+		var _p77 = ls;
+		if (_p77.ctor === '::') {
+			if (_p77._1.ctor === '[]') {
+				return _elm_lang$core$Maybe$Just(_p77._0);
+			} else {
+				var _p78 = _p77._0;
+				return _elm_lang$core$Maybe$Just(
+					_elm_lang$core$Tuple$first(
+						A3(
+							_elm_lang$core$List$foldl,
+							minBy,
+							{
+								ctor: '_Tuple2',
+								_0: _p78,
+								_1: f(_p78)
+							},
+							_p77._1)));
+			}
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _elm_community$list_extra$List_Extra$maximumBy = F2(
+	function (f, ls) {
+		var maxBy = F2(
+			function (x, _p79) {
+				var _p80 = _p79;
+				var _p81 = _p80._1;
+				var fx = f(x);
+				return (_elm_lang$core$Native_Utils.cmp(fx, _p81) > 0) ? {ctor: '_Tuple2', _0: x, _1: fx} : {ctor: '_Tuple2', _0: _p80._0, _1: _p81};
+			});
+		var _p82 = ls;
+		if (_p82.ctor === '::') {
+			if (_p82._1.ctor === '[]') {
+				return _elm_lang$core$Maybe$Just(_p82._0);
+			} else {
+				var _p83 = _p82._0;
+				return _elm_lang$core$Maybe$Just(
+					_elm_lang$core$Tuple$first(
+						A3(
+							_elm_lang$core$List$foldl,
+							maxBy,
+							{
+								ctor: '_Tuple2',
+								_0: _p83,
+								_1: f(_p83)
+							},
+							_p82._1)));
+			}
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _elm_community$list_extra$List_Extra$uncons = function (xs) {
+	var _p84 = xs;
+	if (_p84.ctor === '[]') {
+		return _elm_lang$core$Maybe$Nothing;
+	} else {
+		return _elm_lang$core$Maybe$Just(
+			{ctor: '_Tuple2', _0: _p84._0, _1: _p84._1});
+	}
+};
+var _elm_community$list_extra$List_Extra$swapAt = F3(
+	function (index1, index2, l) {
+		swapAt:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.eq(index1, index2)) {
+				return _elm_lang$core$Maybe$Just(l);
+			} else {
+				if (_elm_lang$core$Native_Utils.cmp(index1, index2) > 0) {
+					var _v56 = index2,
+						_v57 = index1,
+						_v58 = l;
+					index1 = _v56;
+					index2 = _v57;
+					l = _v58;
+					continue swapAt;
+				} else {
+					if (_elm_lang$core$Native_Utils.cmp(index1, 0) < 0) {
+						return _elm_lang$core$Maybe$Nothing;
+					} else {
+						var _p85 = A2(_elm_community$list_extra$List_Extra$splitAt, index1, l);
+						var part1 = _p85._0;
+						var tail1 = _p85._1;
+						var _p86 = A2(_elm_community$list_extra$List_Extra$splitAt, index2 - index1, tail1);
+						var head2 = _p86._0;
+						var tail2 = _p86._1;
+						return A3(
+							_elm_lang$core$Maybe$map2,
+							F2(
+								function (_p88, _p87) {
+									var _p89 = _p88;
+									var _p90 = _p87;
+									return _elm_lang$core$List$concat(
+										{
+											ctor: '::',
+											_0: part1,
+											_1: {
+												ctor: '::',
+												_0: {ctor: '::', _0: _p90._0, _1: _p89._1},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '::', _0: _p89._0, _1: _p90._1},
+													_1: {ctor: '[]'}
+												}
+											}
+										});
+								}),
+							_elm_community$list_extra$List_Extra$uncons(head2),
+							_elm_community$list_extra$List_Extra$uncons(tail2));
+					}
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$iterate = F2(
+	function (f, x) {
+		var _p91 = f(x);
+		if (_p91.ctor === 'Just') {
+			return {
+				ctor: '::',
+				_0: x,
+				_1: A2(_elm_community$list_extra$List_Extra$iterate, f, _p91._0)
+			};
+		} else {
+			return {
+				ctor: '::',
+				_0: x,
+				_1: {ctor: '[]'}
+			};
+		}
+	});
+var _elm_community$list_extra$List_Extra$getAt = F2(
+	function (idx, xs) {
+		return (_elm_lang$core$Native_Utils.cmp(idx, 0) < 0) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$List$head(
+			A2(_elm_lang$core$List$drop, idx, xs));
+	});
+var _elm_community$list_extra$List_Extra_ops = _elm_community$list_extra$List_Extra_ops || {};
+_elm_community$list_extra$List_Extra_ops['!!'] = _elm_lang$core$Basics$flip(_elm_community$list_extra$List_Extra$getAt);
+var _elm_community$list_extra$List_Extra$init = function () {
+	var maybe = F2(
+		function (d, f) {
+			return function (_p92) {
+				return A2(
+					_elm_lang$core$Maybe$withDefault,
+					d,
+					A2(_elm_lang$core$Maybe$map, f, _p92));
+			};
+		});
+	return A2(
+		_elm_lang$core$List$foldr,
+		function (x) {
+			return function (_p93) {
+				return _elm_lang$core$Maybe$Just(
+					A3(
+						maybe,
+						{ctor: '[]'},
+						F2(
+							function (x, y) {
+								return {ctor: '::', _0: x, _1: y};
+							})(x),
+						_p93));
+			};
+		},
+		_elm_lang$core$Maybe$Nothing);
+}();
+var _elm_community$list_extra$List_Extra$last = _elm_community$list_extra$List_Extra$foldl1(
+	_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always));
+
+var _cuducos$elm_format_number$FormatNumber_Locales$Locale = F3(
+	function (a, b, c) {
+		return {decimals: a, thousandSeparator: b, decimalSeparator: c};
+	});
+var _cuducos$elm_format_number$FormatNumber_Locales$frenchLocale = A3(_cuducos$elm_format_number$FormatNumber_Locales$Locale, 3, ' ', ',');
+var _cuducos$elm_format_number$FormatNumber_Locales$spanishLocale = A3(_cuducos$elm_format_number$FormatNumber_Locales$Locale, 3, '.', ',');
+var _cuducos$elm_format_number$FormatNumber_Locales$usLocale = A3(_cuducos$elm_format_number$FormatNumber_Locales$Locale, 2, ',', '.');
+
+var _myrho$elm_round$Round$funNum = F3(
+	function (fun, s, fl) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			1 / 0,
+			_elm_lang$core$Result$toMaybe(
+				_elm_lang$core$String$toFloat(
+					A2(fun, s, fl))));
+	});
+var _myrho$elm_round$Round$splitComma = function (str) {
+	var _p0 = A2(_elm_lang$core$String$split, '.', str);
+	if (_p0.ctor === '::') {
+		if (_p0._1.ctor === '::') {
+			return {ctor: '_Tuple2', _0: _p0._0, _1: _p0._1._0};
+		} else {
+			return {ctor: '_Tuple2', _0: _p0._0, _1: '0'};
+		}
+	} else {
+		return {ctor: '_Tuple2', _0: '0', _1: '0'};
+	}
+};
+var _myrho$elm_round$Round$toDecimal = function (fl) {
+	var _p1 = A2(
+		_elm_lang$core$String$split,
+		'e',
+		_elm_lang$core$Basics$toString(fl));
+	if (_p1.ctor === '::') {
+		if (_p1._1.ctor === '::') {
+			var _p4 = _p1._1._0;
+			var _p2 = function () {
+				var hasSign = _elm_lang$core$Native_Utils.cmp(fl, 0) < 0;
+				var _p3 = _myrho$elm_round$Round$splitComma(_p1._0);
+				var b = _p3._0;
+				var a = _p3._1;
+				return {
+					ctor: '_Tuple3',
+					_0: hasSign ? '-' : '',
+					_1: hasSign ? A2(_elm_lang$core$String$dropLeft, 1, b) : b,
+					_2: a
+				};
+			}();
+			var sign = _p2._0;
+			var before = _p2._1;
+			var after = _p2._2;
+			var e = A2(
+				_elm_lang$core$Maybe$withDefault,
+				0,
+				_elm_lang$core$Result$toMaybe(
+					_elm_lang$core$String$toInt(
+						A2(_elm_lang$core$String$startsWith, '+', _p4) ? A2(_elm_lang$core$String$dropLeft, 1, _p4) : _p4)));
+			var newBefore = (_elm_lang$core$Native_Utils.cmp(e, 0) > -1) ? before : ((_elm_lang$core$Native_Utils.cmp(
+				_elm_lang$core$Basics$abs(e),
+				_elm_lang$core$String$length(before)) < 0) ? A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(
+					_elm_lang$core$String$left,
+					_elm_lang$core$String$length(before) - _elm_lang$core$Basics$abs(e),
+					before),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'.',
+					A2(
+						_elm_lang$core$String$right,
+						_elm_lang$core$Basics$abs(e),
+						before))) : A2(
+				_elm_lang$core$Basics_ops['++'],
+				'0.',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					A2(
+						_elm_lang$core$String$repeat,
+						_elm_lang$core$Basics$abs(e) - _elm_lang$core$String$length(before),
+						'0'),
+					before)));
+			var newAfter = (_elm_lang$core$Native_Utils.cmp(e, 0) < 1) ? after : ((_elm_lang$core$Native_Utils.cmp(
+				e,
+				_elm_lang$core$String$length(after)) < 0) ? A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(_elm_lang$core$String$left, e, after),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'.',
+					A2(
+						_elm_lang$core$String$right,
+						_elm_lang$core$String$length(after) - e,
+						after))) : A2(
+				_elm_lang$core$Basics_ops['++'],
+				after,
+				A2(
+					_elm_lang$core$String$repeat,
+					e - _elm_lang$core$String$length(after),
+					'0')));
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				sign,
+				A2(_elm_lang$core$Basics_ops['++'], newBefore, newAfter));
+		} else {
+			return _p1._0;
+		}
+	} else {
+		return '';
+	}
+};
+var _myrho$elm_round$Round$truncate = function (n) {
+	return (_elm_lang$core$Native_Utils.cmp(n, 0) < 0) ? _elm_lang$core$Basics$ceiling(n) : _elm_lang$core$Basics$floor(n);
+};
+var _myrho$elm_round$Round$roundFun = F3(
+	function (functor, s, fl) {
+		if (_elm_lang$core$Native_Utils.eq(s, 0)) {
+			return _elm_lang$core$Basics$toString(
+				functor(fl));
+		} else {
+			if (_elm_lang$core$Native_Utils.cmp(s, 0) < 0) {
+				return function (r) {
+					return (!_elm_lang$core$Native_Utils.eq(r, '0')) ? A2(
+						_elm_lang$core$Basics_ops['++'],
+						r,
+						A2(
+							_elm_lang$core$String$repeat,
+							_elm_lang$core$Basics$abs(s),
+							'0')) : r;
+				}(
+					A3(
+						_myrho$elm_round$Round$roundFun,
+						functor,
+						0,
+						A2(
+							F2(
+								function (x, y) {
+									return x / y;
+								}),
+							fl,
+							A2(
+								F2(
+									function (x, y) {
+										return Math.pow(x, y);
+									}),
+								10,
+								_elm_lang$core$Basics$abs(
+									_elm_lang$core$Basics$toFloat(s))))));
+			} else {
+				var dd = (_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) ? 2 : 1;
+				var n = (_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) ? -1 : 1;
+				var e = Math.pow(10, s);
+				var _p5 = _myrho$elm_round$Round$splitComma(
+					_myrho$elm_round$Round$toDecimal(fl));
+				var before = _p5._0;
+				var after = _p5._1;
+				var a = A3(
+					_elm_lang$core$String$padRight,
+					s + 1,
+					_elm_lang$core$Native_Utils.chr('0'),
+					after);
+				var b = A2(_elm_lang$core$String$left, s, a);
+				var c = A2(_elm_lang$core$String$dropLeft, s, a);
+				var f = functor(
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						_elm_lang$core$Basics$toFloat(e),
+						_elm_lang$core$Result$toMaybe(
+							_elm_lang$core$String$toFloat(
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									(_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) ? '-' : '',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										'1',
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											b,
+											A2(_elm_lang$core$Basics_ops['++'], '.', c))))))));
+				var g = A2(
+					_elm_lang$core$String$dropLeft,
+					dd,
+					_elm_lang$core$Basics$toString(f));
+				var h = _myrho$elm_round$Round$truncate(fl) + (_elm_lang$core$Native_Utils.eq(f - (e * n), e * n) ? ((_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) ? -1 : 1) : 0);
+				var j = _elm_lang$core$Basics$toString(h);
+				var i = (_elm_lang$core$Native_Utils.eq(j, '0') && ((!_elm_lang$core$Native_Utils.eq(f - (e * n), 0)) && ((_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) && (_elm_lang$core$Native_Utils.cmp(fl, -1) > 0)))) ? A2(_elm_lang$core$Basics_ops['++'], '-', j) : j;
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					i,
+					A2(_elm_lang$core$Basics_ops['++'], '.', g));
+			}
+		}
+	});
+var _myrho$elm_round$Round$round = _myrho$elm_round$Round$roundFun(_elm_lang$core$Basics$round);
+var _myrho$elm_round$Round$roundNum = _myrho$elm_round$Round$funNum(_myrho$elm_round$Round$round);
+var _myrho$elm_round$Round$ceiling = _myrho$elm_round$Round$roundFun(_elm_lang$core$Basics$ceiling);
+var _myrho$elm_round$Round$ceilingNum = _myrho$elm_round$Round$funNum(_myrho$elm_round$Round$ceiling);
+var _myrho$elm_round$Round$floor = _myrho$elm_round$Round$roundFun(_elm_lang$core$Basics$floor);
+var _myrho$elm_round$Round$floorCom = F2(
+	function (s, fl) {
+		return (_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) ? A2(_myrho$elm_round$Round$ceiling, s, fl) : A2(_myrho$elm_round$Round$floor, s, fl);
+	});
+var _myrho$elm_round$Round$floorNumCom = _myrho$elm_round$Round$funNum(_myrho$elm_round$Round$floorCom);
+var _myrho$elm_round$Round$ceilingCom = F2(
+	function (s, fl) {
+		return (_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) ? A2(_myrho$elm_round$Round$floor, s, fl) : A2(_myrho$elm_round$Round$ceiling, s, fl);
+	});
+var _myrho$elm_round$Round$ceilingNumCom = _myrho$elm_round$Round$funNum(_myrho$elm_round$Round$ceilingCom);
+var _myrho$elm_round$Round$floorNum = _myrho$elm_round$Round$funNum(_myrho$elm_round$Round$floor);
+var _myrho$elm_round$Round$roundCom = _myrho$elm_round$Round$roundFun(
+	function (fl) {
+		var dec = fl - _elm_lang$core$Basics$toFloat(
+			_myrho$elm_round$Round$truncate(fl));
+		return (_elm_lang$core$Native_Utils.cmp(dec, 0.5) > -1) ? _elm_lang$core$Basics$ceiling(fl) : ((_elm_lang$core$Native_Utils.cmp(dec, -0.5) < 1) ? _elm_lang$core$Basics$floor(fl) : _elm_lang$core$Basics$round(fl));
+	});
+var _myrho$elm_round$Round$roundNumCom = _myrho$elm_round$Round$funNum(_myrho$elm_round$Round$roundCom);
+
+var _cuducos$elm_format_number$Helpers$stringfy = F2(
+	function (locale, formatted) {
+		var decimals = function () {
+			var _p0 = formatted.decimals;
+			if (_p0.ctor === 'Just') {
+				return A2(_elm_lang$core$Basics_ops['++'], locale.decimalSeparator, _p0._0);
+			} else {
+				return '';
+			}
+		}();
+		return _elm_lang$core$String$concat(
+			{
+				ctor: '::',
+				_0: A2(_elm_lang$core$Maybe$withDefault, '', formatted.prefix),
+				_1: {
+					ctor: '::',
+					_0: A2(_elm_lang$core$String$join, locale.thousandSeparator, formatted.integers),
+					_1: {
+						ctor: '::',
+						_0: decimals,
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _cuducos$elm_format_number$Helpers$splitThousands = function (integers) {
+	var reversedSplitThousands = function (value) {
+		return (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$String$length(value),
+			3) > 0) ? A2(
+			F2(
+				function (x, y) {
+					return {ctor: '::', _0: x, _1: y};
+				}),
+			A2(_elm_lang$core$String$right, 3, value),
+			reversedSplitThousands(
+				A2(_elm_lang$core$String$dropRight, 3, value))) : {
+			ctor: '::',
+			_0: value,
+			_1: {ctor: '[]'}
+		};
+	};
+	return _elm_lang$core$List$reverse(
+		reversedSplitThousands(integers));
+};
+var _cuducos$elm_format_number$Helpers$addPrefix = function (formatted) {
+	var onlyZeros = A2(
+		_elm_lang$core$String$all,
+		function ($char) {
+			return _elm_lang$core$Native_Utils.eq(
+				$char,
+				_elm_lang$core$Native_Utils.chr('0'));
+		},
+		_elm_lang$core$String$concat(
+			A2(
+				_elm_lang$core$List$append,
+				formatted.integers,
+				_elm_lang$core$List$singleton(
+					A2(_elm_lang$core$Maybe$withDefault, '', formatted.decimals)))));
+	var isPositive = _elm_lang$core$Native_Utils.cmp(formatted.original, 0) > -1;
+	var prefix = (isPositive || onlyZeros) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just('−');
+	return _elm_lang$core$Native_Utils.update(
+		formatted,
+		{prefix: prefix});
+};
+var _cuducos$elm_format_number$Helpers$FormattedNumber = F4(
+	function (a, b, c, d) {
+		return {original: a, integers: b, decimals: c, prefix: d};
+	});
+var _cuducos$elm_format_number$Helpers$parse = F2(
+	function (decimalDigits, original) {
+		var parts = A2(
+			_elm_lang$core$String$split,
+			'.',
+			A2(_myrho$elm_round$Round$round, decimalDigits, original));
+		var integers = _cuducos$elm_format_number$Helpers$splitThousands(
+			A2(
+				_elm_lang$core$String$filter,
+				_elm_lang$core$Char$isDigit,
+				A2(
+					_elm_lang$core$Maybe$withDefault,
+					'0',
+					_elm_lang$core$List$head(parts))));
+		var decimals = _elm_lang$core$List$head(
+			A2(_elm_lang$core$List$drop, 1, parts));
+		return _cuducos$elm_format_number$Helpers$addPrefix(
+			A4(_cuducos$elm_format_number$Helpers$FormattedNumber, original, integers, decimals, _elm_lang$core$Maybe$Nothing));
+	});
+
+var _cuducos$elm_format_number$FormatNumber$format = F2(
+	function (locale, num) {
+		return A2(
+			_cuducos$elm_format_number$Helpers$stringfy,
+			locale,
+			A2(_cuducos$elm_format_number$Helpers$parse, locale.decimals, num));
 	});
 
 
@@ -9783,6 +11190,540 @@ return {
 
 var _elm_lang$dom$Dom_LowLevel$onWindow = _elm_lang$dom$Native_Dom.onWindow;
 var _elm_lang$dom$Dom_LowLevel$onDocument = _elm_lang$dom$Native_Dom.onDocument;
+
+var _elm_lang$html$Html_Keyed$node = _elm_lang$virtual_dom$VirtualDom$keyedNode;
+var _elm_lang$html$Html_Keyed$ol = _elm_lang$html$Html_Keyed$node('ol');
+var _elm_lang$html$Html_Keyed$ul = _elm_lang$html$Html_Keyed$node('ul');
+
+var _elm_lang$http$Native_Http = function() {
+
+
+// ENCODING AND DECODING
+
+function encodeUri(string)
+{
+	return encodeURIComponent(string);
+}
+
+function decodeUri(string)
+{
+	try
+	{
+		return _elm_lang$core$Maybe$Just(decodeURIComponent(string));
+	}
+	catch(e)
+	{
+		return _elm_lang$core$Maybe$Nothing;
+	}
+}
+
+
+// SEND REQUEST
+
+function toTask(request, maybeProgress)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		var xhr = new XMLHttpRequest();
+
+		configureProgress(xhr, maybeProgress);
+
+		xhr.addEventListener('error', function() {
+			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NetworkError' }));
+		});
+		xhr.addEventListener('timeout', function() {
+			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'Timeout' }));
+		});
+		xhr.addEventListener('load', function() {
+			callback(handleResponse(xhr, request.expect.responseToResult));
+		});
+
+		try
+		{
+			xhr.open(request.method, request.url, true);
+		}
+		catch (e)
+		{
+			return callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'BadUrl', _0: request.url }));
+		}
+
+		configureRequest(xhr, request);
+		send(xhr, request.body);
+
+		return function() { xhr.abort(); };
+	});
+}
+
+function configureProgress(xhr, maybeProgress)
+{
+	if (maybeProgress.ctor === 'Nothing')
+	{
+		return;
+	}
+
+	xhr.addEventListener('progress', function(event) {
+		if (!event.lengthComputable)
+		{
+			return;
+		}
+		_elm_lang$core$Native_Scheduler.rawSpawn(maybeProgress._0({
+			bytes: event.loaded,
+			bytesExpected: event.total
+		}));
+	});
+}
+
+function configureRequest(xhr, request)
+{
+	function setHeader(pair)
+	{
+		xhr.setRequestHeader(pair._0, pair._1);
+	}
+
+	A2(_elm_lang$core$List$map, setHeader, request.headers);
+	xhr.responseType = request.expect.responseType;
+	xhr.withCredentials = request.withCredentials;
+
+	if (request.timeout.ctor === 'Just')
+	{
+		xhr.timeout = request.timeout._0;
+	}
+}
+
+function send(xhr, body)
+{
+	switch (body.ctor)
+	{
+		case 'EmptyBody':
+			xhr.send();
+			return;
+
+		case 'StringBody':
+			xhr.setRequestHeader('Content-Type', body._0);
+			xhr.send(body._1);
+			return;
+
+		case 'FormDataBody':
+			xhr.send(body._0);
+			return;
+	}
+}
+
+
+// RESPONSES
+
+function handleResponse(xhr, responseToResult)
+{
+	var response = toResponse(xhr);
+
+	if (xhr.status < 200 || 300 <= xhr.status)
+	{
+		response.body = xhr.responseText;
+		return _elm_lang$core$Native_Scheduler.fail({
+			ctor: 'BadStatus',
+			_0: response
+		});
+	}
+
+	var result = responseToResult(response);
+
+	if (result.ctor === 'Ok')
+	{
+		return _elm_lang$core$Native_Scheduler.succeed(result._0);
+	}
+	else
+	{
+		response.body = xhr.responseText;
+		return _elm_lang$core$Native_Scheduler.fail({
+			ctor: 'BadPayload',
+			_0: result._0,
+			_1: response
+		});
+	}
+}
+
+function toResponse(xhr)
+{
+	return {
+		status: { code: xhr.status, message: xhr.statusText },
+		headers: parseHeaders(xhr.getAllResponseHeaders()),
+		url: xhr.responseURL,
+		body: xhr.response
+	};
+}
+
+function parseHeaders(rawHeaders)
+{
+	var headers = _elm_lang$core$Dict$empty;
+
+	if (!rawHeaders)
+	{
+		return headers;
+	}
+
+	var headerPairs = rawHeaders.split('\u000d\u000a');
+	for (var i = headerPairs.length; i--; )
+	{
+		var headerPair = headerPairs[i];
+		var index = headerPair.indexOf('\u003a\u0020');
+		if (index > 0)
+		{
+			var key = headerPair.substring(0, index);
+			var value = headerPair.substring(index + 2);
+
+			headers = A3(_elm_lang$core$Dict$update, key, function(oldValue) {
+				if (oldValue.ctor === 'Just')
+				{
+					return _elm_lang$core$Maybe$Just(value + ', ' + oldValue._0);
+				}
+				return _elm_lang$core$Maybe$Just(value);
+			}, headers);
+		}
+	}
+
+	return headers;
+}
+
+
+// EXPECTORS
+
+function expectStringResponse(responseToResult)
+{
+	return {
+		responseType: 'text',
+		responseToResult: responseToResult
+	};
+}
+
+function mapExpect(func, expect)
+{
+	return {
+		responseType: expect.responseType,
+		responseToResult: function(response) {
+			var convertedResponse = expect.responseToResult(response);
+			return A2(_elm_lang$core$Result$map, func, convertedResponse);
+		}
+	};
+}
+
+
+// BODY
+
+function multipart(parts)
+{
+	var formData = new FormData();
+
+	while (parts.ctor !== '[]')
+	{
+		var part = parts._0;
+		formData.append(part._0, part._1);
+		parts = parts._1;
+	}
+
+	return { ctor: 'FormDataBody', _0: formData };
+}
+
+return {
+	toTask: F2(toTask),
+	expectStringResponse: expectStringResponse,
+	mapExpect: F2(mapExpect),
+	multipart: multipart,
+	encodeUri: encodeUri,
+	decodeUri: decodeUri
+};
+
+}();
+
+var _elm_lang$http$Http_Internal$map = F2(
+	function (func, request) {
+		return _elm_lang$core$Native_Utils.update(
+			request,
+			{
+				expect: A2(_elm_lang$http$Native_Http.mapExpect, func, request.expect)
+			});
+	});
+var _elm_lang$http$Http_Internal$RawRequest = F7(
+	function (a, b, c, d, e, f, g) {
+		return {method: a, headers: b, url: c, body: d, expect: e, timeout: f, withCredentials: g};
+	});
+var _elm_lang$http$Http_Internal$Request = function (a) {
+	return {ctor: 'Request', _0: a};
+};
+var _elm_lang$http$Http_Internal$Expect = {ctor: 'Expect'};
+var _elm_lang$http$Http_Internal$FormDataBody = {ctor: 'FormDataBody'};
+var _elm_lang$http$Http_Internal$StringBody = F2(
+	function (a, b) {
+		return {ctor: 'StringBody', _0: a, _1: b};
+	});
+var _elm_lang$http$Http_Internal$EmptyBody = {ctor: 'EmptyBody'};
+var _elm_lang$http$Http_Internal$Header = F2(
+	function (a, b) {
+		return {ctor: 'Header', _0: a, _1: b};
+	});
+
+var _elm_lang$http$Http$decodeUri = _elm_lang$http$Native_Http.decodeUri;
+var _elm_lang$http$Http$encodeUri = _elm_lang$http$Native_Http.encodeUri;
+var _elm_lang$http$Http$expectStringResponse = _elm_lang$http$Native_Http.expectStringResponse;
+var _elm_lang$http$Http$expectJson = function (decoder) {
+	return _elm_lang$http$Http$expectStringResponse(
+		function (response) {
+			return A2(_elm_lang$core$Json_Decode$decodeString, decoder, response.body);
+		});
+};
+var _elm_lang$http$Http$expectString = _elm_lang$http$Http$expectStringResponse(
+	function (response) {
+		return _elm_lang$core$Result$Ok(response.body);
+	});
+var _elm_lang$http$Http$multipartBody = _elm_lang$http$Native_Http.multipart;
+var _elm_lang$http$Http$stringBody = _elm_lang$http$Http_Internal$StringBody;
+var _elm_lang$http$Http$jsonBody = function (value) {
+	return A2(
+		_elm_lang$http$Http_Internal$StringBody,
+		'application/json',
+		A2(_elm_lang$core$Json_Encode$encode, 0, value));
+};
+var _elm_lang$http$Http$emptyBody = _elm_lang$http$Http_Internal$EmptyBody;
+var _elm_lang$http$Http$header = _elm_lang$http$Http_Internal$Header;
+var _elm_lang$http$Http$request = _elm_lang$http$Http_Internal$Request;
+var _elm_lang$http$Http$post = F3(
+	function (url, body, decoder) {
+		return _elm_lang$http$Http$request(
+			{
+				method: 'POST',
+				headers: {ctor: '[]'},
+				url: url,
+				body: body,
+				expect: _elm_lang$http$Http$expectJson(decoder),
+				timeout: _elm_lang$core$Maybe$Nothing,
+				withCredentials: false
+			});
+	});
+var _elm_lang$http$Http$get = F2(
+	function (url, decoder) {
+		return _elm_lang$http$Http$request(
+			{
+				method: 'GET',
+				headers: {ctor: '[]'},
+				url: url,
+				body: _elm_lang$http$Http$emptyBody,
+				expect: _elm_lang$http$Http$expectJson(decoder),
+				timeout: _elm_lang$core$Maybe$Nothing,
+				withCredentials: false
+			});
+	});
+var _elm_lang$http$Http$getString = function (url) {
+	return _elm_lang$http$Http$request(
+		{
+			method: 'GET',
+			headers: {ctor: '[]'},
+			url: url,
+			body: _elm_lang$http$Http$emptyBody,
+			expect: _elm_lang$http$Http$expectString,
+			timeout: _elm_lang$core$Maybe$Nothing,
+			withCredentials: false
+		});
+};
+var _elm_lang$http$Http$toTask = function (_p0) {
+	var _p1 = _p0;
+	return A2(_elm_lang$http$Native_Http.toTask, _p1._0, _elm_lang$core$Maybe$Nothing);
+};
+var _elm_lang$http$Http$send = F2(
+	function (resultToMessage, request) {
+		return A2(
+			_elm_lang$core$Task$attempt,
+			resultToMessage,
+			_elm_lang$http$Http$toTask(request));
+	});
+var _elm_lang$http$Http$Response = F4(
+	function (a, b, c, d) {
+		return {url: a, status: b, headers: c, body: d};
+	});
+var _elm_lang$http$Http$BadPayload = F2(
+	function (a, b) {
+		return {ctor: 'BadPayload', _0: a, _1: b};
+	});
+var _elm_lang$http$Http$BadStatus = function (a) {
+	return {ctor: 'BadStatus', _0: a};
+};
+var _elm_lang$http$Http$NetworkError = {ctor: 'NetworkError'};
+var _elm_lang$http$Http$Timeout = {ctor: 'Timeout'};
+var _elm_lang$http$Http$BadUrl = function (a) {
+	return {ctor: 'BadUrl', _0: a};
+};
+var _elm_lang$http$Http$StringPart = F2(
+	function (a, b) {
+		return {ctor: 'StringPart', _0: a, _1: b};
+	});
+var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
+
+var _elm_lang$keyboard$Keyboard$onSelfMsg = F3(
+	function (router, _p0, state) {
+		var _p1 = _p0;
+		var _p2 = A2(_elm_lang$core$Dict$get, _p1.category, state);
+		if (_p2.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var send = function (tagger) {
+				return A2(
+					_elm_lang$core$Platform$sendToApp,
+					router,
+					tagger(_p1.keyCode));
+			};
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (_p3) {
+					return _elm_lang$core$Task$succeed(state);
+				},
+				_elm_lang$core$Task$sequence(
+					A2(_elm_lang$core$List$map, send, _p2._0.taggers)));
+		}
+	});
+var _elm_lang$keyboard$Keyboard_ops = _elm_lang$keyboard$Keyboard_ops || {};
+_elm_lang$keyboard$Keyboard_ops['&>'] = F2(
+	function (task1, task2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p4) {
+				return task2;
+			},
+			task1);
+	});
+var _elm_lang$keyboard$Keyboard$init = _elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty);
+var _elm_lang$keyboard$Keyboard$categorizeHelpHelp = F2(
+	function (value, maybeValues) {
+		var _p5 = maybeValues;
+		if (_p5.ctor === 'Nothing') {
+			return _elm_lang$core$Maybe$Just(
+				{
+					ctor: '::',
+					_0: value,
+					_1: {ctor: '[]'}
+				});
+		} else {
+			return _elm_lang$core$Maybe$Just(
+				{ctor: '::', _0: value, _1: _p5._0});
+		}
+	});
+var _elm_lang$keyboard$Keyboard$categorizeHelp = F2(
+	function (subs, subDict) {
+		categorizeHelp:
+		while (true) {
+			var _p6 = subs;
+			if (_p6.ctor === '[]') {
+				return subDict;
+			} else {
+				var _v4 = _p6._1,
+					_v5 = A3(
+					_elm_lang$core$Dict$update,
+					_p6._0._0,
+					_elm_lang$keyboard$Keyboard$categorizeHelpHelp(_p6._0._1),
+					subDict);
+				subs = _v4;
+				subDict = _v5;
+				continue categorizeHelp;
+			}
+		}
+	});
+var _elm_lang$keyboard$Keyboard$categorize = function (subs) {
+	return A2(_elm_lang$keyboard$Keyboard$categorizeHelp, subs, _elm_lang$core$Dict$empty);
+};
+var _elm_lang$keyboard$Keyboard$keyCode = A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int);
+var _elm_lang$keyboard$Keyboard$subscription = _elm_lang$core$Native_Platform.leaf('Keyboard');
+var _elm_lang$keyboard$Keyboard$Watcher = F2(
+	function (a, b) {
+		return {taggers: a, pid: b};
+	});
+var _elm_lang$keyboard$Keyboard$Msg = F2(
+	function (a, b) {
+		return {category: a, keyCode: b};
+	});
+var _elm_lang$keyboard$Keyboard$onEffects = F3(
+	function (router, newSubs, oldState) {
+		var rightStep = F3(
+			function (category, taggers, task) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (state) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (pid) {
+								return _elm_lang$core$Task$succeed(
+									A3(
+										_elm_lang$core$Dict$insert,
+										category,
+										A2(_elm_lang$keyboard$Keyboard$Watcher, taggers, pid),
+										state));
+							},
+							_elm_lang$core$Process$spawn(
+								A3(
+									_elm_lang$dom$Dom_LowLevel$onDocument,
+									category,
+									_elm_lang$keyboard$Keyboard$keyCode,
+									function (_p7) {
+										return A2(
+											_elm_lang$core$Platform$sendToSelf,
+											router,
+											A2(_elm_lang$keyboard$Keyboard$Msg, category, _p7));
+									})));
+					},
+					task);
+			});
+		var bothStep = F4(
+			function (category, _p8, taggers, task) {
+				var _p9 = _p8;
+				return A2(
+					_elm_lang$core$Task$map,
+					A2(
+						_elm_lang$core$Dict$insert,
+						category,
+						A2(_elm_lang$keyboard$Keyboard$Watcher, taggers, _p9.pid)),
+					task);
+			});
+		var leftStep = F3(
+			function (category, _p10, task) {
+				var _p11 = _p10;
+				return A2(
+					_elm_lang$keyboard$Keyboard_ops['&>'],
+					_elm_lang$core$Process$kill(_p11.pid),
+					task);
+			});
+		return A6(
+			_elm_lang$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			oldState,
+			_elm_lang$keyboard$Keyboard$categorize(newSubs),
+			_elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty));
+	});
+var _elm_lang$keyboard$Keyboard$MySub = F2(
+	function (a, b) {
+		return {ctor: 'MySub', _0: a, _1: b};
+	});
+var _elm_lang$keyboard$Keyboard$presses = function (tagger) {
+	return _elm_lang$keyboard$Keyboard$subscription(
+		A2(_elm_lang$keyboard$Keyboard$MySub, 'keypress', tagger));
+};
+var _elm_lang$keyboard$Keyboard$downs = function (tagger) {
+	return _elm_lang$keyboard$Keyboard$subscription(
+		A2(_elm_lang$keyboard$Keyboard$MySub, 'keydown', tagger));
+};
+var _elm_lang$keyboard$Keyboard$ups = function (tagger) {
+	return _elm_lang$keyboard$Keyboard$subscription(
+		A2(_elm_lang$keyboard$Keyboard$MySub, 'keyup', tagger));
+};
+var _elm_lang$keyboard$Keyboard$subMap = F2(
+	function (func, _p12) {
+		var _p13 = _p12;
+		return A2(
+			_elm_lang$keyboard$Keyboard$MySub,
+			_p13._0,
+			function (_p14) {
+				return func(
+					_p13._1(_p14));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Keyboard'] = {pkg: 'elm-lang/keyboard', init: _elm_lang$keyboard$Keyboard$init, onEffects: _elm_lang$keyboard$Keyboard$onEffects, onSelfMsg: _elm_lang$keyboard$Keyboard$onSelfMsg, tag: 'sub', subMap: _elm_lang$keyboard$Keyboard$subMap};
 
 var _elm_lang$mouse$Mouse_ops = _elm_lang$mouse$Mouse_ops || {};
 _elm_lang$mouse$Mouse_ops['&>'] = F2(
@@ -11873,6 +13814,10 @@ var _kirchner$elm_pat$Expr$print = function (expr) {
 			return A3(apply, '/', _p0._0, _p0._1);
 	}
 };
+var _kirchner$elm_pat$Expr$encode = function (expr) {
+	return _elm_lang$core$Json_Encode$string(
+		_kirchner$elm_pat$Expr$print(expr));
+};
 var _kirchner$elm_pat$Expr$compute = F2(
 	function (variables, expr) {
 		var apply = F3(
@@ -11963,9 +13908,22 @@ var _kirchner$elm_pat$Expr$atom = _elm_tools$parser$Parser$oneOf(
 			ctor: '::',
 			_0: A2(
 				_elm_tools$parser$Parser_ops['|='],
-				_elm_tools$parser$Parser$succeed(_kirchner$elm_pat$Expr$Symbol),
-				A3(_elm_tools$parser$Parser_LanguageKit$variable, _elm_lang$core$Char$isLower, _kirchner$elm_pat$Expr$isVarChar, _elm_lang$core$Set$empty)),
-			_1: {ctor: '[]'}
+				A2(
+					_elm_tools$parser$Parser_ops['|.'],
+					_elm_tools$parser$Parser$succeed(
+						function ($float) {
+							return _kirchner$elm_pat$Expr$Number(0 - $float);
+						}),
+					_elm_tools$parser$Parser$symbol('-')),
+				_elm_tools$parser$Parser$float),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_tools$parser$Parser_ops['|='],
+					_elm_tools$parser$Parser$succeed(_kirchner$elm_pat$Expr$Symbol),
+					A3(_elm_tools$parser$Parser_LanguageKit$variable, _elm_lang$core$Char$isLower, _kirchner$elm_pat$Expr$isVarChar, _elm_lang$core$Set$empty)),
+				_1: {ctor: '[]'}
+			}
 		}
 	});
 var _kirchner$elm_pat$Expr$factor = _elm_tools$parser$Parser$oneOf(
@@ -12123,402 +14081,15 @@ var _kirchner$elm_pat$Expr$parse = function (s) {
 	return _elm_lang$core$Result$toMaybe(
 		A2(_elm_tools$parser$Parser$run, _kirchner$elm_pat$Expr$expr, s));
 };
-
-var _kirchner$elm_pat$Types$equals = F2(
-	function (maybe, a) {
-		var _p0 = maybe;
-		if (_p0.ctor === 'Just') {
-			return _elm_lang$core$Native_Utils.eq(a, _p0._0) ? true : false;
-		} else {
-			return false;
-		}
-	});
-var _kirchner$elm_pat$Types$vec = F2(
-	function (x, y) {
+var _kirchner$elm_pat$Expr$decode = A2(
+	_elm_lang$core$Json_Decode$map,
+	function (_p5) {
 		return A2(
-			_elm_community$linear_algebra$Math_Vector2$vec2,
-			_elm_lang$core$Basics$toFloat(x),
-			_elm_lang$core$Basics$toFloat(y));
-	});
-var _kirchner$elm_pat$Types$svgToCanvas = F2(
-	function (viewPort, p) {
-		return {x: p.x + viewPort.x, y: p.y + viewPort.y};
-	});
-var _kirchner$elm_pat$Types$canvasToSvg = F2(
-	function (viewPort, p) {
-		return {x: p.x - viewPort.x, y: p.y - viewPort.y};
-	});
-var _kirchner$elm_pat$Types$position = F3(
-	function (store, variables, point) {
-		var lookUp = function (id) {
-			return A2(
-				_elm_lang$core$Maybe$andThen,
-				A2(_kirchner$elm_pat$Types$position, store, variables),
-				A2(_elm_lang$core$Dict$get, id, store));
-		};
-		var _p1 = point;
-		switch (_p1.ctor) {
-			case 'Absolute':
-				return A3(
-					_elm_lang$core$Maybe$map2,
-					_elm_community$linear_algebra$Math_Vector2$vec2,
-					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._0),
-					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._1));
-			case 'Relative':
-				return A4(
-					_elm_lang$core$Maybe$map3,
-					F3(
-						function (v, p, q) {
-							return A2(
-								_elm_community$linear_algebra$Math_Vector2$add,
-								A2(_elm_community$linear_algebra$Math_Vector2$vec2, p, q),
-								v);
-						}),
-					lookUp(_p1._0),
-					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._1),
-					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._2));
-			case 'Distance':
-				var coords = F3(
-					function (anchorPosition, distance, angle) {
-						return A2(
-							_elm_community$linear_algebra$Math_Vector2$add,
-							anchorPosition,
-							A2(
-								_elm_community$linear_algebra$Math_Vector2$scale,
-								distance,
-								A2(
-									_elm_community$linear_algebra$Math_Vector2$vec2,
-									_elm_lang$core$Basics$cos(angle),
-									_elm_lang$core$Basics$sin(angle))));
-					});
-				return A4(
-					_elm_lang$core$Maybe$map3,
-					coords,
-					lookUp(_p1._0),
-					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._1),
-					A2(_kirchner$elm_pat$Expr$compute, variables, _p1._2));
-			default:
-				return A3(
-					_elm_lang$core$Maybe$map2,
-					F2(
-						function (v, w) {
-							return A2(
-								_elm_community$linear_algebra$Math_Vector2$add,
-								w,
-								A2(
-									_elm_community$linear_algebra$Math_Vector2$scale,
-									_p1._2,
-									A2(_elm_community$linear_algebra$Math_Vector2$sub, w, v)));
-						}),
-					lookUp(_p1._0),
-					lookUp(_p1._1));
-		}
-	});
-var _kirchner$elm_pat$Types$positionById = F3(
-	function (store, variables, id) {
-		return A2(
-			_elm_lang$core$Maybe$andThen,
-			A2(_kirchner$elm_pat$Types$position, store, variables),
-			A2(_elm_lang$core$Dict$get, id, store));
-	});
-var _kirchner$elm_pat$Types$firstId = 0;
-var _kirchner$elm_pat$Types$emptyStore = _elm_lang$core$Dict$empty;
-var _kirchner$elm_pat$Types$toVec = function (p) {
-	return A2(
-		_elm_community$linear_algebra$Math_Vector2$vec2,
-		_elm_lang$core$Basics$toFloat(p.x),
-		_elm_lang$core$Basics$toFloat(p.y));
-};
-var _kirchner$elm_pat$Types$Position = F2(
-	function (a, b) {
-		return {x: a, y: b};
-	});
-var _kirchner$elm_pat$Types$ViewPort = F4(
-	function (a, b, c, d) {
-		return {x: a, y: b, width: c, height: d};
-	});
-var _kirchner$elm_pat$Types$Between = F3(
-	function (a, b, c) {
-		return {ctor: 'Between', _0: a, _1: b, _2: c};
-	});
-var _kirchner$elm_pat$Types$Distance = F3(
-	function (a, b, c) {
-		return {ctor: 'Distance', _0: a, _1: b, _2: c};
-	});
-var _kirchner$elm_pat$Types$Relative = F3(
-	function (a, b, c) {
-		return {ctor: 'Relative', _0: a, _1: b, _2: c};
-	});
-var _kirchner$elm_pat$Types$relative = F2(
-	function (id, v) {
-		return A3(
-			_kirchner$elm_pat$Types$Relative,
-			id,
-			_kirchner$elm_pat$Expr$Number(
-				_elm_community$linear_algebra$Math_Vector2$getX(v)),
-			_kirchner$elm_pat$Expr$Number(
-				_elm_community$linear_algebra$Math_Vector2$getY(v)));
-	});
-var _kirchner$elm_pat$Types$Absolute = F2(
-	function (a, b) {
-		return {ctor: 'Absolute', _0: a, _1: b};
-	});
-var _kirchner$elm_pat$Types$absolute = function (v) {
-	return A2(
-		_kirchner$elm_pat$Types$Absolute,
-		_kirchner$elm_pat$Expr$Number(
-			_elm_community$linear_algebra$Math_Vector2$getX(v)),
-		_kirchner$elm_pat$Expr$Number(
-			_elm_community$linear_algebra$Math_Vector2$getY(v)));
-};
-
-var _kirchner$elm_pat$Events$positionDecoder = A3(
-	_elm_lang$core$Json_Decode$map2,
-	_kirchner$elm_pat$Types$Position,
-	A2(_elm_lang$core$Json_Decode$field, 'offsetX', _elm_lang$core$Json_Decode$int),
-	A2(_elm_lang$core$Json_Decode$field, 'offsetY', _elm_lang$core$Json_Decode$int));
-var _kirchner$elm_pat$Events$onMouseDown = function (tagger) {
-	return A2(
-		_elm_lang$virtual_dom$VirtualDom$on,
-		'mousedown',
-		A2(_elm_lang$core$Json_Decode$map, tagger, _kirchner$elm_pat$Events$positionDecoder));
-};
-var _kirchner$elm_pat$Events$onMove = function (tagger) {
-	return A2(
-		_elm_lang$virtual_dom$VirtualDom$on,
-		'mousemove',
-		A2(_elm_lang$core$Json_Decode$map, tagger, _kirchner$elm_pat$Events$positionDecoder));
-};
-var _kirchner$elm_pat$Events$onClick = function (tagger) {
-	return A2(
-		_elm_lang$virtual_dom$VirtualDom$on,
-		'click',
-		A2(_elm_lang$core$Json_Decode$map, tagger, _kirchner$elm_pat$Events$positionDecoder));
-};
-
-var _kirchner$elm_pat$Styles_Colors$green = '#859900';
-var _kirchner$elm_pat$Styles_Colors$cyan = '#2aa198';
-var _kirchner$elm_pat$Styles_Colors$blue = '#268bd2';
-var _kirchner$elm_pat$Styles_Colors$violet = '#6c71c4';
-var _kirchner$elm_pat$Styles_Colors$magenta = '#d33682';
-var _kirchner$elm_pat$Styles_Colors$red = '#dc322f';
-var _kirchner$elm_pat$Styles_Colors$orange = '#cb4b16';
-var _kirchner$elm_pat$Styles_Colors$yellow = '#b58900';
-var _kirchner$elm_pat$Styles_Colors$base3 = '#fdf6e3';
-var _kirchner$elm_pat$Styles_Colors$base2 = '#eee8d5';
-var _kirchner$elm_pat$Styles_Colors$base1 = '#93a1a1';
-var _kirchner$elm_pat$Styles_Colors$base0 = '#839496';
-var _kirchner$elm_pat$Styles_Colors$base00 = '#657b83';
-var _kirchner$elm_pat$Styles_Colors$base01 = '#586e75';
-var _kirchner$elm_pat$Styles_Colors$base02 = '#073642';
-var _kirchner$elm_pat$Styles_Colors$base03 = '#002b36';
-
-var _kirchner$elm_pat$Svg_Extra$drawVerticalLine = function (x) {
-	return A2(
-		_elm_lang$svg$Svg$line,
-		{
-			ctor: '::',
-			_0: _elm_lang$svg$Svg_Attributes$x1(
-				_elm_lang$core$Basics$toString(x)),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$y1('-1000'),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$x2(
-						_elm_lang$core$Basics$toString(x)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$y2('1000'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		{ctor: '[]'});
-};
-var _kirchner$elm_pat$Svg_Extra$drawHorizontalLine = function (y) {
-	return A2(
-		_elm_lang$svg$Svg$line,
-		{
-			ctor: '::',
-			_0: _elm_lang$svg$Svg_Attributes$x1('-1000'),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$y1(
-					_elm_lang$core$Basics$toString(y)),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$x2('1000'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$y2(
-							_elm_lang$core$Basics$toString(y)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		{ctor: '[]'});
-};
-var _kirchner$elm_pat$Svg_Extra$drawArrow = F2(
-	function (v, w) {
-		return A2(
-			_elm_lang$svg$Svg$line,
-			{
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$x1(
-					_elm_lang$core$Basics$toString(
-						_elm_community$linear_algebra$Math_Vector2$getX(v))),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$y1(
-						_elm_lang$core$Basics$toString(
-							_elm_community$linear_algebra$Math_Vector2$getY(v))),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$x2(
-							_elm_lang$core$Basics$toString(
-								_elm_community$linear_algebra$Math_Vector2$getX(w))),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$y2(
-								_elm_lang$core$Basics$toString(
-									_elm_community$linear_algebra$Math_Vector2$getY(w))),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			{ctor: '[]'});
-	});
-var _kirchner$elm_pat$Svg_Extra$drawRectArrow = F2(
-	function (v, w) {
-		return A2(
-			_elm_lang$svg$Svg$g,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: A2(
-					_kirchner$elm_pat$Svg_Extra$drawArrow,
-					v,
-					A2(
-						_elm_community$linear_algebra$Math_Vector2$vec2,
-						_elm_community$linear_algebra$Math_Vector2$getX(w),
-						_elm_community$linear_algebra$Math_Vector2$getY(v))),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_kirchner$elm_pat$Svg_Extra$drawArrow,
-						A2(
-							_elm_community$linear_algebra$Math_Vector2$vec2,
-							_elm_community$linear_algebra$Math_Vector2$getX(w),
-							_elm_community$linear_algebra$Math_Vector2$getY(v)),
-						w),
-					_1: {ctor: '[]'}
-				}
-			});
-	});
-var _kirchner$elm_pat$Svg_Extra$drawSelector = function (v) {
-	return A2(
-		_elm_lang$svg$Svg$circle,
-		{
-			ctor: '::',
-			_0: _elm_lang$svg$Svg_Attributes$cx(
-				_elm_lang$core$Basics$toString(
-					_elm_community$linear_algebra$Math_Vector2$getX(v))),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$cy(
-					_elm_lang$core$Basics$toString(
-						_elm_community$linear_algebra$Math_Vector2$getY(v))),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$r('5'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$fill('none'),
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}
-			}
-		},
-		{ctor: '[]'});
-};
-var _kirchner$elm_pat$Svg_Extra$drawPoint = function (v) {
-	return A2(
-		_elm_lang$svg$Svg$circle,
-		{
-			ctor: '::',
-			_0: _elm_lang$svg$Svg_Attributes$cx(
-				_elm_lang$core$Basics$toString(
-					_elm_community$linear_algebra$Math_Vector2$getX(v))),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$cy(
-					_elm_lang$core$Basics$toString(
-						_elm_community$linear_algebra$Math_Vector2$getY(v))),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$r('1'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$fill(_kirchner$elm_pat$Styles_Colors$base0),
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			}
-		},
-		{ctor: '[]'});
-};
+			_elm_lang$core$Maybe$withDefault,
+			_kirchner$elm_pat$Expr$Number(0.0),
+			_kirchner$elm_pat$Expr$parse(_p5));
+	},
+	_elm_lang$core$Json_Decode$string);
 
 var _rtfeldman$elm_css_util$Css_Helpers$toCssIdentifier = function (identifier) {
 	return A4(
@@ -17280,6 +18851,92 @@ var _rtfeldman$elm_css$Css$thin = _rtfeldman$elm_css$Css$IntentionallyUnsupporte
 var _rtfeldman$elm_css$Css$thick = _rtfeldman$elm_css$Css$IntentionallyUnsupportedPleaseSeeDocs;
 var _rtfeldman$elm_css$Css$blink = _rtfeldman$elm_css$Css$IntentionallyUnsupportedPleaseSeeDocs;
 
+var _rtfeldman$elm_css$Css_Elements$typeSelector = F2(
+	function (selectorStr, mixins) {
+		var sequence = A2(
+			_rtfeldman$elm_css$Css_Structure$TypeSelectorSequence,
+			_rtfeldman$elm_css$Css_Structure$TypeSelector(selectorStr),
+			{ctor: '[]'});
+		var selector = A3(
+			_rtfeldman$elm_css$Css_Structure$Selector,
+			sequence,
+			{ctor: '[]'},
+			_elm_lang$core$Maybe$Nothing);
+		return _rtfeldman$elm_css$Css_Preprocess$Snippet(
+			{
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css_Preprocess$StyleBlockDeclaration(
+					A3(
+						_rtfeldman$elm_css$Css_Preprocess$StyleBlock,
+						selector,
+						{ctor: '[]'},
+						mixins)),
+				_1: {ctor: '[]'}
+			});
+	});
+var _rtfeldman$elm_css$Css_Elements$html = _rtfeldman$elm_css$Css_Elements$typeSelector('html');
+var _rtfeldman$elm_css$Css_Elements$body = _rtfeldman$elm_css$Css_Elements$typeSelector('body');
+var _rtfeldman$elm_css$Css_Elements$article = _rtfeldman$elm_css$Css_Elements$typeSelector('article');
+var _rtfeldman$elm_css$Css_Elements$header = _rtfeldman$elm_css$Css_Elements$typeSelector('header');
+var _rtfeldman$elm_css$Css_Elements$footer = _rtfeldman$elm_css$Css_Elements$typeSelector('footer');
+var _rtfeldman$elm_css$Css_Elements$h1 = _rtfeldman$elm_css$Css_Elements$typeSelector('h1');
+var _rtfeldman$elm_css$Css_Elements$h2 = _rtfeldman$elm_css$Css_Elements$typeSelector('h2');
+var _rtfeldman$elm_css$Css_Elements$h3 = _rtfeldman$elm_css$Css_Elements$typeSelector('h3');
+var _rtfeldman$elm_css$Css_Elements$h4 = _rtfeldman$elm_css$Css_Elements$typeSelector('h4');
+var _rtfeldman$elm_css$Css_Elements$h5 = _rtfeldman$elm_css$Css_Elements$typeSelector('h5');
+var _rtfeldman$elm_css$Css_Elements$h6 = _rtfeldman$elm_css$Css_Elements$typeSelector('h6');
+var _rtfeldman$elm_css$Css_Elements$nav = _rtfeldman$elm_css$Css_Elements$typeSelector('nav');
+var _rtfeldman$elm_css$Css_Elements$section = _rtfeldman$elm_css$Css_Elements$typeSelector('section');
+var _rtfeldman$elm_css$Css_Elements$div = _rtfeldman$elm_css$Css_Elements$typeSelector('div');
+var _rtfeldman$elm_css$Css_Elements$hr = _rtfeldman$elm_css$Css_Elements$typeSelector('hr');
+var _rtfeldman$elm_css$Css_Elements$li = _rtfeldman$elm_css$Css_Elements$typeSelector('li');
+var _rtfeldman$elm_css$Css_Elements$main_ = _rtfeldman$elm_css$Css_Elements$typeSelector('main');
+var _rtfeldman$elm_css$Css_Elements$ol = _rtfeldman$elm_css$Css_Elements$typeSelector('ol');
+var _rtfeldman$elm_css$Css_Elements$p = _rtfeldman$elm_css$Css_Elements$typeSelector('p');
+var _rtfeldman$elm_css$Css_Elements$ul = _rtfeldman$elm_css$Css_Elements$typeSelector('ul');
+var _rtfeldman$elm_css$Css_Elements$pre = _rtfeldman$elm_css$Css_Elements$typeSelector('pre');
+var _rtfeldman$elm_css$Css_Elements$a = _rtfeldman$elm_css$Css_Elements$typeSelector('a');
+var _rtfeldman$elm_css$Css_Elements$code = _rtfeldman$elm_css$Css_Elements$typeSelector('code');
+var _rtfeldman$elm_css$Css_Elements$small = _rtfeldman$elm_css$Css_Elements$typeSelector('small');
+var _rtfeldman$elm_css$Css_Elements$span = _rtfeldman$elm_css$Css_Elements$typeSelector('span');
+var _rtfeldman$elm_css$Css_Elements$strong = _rtfeldman$elm_css$Css_Elements$typeSelector('strong');
+var _rtfeldman$elm_css$Css_Elements$i = _rtfeldman$elm_css$Css_Elements$typeSelector('i');
+var _rtfeldman$elm_css$Css_Elements$em = _rtfeldman$elm_css$Css_Elements$typeSelector('em');
+var _rtfeldman$elm_css$Css_Elements$img = _rtfeldman$elm_css$Css_Elements$typeSelector('img');
+var _rtfeldman$elm_css$Css_Elements$audio = _rtfeldman$elm_css$Css_Elements$typeSelector('audio');
+var _rtfeldman$elm_css$Css_Elements$video = _rtfeldman$elm_css$Css_Elements$typeSelector('video');
+var _rtfeldman$elm_css$Css_Elements$canvas = _rtfeldman$elm_css$Css_Elements$typeSelector('canvas');
+var _rtfeldman$elm_css$Css_Elements$caption = _rtfeldman$elm_css$Css_Elements$typeSelector('caption');
+var _rtfeldman$elm_css$Css_Elements$col = _rtfeldman$elm_css$Css_Elements$typeSelector('col');
+var _rtfeldman$elm_css$Css_Elements$colgroup = _rtfeldman$elm_css$Css_Elements$typeSelector('colgroup');
+var _rtfeldman$elm_css$Css_Elements$table = _rtfeldman$elm_css$Css_Elements$typeSelector('table');
+var _rtfeldman$elm_css$Css_Elements$tbody = _rtfeldman$elm_css$Css_Elements$typeSelector('tbody');
+var _rtfeldman$elm_css$Css_Elements$td = _rtfeldman$elm_css$Css_Elements$typeSelector('td');
+var _rtfeldman$elm_css$Css_Elements$tfoot = _rtfeldman$elm_css$Css_Elements$typeSelector('tfoot');
+var _rtfeldman$elm_css$Css_Elements$th = _rtfeldman$elm_css$Css_Elements$typeSelector('th');
+var _rtfeldman$elm_css$Css_Elements$thead = _rtfeldman$elm_css$Css_Elements$typeSelector('thead');
+var _rtfeldman$elm_css$Css_Elements$tr = _rtfeldman$elm_css$Css_Elements$typeSelector('tr');
+var _rtfeldman$elm_css$Css_Elements$button = _rtfeldman$elm_css$Css_Elements$typeSelector('button');
+var _rtfeldman$elm_css$Css_Elements$fieldset = _rtfeldman$elm_css$Css_Elements$typeSelector('fieldset');
+var _rtfeldman$elm_css$Css_Elements$form = _rtfeldman$elm_css$Css_Elements$typeSelector('form');
+var _rtfeldman$elm_css$Css_Elements$input = _rtfeldman$elm_css$Css_Elements$typeSelector('input');
+var _rtfeldman$elm_css$Css_Elements$label = _rtfeldman$elm_css$Css_Elements$typeSelector('label');
+var _rtfeldman$elm_css$Css_Elements$legend = _rtfeldman$elm_css$Css_Elements$typeSelector('legend');
+var _rtfeldman$elm_css$Css_Elements$optgroup = _rtfeldman$elm_css$Css_Elements$typeSelector('optgroup');
+var _rtfeldman$elm_css$Css_Elements$option = _rtfeldman$elm_css$Css_Elements$typeSelector('option');
+var _rtfeldman$elm_css$Css_Elements$progress = _rtfeldman$elm_css$Css_Elements$typeSelector('progress');
+var _rtfeldman$elm_css$Css_Elements$select = _rtfeldman$elm_css$Css_Elements$typeSelector('select');
+var _rtfeldman$elm_css$Css_Elements$textarea = _rtfeldman$elm_css$Css_Elements$typeSelector('textarea');
+var _rtfeldman$elm_css$Css_Elements$blockquote = _rtfeldman$elm_css$Css_Elements$typeSelector('blockquote');
+var _rtfeldman$elm_css$Css_Elements$svg = _rtfeldman$elm_css$Css_Elements$typeSelector('svg');
+var _rtfeldman$elm_css$Css_Elements$path = _rtfeldman$elm_css$Css_Elements$typeSelector('path');
+var _rtfeldman$elm_css$Css_Elements$rect = _rtfeldman$elm_css$Css_Elements$typeSelector('rect');
+var _rtfeldman$elm_css$Css_Elements$circle = _rtfeldman$elm_css$Css_Elements$typeSelector('circle');
+var _rtfeldman$elm_css$Css_Elements$ellipse = _rtfeldman$elm_css$Css_Elements$typeSelector('ellipse');
+var _rtfeldman$elm_css$Css_Elements$line = _rtfeldman$elm_css$Css_Elements$typeSelector('line');
+var _rtfeldman$elm_css$Css_Elements$polyline = _rtfeldman$elm_css$Css_Elements$typeSelector('polyline');
+var _rtfeldman$elm_css$Css_Elements$polygon = _rtfeldman$elm_css$Css_Elements$typeSelector('polygon');
+
 var _rtfeldman$elm_css$Css_Namespace$applyNamespaceToProperty = F2(
 	function (name, property) {
 		var _p0 = property.key;
@@ -17604,2712 +19261,22 @@ var _rtfeldman$elm_css_helpers$Html_CssHelpers$Namespace = F4(
 		return {$class: a, classList: b, id: c, name: d};
 	});
 
-var _kirchner$elm_pat$Tools_Styles$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('absolute');
-var _kirchner$elm_pat$Tools_Styles$id = _kirchner$elm_pat$Tools_Styles$_p0.id;
-var _kirchner$elm_pat$Tools_Styles$class = _kirchner$elm_pat$Tools_Styles$_p0.$class;
-var _kirchner$elm_pat$Tools_Styles$classList = _kirchner$elm_pat$Tools_Styles$_p0.classList;
-var _kirchner$elm_pat$Tools_Styles$VariableName = {ctor: 'VariableName'};
-var _kirchner$elm_pat$Tools_Styles$Button = {ctor: 'Button'};
-var _kirchner$elm_pat$Tools_Styles$Textfield = {ctor: 'Textfield'};
-var _kirchner$elm_pat$Tools_Styles$Icon = {ctor: 'Icon'};
-var _kirchner$elm_pat$Tools_Styles$IconButton = {ctor: 'IconButton'};
-var _kirchner$elm_pat$Tools_Styles$Column = {ctor: 'Column'};
-var _kirchner$elm_pat$Tools_Styles$Row = {ctor: 'Row'};
-var _kirchner$elm_pat$Tools_Styles$ToolBox = {ctor: 'ToolBox'};
-var _kirchner$elm_pat$Tools_Styles$css = function (_p1) {
-	return _rtfeldman$elm_css$Css$stylesheet(
-		A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'absolute', _p1));
-}(
-	{
-		ctor: '::',
-		_0: A2(
-			_rtfeldman$elm_css$Css$class,
-			_kirchner$elm_pat$Tools_Styles$ToolBox,
-			{
-				ctor: '::',
-				_0: _rtfeldman$elm_css$Css$backgroundColor(
-					_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base2)),
-				_1: {
-					ctor: '::',
-					_0: _rtfeldman$elm_css$Css$width(
-						_rtfeldman$elm_css$Css$rem(10)),
-					_1: {
-						ctor: '::',
-						_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'auto'),
-						_1: {ctor: '[]'}
-					}
-				}
-			}),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_rtfeldman$elm_css$Css$class,
-				_kirchner$elm_pat$Tools_Styles$Button,
-				{
-					ctor: '::',
-					_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
-					_1: {
-						ctor: '::',
-						_0: _rtfeldman$elm_css$Css$width(
-							_rtfeldman$elm_css$Css$rem(10)),
-						_1: {
-							ctor: '::',
-							_0: _rtfeldman$elm_css$Css$height(
-								_rtfeldman$elm_css$Css$rem(2)),
-							_1: {
-								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$lineHeight(
-									_rtfeldman$elm_css$Css$rem(2)),
-								_1: {
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$color(
-										_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
-									_1: {
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$backgroundColor(
-											_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base03)),
-										_1: {
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
-											_1: {
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$hover(
-													{
-														ctor: '::',
-														_0: _rtfeldman$elm_css$Css$backgroundColor(
-															_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base02)),
-														_1: {ctor: '[]'}
-													}),
-												_1: {ctor: '[]'}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_rtfeldman$elm_css$Css$class,
-					_kirchner$elm_pat$Tools_Styles$Textfield,
-					{
-						ctor: '::',
-						_0: _rtfeldman$elm_css$Css$borderColor(_rtfeldman$elm_css$Css$transparent),
-						_1: {
-							ctor: '::',
-							_0: _rtfeldman$elm_css$Css$fontFamily(_rtfeldman$elm_css$Css$monospace),
-							_1: {
-								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$fontSize(
-									_rtfeldman$elm_css$Css$rem(1)),
-								_1: {
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$lineHeight(
-										_rtfeldman$elm_css$Css$rem(1)),
-									_1: {
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$width(
-											_rtfeldman$elm_css$Css$rem(4.8)),
-										_1: {
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$backgroundColor(_rtfeldman$elm_css$Css$transparent),
-											_1: {
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$focus(
-													{
-														ctor: '::',
-														_0: _rtfeldman$elm_css$Css$outline(_rtfeldman$elm_css$Css$none),
-														_1: {
-															ctor: '::',
-															_0: _rtfeldman$elm_css$Css$borderColor(
-																_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base02)),
-															_1: {ctor: '[]'}
-														}
-													}),
-												_1: {ctor: '[]'}
-											}
-										}
-									}
-								}
-							}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_rtfeldman$elm_css$Css$class,
-						_kirchner$elm_pat$Tools_Styles$Row,
-						{
-							ctor: '::',
-							_0: _rtfeldman$elm_css$Css$displayFlex,
-							_1: {
-								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$flexFlow1(_rtfeldman$elm_css$Css$row),
-								_1: {
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$width(
-										_rtfeldman$elm_css$Css$rem(10)),
-									_1: {
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$alignItems(_rtfeldman$elm_css$Css$stretch),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_rtfeldman$elm_css$Css$class,
-							_kirchner$elm_pat$Tools_Styles$Column,
-							{
-								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$displayFlex,
-								_1: {
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$alignItems(_rtfeldman$elm_css$Css$baseline),
-									_1: {
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$padding(
-											_rtfeldman$elm_css$Css$rem(0.2)),
-										_1: {
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$fontFamily(_rtfeldman$elm_css$Css$monospace),
-											_1: {
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$fontSize(
-													_rtfeldman$elm_css$Css$rem(1)),
-												_1: {
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$lineHeight(
-														_rtfeldman$elm_css$Css$rem(1)),
-													_1: {ctor: '[]'}
-												}
-											}
-										}
-									}
-								}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_rtfeldman$elm_css$Css$class,
-								_kirchner$elm_pat$Tools_Styles$IconButton,
-								{
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$fontSize(
-										_rtfeldman$elm_css$Css$rem(1)),
-									_1: {
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$lineHeight(
-											_rtfeldman$elm_css$Css$rem(1)),
-										_1: {
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$width(
-												_rtfeldman$elm_css$Css$rem(1.5)),
-											_1: {
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$height(
-													_rtfeldman$elm_css$Css$rem(1.5)),
-												_1: {
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$borderRadius(
-														_rtfeldman$elm_css$Css$pct(50)),
-													_1: {
-														ctor: '::',
-														_0: _rtfeldman$elm_css$Css$color(
-															_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
-														_1: {
-															ctor: '::',
-															_0: _rtfeldman$elm_css$Css$backgroundColor(_rtfeldman$elm_css$Css$transparent),
-															_1: {
-																ctor: '::',
-																_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
-																_1: {
-																	ctor: '::',
-																	_0: _rtfeldman$elm_css$Css$hover(
-																		{
-																			ctor: '::',
-																			_0: _rtfeldman$elm_css$Css$backgroundColor(
-																				_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base02)),
-																			_1: {ctor: '[]'}
-																		}),
-																	_1: {
-																		ctor: '::',
-																		_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
-																		_1: {ctor: '[]'}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_rtfeldman$elm_css$Css$class,
-									_kirchner$elm_pat$Tools_Styles$Icon,
-									{
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$fontSize(
-											_rtfeldman$elm_css$Css$rem(0.9)),
-										_1: {
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$lineHeight(
-												_rtfeldman$elm_css$Css$rem(0.9)),
-											_1: {
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
-												_1: {
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$top(
-														_rtfeldman$elm_css$Css$pct(50)),
-													_1: {
-														ctor: '::',
-														_0: _rtfeldman$elm_css$Css$left(
-															_rtfeldman$elm_css$Css$pct(50)),
-														_1: {
-															ctor: '::',
-															_0: _rtfeldman$elm_css$Css$transform(
-																A2(
-																	_rtfeldman$elm_css$Css$translate2,
-																	_rtfeldman$elm_css$Css$pct(-50),
-																	_rtfeldman$elm_css$Css$pct(-50))),
-															_1: {ctor: '[]'}
-														}
-													}
-												}
-											}
-										}
-									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_rtfeldman$elm_css$Css$class,
-										_kirchner$elm_pat$Tools_Styles$VariableName,
-										{
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$fontSize(
-												_rtfeldman$elm_css$Css$rem(1)),
-											_1: {
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$lineHeight(
-													_rtfeldman$elm_css$Css$rem(1)),
-												_1: {
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$paddingRight(
-														_rtfeldman$elm_css$Css$rem(0.4)),
-													_1: {ctor: '[]'}
-												}
-											}
-										}),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	});
-
-var _kirchner$elm_pat$Tools_Common$idDropdown = F3(
-	function (data, anchor, updateAnchor) {
-		var items = A2(
-			_elm_lang$core$List$map,
-			function (id) {
-				return {
-					value: id,
-					text: A2(_elm_lang$core$Basics_ops['++'], 'point ', id),
-					enabled: true
-				};
-			},
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Basics$toString,
-				_elm_lang$core$Dict$keys(data.store)));
-		return A2(
-			_elm_lang$html$Html$div,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('id:'),
-				_1: {
-					ctor: '::',
-					_0: A3(
-						_abadi199$elm_input_extra$Dropdown$dropdown,
-						{
-							items: items,
-							emptyItem: _elm_lang$core$Maybe$Just(
-								{value: '-1', text: 'select point', enabled: true}),
-							onChange: updateAnchor
-						},
-						{ctor: '[]'},
-						anchor),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$button,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(
-									updateAnchor(_elm_lang$core$Maybe$Nothing)),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('clear'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-	});
-var _kirchner$elm_pat$Tools_Common$exprInput = F3(
-	function (name, e, callback) {
-		var input = A2(
-			_elm_lang$html$Html$input,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Events$onInput(callback),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$placeholder(
-						A2(
-							_elm_lang$core$Maybe$withDefault,
-							'',
-							A2(_elm_lang$core$Maybe$map, _kirchner$elm_pat$Expr$print, e))),
-					_1: {
-						ctor: '::',
-						_0: _kirchner$elm_pat$Tools_Styles$class(
-							{
-								ctor: '::',
-								_0: _kirchner$elm_pat$Tools_Styles$Textfield,
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
-				}
-			},
-			{ctor: '[]'});
-		var cell = F2(
-			function (attrs, nodes) {
-				return A2(
-					_elm_lang$html$Html$div,
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						{
-							ctor: '::',
-							_0: _kirchner$elm_pat$Tools_Styles$class(
-								{
-									ctor: '::',
-									_0: _kirchner$elm_pat$Tools_Styles$Column,
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						},
-						attrs),
-					nodes);
-			});
-		var icon = function (name) {
-			return A2(
-				cell,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						{
-							ctor: '::',
-							_0: _kirchner$elm_pat$Tools_Styles$class(
-								{
-									ctor: '::',
-									_0: _kirchner$elm_pat$Tools_Styles$IconButton,
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$i,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('material-icons'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(
-											callback('')),
-										_1: {
-											ctor: '::',
-											_0: _kirchner$elm_pat$Tools_Styles$class(
-												{
-													ctor: '::',
-													_0: _kirchner$elm_pat$Tools_Styles$Icon,
-													_1: {ctor: '[]'}
-												}),
-											_1: {ctor: '[]'}
-										}
-									}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(name),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				});
-		};
-		var row = F2(
-			function (attrs, nodes) {
-				return A2(
-					_elm_lang$html$Html$div,
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						{
-							ctor: '::',
-							_0: _kirchner$elm_pat$Tools_Styles$class(
-								{
-									ctor: '::',
-									_0: _kirchner$elm_pat$Tools_Styles$Row,
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						},
-						attrs),
-					nodes);
-			});
-		return A2(
-			row,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: A2(
-					cell,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _kirchner$elm_pat$Tools_Styles$class(
-									{
-										ctor: '::',
-										_0: _kirchner$elm_pat$Tools_Styles$VariableName,
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(
-									A2(_elm_lang$core$Basics_ops['++'], name, ' =')),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: input,
-							_1: {ctor: '[]'}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: icon('delete'),
-					_1: {ctor: '[]'}
-				}
-			});
-	});
-var _kirchner$elm_pat$Tools_Common$view = F5(
-	function (callbacks, data, state, point, elements) {
-		var addPoint = A2(
-			_elm_lang$core$Maybe$map,
-			callbacks.addPoint,
-			A2(point, data, state));
-		var attr = function () {
-			var _p0 = addPoint;
-			if (_p0.ctor === 'Just') {
-				return _elm_lang$html$Html_Events$onClick(_p0._0);
-			} else {
-				return _elm_lang$html$Html_Attributes$disabled(true);
-			}
-		}();
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: _kirchner$elm_pat$Tools_Styles$class(
-					{
-						ctor: '::',
-						_0: _kirchner$elm_pat$Tools_Styles$ToolBox,
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			},
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				elements,
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						{
-							ctor: '::',
-							_0: _kirchner$elm_pat$Tools_Styles$class(
-								{
-									ctor: '::',
-									_0: _kirchner$elm_pat$Tools_Styles$Button,
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: attr,
-								_1: {ctor: '[]'}
-							}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('add'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}));
-	});
-var _kirchner$elm_pat$Tools_Common$drawCursor = function (position) {
-	var _p1 = _elm_community$linear_algebra$Math_Vector2$toTuple(position);
-	var x = _p1._0;
-	var y = _p1._1;
-	return A2(
-		_elm_lang$svg$Svg$g,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _kirchner$elm_pat$Svg_Extra$drawPoint(
-				A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
-			_1: {
-				ctor: '::',
-				_0: _kirchner$elm_pat$Svg_Extra$drawSelector(
-					A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
-				_1: {ctor: '[]'}
-			}
-		});
-};
-var _kirchner$elm_pat$Tools_Common$pointSelector_ = F4(
-	function (focusPoint, selectPoint, data, _p2) {
-		var _p3 = _p2;
-		var _p4 = _p3._0;
-		var draw = function (v) {
-			return A2(
-				_elm_lang$svg$Svg$g,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$svg$Svg$circle,
-						{
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$cx(
-								_elm_lang$core$Basics$toString(
-									_elm_community$linear_algebra$Math_Vector2$getX(v))),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$cy(
-									_elm_lang$core$Basics$toString(
-										_elm_community$linear_algebra$Math_Vector2$getY(v))),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$r('5'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$svg$Svg_Events$onClick(
-													selectPoint(
-														_elm_lang$core$Maybe$Just(_p4))),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$svg$Svg_Events$onMouseOver(
-														focusPoint(
-															_elm_lang$core$Maybe$Just(_p4))),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$svg$Svg_Events$onMouseOut(
-															focusPoint(_elm_lang$core$Maybe$Nothing)),
-														_1: {ctor: '[]'}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						},
-						{ctor: '[]'}),
-					_1: {
-						ctor: '::',
-						_0: A2(_kirchner$elm_pat$Types$equals, data.focusedPoint, _p4) ? _kirchner$elm_pat$Svg_Extra$drawSelector(v) : A2(
-							_elm_lang$svg$Svg$g,
-							{ctor: '[]'},
-							{ctor: '[]'}),
-						_1: {ctor: '[]'}
-					}
-				});
-		};
-		return A2(
-			_elm_lang$core$Maybe$map,
-			draw,
-			A3(_kirchner$elm_pat$Types$position, data.store, data.variables, _p3._1));
-	});
-var _kirchner$elm_pat$Tools_Common$svgSelectPoint = F3(
-	function (focusPoint, selectPoint, data) {
-		return A2(
-			_elm_lang$svg$Svg$g,
-			{ctor: '[]'},
-			A2(
-				_elm_lang$core$List$filterMap,
-				A3(_kirchner$elm_pat$Tools_Common$pointSelector_, focusPoint, selectPoint, data),
-				_elm_lang$core$Dict$toList(data.store)));
-	});
-var _kirchner$elm_pat$Tools_Common$svgUpdateMouse = F3(
-	function (mouseClicked, updateCursorPosition, data) {
-		return A2(
-			_elm_lang$svg$Svg$rect,
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				{
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$x(
-						_elm_lang$core$Basics$toString(data.viewPort.x)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$y(
-							_elm_lang$core$Basics$toString(data.viewPort.y)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$width(
-								_elm_lang$core$Basics$toString(data.viewPort.width)),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$height(
-									_elm_lang$core$Basics$toString(data.viewPort.height)),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
-										_1: {
-											ctor: '::',
-											_0: _kirchner$elm_pat$Events$onMove(
-												function (_p5) {
-													return updateCursorPosition(
-														_elm_lang$core$Maybe$Just(_p5));
-												}),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$svg$Svg_Events$onMouseOut(
-													updateCursorPosition(_elm_lang$core$Maybe$Nothing)),
-												_1: {ctor: '[]'}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				},
-				_elm_community$maybe_extra$Maybe_Extra$toList(
-					A2(_elm_lang$core$Maybe$map, _elm_lang$svg$Svg_Events$onClick, mouseClicked))),
-			{ctor: '[]'});
-	});
-var _kirchner$elm_pat$Tools_Common$Data = F5(
-	function (a, b, c, d, e) {
-		return {store: a, variables: b, viewPort: c, cursorPosition: d, focusedPoint: e};
-	});
-var _kirchner$elm_pat$Tools_Common$Callbacks = F3(
-	function (a, b, c) {
-		return {addPoint: a, updateCursorPosition: b, focusPoint: c};
-	});
-
-var _kirchner$elm_pat$Tools_Absolute$verticalLine = F2(
-	function (data, state) {
-		return A2(
-			_elm_lang$core$Maybe$map,
-			_kirchner$elm_pat$Svg_Extra$drawVerticalLine,
-			A2(
-				_elm_lang$core$Maybe$andThen,
-				_kirchner$elm_pat$Expr$compute(data.variables),
-				state.x));
-	});
-var _kirchner$elm_pat$Tools_Absolute$horizontalLine = F2(
-	function (data, state) {
-		return A2(
-			_elm_lang$core$Maybe$map,
-			_kirchner$elm_pat$Svg_Extra$drawHorizontalLine,
-			A2(
-				_elm_lang$core$Maybe$andThen,
-				_kirchner$elm_pat$Expr$compute(data.variables),
-				state.y));
-	});
-var _kirchner$elm_pat$Tools_Absolute$newPoint = F2(
-	function (data, state) {
-		var yCursor = A2(
-			_elm_lang$core$Maybe$map,
-			function (_p0) {
-				var _p1 = _p0;
-				return _elm_lang$core$Basics$toFloat(_p1.y);
-			},
-			data.cursorPosition);
-		var xCursor = A2(
-			_elm_lang$core$Maybe$map,
-			function (_p2) {
-				var _p3 = _p2;
-				return _elm_lang$core$Basics$toFloat(_p3.x);
-			},
-			data.cursorPosition);
-		var yState = A2(
-			_elm_lang$core$Maybe$andThen,
-			_kirchner$elm_pat$Expr$compute(data.variables),
-			state.y);
-		var y = A2(_elm_community$maybe_extra$Maybe_Extra$or, yState, yCursor);
-		var xState = A2(
-			_elm_lang$core$Maybe$andThen,
-			_kirchner$elm_pat$Expr$compute(data.variables),
-			state.x);
-		var x = A2(_elm_community$maybe_extra$Maybe_Extra$or, xState, xCursor);
-		var draw = F2(
-			function (x, y) {
-				return A2(
-					_elm_lang$svg$Svg$g,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _kirchner$elm_pat$Svg_Extra$drawPoint(
-							A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
-						_1: {
-							ctor: '::',
-							_0: _kirchner$elm_pat$Svg_Extra$drawSelector(
-								A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
-							_1: {ctor: '[]'}
-						}
-					});
-			});
-		return A3(_elm_lang$core$Maybe$map2, draw, x, y);
-	});
-var _kirchner$elm_pat$Tools_Absolute$point = F2(
-	function (data, state) {
-		var yCursor = A2(
-			_elm_lang$core$Maybe$map,
-			function (_p4) {
-				var _p5 = _p4;
-				return _kirchner$elm_pat$Expr$Number(
-					_elm_lang$core$Basics$toFloat(_p5.y));
-			},
-			data.cursorPosition);
-		var y = A2(_elm_community$maybe_extra$Maybe_Extra$or, state.y, yCursor);
-		var xCursor = A2(
-			_elm_lang$core$Maybe$map,
-			function (_p6) {
-				var _p7 = _p6;
-				return _kirchner$elm_pat$Expr$Number(
-					_elm_lang$core$Basics$toFloat(_p7.x));
-			},
-			data.cursorPosition);
-		var x = A2(_elm_community$maybe_extra$Maybe_Extra$or, state.x, xCursor);
-		return A3(_elm_lang$core$Maybe$map2, _kirchner$elm_pat$Types$Absolute, x, y);
-	});
-var _kirchner$elm_pat$Tools_Absolute$svg = F4(
-	function (callbacks, updateState, data, state) {
-		var addPoint = A2(
-			_elm_lang$core$Maybe$map,
-			callbacks.addPoint,
-			A2(_kirchner$elm_pat$Tools_Absolute$point, data, state));
-		return A2(
-			_elm_lang$svg$Svg$g,
-			{ctor: '[]'},
-			A2(
-				_elm_lang$core$List$filterMap,
-				_elm_lang$core$Basics$identity,
-				{
-					ctor: '::',
-					_0: A2(_kirchner$elm_pat$Tools_Absolute$newPoint, data, state),
-					_1: {
-						ctor: '::',
-						_0: A2(_kirchner$elm_pat$Tools_Absolute$horizontalLine, data, state),
-						_1: {
-							ctor: '::',
-							_0: A2(_kirchner$elm_pat$Tools_Absolute$verticalLine, data, state),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$core$Maybe$Just(
-									A3(_kirchner$elm_pat$Tools_Common$svgUpdateMouse, addPoint, callbacks.updateCursorPosition, data)),
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}));
-	});
-var _kirchner$elm_pat$Tools_Absolute$view = F4(
-	function (callbacks, updateState, data, state) {
-		var updateY = function (_p8) {
-			return updateState(
-				function (s) {
-					return _elm_lang$core$Native_Utils.update(
-						state,
-						{
-							y: _kirchner$elm_pat$Expr$parse(s)
-						});
-				}(_p8));
-		};
-		var updateX = function (_p9) {
-			return updateState(
-				function (s) {
-					return _elm_lang$core$Native_Utils.update(
-						state,
-						{
-							x: _kirchner$elm_pat$Expr$parse(s)
-						});
-				}(_p9));
-		};
-		return A5(
-			_kirchner$elm_pat$Tools_Common$view,
-			callbacks,
-			data,
-			state,
-			_kirchner$elm_pat$Tools_Absolute$point,
-			{
-				ctor: '::',
-				_0: A3(_kirchner$elm_pat$Tools_Common$exprInput, 'x', state.x, updateX),
-				_1: {
-					ctor: '::',
-					_0: A3(_kirchner$elm_pat$Tools_Common$exprInput, 'y', state.y, updateY),
-					_1: {ctor: '[]'}
-				}
-			});
-	});
-var _kirchner$elm_pat$Tools_Absolute$initWith = F3(
-	function (id, x, y) {
-		return {
-			x: _elm_lang$core$Maybe$Just(x),
-			y: _elm_lang$core$Maybe$Just(y),
-			id: _elm_lang$core$Maybe$Just(id)
-		};
-	});
-var _kirchner$elm_pat$Tools_Absolute$init = {x: _elm_lang$core$Maybe$Nothing, y: _elm_lang$core$Maybe$Nothing, id: _elm_lang$core$Maybe$Nothing};
-var _kirchner$elm_pat$Tools_Absolute$State = F3(
-	function (a, b, c) {
-		return {x: a, y: b, id: c};
-	});
-
-var _kirchner$elm_pat$Tools_Distance$pointPosition = F3(
-	function (data, state, anchorPosition) {
-		var position = F2(
-			function (distance, angle) {
-				return A2(
-					_elm_community$linear_algebra$Math_Vector2$add,
-					anchorPosition,
-					A2(
-						_elm_community$linear_algebra$Math_Vector2$scale,
-						distance,
-						A2(
-							_elm_community$linear_algebra$Math_Vector2$vec2,
-							_elm_lang$core$Basics$cos(angle),
-							_elm_lang$core$Basics$sin(angle))));
-			});
-		var _p2 = A2(
-			_elm_lang$core$Maybe$map,
-			function (_p0) {
-				var _p1 = _p0;
-				return A2(
-					_elm_community$linear_algebra$Math_Vector2$vec2,
-					_elm_lang$core$Basics$toFloat(_p1.x),
-					_elm_lang$core$Basics$toFloat(_p1.y));
-			},
-			data.cursorPosition);
-		if (_p2.ctor === 'Just') {
-			var delta = A2(_elm_community$linear_algebra$Math_Vector2$sub, _p2._0, anchorPosition);
-			return _elm_lang$core$Maybe$Just(
-				A2(
-					position,
-					A2(
-						_elm_lang$core$Maybe$withDefault,
-						_elm_community$linear_algebra$Math_Vector2$length(delta),
-						A2(
-							_elm_lang$core$Maybe$andThen,
-							_kirchner$elm_pat$Expr$compute(data.variables),
-							state.distance)),
-					A2(
-						_elm_lang$core$Maybe$withDefault,
-						A2(
-							_elm_lang$core$Basics$atan2,
-							_elm_community$linear_algebra$Math_Vector2$getY(delta),
-							_elm_community$linear_algebra$Math_Vector2$getX(delta)),
-						A2(
-							_elm_lang$core$Maybe$andThen,
-							_kirchner$elm_pat$Expr$compute(data.variables),
-							state.angle))));
-		} else {
-			return A3(
-				_elm_lang$core$Maybe$map2,
-				position,
-				A2(
-					_elm_lang$core$Maybe$andThen,
-					_kirchner$elm_pat$Expr$compute(data.variables),
-					state.distance),
-				A2(
-					_elm_lang$core$Maybe$andThen,
-					_kirchner$elm_pat$Expr$compute(data.variables),
-					state.angle));
-		}
-	});
-var _kirchner$elm_pat$Tools_Distance$anchorPosition = F2(
-	function (data, state) {
-		return A2(
-			_elm_lang$core$Maybe$andThen,
-			A2(_kirchner$elm_pat$Types$position, data.store, data.variables),
-			A2(
-				_elm_lang$core$Maybe$andThen,
-				A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, data.store),
-				A2(
-					_elm_lang$core$Maybe$andThen,
-					function (_p3) {
-						return _elm_lang$core$Result$toMaybe(
-							_elm_lang$core$String$toInt(_p3));
-					},
-					state.anchor)));
-	});
-var _kirchner$elm_pat$Tools_Distance$line = F2(
-	function (data, state) {
-		var draw = F2(
-			function (anchorPosition, angle) {
-				return A2(
-					_kirchner$elm_pat$Svg_Extra$drawArrow,
-					anchorPosition,
-					A2(
-						_elm_community$linear_algebra$Math_Vector2$add,
-						anchorPosition,
-						A2(
-							_elm_community$linear_algebra$Math_Vector2$scale,
-							10000,
-							A2(
-								_elm_community$linear_algebra$Math_Vector2$vec2,
-								_elm_lang$core$Basics$cos(angle),
-								_elm_lang$core$Basics$sin(angle)))));
-			});
-		var _p4 = A2(_kirchner$elm_pat$Tools_Distance$anchorPosition, data, state);
-		if (_p4.ctor === 'Just') {
-			return A2(
-				_elm_lang$core$Maybe$map,
-				draw(_p4._0),
-				A2(
-					_elm_lang$core$Maybe$andThen,
-					_kirchner$elm_pat$Expr$compute(data.variables),
-					state.angle));
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
-	});
-var _kirchner$elm_pat$Tools_Distance$circle = F2(
-	function (data, state) {
-		var draw = F2(
-			function (anchorPosition, distance) {
-				return A2(
-					_elm_lang$svg$Svg$circle,
-					{
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$cx(
-							_elm_lang$core$Basics$toString(
-								_elm_community$linear_algebra$Math_Vector2$getX(anchorPosition))),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$cy(
-								_elm_lang$core$Basics$toString(
-									_elm_community$linear_algebra$Math_Vector2$getY(anchorPosition))),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$r(
-									_elm_lang$core$Basics$toString(distance)),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$svg$Svg_Attributes$fill('none'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
-												_1: {ctor: '[]'}
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					{ctor: '[]'});
-			});
-		var _p5 = A2(_kirchner$elm_pat$Tools_Distance$anchorPosition, data, state);
-		if (_p5.ctor === 'Just') {
-			return A2(
-				_elm_lang$core$Maybe$map,
-				draw(_p5._0),
-				A2(
-					_elm_lang$core$Maybe$andThen,
-					_kirchner$elm_pat$Expr$compute(data.variables),
-					state.distance));
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
-	});
-var _kirchner$elm_pat$Tools_Distance$newPoint = F2(
-	function (data, state) {
-		var draw = function (anchorPosition) {
-			return A2(
-				_elm_lang$core$Maybe$map,
-				function (pointPosition) {
-					return A2(
-						_elm_lang$svg$Svg$g,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _kirchner$elm_pat$Svg_Extra$drawPoint(pointPosition),
-							_1: {
-								ctor: '::',
-								_0: _kirchner$elm_pat$Svg_Extra$drawSelector(pointPosition),
-								_1: {
-									ctor: '::',
-									_0: A2(_kirchner$elm_pat$Svg_Extra$drawArrow, anchorPosition, pointPosition),
-									_1: {ctor: '[]'}
-								}
-							}
-						});
-				},
-				A3(_kirchner$elm_pat$Tools_Distance$pointPosition, data, state, anchorPosition));
-		};
-		return A2(
-			_elm_lang$core$Maybe$andThen,
-			draw,
-			A2(_kirchner$elm_pat$Tools_Distance$anchorPosition, data, state));
-	});
-var _kirchner$elm_pat$Tools_Distance$point = F2(
-	function (data, state) {
-		var anchorId = A2(
-			_elm_lang$core$Maybe$andThen,
-			function (_p6) {
-				return _elm_lang$core$Result$toMaybe(
-					_elm_lang$core$String$toInt(_p6));
-			},
-			state.anchor);
-		var anchorPosition = A2(
-			_elm_lang$core$Maybe$andThen,
-			A2(_kirchner$elm_pat$Types$position, data.store, data.variables),
-			A2(
-				_elm_lang$core$Maybe$andThen,
-				A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, data.store),
-				anchorId));
-		var cursorPosition = A2(
-			_elm_lang$core$Maybe$map,
-			function (_p7) {
-				var _p8 = _p7;
-				return A2(
-					_elm_community$linear_algebra$Math_Vector2$vec2,
-					_elm_lang$core$Basics$toFloat(_p8.x),
-					_elm_lang$core$Basics$toFloat(_p8.y));
-			},
-			data.cursorPosition);
-		var deltaCursor = A3(_elm_lang$core$Maybe$map2, _elm_community$linear_algebra$Math_Vector2$sub, cursorPosition, anchorPosition);
-		var distanceCursor = A2(
-			_elm_lang$core$Maybe$map,
-			_kirchner$elm_pat$Expr$Number,
-			A2(_elm_lang$core$Maybe$map, _elm_community$linear_algebra$Math_Vector2$length, deltaCursor));
-		var distance = A2(_elm_community$maybe_extra$Maybe_Extra$or, state.distance, distanceCursor);
-		var angleCursor = A2(
-			_elm_lang$core$Maybe$map,
-			_kirchner$elm_pat$Expr$Number,
-			A2(
-				_elm_lang$core$Maybe$map,
-				function (delta) {
-					return A2(
-						_elm_lang$core$Basics$atan2,
-						_elm_community$linear_algebra$Math_Vector2$getY(delta),
-						_elm_community$linear_algebra$Math_Vector2$getX(delta));
-				},
-				deltaCursor));
-		var angle = A2(_elm_community$maybe_extra$Maybe_Extra$or, state.angle, angleCursor);
-		return A4(_elm_lang$core$Maybe$map3, _kirchner$elm_pat$Types$Distance, anchorId, distance, angle);
-	});
-var _kirchner$elm_pat$Tools_Distance$svg = F4(
-	function (callbacks, updateState, data, state) {
-		var _p9 = A2(_kirchner$elm_pat$Tools_Distance$anchorPosition, data, state);
-		if (_p9.ctor === 'Just') {
-			var addPoint = A2(
-				_elm_lang$core$Maybe$map,
-				callbacks.addPoint,
-				A2(_kirchner$elm_pat$Tools_Distance$point, data, state));
-			return A2(
-				_elm_lang$svg$Svg$g,
-				{ctor: '[]'},
-				A2(
-					_elm_lang$core$List$filterMap,
-					_elm_lang$core$Basics$identity,
-					{
-						ctor: '::',
-						_0: A2(_kirchner$elm_pat$Tools_Distance$newPoint, data, state),
-						_1: {
-							ctor: '::',
-							_0: A2(_kirchner$elm_pat$Tools_Distance$circle, data, state),
-							_1: {
-								ctor: '::',
-								_0: A2(_kirchner$elm_pat$Tools_Distance$line, data, state),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$core$Maybe$Just(
-										A3(_kirchner$elm_pat$Tools_Common$svgUpdateMouse, addPoint, callbacks.updateCursorPosition, data)),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}));
-		} else {
-			var selectPoint = function (_p10) {
-				return updateState(
-					function (id) {
-						return _elm_lang$core$Native_Utils.update(
-							state,
-							{
-								anchor: A2(_elm_lang$core$Maybe$map, _elm_lang$core$Basics$toString, id)
-							});
-					}(_p10));
-			};
-			return A2(
-				_elm_lang$svg$Svg$g,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: A3(_kirchner$elm_pat$Tools_Common$svgSelectPoint, callbacks.focusPoint, selectPoint, data),
-					_1: {ctor: '[]'}
-				});
-		}
-	});
-var _kirchner$elm_pat$Tools_Distance$view = F4(
-	function (callbacks, updateState, data, state) {
-		var updateAngle = function (_p11) {
-			return updateState(
-				function (s) {
-					return _elm_lang$core$Native_Utils.update(
-						state,
-						{
-							angle: _kirchner$elm_pat$Expr$parse(s)
-						});
-				}(_p11));
-		};
-		var updateDistance = function (_p12) {
-			return updateState(
-				function (s) {
-					return _elm_lang$core$Native_Utils.update(
-						state,
-						{
-							distance: _kirchner$elm_pat$Expr$parse(s)
-						});
-				}(_p12));
-		};
-		var updateAnchor = function (_p13) {
-			return updateState(
-				function (id) {
-					return _elm_lang$core$Native_Utils.update(
-						state,
-						{anchor: id});
-				}(_p13));
-		};
-		return A5(
-			_kirchner$elm_pat$Tools_Common$view,
-			callbacks,
-			data,
-			state,
-			_kirchner$elm_pat$Tools_Distance$point,
-			{
-				ctor: '::',
-				_0: A3(_kirchner$elm_pat$Tools_Common$idDropdown, data, state.anchor, updateAnchor),
-				_1: {
-					ctor: '::',
-					_0: A3(_kirchner$elm_pat$Tools_Common$exprInput, 'd', state.distance, updateDistance),
-					_1: {
-						ctor: '::',
-						_0: A3(_kirchner$elm_pat$Tools_Common$exprInput, 'a', state.angle, updateAngle),
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-	});
-var _kirchner$elm_pat$Tools_Distance$initWith = F4(
-	function (id, anchor, distance, angle) {
-		return {
-			anchor: _elm_lang$core$Maybe$Just(
-				_elm_lang$core$Basics$toString(anchor)),
-			distance: _elm_lang$core$Maybe$Just(distance),
-			angle: _elm_lang$core$Maybe$Just(angle),
-			id: _elm_lang$core$Maybe$Just(id)
-		};
-	});
-var _kirchner$elm_pat$Tools_Distance$init = {anchor: _elm_lang$core$Maybe$Nothing, distance: _elm_lang$core$Maybe$Nothing, angle: _elm_lang$core$Maybe$Nothing, id: _elm_lang$core$Maybe$Nothing};
-var _kirchner$elm_pat$Tools_Distance$State = F4(
-	function (a, b, c, d) {
-		return {anchor: a, distance: b, angle: c, id: d};
-	});
-
-var _kirchner$elm_pat$Tools_Relative$pointPosition = F3(
-	function (data, state, anchorPosition) {
-		var y = A2(
-			_elm_lang$core$Maybe$map,
-			function (y) {
-				return y + _elm_community$linear_algebra$Math_Vector2$getY(anchorPosition);
-			},
-			A2(
-				_elm_lang$core$Maybe$andThen,
-				_kirchner$elm_pat$Expr$compute(data.variables),
-				state.y));
-		var x = A2(
-			_elm_lang$core$Maybe$map,
-			function (x) {
-				return x + _elm_community$linear_algebra$Math_Vector2$getX(anchorPosition);
-			},
-			A2(
-				_elm_lang$core$Maybe$andThen,
-				_kirchner$elm_pat$Expr$compute(data.variables),
-				state.x));
-		var _p0 = data.cursorPosition;
-		if (_p0.ctor === 'Just') {
-			var _p1 = _p0._0;
-			return _elm_lang$core$Maybe$Just(
-				A2(
-					_elm_community$linear_algebra$Math_Vector2$vec2,
-					A2(
-						_elm_lang$core$Maybe$withDefault,
-						_elm_lang$core$Basics$toFloat(_p1.x),
-						x),
-					A2(
-						_elm_lang$core$Maybe$withDefault,
-						_elm_lang$core$Basics$toFloat(_p1.y),
-						y)));
-		} else {
-			return A3(_elm_lang$core$Maybe$map2, _elm_community$linear_algebra$Math_Vector2$vec2, x, y);
-		}
-	});
-var _kirchner$elm_pat$Tools_Relative$anchorPosition = F2(
-	function (data, state) {
-		return A2(
-			_elm_lang$core$Maybe$andThen,
-			A2(_kirchner$elm_pat$Types$position, data.store, data.variables),
-			A2(
-				_elm_lang$core$Maybe$andThen,
-				A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, data.store),
-				A2(
-					_elm_lang$core$Maybe$andThen,
-					function (_p2) {
-						return _elm_lang$core$Result$toMaybe(
-							_elm_lang$core$String$toInt(_p2));
-					},
-					state.anchor)));
-	});
-var _kirchner$elm_pat$Tools_Relative$verticalLine = F3(
-	function (data, state, anchorPosition) {
-		return A2(
-			_elm_lang$core$Maybe$map,
-			function (x) {
-				return _kirchner$elm_pat$Svg_Extra$drawVerticalLine(
-					x + _elm_community$linear_algebra$Math_Vector2$getX(anchorPosition));
-			},
-			A2(
-				_elm_lang$core$Maybe$andThen,
-				_kirchner$elm_pat$Expr$compute(data.variables),
-				state.x));
-	});
-var _kirchner$elm_pat$Tools_Relative$horizontalLine = F3(
-	function (data, state, anchorPosition) {
-		return A2(
-			_elm_lang$core$Maybe$map,
-			function (y) {
-				return _kirchner$elm_pat$Svg_Extra$drawHorizontalLine(
-					y + _elm_community$linear_algebra$Math_Vector2$getY(anchorPosition));
-			},
-			A2(
-				_elm_lang$core$Maybe$andThen,
-				_kirchner$elm_pat$Expr$compute(data.variables),
-				state.y));
-	});
-var _kirchner$elm_pat$Tools_Relative$newPoint = F2(
-	function (data, state) {
-		var draw = function (anchorPosition) {
-			return A2(
-				_elm_lang$core$Maybe$map,
-				function (pointPosition) {
-					return A2(
-						_elm_lang$svg$Svg$g,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _kirchner$elm_pat$Svg_Extra$drawPoint(pointPosition),
-							_1: {
-								ctor: '::',
-								_0: _kirchner$elm_pat$Svg_Extra$drawSelector(pointPosition),
-								_1: {
-									ctor: '::',
-									_0: A2(_kirchner$elm_pat$Svg_Extra$drawRectArrow, anchorPosition, pointPosition),
-									_1: {ctor: '[]'}
-								}
-							}
-						});
-				},
-				A3(_kirchner$elm_pat$Tools_Relative$pointPosition, data, state, anchorPosition));
-		};
-		return A2(
-			_elm_lang$core$Maybe$andThen,
-			draw,
-			A2(_kirchner$elm_pat$Tools_Relative$anchorPosition, data, state));
-	});
-var _kirchner$elm_pat$Tools_Relative$point = F2(
-	function (data, state) {
-		var yCursor = A2(
-			_elm_lang$core$Maybe$map,
-			function (_p3) {
-				var _p4 = _p3;
-				return _elm_lang$core$Basics$toFloat(_p4.y);
-			},
-			data.cursorPosition);
-		var xCursor = A2(
-			_elm_lang$core$Maybe$map,
-			function (_p5) {
-				var _p6 = _p5;
-				return _elm_lang$core$Basics$toFloat(_p6.x);
-			},
-			data.cursorPosition);
-		var anchorId = A2(
-			_elm_lang$core$Maybe$andThen,
-			function (_p7) {
-				return _elm_lang$core$Result$toMaybe(
-					_elm_lang$core$String$toInt(_p7));
-			},
-			state.anchor);
-		var anchorPosition = A2(
-			_elm_lang$core$Maybe$andThen,
-			A2(_kirchner$elm_pat$Types$position, data.store, data.variables),
-			A2(
-				_elm_lang$core$Maybe$andThen,
-				A2(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, data.store),
-				anchorId));
-		var xOffsetCursor = A3(
-			_elm_lang$core$Maybe$map2,
-			F2(
-				function (x, anchor) {
-					return _kirchner$elm_pat$Expr$Number(
-						x - _elm_community$linear_algebra$Math_Vector2$getX(anchor));
-				}),
-			xCursor,
-			anchorPosition);
-		var xOffset = A2(_elm_community$maybe_extra$Maybe_Extra$or, state.x, xOffsetCursor);
-		var yOffsetCursor = A3(
-			_elm_lang$core$Maybe$map2,
-			F2(
-				function (y, anchor) {
-					return _kirchner$elm_pat$Expr$Number(
-						y - _elm_community$linear_algebra$Math_Vector2$getY(anchor));
-				}),
-			yCursor,
-			anchorPosition);
-		var yOffset = A2(_elm_community$maybe_extra$Maybe_Extra$or, state.y, yOffsetCursor);
-		return A4(_elm_lang$core$Maybe$map3, _kirchner$elm_pat$Types$Relative, anchorId, xOffset, yOffset);
-	});
-var _kirchner$elm_pat$Tools_Relative$svg = F4(
-	function (callbacks, updateState, data, state) {
-		var _p8 = A2(_kirchner$elm_pat$Tools_Relative$anchorPosition, data, state);
-		if (_p8.ctor === 'Just') {
-			var _p9 = _p8._0;
-			var addPoint = A2(
-				_elm_lang$core$Maybe$map,
-				callbacks.addPoint,
-				A2(_kirchner$elm_pat$Tools_Relative$point, data, state));
-			return A2(
-				_elm_lang$svg$Svg$g,
-				{ctor: '[]'},
-				A2(
-					_elm_lang$core$List$filterMap,
-					_elm_lang$core$Basics$identity,
-					{
-						ctor: '::',
-						_0: A2(_kirchner$elm_pat$Tools_Relative$newPoint, data, state),
-						_1: {
-							ctor: '::',
-							_0: A3(_kirchner$elm_pat$Tools_Relative$horizontalLine, data, state, _p9),
-							_1: {
-								ctor: '::',
-								_0: A3(_kirchner$elm_pat$Tools_Relative$verticalLine, data, state, _p9),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$core$Maybe$Just(
-										A3(_kirchner$elm_pat$Tools_Common$svgUpdateMouse, addPoint, callbacks.updateCursorPosition, data)),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}));
-		} else {
-			var selectPoint = function (_p10) {
-				return updateState(
-					function (id) {
-						return _elm_lang$core$Native_Utils.update(
-							state,
-							{
-								anchor: A2(_elm_lang$core$Maybe$map, _elm_lang$core$Basics$toString, id)
-							});
-					}(_p10));
-			};
-			return A2(
-				_elm_lang$svg$Svg$g,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: A3(_kirchner$elm_pat$Tools_Common$svgSelectPoint, callbacks.focusPoint, selectPoint, data),
-					_1: {ctor: '[]'}
-				});
-		}
-	});
-var _kirchner$elm_pat$Tools_Relative$view = F4(
-	function (callbacks, updateState, data, state) {
-		var updateY = function (_p11) {
-			return updateState(
-				function (s) {
-					return _elm_lang$core$Native_Utils.update(
-						state,
-						{
-							y: _kirchner$elm_pat$Expr$parse(s)
-						});
-				}(_p11));
-		};
-		var updateX = function (_p12) {
-			return updateState(
-				function (s) {
-					return _elm_lang$core$Native_Utils.update(
-						state,
-						{
-							x: _kirchner$elm_pat$Expr$parse(s)
-						});
-				}(_p12));
-		};
-		var updateAnchor = function (_p13) {
-			return updateState(
-				function (id) {
-					return _elm_lang$core$Native_Utils.update(
-						state,
-						{anchor: id});
-				}(_p13));
-		};
-		return A5(
-			_kirchner$elm_pat$Tools_Common$view,
-			callbacks,
-			data,
-			state,
-			_kirchner$elm_pat$Tools_Relative$point,
-			{
-				ctor: '::',
-				_0: A3(_kirchner$elm_pat$Tools_Common$idDropdown, data, state.anchor, updateAnchor),
-				_1: {
-					ctor: '::',
-					_0: A3(_kirchner$elm_pat$Tools_Common$exprInput, 'x', state.x, updateX),
-					_1: {
-						ctor: '::',
-						_0: A3(_kirchner$elm_pat$Tools_Common$exprInput, 'y', state.y, updateY),
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-	});
-var _kirchner$elm_pat$Tools_Relative$initWith = F4(
-	function (id, anchor, x, y) {
-		return {
-			anchor: _elm_lang$core$Maybe$Just(
-				_elm_lang$core$Basics$toString(anchor)),
-			x: _elm_lang$core$Maybe$Just(x),
-			y: _elm_lang$core$Maybe$Just(y),
-			id: _elm_lang$core$Maybe$Just(id)
-		};
-	});
-var _kirchner$elm_pat$Tools_Relative$init = {anchor: _elm_lang$core$Maybe$Nothing, x: _elm_lang$core$Maybe$Nothing, y: _elm_lang$core$Maybe$Nothing, id: _elm_lang$core$Maybe$Nothing};
-var _kirchner$elm_pat$Tools_Relative$State = F4(
-	function (a, b, c, d) {
-		return {anchor: a, x: b, y: c, id: d};
-	});
-
-var _kirchner$elm_pat$Editor$getViewPort = F2(
-	function (oldViewPort, drag) {
-		var _p0 = drag;
-		if (_p0.ctor === 'Nothing') {
-			return oldViewPort;
-		} else {
-			var _p2 = _p0._0.start;
-			var _p1 = _p0._0.current;
-			return _elm_lang$core$Native_Utils.update(
-				oldViewPort,
-				{x: oldViewPort.x - (_p1.x - _p2.x), y: oldViewPort.y - (_p1.y - _p2.y)});
-		}
-	});
-var _kirchner$elm_pat$Editor$toolDescription = function (tool) {
-	var _p3 = tool;
-	switch (_p3.ctor) {
-		case 'Absolute':
-			return 'add a point given by absolute coordinates';
-		case 'Relative':
-			return 'relative';
-		case 'Distance':
-			return 'distance';
-		default:
-			return 'none';
-	}
-};
-var _kirchner$elm_pat$Editor$toolName = function (tool) {
-	var _p4 = tool;
-	switch (_p4.ctor) {
-		case 'Absolute':
-			return 'absolute';
-		case 'Relative':
-			return 'relative';
-		case 'Distance':
-			return 'distance';
-		default:
-			return 'none';
-	}
-};
-var _kirchner$elm_pat$Editor$Model = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return {store: a, nextId: b, variables: c, newName: d, newValue: e, tool: f, viewPort: g, drag: h, cursorPosition: i, focusedPoint: j};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _kirchner$elm_pat$Editor$Drag = F2(
-	function (a, b) {
-		return {start: a, current: b};
-	});
-var _kirchner$elm_pat$Editor$None = {ctor: 'None'};
-var _kirchner$elm_pat$Editor$Distance = function (a) {
-	return {ctor: 'Distance', _0: a};
-};
-var _kirchner$elm_pat$Editor$Relative = function (a) {
-	return {ctor: 'Relative', _0: a};
-};
-var _kirchner$elm_pat$Editor$Absolute = function (a) {
-	return {ctor: 'Absolute', _0: a};
-};
-var _kirchner$elm_pat$Editor$allTools = {
-	ctor: '::',
-	_0: _kirchner$elm_pat$Editor$Absolute(_kirchner$elm_pat$Tools_Absolute$init),
-	_1: {
-		ctor: '::',
-		_0: _kirchner$elm_pat$Editor$Relative(_kirchner$elm_pat$Tools_Relative$init),
-		_1: {
-			ctor: '::',
-			_0: _kirchner$elm_pat$Editor$Distance(_kirchner$elm_pat$Tools_Distance$init),
-			_1: {ctor: '[]'}
-		}
-	}
-};
-var _kirchner$elm_pat$Editor$update = F2(
-	function (msg, model) {
-		var _p5 = msg;
-		switch (_p5.ctor) {
-			case 'UpdateTool':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{tool: _p5._0}),
-					{ctor: '[]'});
-			case 'AddPoint':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							store: A3(_elm_lang$core$Dict$insert, model.nextId, _p5._0, model.store),
-							nextId: model.nextId + 1,
-							tool: _kirchner$elm_pat$Editor$None,
-							cursorPosition: _elm_lang$core$Maybe$Nothing,
-							focusedPoint: _elm_lang$core$Maybe$Nothing
-						}),
-					{ctor: '[]'});
-			case 'SelectPoint':
-				var _p7 = _p5._0;
-				var _p6 = A2(_elm_lang$core$Dict$get, _p7, model.store);
-				_v4_2:
-				do {
-					if (_p6.ctor === 'Just') {
-						switch (_p6._0.ctor) {
-							case 'Absolute':
-								return A2(
-									_elm_lang$core$Platform_Cmd_ops['!'],
-									_elm_lang$core$Native_Utils.update(
-										model,
-										{
-											tool: _kirchner$elm_pat$Editor$Absolute(
-												A3(_kirchner$elm_pat$Tools_Absolute$initWith, _p7, _p6._0._0, _p6._0._1))
-										}),
-									{ctor: '[]'});
-							case 'Relative':
-								return A2(
-									_elm_lang$core$Platform_Cmd_ops['!'],
-									_elm_lang$core$Native_Utils.update(
-										model,
-										{
-											tool: _kirchner$elm_pat$Editor$Relative(
-												A4(_kirchner$elm_pat$Tools_Relative$initWith, _p7, _p6._0._0, _p6._0._1, _p6._0._2))
-										}),
-									{ctor: '[]'});
-							default:
-								break _v4_2;
-						}
-					} else {
-						break _v4_2;
-					}
-				} while(false);
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{tool: _kirchner$elm_pat$Editor$None}),
-					{ctor: '[]'});
-			case 'UpdatePoint':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							store: A3(
-								_elm_lang$core$Dict$update,
-								_p5._0,
-								function (_p8) {
-									return _elm_lang$core$Maybe$Just(_p5._1);
-								},
-								model.store),
-							tool: _kirchner$elm_pat$Editor$None
-						}),
-					{ctor: '[]'});
-			case 'DeletePoint':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							store: A2(_elm_lang$core$Dict$remove, _p5._0, model.store)
-						}),
-					{ctor: '[]'});
-			case 'NameUpdated':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							newName: _kirchner$elm_pat$Expr$parseVariable(_p5._0)
-						}),
-					{ctor: '[]'});
-			case 'ValueUpdated':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							newValue: _kirchner$elm_pat$Expr$parse(_p5._0)
-						}),
-					{ctor: '[]'});
-			case 'AddVariable':
-				var _p9 = {ctor: '_Tuple2', _0: model.newName, _1: model.newValue};
-				if (((_p9.ctor === '_Tuple2') && (_p9._0.ctor === 'Just')) && (_p9._1.ctor === 'Just')) {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								variables: A3(_elm_lang$core$Dict$insert, _p9._0._0, _p9._1._0, model.variables),
-								newName: _elm_lang$core$Maybe$Nothing,
-								newValue: _elm_lang$core$Maybe$Nothing
-							}),
-						{ctor: '[]'});
-				} else {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						model,
-						{ctor: '[]'});
-				}
-			case 'Resize':
-				var _p10 = _p5._0;
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							viewPort: {x: (_p10.width / -2) | 0, y: (_p10.height / -2) | 0, width: _p10.width, height: _p10.height}
-						}),
-					{ctor: '[]'});
-			case 'DragStart':
-				var _p11 = _p5._0;
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							drag: _elm_lang$core$Maybe$Just(
-								A2(_kirchner$elm_pat$Editor$Drag, _p11, _p11))
-						}),
-					{ctor: '[]'});
-			case 'DragAt':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							drag: A2(
-								_elm_lang$core$Maybe$map,
-								function (_p12) {
-									var _p13 = _p12;
-									return A2(_kirchner$elm_pat$Editor$Drag, _p13.start, _p5._0);
-								},
-								model.drag)
-						}),
-					{ctor: '[]'});
-			case 'DragStop':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							drag: _elm_lang$core$Maybe$Nothing,
-							viewPort: A2(_kirchner$elm_pat$Editor$getViewPort, model.viewPort, model.drag)
-						}),
-					{ctor: '[]'});
-			case 'UpdateCursorPosition':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							cursorPosition: A2(
-								_elm_lang$core$Maybe$map,
-								_kirchner$elm_pat$Types$svgToCanvas(model.viewPort),
-								_p5._0)
-						}),
-					{ctor: '[]'});
-			default:
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{focusedPoint: _p5._0}),
-					{ctor: '[]'});
-		}
-	});
-var _kirchner$elm_pat$Editor$FocusPoint = function (a) {
-	return {ctor: 'FocusPoint', _0: a};
-};
-var _kirchner$elm_pat$Editor$UpdateCursorPosition = function (a) {
-	return {ctor: 'UpdateCursorPosition', _0: a};
-};
-var _kirchner$elm_pat$Editor$DragStop = function (a) {
-	return {ctor: 'DragStop', _0: a};
-};
-var _kirchner$elm_pat$Editor$DragAt = function (a) {
-	return {ctor: 'DragAt', _0: a};
-};
-var _kirchner$elm_pat$Editor$DragStart = function (a) {
-	return {ctor: 'DragStart', _0: a};
-};
-var _kirchner$elm_pat$Editor$Resize = function (a) {
-	return {ctor: 'Resize', _0: a};
-};
-var _kirchner$elm_pat$Editor$init = A2(
-	_elm_lang$core$Platform_Cmd_ops['!'],
-	{
-		store: _kirchner$elm_pat$Types$emptyStore,
-		nextId: _kirchner$elm_pat$Types$firstId,
-		variables: _elm_lang$core$Dict$empty,
-		newName: _elm_lang$core$Maybe$Nothing,
-		newValue: _elm_lang$core$Maybe$Nothing,
-		tool: _kirchner$elm_pat$Editor$None,
-		viewPort: {x: -320, y: -320, width: 640, height: 640},
-		drag: _elm_lang$core$Maybe$Nothing,
-		cursorPosition: _elm_lang$core$Maybe$Nothing,
-		focusedPoint: _elm_lang$core$Maybe$Nothing
-	},
-	{
-		ctor: '::',
-		_0: A2(_elm_lang$core$Task$perform, _kirchner$elm_pat$Editor$Resize, _elm_lang$window$Window$size),
-		_1: {ctor: '[]'}
-	});
-var _kirchner$elm_pat$Editor$subscriptions = function (model) {
-	var _p14 = model.drag;
-	if (_p14.ctor === 'Nothing') {
-		return _elm_lang$core$Platform_Sub$batch(
-			{
-				ctor: '::',
-				_0: _elm_lang$window$Window$resizes(_kirchner$elm_pat$Editor$Resize),
-				_1: {ctor: '[]'}
-			});
-	} else {
-		return _elm_lang$core$Platform_Sub$batch(
-			{
-				ctor: '::',
-				_0: _elm_lang$window$Window$resizes(_kirchner$elm_pat$Editor$Resize),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$mouse$Mouse$moves(_kirchner$elm_pat$Editor$DragAt),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$mouse$Mouse$ups(_kirchner$elm_pat$Editor$DragStop),
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-	}
-};
-var _kirchner$elm_pat$Editor$AddVariable = {ctor: 'AddVariable'};
-var _kirchner$elm_pat$Editor$NameUpdated = function (a) {
-	return {ctor: 'NameUpdated', _0: a};
-};
-var _kirchner$elm_pat$Editor$ValueUpdated = function (a) {
-	return {ctor: 'ValueUpdated', _0: a};
-};
-var _kirchner$elm_pat$Editor$DeletePoint = function (a) {
-	return {ctor: 'DeletePoint', _0: a};
-};
-var _kirchner$elm_pat$Editor$UpdatePoint = F2(
-	function (a, b) {
-		return {ctor: 'UpdatePoint', _0: a, _1: b};
-	});
-var _kirchner$elm_pat$Editor$SelectPoint = function (a) {
-	return {ctor: 'SelectPoint', _0: a};
-};
-var _kirchner$elm_pat$Editor$AddPoint = function (a) {
-	return {ctor: 'AddPoint', _0: a};
-};
-var _kirchner$elm_pat$Editor$UpdateTool = function (a) {
-	return {ctor: 'UpdateTool', _0: a};
-};
-
-var _rtfeldman$elm_css$Css_Elements$typeSelector = F2(
-	function (selectorStr, mixins) {
-		var sequence = A2(
-			_rtfeldman$elm_css$Css_Structure$TypeSelectorSequence,
-			_rtfeldman$elm_css$Css_Structure$TypeSelector(selectorStr),
-			{ctor: '[]'});
-		var selector = A3(
-			_rtfeldman$elm_css$Css_Structure$Selector,
-			sequence,
-			{ctor: '[]'},
-			_elm_lang$core$Maybe$Nothing);
-		return _rtfeldman$elm_css$Css_Preprocess$Snippet(
-			{
-				ctor: '::',
-				_0: _rtfeldman$elm_css$Css_Preprocess$StyleBlockDeclaration(
-					A3(
-						_rtfeldman$elm_css$Css_Preprocess$StyleBlock,
-						selector,
-						{ctor: '[]'},
-						mixins)),
-				_1: {ctor: '[]'}
-			});
-	});
-var _rtfeldman$elm_css$Css_Elements$html = _rtfeldman$elm_css$Css_Elements$typeSelector('html');
-var _rtfeldman$elm_css$Css_Elements$body = _rtfeldman$elm_css$Css_Elements$typeSelector('body');
-var _rtfeldman$elm_css$Css_Elements$article = _rtfeldman$elm_css$Css_Elements$typeSelector('article');
-var _rtfeldman$elm_css$Css_Elements$header = _rtfeldman$elm_css$Css_Elements$typeSelector('header');
-var _rtfeldman$elm_css$Css_Elements$footer = _rtfeldman$elm_css$Css_Elements$typeSelector('footer');
-var _rtfeldman$elm_css$Css_Elements$h1 = _rtfeldman$elm_css$Css_Elements$typeSelector('h1');
-var _rtfeldman$elm_css$Css_Elements$h2 = _rtfeldman$elm_css$Css_Elements$typeSelector('h2');
-var _rtfeldman$elm_css$Css_Elements$h3 = _rtfeldman$elm_css$Css_Elements$typeSelector('h3');
-var _rtfeldman$elm_css$Css_Elements$h4 = _rtfeldman$elm_css$Css_Elements$typeSelector('h4');
-var _rtfeldman$elm_css$Css_Elements$h5 = _rtfeldman$elm_css$Css_Elements$typeSelector('h5');
-var _rtfeldman$elm_css$Css_Elements$h6 = _rtfeldman$elm_css$Css_Elements$typeSelector('h6');
-var _rtfeldman$elm_css$Css_Elements$nav = _rtfeldman$elm_css$Css_Elements$typeSelector('nav');
-var _rtfeldman$elm_css$Css_Elements$section = _rtfeldman$elm_css$Css_Elements$typeSelector('section');
-var _rtfeldman$elm_css$Css_Elements$div = _rtfeldman$elm_css$Css_Elements$typeSelector('div');
-var _rtfeldman$elm_css$Css_Elements$hr = _rtfeldman$elm_css$Css_Elements$typeSelector('hr');
-var _rtfeldman$elm_css$Css_Elements$li = _rtfeldman$elm_css$Css_Elements$typeSelector('li');
-var _rtfeldman$elm_css$Css_Elements$main_ = _rtfeldman$elm_css$Css_Elements$typeSelector('main');
-var _rtfeldman$elm_css$Css_Elements$ol = _rtfeldman$elm_css$Css_Elements$typeSelector('ol');
-var _rtfeldman$elm_css$Css_Elements$p = _rtfeldman$elm_css$Css_Elements$typeSelector('p');
-var _rtfeldman$elm_css$Css_Elements$ul = _rtfeldman$elm_css$Css_Elements$typeSelector('ul');
-var _rtfeldman$elm_css$Css_Elements$pre = _rtfeldman$elm_css$Css_Elements$typeSelector('pre');
-var _rtfeldman$elm_css$Css_Elements$a = _rtfeldman$elm_css$Css_Elements$typeSelector('a');
-var _rtfeldman$elm_css$Css_Elements$code = _rtfeldman$elm_css$Css_Elements$typeSelector('code');
-var _rtfeldman$elm_css$Css_Elements$small = _rtfeldman$elm_css$Css_Elements$typeSelector('small');
-var _rtfeldman$elm_css$Css_Elements$span = _rtfeldman$elm_css$Css_Elements$typeSelector('span');
-var _rtfeldman$elm_css$Css_Elements$strong = _rtfeldman$elm_css$Css_Elements$typeSelector('strong');
-var _rtfeldman$elm_css$Css_Elements$i = _rtfeldman$elm_css$Css_Elements$typeSelector('i');
-var _rtfeldman$elm_css$Css_Elements$em = _rtfeldman$elm_css$Css_Elements$typeSelector('em');
-var _rtfeldman$elm_css$Css_Elements$img = _rtfeldman$elm_css$Css_Elements$typeSelector('img');
-var _rtfeldman$elm_css$Css_Elements$audio = _rtfeldman$elm_css$Css_Elements$typeSelector('audio');
-var _rtfeldman$elm_css$Css_Elements$video = _rtfeldman$elm_css$Css_Elements$typeSelector('video');
-var _rtfeldman$elm_css$Css_Elements$canvas = _rtfeldman$elm_css$Css_Elements$typeSelector('canvas');
-var _rtfeldman$elm_css$Css_Elements$caption = _rtfeldman$elm_css$Css_Elements$typeSelector('caption');
-var _rtfeldman$elm_css$Css_Elements$col = _rtfeldman$elm_css$Css_Elements$typeSelector('col');
-var _rtfeldman$elm_css$Css_Elements$colgroup = _rtfeldman$elm_css$Css_Elements$typeSelector('colgroup');
-var _rtfeldman$elm_css$Css_Elements$table = _rtfeldman$elm_css$Css_Elements$typeSelector('table');
-var _rtfeldman$elm_css$Css_Elements$tbody = _rtfeldman$elm_css$Css_Elements$typeSelector('tbody');
-var _rtfeldman$elm_css$Css_Elements$td = _rtfeldman$elm_css$Css_Elements$typeSelector('td');
-var _rtfeldman$elm_css$Css_Elements$tfoot = _rtfeldman$elm_css$Css_Elements$typeSelector('tfoot');
-var _rtfeldman$elm_css$Css_Elements$th = _rtfeldman$elm_css$Css_Elements$typeSelector('th');
-var _rtfeldman$elm_css$Css_Elements$thead = _rtfeldman$elm_css$Css_Elements$typeSelector('thead');
-var _rtfeldman$elm_css$Css_Elements$tr = _rtfeldman$elm_css$Css_Elements$typeSelector('tr');
-var _rtfeldman$elm_css$Css_Elements$button = _rtfeldman$elm_css$Css_Elements$typeSelector('button');
-var _rtfeldman$elm_css$Css_Elements$fieldset = _rtfeldman$elm_css$Css_Elements$typeSelector('fieldset');
-var _rtfeldman$elm_css$Css_Elements$form = _rtfeldman$elm_css$Css_Elements$typeSelector('form');
-var _rtfeldman$elm_css$Css_Elements$input = _rtfeldman$elm_css$Css_Elements$typeSelector('input');
-var _rtfeldman$elm_css$Css_Elements$label = _rtfeldman$elm_css$Css_Elements$typeSelector('label');
-var _rtfeldman$elm_css$Css_Elements$legend = _rtfeldman$elm_css$Css_Elements$typeSelector('legend');
-var _rtfeldman$elm_css$Css_Elements$optgroup = _rtfeldman$elm_css$Css_Elements$typeSelector('optgroup');
-var _rtfeldman$elm_css$Css_Elements$option = _rtfeldman$elm_css$Css_Elements$typeSelector('option');
-var _rtfeldman$elm_css$Css_Elements$progress = _rtfeldman$elm_css$Css_Elements$typeSelector('progress');
-var _rtfeldman$elm_css$Css_Elements$select = _rtfeldman$elm_css$Css_Elements$typeSelector('select');
-var _rtfeldman$elm_css$Css_Elements$textarea = _rtfeldman$elm_css$Css_Elements$typeSelector('textarea');
-var _rtfeldman$elm_css$Css_Elements$blockquote = _rtfeldman$elm_css$Css_Elements$typeSelector('blockquote');
-var _rtfeldman$elm_css$Css_Elements$svg = _rtfeldman$elm_css$Css_Elements$typeSelector('svg');
-var _rtfeldman$elm_css$Css_Elements$path = _rtfeldman$elm_css$Css_Elements$typeSelector('path');
-var _rtfeldman$elm_css$Css_Elements$rect = _rtfeldman$elm_css$Css_Elements$typeSelector('rect');
-var _rtfeldman$elm_css$Css_Elements$circle = _rtfeldman$elm_css$Css_Elements$typeSelector('circle');
-var _rtfeldman$elm_css$Css_Elements$ellipse = _rtfeldman$elm_css$Css_Elements$typeSelector('ellipse');
-var _rtfeldman$elm_css$Css_Elements$line = _rtfeldman$elm_css$Css_Elements$typeSelector('line');
-var _rtfeldman$elm_css$Css_Elements$polyline = _rtfeldman$elm_css$Css_Elements$typeSelector('polyline');
-var _rtfeldman$elm_css$Css_Elements$polygon = _rtfeldman$elm_css$Css_Elements$typeSelector('polygon');
-
-var _kirchner$elm_pat$Styles_Editor$rem = _rtfeldman$elm_css$Css$rem;
-var _kirchner$elm_pat$Styles_Editor$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('editor__');
-var _kirchner$elm_pat$Styles_Editor$id = _kirchner$elm_pat$Styles_Editor$_p0.id;
-var _kirchner$elm_pat$Styles_Editor$class = _kirchner$elm_pat$Styles_Editor$_p0.$class;
-var _kirchner$elm_pat$Styles_Editor$classList = _kirchner$elm_pat$Styles_Editor$_p0.classList;
-var _kirchner$elm_pat$Styles_Editor$ContainerBottomRight = {ctor: 'ContainerBottomRight'};
-var _kirchner$elm_pat$Styles_Editor$ContainerBottomLeft = {ctor: 'ContainerBottomLeft'};
-var _kirchner$elm_pat$Styles_Editor$ContainerTopLeft = {ctor: 'ContainerTopLeft'};
-var _kirchner$elm_pat$Styles_Editor$ContainerTopLeftLeft = {ctor: 'ContainerTopLeftLeft'};
-var _kirchner$elm_pat$Styles_Editor$Container = {ctor: 'Container'};
-var _kirchner$elm_pat$Styles_Editor$MouseMove = {ctor: 'MouseMove'};
-var _kirchner$elm_pat$Styles_Editor$Main = {ctor: 'Main'};
-var _kirchner$elm_pat$Styles_Editor$css = function () {
-	var $class = _rtfeldman$elm_css$Css$class;
-	return function (_p1) {
-		return _rtfeldman$elm_css$Css$stylesheet(
-			A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'editor__', _p1));
-	}(
-		{
-			ctor: '::',
-			_0: _rtfeldman$elm_css$Css_Elements$body(
-				{
-					ctor: '::',
-					_0: _rtfeldman$elm_css$Css$margin(_rtfeldman$elm_css$Css$zero),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					$class,
-					_kirchner$elm_pat$Styles_Editor$Main,
-					{
-						ctor: '::',
-						_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						$class,
-						_kirchner$elm_pat$Styles_Editor$MouseMove,
-						{
-							ctor: '::',
-							_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$move),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							$class,
-							_kirchner$elm_pat$Styles_Editor$Container,
-							{
-								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$padding(
-									_kirchner$elm_pat$Styles_Editor$rem(0.3)),
-								_1: {
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$borderRadius(
-										_rtfeldman$elm_css$Css$px(4)),
-									_1: {
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$color(
-											_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
-										_1: {
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$backgroundColor(
-												_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base2)),
-											_1: {
-												ctor: '::',
-												_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'auto'),
-												_1: {ctor: '[]'}
-											}
-										}
-									}
-								}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								$class,
-								_kirchner$elm_pat$Styles_Editor$ContainerTopLeftLeft,
-								{
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
-									_1: {
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$top(
-											_kirchner$elm_pat$Styles_Editor$rem(1)),
-										_1: {
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$left(
-												_kirchner$elm_pat$Styles_Editor$rem(1)),
-											_1: {ctor: '[]'}
-										}
-									}
-								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									$class,
-									_kirchner$elm_pat$Styles_Editor$ContainerTopLeft,
-									{
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
-										_1: {
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$top(
-												_kirchner$elm_pat$Styles_Editor$rem(1)),
-											_1: {
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$left(
-													_kirchner$elm_pat$Styles_Editor$rem(5)),
-												_1: {ctor: '[]'}
-											}
-										}
-									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										$class,
-										_kirchner$elm_pat$Styles_Editor$ContainerBottomLeft,
-										{
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
-											_1: {
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$bottom(
-													_kirchner$elm_pat$Styles_Editor$rem(1)),
-												_1: {
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$left(
-														_kirchner$elm_pat$Styles_Editor$rem(1)),
-													_1: {ctor: '[]'}
-												}
-											}
-										}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											$class,
-											_kirchner$elm_pat$Styles_Editor$ContainerBottomRight,
-											{
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
-												_1: {
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$bottom(
-														_kirchner$elm_pat$Styles_Editor$rem(1)),
-													_1: {
-														ctor: '::',
-														_0: _rtfeldman$elm_css$Css$right(
-															_kirchner$elm_pat$Styles_Editor$rem(1)),
-														_1: {ctor: '[]'}
-													}
-												}
-											}),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		});
-}();
-
-var _kirchner$elm_pat$View_Canvas$point = F3(
-	function (store, variables, point) {
-		var _p0 = point;
-		switch (_p0.ctor) {
-			case 'Absolute':
-				return A2(
-					_elm_lang$core$Maybe$map,
-					_kirchner$elm_pat$Svg_Extra$drawPoint,
-					A3(_kirchner$elm_pat$Types$position, store, variables, point));
-			case 'Relative':
-				var draw = F2(
-					function (v, w) {
-						return A2(
-							_elm_lang$svg$Svg$g,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _kirchner$elm_pat$Svg_Extra$drawPoint(w),
-								_1: {
-									ctor: '::',
-									_0: A2(_kirchner$elm_pat$Svg_Extra$drawRectArrow, v, w),
-									_1: {ctor: '[]'}
-								}
-							});
-					});
-				return A3(
-					_elm_lang$core$Maybe$map2,
-					draw,
-					A3(_kirchner$elm_pat$Types$positionById, store, variables, _p0._0),
-					A3(_kirchner$elm_pat$Types$position, store, variables, point));
-			case 'Distance':
-				var draw = F2(
-					function (v, w) {
-						return A2(
-							_elm_lang$svg$Svg$g,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _kirchner$elm_pat$Svg_Extra$drawPoint(w),
-								_1: {
-									ctor: '::',
-									_0: A2(_kirchner$elm_pat$Svg_Extra$drawArrow, v, w),
-									_1: {ctor: '[]'}
-								}
-							});
-					});
-				return A3(
-					_elm_lang$core$Maybe$map2,
-					draw,
-					A3(_kirchner$elm_pat$Types$positionById, store, variables, _p0._0),
-					A3(_kirchner$elm_pat$Types$position, store, variables, point));
-			default:
-				return _elm_lang$core$Maybe$Just(
-					A2(
-						_elm_lang$svg$Svg$g,
-						{ctor: '[]'},
-						{ctor: '[]'}));
-		}
-	});
-var _kirchner$elm_pat$View_Canvas$points = F2(
-	function (store, variables) {
-		return A2(
-			_elm_lang$core$List$filterMap,
-			A2(_kirchner$elm_pat$View_Canvas$point, store, variables),
-			_elm_lang$core$Dict$values(store));
-	});
-var _kirchner$elm_pat$View_Canvas$origin = A2(
-	_elm_lang$svg$Svg$g,
-	{ctor: '[]'},
-	{
-		ctor: '::',
-		_0: A2(
-			_elm_lang$svg$Svg$line,
-			{
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$x1('-10'),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$y1('0'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$x2('10'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$y2('0'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$green),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}
-			},
-			{ctor: '[]'}),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$svg$Svg$line,
-				{
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$x1('0'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$y1('-10'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$x2('0'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$y2('10'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$green),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {ctor: '[]'}
-		}
-	});
-var _kirchner$elm_pat$View_Canvas$dragArea = F2(
-	function (startDrag, viewPort) {
-		return A2(
-			_elm_lang$svg$Svg$rect,
-			{
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$x(
-					_elm_lang$core$Basics$toString(viewPort.x)),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$y(
-						_elm_lang$core$Basics$toString(viewPort.y)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$width(
-							_elm_lang$core$Basics$toString(viewPort.width)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$height(
-								_elm_lang$core$Basics$toString(viewPort.height)),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
-									_1: {
-										ctor: '::',
-										_0: _kirchner$elm_pat$Events$onMouseDown(startDrag),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			{ctor: '[]'});
-	});
-var _kirchner$elm_pat$View_Canvas$view = F5(
-	function (tool, startDrag, viewPort, store, variables) {
-		var viewBoxString = A2(
-			_elm_lang$core$String$join,
-			' ',
-			{
-				ctor: '::',
-				_0: _elm_lang$core$Basics$toString(viewPort.x),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$core$Basics$toString(viewPort.y),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$core$Basics$toString(viewPort.width),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$core$Basics$toString(viewPort.height),
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			});
-		return A2(
-			_elm_lang$svg$Svg$svg,
-			{
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$viewBox(viewBoxString),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$style(
-						{
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'background-color', _1: _kirchner$elm_pat$Styles_Colors$base3},
-							_1: {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: 'width',
-									_1: _elm_lang$core$Basics$toString(viewPort.width)
-								},
-								_1: {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'height',
-										_1: _elm_lang$core$Basics$toString(viewPort.height)
-									},
-									_1: {ctor: '[]'}
-								}
-							}
-						}),
-					_1: {ctor: '[]'}
-				}
-			},
-			{
-				ctor: '::',
-				_0: A2(_kirchner$elm_pat$View_Canvas$dragArea, startDrag, viewPort),
-				_1: {
-					ctor: '::',
-					_0: _kirchner$elm_pat$View_Canvas$origin,
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$svg$Svg$g,
-							{ctor: '[]'},
-							A2(_kirchner$elm_pat$View_Canvas$points, store, variables)),
-						_1: {
-							ctor: '::',
-							_0: tool,
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			});
-	});
-
-var _kirchner$elm_pat$Styles_PointTable$rem = _rtfeldman$elm_css$Css$rem;
-var _kirchner$elm_pat$Styles_PointTable$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('point-table__');
-var _kirchner$elm_pat$Styles_PointTable$id = _kirchner$elm_pat$Styles_PointTable$_p0.id;
-var _kirchner$elm_pat$Styles_PointTable$class = _kirchner$elm_pat$Styles_PointTable$_p0.$class;
-var _kirchner$elm_pat$Styles_PointTable$classList = _kirchner$elm_pat$Styles_PointTable$_p0.classList;
-var _kirchner$elm_pat$Styles_PointTable$Icon = {ctor: 'Icon'};
-var _kirchner$elm_pat$Styles_PointTable$IconButton = {ctor: 'IconButton'};
-var _kirchner$elm_pat$Styles_PointTable$CellAction = {ctor: 'CellAction'};
-var _kirchner$elm_pat$Styles_PointTable$CellType = {ctor: 'CellType'};
-var _kirchner$elm_pat$Styles_PointTable$CellCoordinate = {ctor: 'CellCoordinate'};
-var _kirchner$elm_pat$Styles_PointTable$CellId = {ctor: 'CellId'};
-var _kirchner$elm_pat$Styles_PointTable$Table = {ctor: 'Table'};
-var _kirchner$elm_pat$Styles_PointTable$css = function () {
-	var $class = _rtfeldman$elm_css$Css$class;
-	return function (_p1) {
-		return _rtfeldman$elm_css$Css$stylesheet(
-			A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'point-table__', _p1));
-	}(
-		{
-			ctor: '::',
-			_0: A2(
-				$class,
-				_kirchner$elm_pat$Styles_PointTable$Table,
-				{
-					ctor: '::',
-					_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'auto'),
-					_1: {
-						ctor: '::',
-						_0: _rtfeldman$elm_css$Css$fontFamily(_rtfeldman$elm_css$Css$monospace),
-						_1: {
-							ctor: '::',
-							_0: _rtfeldman$elm_css$Css$fontSize(
-								_rtfeldman$elm_css$Css$px(16)),
-							_1: {
-								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$lineHeight(
-									_kirchner$elm_pat$Styles_PointTable$rem(1)),
-								_1: {
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$borderCollapse(_rtfeldman$elm_css$Css$collapse),
-									_1: {
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$children(
-											{
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css_Elements$tr(
-													{
-														ctor: '::',
-														_0: _rtfeldman$elm_css$Css$children(
-															{
-																ctor: '::',
-																_0: _rtfeldman$elm_css$Css_Elements$th(
-																	{
-																		ctor: '::',
-																		_0: _rtfeldman$elm_css$Css$paddingLeft(
-																			_kirchner$elm_pat$Styles_PointTable$rem(0.3)),
-																		_1: {
-																			ctor: '::',
-																			_0: _rtfeldman$elm_css$Css$paddingRight(
-																				_kirchner$elm_pat$Styles_PointTable$rem(0.3)),
-																			_1: {
-																				ctor: '::',
-																				_0: _rtfeldman$elm_css$Css$paddingTop(
-																					_kirchner$elm_pat$Styles_PointTable$rem(0.5)),
-																				_1: {
-																					ctor: '::',
-																					_0: _rtfeldman$elm_css$Css$paddingBottom(
-																						_kirchner$elm_pat$Styles_PointTable$rem(0.5)),
-																					_1: {
-																						ctor: '::',
-																						_0: A3(
-																							_rtfeldman$elm_css$Css$borderBottom3,
-																							_rtfeldman$elm_css$Css$px(1),
-																							_rtfeldman$elm_css$Css$solid,
-																							_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
-																						_1: {
-																							ctor: '::',
-																							_0: _rtfeldman$elm_css$Css$fontWeight(_rtfeldman$elm_css$Css$bold),
-																							_1: {ctor: '[]'}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}),
-																_1: {
-																	ctor: '::',
-																	_0: _rtfeldman$elm_css$Css_Elements$td(
-																		{
-																			ctor: '::',
-																			_0: _rtfeldman$elm_css$Css$paddingLeft(
-																				_kirchner$elm_pat$Styles_PointTable$rem(0.3)),
-																			_1: {
-																				ctor: '::',
-																				_0: _rtfeldman$elm_css$Css$paddingRight(
-																					_kirchner$elm_pat$Styles_PointTable$rem(0.3)),
-																				_1: {
-																					ctor: '::',
-																					_0: _rtfeldman$elm_css$Css$paddingTop(
-																						_kirchner$elm_pat$Styles_PointTable$rem(0.5)),
-																					_1: {
-																						ctor: '::',
-																						_0: _rtfeldman$elm_css$Css$paddingBottom(
-																							_kirchner$elm_pat$Styles_PointTable$rem(0.5)),
-																						_1: {ctor: '[]'}
-																					}
-																				}
-																			}
-																		}),
-																	_1: {ctor: '[]'}
-																}
-															}),
-														_1: {ctor: '[]'}
-													}),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					$class,
-					_kirchner$elm_pat$Styles_PointTable$CellId,
-					{
-						ctor: '::',
-						_0: _rtfeldman$elm_css$Css$width(
-							_kirchner$elm_pat$Styles_PointTable$rem(1)),
-						_1: {
-							ctor: '::',
-							_0: A3(
-								_rtfeldman$elm_css$Css$borderRight3,
-								_rtfeldman$elm_css$Css$px(1),
-								_rtfeldman$elm_css$Css$solid,
-								_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
-							_1: {
-								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$right),
-								_1: {ctor: '[]'}
-							}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						$class,
-						_kirchner$elm_pat$Styles_PointTable$CellCoordinate,
-						{
-							ctor: '::',
-							_0: _rtfeldman$elm_css$Css$width(
-								_kirchner$elm_pat$Styles_PointTable$rem(3)),
-							_1: {
-								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$right),
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							$class,
-							_kirchner$elm_pat$Styles_PointTable$CellType,
-							{
-								ctor: '::',
-								_0: _rtfeldman$elm_css$Css$width(
-									_kirchner$elm_pat$Styles_PointTable$rem(6)),
-								_1: {
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
-									_1: {ctor: '[]'}
-								}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								$class,
-								_kirchner$elm_pat$Styles_PointTable$CellAction,
-								{
-									ctor: '::',
-									_0: _rtfeldman$elm_css$Css$width(
-										_kirchner$elm_pat$Styles_PointTable$rem(1)),
-									_1: {
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
-										_1: {ctor: '[]'}
-									}
-								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									$class,
-									_kirchner$elm_pat$Styles_PointTable$IconButton,
-									{
-										ctor: '::',
-										_0: _rtfeldman$elm_css$Css$width(
-											_kirchner$elm_pat$Styles_PointTable$rem(1)),
-										_1: {
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$height(
-												_kirchner$elm_pat$Styles_PointTable$rem(1)),
-											_1: {
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$borderRadius(
-													_rtfeldman$elm_css$Css$pct(50)),
-												_1: {
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$color(
-														_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
-													_1: {
-														ctor: '::',
-														_0: _rtfeldman$elm_css$Css$backgroundColor(_rtfeldman$elm_css$Css$transparent),
-														_1: {
-															ctor: '::',
-															_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
-															_1: {
-																ctor: '::',
-																_0: _rtfeldman$elm_css$Css$hover(
-																	{
-																		ctor: '::',
-																		_0: _rtfeldman$elm_css$Css$backgroundColor(
-																			_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
-																		_1: {ctor: '[]'}
-																	}),
-																_1: {
-																	ctor: '::',
-																	_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
-																	_1: {ctor: '[]'}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										$class,
-										_kirchner$elm_pat$Styles_PointTable$Icon,
-										{
-											ctor: '::',
-											_0: _rtfeldman$elm_css$Css$important(
-												_rtfeldman$elm_css$Css$fontSize(
-													_kirchner$elm_pat$Styles_PointTable$rem(0.6))),
-											_1: {
-												ctor: '::',
-												_0: _rtfeldman$elm_css$Css$important(
-													_rtfeldman$elm_css$Css$lineHeight(
-														_kirchner$elm_pat$Styles_PointTable$rem(0.6))),
-												_1: {
-													ctor: '::',
-													_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
-													_1: {
-														ctor: '::',
-														_0: _rtfeldman$elm_css$Css$top(
-															_rtfeldman$elm_css$Css$pct(50)),
-														_1: {
-															ctor: '::',
-															_0: _rtfeldman$elm_css$Css$left(
-																_rtfeldman$elm_css$Css$pct(50)),
-															_1: {
-																ctor: '::',
-																_0: _rtfeldman$elm_css$Css$transform(
-																	A2(
-																		_rtfeldman$elm_css$Css$translate2,
-																		_rtfeldman$elm_css$Css$pct(-50),
-																		_rtfeldman$elm_css$Css$pct(-50))),
-																_1: {ctor: '[]'}
-															}
-														}
-													}
-												}
-											}
-										}),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}
-			}
-		});
-}();
+var _kirchner$elm_pat$Styles_Colors$green = '#859900';
+var _kirchner$elm_pat$Styles_Colors$cyan = '#2aa198';
+var _kirchner$elm_pat$Styles_Colors$blue = '#268bd2';
+var _kirchner$elm_pat$Styles_Colors$violet = '#6c71c4';
+var _kirchner$elm_pat$Styles_Colors$magenta = '#d33682';
+var _kirchner$elm_pat$Styles_Colors$red = '#dc322f';
+var _kirchner$elm_pat$Styles_Colors$orange = '#cb4b16';
+var _kirchner$elm_pat$Styles_Colors$yellow = '#b58900';
+var _kirchner$elm_pat$Styles_Colors$base3 = '#fdf6e3';
+var _kirchner$elm_pat$Styles_Colors$base2 = '#eee8d5';
+var _kirchner$elm_pat$Styles_Colors$base1 = '#93a1a1';
+var _kirchner$elm_pat$Styles_Colors$base0 = '#839496';
+var _kirchner$elm_pat$Styles_Colors$base00 = '#657b83';
+var _kirchner$elm_pat$Styles_Colors$base01 = '#586e75';
+var _kirchner$elm_pat$Styles_Colors$base02 = '#073642';
+var _kirchner$elm_pat$Styles_Colors$base03 = '#002b36';
 
 var _kirchner$elm_pat$Styles_Common$rem = _rtfeldman$elm_css$Css$rem;
 var _kirchner$elm_pat$Styles_Common$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('common__');
@@ -20481,6 +19448,108 @@ var _kirchner$elm_pat$Styles_Common$css = function () {
 		});
 }();
 
+var _kirchner$elm_pat$Styles_FileBrowser$rem = _rtfeldman$elm_css$Css$rem;
+var _kirchner$elm_pat$Styles_FileBrowser$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('file-browser__');
+var _kirchner$elm_pat$Styles_FileBrowser$id = _kirchner$elm_pat$Styles_FileBrowser$_p0.id;
+var _kirchner$elm_pat$Styles_FileBrowser$class = _kirchner$elm_pat$Styles_FileBrowser$_p0.$class;
+var _kirchner$elm_pat$Styles_FileBrowser$classList = _kirchner$elm_pat$Styles_FileBrowser$_p0.classList;
+var _kirchner$elm_pat$Styles_FileBrowser$FileBrowserFileLink = {ctor: 'FileBrowserFileLink'};
+var _kirchner$elm_pat$Styles_FileBrowser$FileBrowserFileLinkWrapper = {ctor: 'FileBrowserFileLinkWrapper'};
+var _kirchner$elm_pat$Styles_FileBrowser$FileBrowser = {ctor: 'FileBrowser'};
+var _kirchner$elm_pat$Styles_FileBrowser$css = function () {
+	var $class = _rtfeldman$elm_css$Css$class;
+	return function (_p1) {
+		return _rtfeldman$elm_css$Css$stylesheet(
+			A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'file-browser__', _p1));
+	}(
+		{
+			ctor: '::',
+			_0: A2(
+				$class,
+				_kirchner$elm_pat$Styles_FileBrowser$FileBrowser,
+				{
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					$class,
+					_kirchner$elm_pat$Styles_FileBrowser$FileBrowserFileLink,
+					{
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$backgroundColor(
+								_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$color(
+									_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base1)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$padding(
+											_kirchner$elm_pat$Styles_FileBrowser$rem(0.2)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$margin(
+												_kirchner$elm_pat$Styles_FileBrowser$rem(5.0e-2)),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$hover(
+													{
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$backgroundColor(
+															_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base2)),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$color(
+																_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base1)),
+															_1: {ctor: '[]'}
+														}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						$class,
+						_kirchner$elm_pat$Styles_FileBrowser$FileBrowserFileLinkWrapper,
+						{
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$displayFlex,
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$flexFlow1(_rtfeldman$elm_css$Css$column),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$alignItems(_rtfeldman$elm_css$Css$stretch),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$width(
+											_kirchner$elm_pat$Styles_FileBrowser$rem(16)),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+}();
+
 var _kirchner$elm_pat$Views_Common$iconSmall = F2(
 	function (name, callback) {
 		return A2(
@@ -20570,26 +19639,7126 @@ var _kirchner$elm_pat$Views_Common$iconBig = F2(
 			});
 	});
 
-var _kirchner$elm_pat$Views_PointTable$printPoint = F2(
-	function (variables, point) {
-		var _p0 = point;
-		switch (_p0.ctor) {
-			case 'Absolute':
-				return 'absolute';
-			case 'Relative':
-				return 'relative';
-			case 'Distance':
-				return 'distance';
-			default:
-				return _elm_lang$core$Basics$toString(point);
+var _kirchner$elm_pat$FileBrowser$github = function (fn) {
+	return A2(_elm_lang$core$Basics_ops['++'], 'https://raw.githubusercontent.com/kirchner/elm-pat/master/demo_patterns/', fn);
+};
+var _kirchner$elm_pat$FileBrowser$update = F2(
+	function (msg, model) {
+		return model;
+	});
+var _kirchner$elm_pat$FileBrowser$defaultModel = {};
+var _kirchner$elm_pat$FileBrowser$FileBrowser = {};
+var _kirchner$elm_pat$FileBrowser$Callbacks = F3(
+	function (a, b, c) {
+		return {clearSession: a, lift: b, loadRemoteFile: c};
+	});
+var _kirchner$elm_pat$FileBrowser$NoOp = {ctor: 'NoOp'};
+var _kirchner$elm_pat$FileBrowser$view = F2(
+	function (callbacks, data) {
+		var onClick = function (url) {
+			return A2(
+				_elm_lang$core$Maybe$withDefault,
+				callbacks.lift(_kirchner$elm_pat$FileBrowser$NoOp),
+				A2(
+					_elm_lang$core$Maybe$map,
+					function (loadRemoteFile) {
+						return loadRemoteFile(url);
+					},
+					callbacks.loadRemoteFile));
+		};
+		var fileLink = F2(
+			function (url, label) {
+				return A2(
+					_elm_lang$html$Html$a,
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Styles_FileBrowser$class(
+							{
+								ctor: '::',
+								_0: _kirchner$elm_pat$Styles_FileBrowser$FileBrowserFileLink,
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(
+								onClick(url)),
+							_1: {ctor: '[]'}
+						}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(label),
+						_1: {ctor: '[]'}
+					});
+			});
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Styles_FileBrowser$class(
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Styles_FileBrowser$FileBrowser,
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			_elm_lang$core$List$concat(
+				{
+					ctor: '::',
+					_0: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _kirchner$elm_pat$Styles_FileBrowser$class(
+									{
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_FileBrowser$FileBrowserFileLinkWrapper,
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									fileLink,
+									_kirchner$elm_pat$FileBrowser$github('demo-demo.json'),
+									'demo-demo'),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										fileLink,
+										_kirchner$elm_pat$FileBrowser$github('basic_bodice.json'),
+										'basic bodice'),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '::',
+							_0: A2(
+								_kirchner$elm_pat$Views_Common$iconBig,
+								'close',
+								A2(
+									_elm_lang$core$Maybe$withDefault,
+									callbacks.lift(_kirchner$elm_pat$FileBrowser$NoOp),
+									callbacks.clearSession)),
+							_1: {ctor: '[]'}
+						},
+						_1: {ctor: '[]'}
+					}
+				}));
+	});
+
+var _ohanhi$keyboard_extra$Keyboard_Extra$boolToInt = function (bool) {
+	return bool ? 1 : 0;
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$remove = F2(
+	function (code, list) {
+		return A2(
+			_elm_lang$core$List$filter,
+			F2(
+				function (x, y) {
+					return !_elm_lang$core$Native_Utils.eq(x, y);
+				})(code),
+			list);
+	});
+var _ohanhi$keyboard_extra$Keyboard_Extra$insert = F2(
+	function (code, list) {
+		return A2(
+			F2(
+				function (x, y) {
+					return {ctor: '::', _0: x, _1: y};
+				}),
+			code,
+			A2(_ohanhi$keyboard_extra$Keyboard_Extra$remove, code, list));
+	});
+var _ohanhi$keyboard_extra$Keyboard_Extra$update = F2(
+	function (msg, state) {
+		var _p0 = msg;
+		if (_p0.ctor === 'Down') {
+			return A2(_ohanhi$keyboard_extra$Keyboard_Extra$insert, _p0._0, state);
+		} else {
+			return A2(_ohanhi$keyboard_extra$Keyboard_Extra$remove, _p0._0, state);
 		}
 	});
-var _kirchner$elm_pat$Views_PointTable$viewPointEntry = F3(
-	function (variables, store, _p1) {
+var _ohanhi$keyboard_extra$Keyboard_Extra$Arrows = F2(
+	function (a, b) {
+		return {x: a, y: b};
+	});
+var _ohanhi$keyboard_extra$Keyboard_Extra$Up = function (a) {
+	return {ctor: 'Up', _0: a};
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Down = function (a) {
+	return {ctor: 'Down', _0: a};
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$KeyUp = function (a) {
+	return {ctor: 'KeyUp', _0: a};
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$KeyDown = function (a) {
+	return {ctor: 'KeyDown', _0: a};
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$updateWithKeyChange = F2(
+	function (msg, state) {
+		var _p1 = msg;
+		if (_p1.ctor === 'Down') {
+			var _p2 = _p1._0;
+			var nextState = A2(_ohanhi$keyboard_extra$Keyboard_Extra$insert, _p2, state);
+			var change = (!_elm_lang$core$Native_Utils.eq(
+				_elm_lang$core$List$length(nextState),
+				_elm_lang$core$List$length(state))) ? _elm_lang$core$Maybe$Just(
+				_ohanhi$keyboard_extra$Keyboard_Extra$KeyDown(_p2)) : _elm_lang$core$Maybe$Nothing;
+			return {ctor: '_Tuple2', _0: nextState, _1: change};
+		} else {
+			var _p3 = _p1._0;
+			var nextState = A2(_ohanhi$keyboard_extra$Keyboard_Extra$remove, _p3, state);
+			var change = (!_elm_lang$core$Native_Utils.eq(
+				_elm_lang$core$List$length(nextState),
+				_elm_lang$core$List$length(state))) ? _elm_lang$core$Maybe$Just(
+				_ohanhi$keyboard_extra$Keyboard_Extra$KeyUp(_p3)) : _elm_lang$core$Maybe$Nothing;
+			return {ctor: '_Tuple2', _0: nextState, _1: change};
+		}
+	});
+var _ohanhi$keyboard_extra$Keyboard_Extra$NoDirection = {ctor: 'NoDirection'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$NorthWest = {ctor: 'NorthWest'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$West = {ctor: 'West'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$SouthWest = {ctor: 'SouthWest'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$South = {ctor: 'South'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$SouthEast = {ctor: 'SouthEast'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$East = {ctor: 'East'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$NorthEast = {ctor: 'NorthEast'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$North = {ctor: 'North'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$arrowsToDir = function (_p4) {
+	var _p5 = _p4;
+	var _p6 = {ctor: '_Tuple2', _0: _p5.x, _1: _p5.y};
+	_v3_8:
+	do {
+		if (_p6.ctor === '_Tuple2') {
+			switch (_p6._0) {
+				case 1:
+					switch (_p6._1) {
+						case 1:
+							return _ohanhi$keyboard_extra$Keyboard_Extra$NorthEast;
+						case 0:
+							return _ohanhi$keyboard_extra$Keyboard_Extra$East;
+						case -1:
+							return _ohanhi$keyboard_extra$Keyboard_Extra$SouthEast;
+						default:
+							break _v3_8;
+					}
+				case 0:
+					switch (_p6._1) {
+						case 1:
+							return _ohanhi$keyboard_extra$Keyboard_Extra$North;
+						case -1:
+							return _ohanhi$keyboard_extra$Keyboard_Extra$South;
+						default:
+							break _v3_8;
+					}
+				case -1:
+					switch (_p6._1) {
+						case -1:
+							return _ohanhi$keyboard_extra$Keyboard_Extra$SouthWest;
+						case 0:
+							return _ohanhi$keyboard_extra$Keyboard_Extra$West;
+						case 1:
+							return _ohanhi$keyboard_extra$Keyboard_Extra$NorthWest;
+						default:
+							break _v3_8;
+					}
+				default:
+					break _v3_8;
+			}
+		} else {
+			break _v3_8;
+		}
+	} while(false);
+	return _ohanhi$keyboard_extra$Keyboard_Extra$NoDirection;
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Other = {ctor: 'Other'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Altgr = {ctor: 'Altgr'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Meta = {ctor: 'Meta'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Quote = {ctor: 'Quote'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CloseBracket = {ctor: 'CloseBracket'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$BackSlash = {ctor: 'BackSlash'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$OpenBracket = {ctor: 'OpenBracket'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$BackQuote = {ctor: 'BackQuote'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Slash = {ctor: 'Slash'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Period = {ctor: 'Period'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Minus = {ctor: 'Minus'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Comma = {ctor: 'Comma'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$VolumeUp = {ctor: 'VolumeUp'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$VolumeDown = {ctor: 'VolumeDown'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$VolumeMute = {ctor: 'VolumeMute'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Tilde = {ctor: 'Tilde'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CloseCurlyBracket = {ctor: 'CloseCurlyBracket'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$OpenCurlyBracket = {ctor: 'OpenCurlyBracket'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$HyphenMinus = {ctor: 'HyphenMinus'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Pipe = {ctor: 'Pipe'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Plus = {ctor: 'Plus'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Asterisk = {ctor: 'Asterisk'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CloseParen = {ctor: 'CloseParen'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$OpenParen = {ctor: 'OpenParen'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Underscore = {ctor: 'Underscore'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Ampersand = {ctor: 'Ampersand'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Percent = {ctor: 'Percent'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Dollar = {ctor: 'Dollar'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Hash = {ctor: 'Hash'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$DoubleQuote = {ctor: 'DoubleQuote'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Exclamation = {ctor: 'Exclamation'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Circumflex = {ctor: 'Circumflex'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$ScrollLock = {ctor: 'ScrollLock'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$NumLock = {ctor: 'NumLock'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F24 = {ctor: 'F24'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F23 = {ctor: 'F23'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F22 = {ctor: 'F22'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F21 = {ctor: 'F21'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F20 = {ctor: 'F20'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F19 = {ctor: 'F19'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F18 = {ctor: 'F18'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F17 = {ctor: 'F17'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F16 = {ctor: 'F16'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F15 = {ctor: 'F15'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F14 = {ctor: 'F14'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F13 = {ctor: 'F13'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F12 = {ctor: 'F12'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F11 = {ctor: 'F11'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F10 = {ctor: 'F10'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F9 = {ctor: 'F9'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F8 = {ctor: 'F8'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F7 = {ctor: 'F7'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F6 = {ctor: 'F6'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F5 = {ctor: 'F5'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F4 = {ctor: 'F4'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F3 = {ctor: 'F3'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F2 = {ctor: 'F2'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$F1 = {ctor: 'F1'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Divide = {ctor: 'Divide'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Decimal = {ctor: 'Decimal'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Subtract = {ctor: 'Subtract'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Separator = {ctor: 'Separator'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Add = {ctor: 'Add'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Multiply = {ctor: 'Multiply'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Numpad9 = {ctor: 'Numpad9'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Numpad8 = {ctor: 'Numpad8'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Numpad7 = {ctor: 'Numpad7'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Numpad6 = {ctor: 'Numpad6'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Numpad5 = {ctor: 'Numpad5'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Numpad4 = {ctor: 'Numpad4'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Numpad3 = {ctor: 'Numpad3'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Numpad2 = {ctor: 'Numpad2'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Numpad1 = {ctor: 'Numpad1'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Numpad0 = {ctor: 'Numpad0'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Sleep = {ctor: 'Sleep'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$ContextMenu = {ctor: 'ContextMenu'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Super = {ctor: 'Super'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharZ = {ctor: 'CharZ'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharY = {ctor: 'CharY'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharX = {ctor: 'CharX'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharW = {ctor: 'CharW'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharV = {ctor: 'CharV'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharU = {ctor: 'CharU'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharT = {ctor: 'CharT'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharS = {ctor: 'CharS'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharR = {ctor: 'CharR'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharQ = {ctor: 'CharQ'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharP = {ctor: 'CharP'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharO = {ctor: 'CharO'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharN = {ctor: 'CharN'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharM = {ctor: 'CharM'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharL = {ctor: 'CharL'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharK = {ctor: 'CharK'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharJ = {ctor: 'CharJ'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharI = {ctor: 'CharI'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharH = {ctor: 'CharH'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharG = {ctor: 'CharG'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharF = {ctor: 'CharF'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharE = {ctor: 'CharE'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharD = {ctor: 'CharD'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharC = {ctor: 'CharC'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharB = {ctor: 'CharB'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CharA = {ctor: 'CharA'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$wasd = function (keys) {
+	var toInt = function (key) {
+		return _ohanhi$keyboard_extra$Keyboard_Extra$boolToInt(
+			A2(_elm_lang$core$List$member, key, keys));
+	};
+	var x = toInt(_ohanhi$keyboard_extra$Keyboard_Extra$CharD) - toInt(_ohanhi$keyboard_extra$Keyboard_Extra$CharA);
+	var y = toInt(_ohanhi$keyboard_extra$Keyboard_Extra$CharW) - toInt(_ohanhi$keyboard_extra$Keyboard_Extra$CharS);
+	return {x: x, y: y};
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$wasdDirection = function (_p7) {
+	return _ohanhi$keyboard_extra$Keyboard_Extra$arrowsToDir(
+		_ohanhi$keyboard_extra$Keyboard_Extra$wasd(_p7));
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$At = {ctor: 'At'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$QuestionMark = {ctor: 'QuestionMark'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$GreaterThan = {ctor: 'GreaterThan'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Equals = {ctor: 'Equals'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$LessThan = {ctor: 'LessThan'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Semicolon = {ctor: 'Semicolon'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Colon = {ctor: 'Colon'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Number9 = {ctor: 'Number9'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Number8 = {ctor: 'Number8'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Number7 = {ctor: 'Number7'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Number6 = {ctor: 'Number6'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Number5 = {ctor: 'Number5'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Number4 = {ctor: 'Number4'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Number3 = {ctor: 'Number3'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Number2 = {ctor: 'Number2'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Number1 = {ctor: 'Number1'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Number0 = {ctor: 'Number0'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Delete = {ctor: 'Delete'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Insert = {ctor: 'Insert'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$PrintScreen = {ctor: 'PrintScreen'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Execute = {ctor: 'Execute'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Print = {ctor: 'Print'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Select = {ctor: 'Select'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$ArrowDown = {ctor: 'ArrowDown'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$ArrowRight = {ctor: 'ArrowRight'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$ArrowUp = {ctor: 'ArrowUp'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$ArrowLeft = {ctor: 'ArrowLeft'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$arrows = function (keys) {
+	var toInt = function (key) {
+		return _ohanhi$keyboard_extra$Keyboard_Extra$boolToInt(
+			A2(_elm_lang$core$List$member, key, keys));
+	};
+	var x = toInt(_ohanhi$keyboard_extra$Keyboard_Extra$ArrowRight) - toInt(_ohanhi$keyboard_extra$Keyboard_Extra$ArrowLeft);
+	var y = toInt(_ohanhi$keyboard_extra$Keyboard_Extra$ArrowUp) - toInt(_ohanhi$keyboard_extra$Keyboard_Extra$ArrowDown);
+	return {x: x, y: y};
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$arrowsDirection = function (_p8) {
+	return _ohanhi$keyboard_extra$Keyboard_Extra$arrowsToDir(
+		_ohanhi$keyboard_extra$Keyboard_Extra$arrows(_p8));
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Home = {ctor: 'Home'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$End = {ctor: 'End'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$PageDown = {ctor: 'PageDown'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$PageUp = {ctor: 'PageUp'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Space = {ctor: 'Space'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$ModeChange = {ctor: 'ModeChange'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Accept = {ctor: 'Accept'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$NonConvert = {ctor: 'NonConvert'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Convert = {ctor: 'Convert'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Escape = {ctor: 'Escape'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$CapsLock = {ctor: 'CapsLock'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Pause = {ctor: 'Pause'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Alt = {ctor: 'Alt'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Control = {ctor: 'Control'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Shift = {ctor: 'Shift'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Enter = {ctor: 'Enter'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Clear = {ctor: 'Clear'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Tab = {ctor: 'Tab'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$BackSpace = {ctor: 'BackSpace'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Help = {ctor: 'Help'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$Cancel = {ctor: 'Cancel'};
+var _ohanhi$keyboard_extra$Keyboard_Extra$codeBook = {
+	ctor: '::',
+	_0: {ctor: '_Tuple2', _0: 3, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Cancel},
+	_1: {
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 6, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Help},
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 8, _1: _ohanhi$keyboard_extra$Keyboard_Extra$BackSpace},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 9, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Tab},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 12, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Clear},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 13, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Enter},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 16, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Shift},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 17, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Control},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 18, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Alt},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 19, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Pause},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 20, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CapsLock},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 27, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Escape},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 28, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Convert},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 29, _1: _ohanhi$keyboard_extra$Keyboard_Extra$NonConvert},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 30, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Accept},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 31, _1: _ohanhi$keyboard_extra$Keyboard_Extra$ModeChange},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: 32, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Space},
+																	_1: {
+																		ctor: '::',
+																		_0: {ctor: '_Tuple2', _0: 33, _1: _ohanhi$keyboard_extra$Keyboard_Extra$PageUp},
+																		_1: {
+																			ctor: '::',
+																			_0: {ctor: '_Tuple2', _0: 34, _1: _ohanhi$keyboard_extra$Keyboard_Extra$PageDown},
+																			_1: {
+																				ctor: '::',
+																				_0: {ctor: '_Tuple2', _0: 35, _1: _ohanhi$keyboard_extra$Keyboard_Extra$End},
+																				_1: {
+																					ctor: '::',
+																					_0: {ctor: '_Tuple2', _0: 36, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Home},
+																					_1: {
+																						ctor: '::',
+																						_0: {ctor: '_Tuple2', _0: 37, _1: _ohanhi$keyboard_extra$Keyboard_Extra$ArrowLeft},
+																						_1: {
+																							ctor: '::',
+																							_0: {ctor: '_Tuple2', _0: 38, _1: _ohanhi$keyboard_extra$Keyboard_Extra$ArrowUp},
+																							_1: {
+																								ctor: '::',
+																								_0: {ctor: '_Tuple2', _0: 39, _1: _ohanhi$keyboard_extra$Keyboard_Extra$ArrowRight},
+																								_1: {
+																									ctor: '::',
+																									_0: {ctor: '_Tuple2', _0: 40, _1: _ohanhi$keyboard_extra$Keyboard_Extra$ArrowDown},
+																									_1: {
+																										ctor: '::',
+																										_0: {ctor: '_Tuple2', _0: 41, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Select},
+																										_1: {
+																											ctor: '::',
+																											_0: {ctor: '_Tuple2', _0: 42, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Print},
+																											_1: {
+																												ctor: '::',
+																												_0: {ctor: '_Tuple2', _0: 43, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Execute},
+																												_1: {
+																													ctor: '::',
+																													_0: {ctor: '_Tuple2', _0: 44, _1: _ohanhi$keyboard_extra$Keyboard_Extra$PrintScreen},
+																													_1: {
+																														ctor: '::',
+																														_0: {ctor: '_Tuple2', _0: 45, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Insert},
+																														_1: {
+																															ctor: '::',
+																															_0: {ctor: '_Tuple2', _0: 46, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Delete},
+																															_1: {
+																																ctor: '::',
+																																_0: {ctor: '_Tuple2', _0: 48, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Number0},
+																																_1: {
+																																	ctor: '::',
+																																	_0: {ctor: '_Tuple2', _0: 49, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Number1},
+																																	_1: {
+																																		ctor: '::',
+																																		_0: {ctor: '_Tuple2', _0: 50, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Number2},
+																																		_1: {
+																																			ctor: '::',
+																																			_0: {ctor: '_Tuple2', _0: 51, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Number3},
+																																			_1: {
+																																				ctor: '::',
+																																				_0: {ctor: '_Tuple2', _0: 52, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Number4},
+																																				_1: {
+																																					ctor: '::',
+																																					_0: {ctor: '_Tuple2', _0: 53, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Number5},
+																																					_1: {
+																																						ctor: '::',
+																																						_0: {ctor: '_Tuple2', _0: 54, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Number6},
+																																						_1: {
+																																							ctor: '::',
+																																							_0: {ctor: '_Tuple2', _0: 55, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Number7},
+																																							_1: {
+																																								ctor: '::',
+																																								_0: {ctor: '_Tuple2', _0: 56, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Number8},
+																																								_1: {
+																																									ctor: '::',
+																																									_0: {ctor: '_Tuple2', _0: 57, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Number9},
+																																									_1: {
+																																										ctor: '::',
+																																										_0: {ctor: '_Tuple2', _0: 58, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Colon},
+																																										_1: {
+																																											ctor: '::',
+																																											_0: {ctor: '_Tuple2', _0: 59, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Semicolon},
+																																											_1: {
+																																												ctor: '::',
+																																												_0: {ctor: '_Tuple2', _0: 60, _1: _ohanhi$keyboard_extra$Keyboard_Extra$LessThan},
+																																												_1: {
+																																													ctor: '::',
+																																													_0: {ctor: '_Tuple2', _0: 61, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Equals},
+																																													_1: {
+																																														ctor: '::',
+																																														_0: {ctor: '_Tuple2', _0: 62, _1: _ohanhi$keyboard_extra$Keyboard_Extra$GreaterThan},
+																																														_1: {
+																																															ctor: '::',
+																																															_0: {ctor: '_Tuple2', _0: 63, _1: _ohanhi$keyboard_extra$Keyboard_Extra$QuestionMark},
+																																															_1: {
+																																																ctor: '::',
+																																																_0: {ctor: '_Tuple2', _0: 64, _1: _ohanhi$keyboard_extra$Keyboard_Extra$At},
+																																																_1: {
+																																																	ctor: '::',
+																																																	_0: {ctor: '_Tuple2', _0: 65, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharA},
+																																																	_1: {
+																																																		ctor: '::',
+																																																		_0: {ctor: '_Tuple2', _0: 66, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharB},
+																																																		_1: {
+																																																			ctor: '::',
+																																																			_0: {ctor: '_Tuple2', _0: 67, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharC},
+																																																			_1: {
+																																																				ctor: '::',
+																																																				_0: {ctor: '_Tuple2', _0: 68, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharD},
+																																																				_1: {
+																																																					ctor: '::',
+																																																					_0: {ctor: '_Tuple2', _0: 69, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharE},
+																																																					_1: {
+																																																						ctor: '::',
+																																																						_0: {ctor: '_Tuple2', _0: 70, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharF},
+																																																						_1: {
+																																																							ctor: '::',
+																																																							_0: {ctor: '_Tuple2', _0: 71, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharG},
+																																																							_1: {
+																																																								ctor: '::',
+																																																								_0: {ctor: '_Tuple2', _0: 72, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharH},
+																																																								_1: {
+																																																									ctor: '::',
+																																																									_0: {ctor: '_Tuple2', _0: 73, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharI},
+																																																									_1: {
+																																																										ctor: '::',
+																																																										_0: {ctor: '_Tuple2', _0: 74, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharJ},
+																																																										_1: {
+																																																											ctor: '::',
+																																																											_0: {ctor: '_Tuple2', _0: 75, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharK},
+																																																											_1: {
+																																																												ctor: '::',
+																																																												_0: {ctor: '_Tuple2', _0: 76, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharL},
+																																																												_1: {
+																																																													ctor: '::',
+																																																													_0: {ctor: '_Tuple2', _0: 77, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharM},
+																																																													_1: {
+																																																														ctor: '::',
+																																																														_0: {ctor: '_Tuple2', _0: 78, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharN},
+																																																														_1: {
+																																																															ctor: '::',
+																																																															_0: {ctor: '_Tuple2', _0: 79, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharO},
+																																																															_1: {
+																																																																ctor: '::',
+																																																																_0: {ctor: '_Tuple2', _0: 80, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharP},
+																																																																_1: {
+																																																																	ctor: '::',
+																																																																	_0: {ctor: '_Tuple2', _0: 81, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharQ},
+																																																																	_1: {
+																																																																		ctor: '::',
+																																																																		_0: {ctor: '_Tuple2', _0: 82, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharR},
+																																																																		_1: {
+																																																																			ctor: '::',
+																																																																			_0: {ctor: '_Tuple2', _0: 83, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharS},
+																																																																			_1: {
+																																																																				ctor: '::',
+																																																																				_0: {ctor: '_Tuple2', _0: 84, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharT},
+																																																																				_1: {
+																																																																					ctor: '::',
+																																																																					_0: {ctor: '_Tuple2', _0: 85, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharU},
+																																																																					_1: {
+																																																																						ctor: '::',
+																																																																						_0: {ctor: '_Tuple2', _0: 86, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharV},
+																																																																						_1: {
+																																																																							ctor: '::',
+																																																																							_0: {ctor: '_Tuple2', _0: 87, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharW},
+																																																																							_1: {
+																																																																								ctor: '::',
+																																																																								_0: {ctor: '_Tuple2', _0: 88, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharX},
+																																																																								_1: {
+																																																																									ctor: '::',
+																																																																									_0: {ctor: '_Tuple2', _0: 89, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharY},
+																																																																									_1: {
+																																																																										ctor: '::',
+																																																																										_0: {ctor: '_Tuple2', _0: 90, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CharZ},
+																																																																										_1: {
+																																																																											ctor: '::',
+																																																																											_0: {ctor: '_Tuple2', _0: 91, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Super},
+																																																																											_1: {
+																																																																												ctor: '::',
+																																																																												_0: {ctor: '_Tuple2', _0: 93, _1: _ohanhi$keyboard_extra$Keyboard_Extra$ContextMenu},
+																																																																												_1: {
+																																																																													ctor: '::',
+																																																																													_0: {ctor: '_Tuple2', _0: 95, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Sleep},
+																																																																													_1: {
+																																																																														ctor: '::',
+																																																																														_0: {ctor: '_Tuple2', _0: 96, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Numpad0},
+																																																																														_1: {
+																																																																															ctor: '::',
+																																																																															_0: {ctor: '_Tuple2', _0: 97, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Numpad1},
+																																																																															_1: {
+																																																																																ctor: '::',
+																																																																																_0: {ctor: '_Tuple2', _0: 98, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Numpad2},
+																																																																																_1: {
+																																																																																	ctor: '::',
+																																																																																	_0: {ctor: '_Tuple2', _0: 99, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Numpad3},
+																																																																																	_1: {
+																																																																																		ctor: '::',
+																																																																																		_0: {ctor: '_Tuple2', _0: 100, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Numpad4},
+																																																																																		_1: {
+																																																																																			ctor: '::',
+																																																																																			_0: {ctor: '_Tuple2', _0: 101, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Numpad5},
+																																																																																			_1: {
+																																																																																				ctor: '::',
+																																																																																				_0: {ctor: '_Tuple2', _0: 102, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Numpad6},
+																																																																																				_1: {
+																																																																																					ctor: '::',
+																																																																																					_0: {ctor: '_Tuple2', _0: 103, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Numpad7},
+																																																																																					_1: {
+																																																																																						ctor: '::',
+																																																																																						_0: {ctor: '_Tuple2', _0: 104, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Numpad8},
+																																																																																						_1: {
+																																																																																							ctor: '::',
+																																																																																							_0: {ctor: '_Tuple2', _0: 105, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Numpad9},
+																																																																																							_1: {
+																																																																																								ctor: '::',
+																																																																																								_0: {ctor: '_Tuple2', _0: 106, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Multiply},
+																																																																																								_1: {
+																																																																																									ctor: '::',
+																																																																																									_0: {ctor: '_Tuple2', _0: 107, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Add},
+																																																																																									_1: {
+																																																																																										ctor: '::',
+																																																																																										_0: {ctor: '_Tuple2', _0: 108, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Separator},
+																																																																																										_1: {
+																																																																																											ctor: '::',
+																																																																																											_0: {ctor: '_Tuple2', _0: 109, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Subtract},
+																																																																																											_1: {
+																																																																																												ctor: '::',
+																																																																																												_0: {ctor: '_Tuple2', _0: 110, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Decimal},
+																																																																																												_1: {
+																																																																																													ctor: '::',
+																																																																																													_0: {ctor: '_Tuple2', _0: 111, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Divide},
+																																																																																													_1: {
+																																																																																														ctor: '::',
+																																																																																														_0: {ctor: '_Tuple2', _0: 112, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F1},
+																																																																																														_1: {
+																																																																																															ctor: '::',
+																																																																																															_0: {ctor: '_Tuple2', _0: 113, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F2},
+																																																																																															_1: {
+																																																																																																ctor: '::',
+																																																																																																_0: {ctor: '_Tuple2', _0: 114, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F3},
+																																																																																																_1: {
+																																																																																																	ctor: '::',
+																																																																																																	_0: {ctor: '_Tuple2', _0: 115, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F4},
+																																																																																																	_1: {
+																																																																																																		ctor: '::',
+																																																																																																		_0: {ctor: '_Tuple2', _0: 116, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F5},
+																																																																																																		_1: {
+																																																																																																			ctor: '::',
+																																																																																																			_0: {ctor: '_Tuple2', _0: 117, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F6},
+																																																																																																			_1: {
+																																																																																																				ctor: '::',
+																																																																																																				_0: {ctor: '_Tuple2', _0: 118, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F7},
+																																																																																																				_1: {
+																																																																																																					ctor: '::',
+																																																																																																					_0: {ctor: '_Tuple2', _0: 119, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F8},
+																																																																																																					_1: {
+																																																																																																						ctor: '::',
+																																																																																																						_0: {ctor: '_Tuple2', _0: 120, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F9},
+																																																																																																						_1: {
+																																																																																																							ctor: '::',
+																																																																																																							_0: {ctor: '_Tuple2', _0: 121, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F10},
+																																																																																																							_1: {
+																																																																																																								ctor: '::',
+																																																																																																								_0: {ctor: '_Tuple2', _0: 122, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F11},
+																																																																																																								_1: {
+																																																																																																									ctor: '::',
+																																																																																																									_0: {ctor: '_Tuple2', _0: 123, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F12},
+																																																																																																									_1: {
+																																																																																																										ctor: '::',
+																																																																																																										_0: {ctor: '_Tuple2', _0: 124, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F13},
+																																																																																																										_1: {
+																																																																																																											ctor: '::',
+																																																																																																											_0: {ctor: '_Tuple2', _0: 125, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F14},
+																																																																																																											_1: {
+																																																																																																												ctor: '::',
+																																																																																																												_0: {ctor: '_Tuple2', _0: 126, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F15},
+																																																																																																												_1: {
+																																																																																																													ctor: '::',
+																																																																																																													_0: {ctor: '_Tuple2', _0: 127, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F16},
+																																																																																																													_1: {
+																																																																																																														ctor: '::',
+																																																																																																														_0: {ctor: '_Tuple2', _0: 128, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F17},
+																																																																																																														_1: {
+																																																																																																															ctor: '::',
+																																																																																																															_0: {ctor: '_Tuple2', _0: 129, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F18},
+																																																																																																															_1: {
+																																																																																																																ctor: '::',
+																																																																																																																_0: {ctor: '_Tuple2', _0: 130, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F19},
+																																																																																																																_1: {
+																																																																																																																	ctor: '::',
+																																																																																																																	_0: {ctor: '_Tuple2', _0: 131, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F20},
+																																																																																																																	_1: {
+																																																																																																																		ctor: '::',
+																																																																																																																		_0: {ctor: '_Tuple2', _0: 132, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F21},
+																																																																																																																		_1: {
+																																																																																																																			ctor: '::',
+																																																																																																																			_0: {ctor: '_Tuple2', _0: 133, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F22},
+																																																																																																																			_1: {
+																																																																																																																				ctor: '::',
+																																																																																																																				_0: {ctor: '_Tuple2', _0: 134, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F23},
+																																																																																																																				_1: {
+																																																																																																																					ctor: '::',
+																																																																																																																					_0: {ctor: '_Tuple2', _0: 135, _1: _ohanhi$keyboard_extra$Keyboard_Extra$F24},
+																																																																																																																					_1: {
+																																																																																																																						ctor: '::',
+																																																																																																																						_0: {ctor: '_Tuple2', _0: 144, _1: _ohanhi$keyboard_extra$Keyboard_Extra$NumLock},
+																																																																																																																						_1: {
+																																																																																																																							ctor: '::',
+																																																																																																																							_0: {ctor: '_Tuple2', _0: 145, _1: _ohanhi$keyboard_extra$Keyboard_Extra$ScrollLock},
+																																																																																																																							_1: {
+																																																																																																																								ctor: '::',
+																																																																																																																								_0: {ctor: '_Tuple2', _0: 160, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Circumflex},
+																																																																																																																								_1: {
+																																																																																																																									ctor: '::',
+																																																																																																																									_0: {ctor: '_Tuple2', _0: 161, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Exclamation},
+																																																																																																																									_1: {
+																																																																																																																										ctor: '::',
+																																																																																																																										_0: {ctor: '_Tuple2', _0: 162, _1: _ohanhi$keyboard_extra$Keyboard_Extra$DoubleQuote},
+																																																																																																																										_1: {
+																																																																																																																											ctor: '::',
+																																																																																																																											_0: {ctor: '_Tuple2', _0: 163, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Hash},
+																																																																																																																											_1: {
+																																																																																																																												ctor: '::',
+																																																																																																																												_0: {ctor: '_Tuple2', _0: 164, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Dollar},
+																																																																																																																												_1: {
+																																																																																																																													ctor: '::',
+																																																																																																																													_0: {ctor: '_Tuple2', _0: 165, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Percent},
+																																																																																																																													_1: {
+																																																																																																																														ctor: '::',
+																																																																																																																														_0: {ctor: '_Tuple2', _0: 166, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Ampersand},
+																																																																																																																														_1: {
+																																																																																																																															ctor: '::',
+																																																																																																																															_0: {ctor: '_Tuple2', _0: 167, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Underscore},
+																																																																																																																															_1: {
+																																																																																																																																ctor: '::',
+																																																																																																																																_0: {ctor: '_Tuple2', _0: 168, _1: _ohanhi$keyboard_extra$Keyboard_Extra$OpenParen},
+																																																																																																																																_1: {
+																																																																																																																																	ctor: '::',
+																																																																																																																																	_0: {ctor: '_Tuple2', _0: 169, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CloseParen},
+																																																																																																																																	_1: {
+																																																																																																																																		ctor: '::',
+																																																																																																																																		_0: {ctor: '_Tuple2', _0: 170, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Asterisk},
+																																																																																																																																		_1: {
+																																																																																																																																			ctor: '::',
+																																																																																																																																			_0: {ctor: '_Tuple2', _0: 171, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Plus},
+																																																																																																																																			_1: {
+																																																																																																																																				ctor: '::',
+																																																																																																																																				_0: {ctor: '_Tuple2', _0: 172, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Pipe},
+																																																																																																																																				_1: {
+																																																																																																																																					ctor: '::',
+																																																																																																																																					_0: {ctor: '_Tuple2', _0: 173, _1: _ohanhi$keyboard_extra$Keyboard_Extra$HyphenMinus},
+																																																																																																																																					_1: {
+																																																																																																																																						ctor: '::',
+																																																																																																																																						_0: {ctor: '_Tuple2', _0: 174, _1: _ohanhi$keyboard_extra$Keyboard_Extra$OpenCurlyBracket},
+																																																																																																																																						_1: {
+																																																																																																																																							ctor: '::',
+																																																																																																																																							_0: {ctor: '_Tuple2', _0: 175, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CloseCurlyBracket},
+																																																																																																																																							_1: {
+																																																																																																																																								ctor: '::',
+																																																																																																																																								_0: {ctor: '_Tuple2', _0: 176, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Tilde},
+																																																																																																																																								_1: {
+																																																																																																																																									ctor: '::',
+																																																																																																																																									_0: {ctor: '_Tuple2', _0: 181, _1: _ohanhi$keyboard_extra$Keyboard_Extra$VolumeMute},
+																																																																																																																																									_1: {
+																																																																																																																																										ctor: '::',
+																																																																																																																																										_0: {ctor: '_Tuple2', _0: 182, _1: _ohanhi$keyboard_extra$Keyboard_Extra$VolumeDown},
+																																																																																																																																										_1: {
+																																																																																																																																											ctor: '::',
+																																																																																																																																											_0: {ctor: '_Tuple2', _0: 183, _1: _ohanhi$keyboard_extra$Keyboard_Extra$VolumeUp},
+																																																																																																																																											_1: {
+																																																																																																																																												ctor: '::',
+																																																																																																																																												_0: {ctor: '_Tuple2', _0: 186, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Semicolon},
+																																																																																																																																												_1: {
+																																																																																																																																													ctor: '::',
+																																																																																																																																													_0: {ctor: '_Tuple2', _0: 187, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Equals},
+																																																																																																																																													_1: {
+																																																																																																																																														ctor: '::',
+																																																																																																																																														_0: {ctor: '_Tuple2', _0: 188, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Comma},
+																																																																																																																																														_1: {
+																																																																																																																																															ctor: '::',
+																																																																																																																																															_0: {ctor: '_Tuple2', _0: 189, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Minus},
+																																																																																																																																															_1: {
+																																																																																																																																																ctor: '::',
+																																																																																																																																																_0: {ctor: '_Tuple2', _0: 190, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Period},
+																																																																																																																																																_1: {
+																																																																																																																																																	ctor: '::',
+																																																																																																																																																	_0: {ctor: '_Tuple2', _0: 191, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Slash},
+																																																																																																																																																	_1: {
+																																																																																																																																																		ctor: '::',
+																																																																																																																																																		_0: {ctor: '_Tuple2', _0: 192, _1: _ohanhi$keyboard_extra$Keyboard_Extra$BackQuote},
+																																																																																																																																																		_1: {
+																																																																																																																																																			ctor: '::',
+																																																																																																																																																			_0: {ctor: '_Tuple2', _0: 219, _1: _ohanhi$keyboard_extra$Keyboard_Extra$OpenBracket},
+																																																																																																																																																			_1: {
+																																																																																																																																																				ctor: '::',
+																																																																																																																																																				_0: {ctor: '_Tuple2', _0: 220, _1: _ohanhi$keyboard_extra$Keyboard_Extra$BackSlash},
+																																																																																																																																																				_1: {
+																																																																																																																																																					ctor: '::',
+																																																																																																																																																					_0: {ctor: '_Tuple2', _0: 221, _1: _ohanhi$keyboard_extra$Keyboard_Extra$CloseBracket},
+																																																																																																																																																					_1: {
+																																																																																																																																																						ctor: '::',
+																																																																																																																																																						_0: {ctor: '_Tuple2', _0: 222, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Quote},
+																																																																																																																																																						_1: {
+																																																																																																																																																							ctor: '::',
+																																																																																																																																																							_0: {ctor: '_Tuple2', _0: 224, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Meta},
+																																																																																																																																																							_1: {
+																																																																																																																																																								ctor: '::',
+																																																																																																																																																								_0: {ctor: '_Tuple2', _0: 225, _1: _ohanhi$keyboard_extra$Keyboard_Extra$Altgr},
+																																																																																																																																																								_1: {ctor: '[]'}
+																																																																																																																																																							}
+																																																																																																																																																						}
+																																																																																																																																																					}
+																																																																																																																																																				}
+																																																																																																																																																			}
+																																																																																																																																																		}
+																																																																																																																																																	}
+																																																																																																																																																}
+																																																																																																																																															}
+																																																																																																																																														}
+																																																																																																																																													}
+																																																																																																																																												}
+																																																																																																																																											}
+																																																																																																																																										}
+																																																																																																																																									}
+																																																																																																																																								}
+																																																																																																																																							}
+																																																																																																																																						}
+																																																																																																																																					}
+																																																																																																																																				}
+																																																																																																																																			}
+																																																																																																																																		}
+																																																																																																																																	}
+																																																																																																																																}
+																																																																																																																															}
+																																																																																																																														}
+																																																																																																																													}
+																																																																																																																												}
+																																																																																																																											}
+																																																																																																																										}
+																																																																																																																									}
+																																																																																																																								}
+																																																																																																																							}
+																																																																																																																						}
+																																																																																																																					}
+																																																																																																																				}
+																																																																																																																			}
+																																																																																																																		}
+																																																																																																																	}
+																																																																																																																}
+																																																																																																															}
+																																																																																																														}
+																																																																																																													}
+																																																																																																												}
+																																																																																																											}
+																																																																																																										}
+																																																																																																									}
+																																																																																																								}
+																																																																																																							}
+																																																																																																						}
+																																																																																																					}
+																																																																																																				}
+																																																																																																			}
+																																																																																																		}
+																																																																																																	}
+																																																																																																}
+																																																																																															}
+																																																																																														}
+																																																																																													}
+																																																																																												}
+																																																																																											}
+																																																																																										}
+																																																																																									}
+																																																																																								}
+																																																																																							}
+																																																																																						}
+																																																																																					}
+																																																																																				}
+																																																																																			}
+																																																																																		}
+																																																																																	}
+																																																																																}
+																																																																															}
+																																																																														}
+																																																																													}
+																																																																												}
+																																																																											}
+																																																																										}
+																																																																									}
+																																																																								}
+																																																																							}
+																																																																						}
+																																																																					}
+																																																																				}
+																																																																			}
+																																																																		}
+																																																																	}
+																																																																}
+																																																															}
+																																																														}
+																																																													}
+																																																												}
+																																																											}
+																																																										}
+																																																									}
+																																																								}
+																																																							}
+																																																						}
+																																																					}
+																																																				}
+																																																			}
+																																																		}
+																																																	}
+																																																}
+																																															}
+																																														}
+																																													}
+																																												}
+																																											}
+																																										}
+																																									}
+																																								}
+																																							}
+																																						}
+																																					}
+																																				}
+																																			}
+																																		}
+																																	}
+																																}
+																															}
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$toCode = function (key) {
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		0,
+		_elm_lang$core$List$head(
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Tuple$first,
+				A2(
+					_elm_lang$core$List$filter,
+					function (_p9) {
+						return A2(
+							F2(
+								function (x, y) {
+									return _elm_lang$core$Native_Utils.eq(x, y);
+								}),
+							key,
+							_elm_lang$core$Tuple$second(_p9));
+					},
+					_ohanhi$keyboard_extra$Keyboard_Extra$codeBook))));
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$codeDict = _elm_lang$core$Dict$fromList(_ohanhi$keyboard_extra$Keyboard_Extra$codeBook);
+var _ohanhi$keyboard_extra$Keyboard_Extra$fromCode = function (code) {
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		_ohanhi$keyboard_extra$Keyboard_Extra$Other,
+		A2(_elm_lang$core$Dict$get, code, _ohanhi$keyboard_extra$Keyboard_Extra$codeDict));
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$downs = function (toMsg) {
+	return _elm_lang$keyboard$Keyboard$downs(
+		function (_p10) {
+			return toMsg(
+				_ohanhi$keyboard_extra$Keyboard_Extra$fromCode(_p10));
+		});
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$ups = function (toMsg) {
+	return _elm_lang$keyboard$Keyboard$ups(
+		function (_p11) {
+			return toMsg(
+				_ohanhi$keyboard_extra$Keyboard_Extra$fromCode(_p11));
+		});
+};
+var _ohanhi$keyboard_extra$Keyboard_Extra$subscriptions = _elm_lang$core$Platform_Sub$batch(
+	{
+		ctor: '::',
+		_0: _elm_lang$keyboard$Keyboard$downs(
+			function (_p12) {
+				return _ohanhi$keyboard_extra$Keyboard_Extra$Down(
+					_ohanhi$keyboard_extra$Keyboard_Extra$fromCode(_p12));
+			}),
+		_1: {
+			ctor: '::',
+			_0: _elm_lang$keyboard$Keyboard$ups(
+				function (_p13) {
+					return _ohanhi$keyboard_extra$Keyboard_Extra$Up(
+						_ohanhi$keyboard_extra$Keyboard_Extra$fromCode(_p13));
+				}),
+			_1: {ctor: '[]'}
+		}
+	});
+var _ohanhi$keyboard_extra$Keyboard_Extra$targetKey = A2(
+	_elm_lang$core$Json_Decode$map,
+	_ohanhi$keyboard_extra$Keyboard_Extra$fromCode,
+	A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int));
+
+var _kirchner$elm_pat$Store$encodeId = function (_p0) {
+	var _p1 = _p0;
+	return _elm_lang$core$Json_Encode$int(_p1._0);
+};
+var _kirchner$elm_pat$Store$encode = F2(
+	function (encodeElement, _p2) {
+		var _p3 = _p2;
+		var _p6 = _p3._0;
+		var encodeDict = function (dict) {
+			return _elm_lang$core$Json_Encode$list(
+				A2(
+					_elm_lang$core$List$map,
+					function (_p4) {
+						var _p5 = _p4;
+						return _elm_lang$core$Json_Encode$object(
+							{
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'k',
+									_1: _elm_lang$core$Json_Encode$int(_p5._0)
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'v',
+										_1: encodeElement(_p5._1)
+									},
+									_1: {ctor: '[]'}
+								}
+							});
+					},
+					_elm_lang$core$Dict$toList(dict)));
+		};
+		return _elm_lang$core$Json_Encode$object(
+			{
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'data',
+					_1: encodeDict(_p6.data)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'nextId',
+						_1: _elm_lang$core$Json_Encode$int(_p6.nextId)
+					},
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _kirchner$elm_pat$Store$toInt = function (_p7) {
+	var _p8 = _p7;
+	return _p8._0;
+};
+var _kirchner$elm_pat$Store$intKeys = function (_p9) {
+	var _p10 = _p9;
+	return _elm_lang$core$Dict$keys(_p10._0.data);
+};
+var _kirchner$elm_pat$Store$values = function (_p11) {
+	var _p12 = _p11;
+	return _elm_lang$core$Dict$values(_p12._0.data);
+};
+var _kirchner$elm_pat$Store$get = F2(
+	function (_p14, _p13) {
+		var _p15 = _p14;
+		var _p16 = _p13;
+		return A2(_elm_lang$core$Dict$get, _p15._0, _p16._0.data);
+	});
+var _kirchner$elm_pat$Store$Store = function (a) {
+	return {ctor: 'Store', _0: a};
+};
+var _kirchner$elm_pat$Store$empty = _kirchner$elm_pat$Store$Store(
+	{data: _elm_lang$core$Dict$empty, nextId: 0});
+var _kirchner$elm_pat$Store$update = F3(
+	function (_p18, f, _p17) {
+		var _p19 = _p18;
+		var _p20 = _p17;
+		var _p21 = _p20._0;
+		return _kirchner$elm_pat$Store$Store(
+			_elm_lang$core$Native_Utils.update(
+				_p21,
+				{
+					data: A3(_elm_lang$core$Dict$update, _p19._0, f, _p21.data)
+				}));
+	});
+var _kirchner$elm_pat$Store$remove = F2(
+	function (_p23, _p22) {
+		var _p24 = _p23;
+		var _p25 = _p22;
+		var _p26 = _p25._0;
+		return _kirchner$elm_pat$Store$Store(
+			_elm_lang$core$Native_Utils.update(
+				_p26,
+				{
+					data: A2(_elm_lang$core$Dict$remove, _p24._0, _p26.data)
+				}));
+	});
+var _kirchner$elm_pat$Store$decode = function (decodeElement) {
+	var decodeDict = A2(
+		_elm_lang$core$Json_Decode$map,
+		_elm_lang$core$Dict$fromList,
+		_elm_lang$core$Json_Decode$list(
+			A3(
+				_elm_lang$core$Json_Decode$map2,
+				F2(
+					function (v0, v1) {
+						return {ctor: '_Tuple2', _0: v0, _1: v1};
+					}),
+				A2(
+					_elm_lang$core$Json_Decode$at,
+					{
+						ctor: '::',
+						_0: 'k',
+						_1: {ctor: '[]'}
+					},
+					_elm_lang$core$Json_Decode$int),
+				A2(
+					_elm_lang$core$Json_Decode$at,
+					{
+						ctor: '::',
+						_0: 'v',
+						_1: {ctor: '[]'}
+					},
+					decodeElement))));
+	return A3(
+		_elm_lang$core$Json_Decode$map2,
+		F2(
+			function (data, nextId) {
+				return _kirchner$elm_pat$Store$Store(
+					{data: data, nextId: nextId});
+			}),
+		A2(
+			_elm_lang$core$Json_Decode$at,
+			{
+				ctor: '::',
+				_0: 'data',
+				_1: {ctor: '[]'}
+			},
+			decodeDict),
+		A2(
+			_elm_lang$core$Json_Decode$at,
+			{
+				ctor: '::',
+				_0: 'nextId',
+				_1: {ctor: '[]'}
+			},
+			_elm_lang$core$Json_Decode$int));
+};
+var _kirchner$elm_pat$Store$Id = function (a) {
+	return {ctor: 'Id', _0: a};
+};
+var _kirchner$elm_pat$Store$idUnsafe = _kirchner$elm_pat$Store$Id;
+var _kirchner$elm_pat$Store$insert = F2(
+	function (element, _p27) {
+		var _p28 = _p27;
+		var _p29 = _p28._0;
+		return {
+			ctor: '_Tuple2',
+			_0: _kirchner$elm_pat$Store$Id(_p29.nextId),
+			_1: _kirchner$elm_pat$Store$Store(
+				_elm_lang$core$Native_Utils.update(
+					_p29,
+					{
+						data: A3(_elm_lang$core$Dict$insert, _p29.nextId, element, _p29.data),
+						nextId: 1 + _p29.nextId
+					}))
+		};
+	});
+var _kirchner$elm_pat$Store$keys = function (_p30) {
+	var _p31 = _p30;
+	return A2(
+		_elm_lang$core$List$map,
+		_kirchner$elm_pat$Store$Id,
+		_elm_lang$core$Dict$keys(_p31._0.data));
+};
+var _kirchner$elm_pat$Store$fromInt = function (id) {
+	return _kirchner$elm_pat$Store$Id(id);
+};
+var _kirchner$elm_pat$Store$toList = function (_p32) {
+	var _p33 = _p32;
+	return A2(
+		_elm_lang$core$List$map,
+		function (_p34) {
+			var _p35 = _p34;
+			return {
+				ctor: '_Tuple2',
+				_0: _kirchner$elm_pat$Store$Id(_p35._0),
+				_1: _p35._1
+			};
+		},
+		_elm_lang$core$Dict$toList(_p33._0.data));
+};
+var _kirchner$elm_pat$Store$decodeId = A2(_elm_lang$core$Json_Decode$map, _kirchner$elm_pat$Store$Id, _elm_lang$core$Json_Decode$int);
+
+var _kirchner$elm_pat$Point$encode = function (_p0) {
+	var _p1 = _p0;
+	var _p3 = _p1._0;
+	var encodeName = _elm_lang$core$Json_Encode$string(_p3.name);
+	var def = F7(
+		function (tag, e0, e1, id, id0, id1, ratio) {
+			return _elm_lang$core$Json_Encode$object(
+				{
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'tag',
+						_1: _elm_lang$core$Json_Encode$string(tag)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'e0',
+							_1: _kirchner$elm_pat$Expr$encode(e0)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'e1',
+								_1: _kirchner$elm_pat$Expr$encode(e1)
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'id',
+									_1: _kirchner$elm_pat$Store$encodeId(id)
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'id0',
+										_1: _kirchner$elm_pat$Store$encodeId(id0)
+									},
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'id1',
+											_1: _kirchner$elm_pat$Store$encodeId(id1)
+										},
+										_1: {
+											ctor: '::',
+											_0: {
+												ctor: '_Tuple2',
+												_0: 'ratio',
+												_1: _elm_lang$core$Json_Encode$float(ratio)
+											},
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				});
+		});
+	var encodeData = function () {
+		var _p2 = _p3.data;
+		switch (_p2.ctor) {
+			case 'Absolute':
+				return A7(
+					def,
+					'absolute',
+					_p2._0,
+					_p2._1,
+					_kirchner$elm_pat$Store$idUnsafe(0),
+					_kirchner$elm_pat$Store$idUnsafe(0),
+					_kirchner$elm_pat$Store$idUnsafe(0),
+					0.0);
+			case 'Relative':
+				return A7(
+					def,
+					'relative',
+					_p2._1,
+					_p2._2,
+					_p2._0,
+					_kirchner$elm_pat$Store$idUnsafe(0),
+					_kirchner$elm_pat$Store$idUnsafe(0),
+					0.0);
+			case 'Distance':
+				return A7(
+					def,
+					'distance',
+					_p2._1,
+					_p2._2,
+					_p2._0,
+					_kirchner$elm_pat$Store$idUnsafe(0),
+					_kirchner$elm_pat$Store$idUnsafe(0),
+					0.0);
+			default:
+				return A7(
+					def,
+					'between',
+					_kirchner$elm_pat$Expr$Number(0.0),
+					_kirchner$elm_pat$Expr$Number(0.0),
+					_kirchner$elm_pat$Store$idUnsafe(0),
+					_p2._0,
+					_p2._1,
+					_p2._2);
+		}
+	}();
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'name', _1: encodeName},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'data', _1: encodeData},
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _kirchner$elm_pat$Point$position = F3(
+	function (store, variables, _p4) {
+		var _p5 = _p4;
+		var lookUp = function (id) {
+			return A2(
+				_elm_lang$core$Maybe$andThen,
+				A2(_kirchner$elm_pat$Point$position, store, variables),
+				A2(_kirchner$elm_pat$Store$get, id, store));
+		};
+		var _p6 = _p5._0.data;
+		switch (_p6.ctor) {
+			case 'Absolute':
+				return A3(
+					_elm_lang$core$Maybe$map2,
+					_elm_community$linear_algebra$Math_Vector2$vec2,
+					A2(_kirchner$elm_pat$Expr$compute, variables, _p6._0),
+					A2(_kirchner$elm_pat$Expr$compute, variables, _p6._1));
+			case 'Relative':
+				return A4(
+					_elm_lang$core$Maybe$map3,
+					F3(
+						function (v, p, q) {
+							return A2(
+								_elm_community$linear_algebra$Math_Vector2$add,
+								A2(_elm_community$linear_algebra$Math_Vector2$vec2, p, q),
+								v);
+						}),
+					lookUp(_p6._0),
+					A2(_kirchner$elm_pat$Expr$compute, variables, _p6._1),
+					A2(_kirchner$elm_pat$Expr$compute, variables, _p6._2));
+			case 'Distance':
+				var coords = F3(
+					function (anchorPosition, distance, angle) {
+						return A2(
+							_elm_community$linear_algebra$Math_Vector2$add,
+							anchorPosition,
+							A2(
+								_elm_community$linear_algebra$Math_Vector2$scale,
+								distance,
+								A2(
+									_elm_community$linear_algebra$Math_Vector2$vec2,
+									_elm_lang$core$Basics$cos(angle),
+									_elm_lang$core$Basics$sin(angle))));
+					});
+				return A4(
+					_elm_lang$core$Maybe$map3,
+					coords,
+					lookUp(_p6._0),
+					A2(_kirchner$elm_pat$Expr$compute, variables, _p6._1),
+					A2(_kirchner$elm_pat$Expr$compute, variables, _p6._2));
+			default:
+				return A3(
+					_elm_lang$core$Maybe$map2,
+					F2(
+						function (v, w) {
+							return A2(
+								_elm_community$linear_algebra$Math_Vector2$add,
+								w,
+								A2(
+									_elm_community$linear_algebra$Math_Vector2$scale,
+									_p6._2,
+									A2(_elm_community$linear_algebra$Math_Vector2$sub, w, v)));
+						}),
+					lookUp(_p6._0),
+					lookUp(_p6._1));
+		}
+	});
+var _kirchner$elm_pat$Point$positionById = F3(
+	function (store, variables, id) {
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			A2(_kirchner$elm_pat$Point$position, store, variables),
+			A2(_kirchner$elm_pat$Store$get, id, store));
+	});
+var _kirchner$elm_pat$Point$dispatch = F2(
+	function (handlers, _p7) {
+		var _p8 = _p7;
+		var _p10 = _p8;
+		var _p9 = _p8._0.data;
+		switch (_p9.ctor) {
+			case 'Absolute':
+				return A3(handlers.withAbsolute, _p10, _p9._0, _p9._1);
+			case 'Relative':
+				return A4(handlers.withRelative, _p10, _p9._0, _p9._1, _p9._2);
+			case 'Distance':
+				return A4(handlers.withDistance, _p10, _p9._0, _p9._1, _p9._2);
+			default:
+				return A4(handlers.withBetween, _p10, _p9._0, _p9._1, _p9._2);
+		}
+	});
+var _kirchner$elm_pat$Point$name = function (_p11) {
+	var _p12 = _p11;
+	return _p12._0.name;
+};
+var _kirchner$elm_pat$Point$Handlers = F4(
+	function (a, b, c, d) {
+		return {withAbsolute: a, withRelative: b, withDistance: c, withBetween: d};
+	});
+var _kirchner$elm_pat$Point$Point = function (a) {
+	return {ctor: 'Point', _0: a};
+};
+var _kirchner$elm_pat$Point$setName = F2(
+	function (name, _p13) {
+		var _p14 = _p13;
+		return _kirchner$elm_pat$Point$Point(
+			_elm_lang$core$Native_Utils.update(
+				_p14._0,
+				{name: name}));
+	});
+var _kirchner$elm_pat$Point$Between = F3(
+	function (a, b, c) {
+		return {ctor: 'Between', _0: a, _1: b, _2: c};
+	});
+var _kirchner$elm_pat$Point$between = F3(
+	function (first, last, ratio) {
+		return _kirchner$elm_pat$Point$Point(
+			{
+				name: '',
+				data: A3(_kirchner$elm_pat$Point$Between, first, last, ratio)
+			});
+	});
+var _kirchner$elm_pat$Point$Distance = F3(
+	function (a, b, c) {
+		return {ctor: 'Distance', _0: a, _1: b, _2: c};
+	});
+var _kirchner$elm_pat$Point$distance = F3(
+	function (id, angle, distance) {
+		return _kirchner$elm_pat$Point$Point(
+			{
+				name: '',
+				data: A3(_kirchner$elm_pat$Point$Distance, id, angle, distance)
+			});
+	});
+var _kirchner$elm_pat$Point$Relative = F3(
+	function (a, b, c) {
+		return {ctor: 'Relative', _0: a, _1: b, _2: c};
+	});
+var _kirchner$elm_pat$Point$relative = F3(
+	function (id, x, y) {
+		return _kirchner$elm_pat$Point$Point(
+			{
+				name: '',
+				data: A3(_kirchner$elm_pat$Point$Relative, id, x, y)
+			});
+	});
+var _kirchner$elm_pat$Point$Absolute = F2(
+	function (a, b) {
+		return {ctor: 'Absolute', _0: a, _1: b};
+	});
+var _kirchner$elm_pat$Point$absolute = F2(
+	function (x, y) {
+		return _kirchner$elm_pat$Point$Point(
+			{
+				name: '',
+				data: A2(_kirchner$elm_pat$Point$Absolute, x, y)
+			});
+	});
+var _kirchner$elm_pat$Point$decode = function () {
+	var nameDecoder = _elm_lang$core$Json_Decode$string;
+	var dataDecoder = A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (tag) {
+			var _p15 = tag;
+			switch (_p15) {
+				case 'absolute':
+					return A3(
+						_elm_lang$core$Json_Decode$map2,
+						_kirchner$elm_pat$Point$Absolute,
+						A2(
+							_elm_lang$core$Json_Decode$at,
+							{
+								ctor: '::',
+								_0: 'e0',
+								_1: {ctor: '[]'}
+							},
+							_kirchner$elm_pat$Expr$decode),
+						A2(
+							_elm_lang$core$Json_Decode$at,
+							{
+								ctor: '::',
+								_0: 'e1',
+								_1: {ctor: '[]'}
+							},
+							_kirchner$elm_pat$Expr$decode));
+				case 'relative':
+					return A4(
+						_elm_lang$core$Json_Decode$map3,
+						_kirchner$elm_pat$Point$Relative,
+						A2(
+							_elm_lang$core$Json_Decode$at,
+							{
+								ctor: '::',
+								_0: 'id',
+								_1: {ctor: '[]'}
+							},
+							_kirchner$elm_pat$Store$decodeId),
+						A2(
+							_elm_lang$core$Json_Decode$at,
+							{
+								ctor: '::',
+								_0: 'e0',
+								_1: {ctor: '[]'}
+							},
+							_kirchner$elm_pat$Expr$decode),
+						A2(
+							_elm_lang$core$Json_Decode$at,
+							{
+								ctor: '::',
+								_0: 'e1',
+								_1: {ctor: '[]'}
+							},
+							_kirchner$elm_pat$Expr$decode));
+				case 'distance':
+					return A4(
+						_elm_lang$core$Json_Decode$map3,
+						_kirchner$elm_pat$Point$Distance,
+						A2(
+							_elm_lang$core$Json_Decode$at,
+							{
+								ctor: '::',
+								_0: 'id',
+								_1: {ctor: '[]'}
+							},
+							_kirchner$elm_pat$Store$decodeId),
+						A2(
+							_elm_lang$core$Json_Decode$at,
+							{
+								ctor: '::',
+								_0: 'e0',
+								_1: {ctor: '[]'}
+							},
+							_kirchner$elm_pat$Expr$decode),
+						A2(
+							_elm_lang$core$Json_Decode$at,
+							{
+								ctor: '::',
+								_0: 'e1',
+								_1: {ctor: '[]'}
+							},
+							_kirchner$elm_pat$Expr$decode));
+				case 'between':
+					return A4(
+						_elm_lang$core$Json_Decode$map3,
+						_kirchner$elm_pat$Point$Between,
+						A2(
+							_elm_lang$core$Json_Decode$at,
+							{
+								ctor: '::',
+								_0: 'id0',
+								_1: {ctor: '[]'}
+							},
+							_kirchner$elm_pat$Store$decodeId),
+						A2(
+							_elm_lang$core$Json_Decode$at,
+							{
+								ctor: '::',
+								_0: 'id1',
+								_1: {ctor: '[]'}
+							},
+							_kirchner$elm_pat$Store$decodeId),
+						A2(
+							_elm_lang$core$Json_Decode$at,
+							{
+								ctor: '::',
+								_0: 'ratio',
+								_1: {ctor: '[]'}
+							},
+							_elm_lang$core$Json_Decode$float));
+				default:
+					return _elm_lang$core$Json_Decode$fail('decodePoint: mailformed input');
+			}
+		},
+		A2(
+			_elm_lang$core$Json_Decode$at,
+			{
+				ctor: '::',
+				_0: 'tag',
+				_1: {ctor: '[]'}
+			},
+			_elm_lang$core$Json_Decode$string));
+	return A3(
+		_elm_lang$core$Json_Decode$map2,
+		F2(
+			function (name, data) {
+				return _kirchner$elm_pat$Point$Point(
+					{name: name, data: data});
+			}),
+		A2(
+			_elm_lang$core$Json_Decode$at,
+			{
+				ctor: '::',
+				_0: 'name',
+				_1: {ctor: '[]'}
+			},
+			nameDecoder),
+		A2(
+			_elm_lang$core$Json_Decode$at,
+			{
+				ctor: '::',
+				_0: 'data',
+				_1: {ctor: '[]'}
+			},
+			dataDecoder));
+}();
+
+var _kirchner$elm_pat$Piece$insertBefore = F5(
+	function (store, variables, $new, reference, piece) {
+		return _elm_lang$core$Native_Utils.crash(
+			'Piece',
+			{
+				start: {line: 90, column: 5},
+				end: {line: 90, column: 16}
+			})('implement insertBefore');
+	});
+var _kirchner$elm_pat$Piece$nextHelper = F3(
+	function (firstId, id, points) {
+		nextHelper:
+		while (true) {
+			var _p0 = points;
+			if (_p0.ctor === '::') {
+				if (_p0._1.ctor === '::') {
+					var _p1 = _p0._1._0;
+					if (_elm_lang$core$Native_Utils.eq(id, _p0._0)) {
+						return _elm_lang$core$Maybe$Just(_p1);
+					} else {
+						var _v1 = firstId,
+							_v2 = id,
+							_v3 = {ctor: '::', _0: _p1, _1: _p0._1._1};
+						firstId = _v1;
+						id = _v2;
+						points = _v3;
+						continue nextHelper;
+					}
+				} else {
+					return _elm_lang$core$Native_Utils.eq(id, _p0._0) ? _elm_lang$core$Maybe$Just(firstId) : _elm_lang$core$Maybe$Nothing;
+				}
+			} else {
+				return _elm_lang$core$Maybe$Nothing;
+			}
+		}
+	});
+var _kirchner$elm_pat$Piece$next = F2(
+	function (id, _p2) {
+		var _p3 = _p2;
+		return A3(_kirchner$elm_pat$Piece$nextHelper, id, id, _p3._0.points);
+	});
+var _kirchner$elm_pat$Piece$toList = function (_p4) {
+	var _p5 = _p4;
+	return _p5._0.points;
+};
+var _kirchner$elm_pat$Piece$encode = function (piece) {
+	return _elm_lang$core$Json_Encode$list(
+		A2(
+			_elm_lang$core$List$map,
+			_kirchner$elm_pat$Store$encodeId,
+			_kirchner$elm_pat$Piece$toList(piece)));
+};
+var _kirchner$elm_pat$Piece$Piece = function (a) {
+	return {ctor: 'Piece', _0: a};
+};
+var _kirchner$elm_pat$Piece$fromList = F3(
+	function (store, variables, points) {
+		var pointCount = _elm_lang$core$List$length(points);
+		var positions = A2(
+			_elm_lang$core$List$filterMap,
+			A2(_kirchner$elm_pat$Point$positionById, store, variables),
+			points);
+		return (_elm_lang$core$Native_Utils.eq(pointCount, 0) || (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$List$length(positions),
+			pointCount) < 0)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
+			_kirchner$elm_pat$Piece$Piece(
+				{points: points}));
+	});
+var _kirchner$elm_pat$Piece$insertAfter = F5(
+	function (store, variables, $new, reference, _p6) {
+		var _p7 = _p6;
+		var insert = F2(
+			function (id, list) {
+				return _elm_lang$core$Native_Utils.eq(id, reference) ? {
+					ctor: '::',
+					_0: $new,
+					_1: {ctor: '::', _0: id, _1: list}
+				} : {ctor: '::', _0: id, _1: list};
+			});
+		var newPoints = A3(
+			_elm_lang$core$List$foldl,
+			insert,
+			{ctor: '[]'},
+			_p7._0.points);
+		return _kirchner$elm_pat$Piece$Piece(
+			{points: newPoints});
+	});
+var _kirchner$elm_pat$Piece$decode = A2(
+	_elm_lang$core$Json_Decode$map,
+	function (points) {
+		return _kirchner$elm_pat$Piece$Piece(
+			{points: points});
+	},
+	_elm_lang$core$Json_Decode$list(_kirchner$elm_pat$Store$decodeId));
+
+var _kirchner$elm_pat$Svg_Extra$label = function (options) {
+	return _elm_lang$svg$Svg$text_(
+		{
+			ctor: '::',
+			_0: _elm_lang$svg$Svg_Attributes$fontSize('14px'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$color(_kirchner$elm_pat$Styles_Colors$base0),
+				_1: options
+			}
+		});
+};
+var _kirchner$elm_pat$Svg_Extra$defaultArcConfig = {radius: 65, label: true};
+var _kirchner$elm_pat$Svg_Extra$translate2 = F2(
+	function (x, y) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			'translate(',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(x),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					',',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(y),
+						')'))));
+	});
+var _kirchner$elm_pat$Svg_Extra$translate = function (u) {
+	return A2(
+		_kirchner$elm_pat$Svg_Extra$translate2,
+		_elm_community$linear_algebra$Math_Vector2$getX(u),
+		_elm_community$linear_algebra$Math_Vector2$getY(u));
+};
+var _kirchner$elm_pat$Svg_Extra$drawAngleArc = F3(
+	function (config, anchorPosition, pointPosition) {
+		var format = _cuducos$elm_format_number$FormatNumber$format(
+			{decimals: 2, thousandSeparator: ' ', decimalSeparator: '.'});
+		var v = A2(_elm_community$linear_algebra$Math_Vector2$sub, pointPosition, anchorPosition);
+		var radians = 0 - A2(
+			_elm_lang$core$Basics$atan2,
+			_elm_community$linear_algebra$Math_Vector2$getY(v),
+			_elm_community$linear_algebra$Math_Vector2$getX(v));
+		var a = A2(
+			_elm_community$linear_algebra$Math_Vector2$scale,
+			config.radius,
+			A2(
+				_elm_community$linear_algebra$Math_Vector2$vec2,
+				_elm_lang$core$Basics$cos(radians),
+				0 - _elm_lang$core$Basics$sin(radians)));
+		var _p0 = {
+			ctor: '_Tuple2',
+			_0: _elm_community$linear_algebra$Math_Vector2$getX(a),
+			_1: _elm_community$linear_algebra$Math_Vector2$getY(a)
+		};
+		var x = _p0._0;
+		var y = _p0._1;
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$transform(
+					_kirchner$elm_pat$Svg_Extra$translate(anchorPosition)),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$svg$Svg$path,
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$d(
+							A2(
+								_elm_lang$core$String$join,
+								' ',
+								{
+									ctor: '::',
+									_0: 'M0,0',
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$core$Basics_ops['++'],
+											'h',
+											_elm_lang$core$Basics$toString(config.radius)),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$core$Basics_ops['++'],
+												'A',
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													_elm_lang$core$Basics$toString(config.radius),
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														',',
+														_elm_lang$core$Basics$toString(config.radius)))),
+											_1: {
+												ctor: '::',
+												_0: (_elm_lang$core$Native_Utils.cmp(radians, 0) < 0) ? '0 0,1' : '0 0,0',
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$core$Basics_ops['++'],
+														_elm_lang$core$Basics$toString(x),
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															',',
+															_elm_lang$core$Basics$toString(y))),
+													_1: {
+														ctor: '::',
+														_0: 'z',
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										}
+									}
+								})),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base0),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_kirchner$elm_pat$Svg_Extra$label,
+						{
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$transform(
+								_kirchner$elm_pat$Svg_Extra$translate(
+									A2(_elm_community$linear_algebra$Math_Vector2$vec2, 10, -10))),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$svg$Svg$text(
+								format((180 * radians) / _elm_lang$core$Basics$pi)),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _kirchner$elm_pat$Svg_Extra$drawVerticalLine = function (x) {
+	return A2(
+		_elm_lang$svg$Svg$line,
+		{
+			ctor: '::',
+			_0: _elm_lang$svg$Svg_Attributes$x1(
+				_elm_lang$core$Basics$toString(x)),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$y1('-1000'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$x2(
+						_elm_lang$core$Basics$toString(x)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$y2('1000'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		{ctor: '[]'});
+};
+var _kirchner$elm_pat$Svg_Extra$drawHorizontalLine = function (y) {
+	return A2(
+		_elm_lang$svg$Svg$line,
+		{
+			ctor: '::',
+			_0: _elm_lang$svg$Svg_Attributes$x1('-1000'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$y1(
+					_elm_lang$core$Basics$toString(y)),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$x2('1000'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$y2(
+							_elm_lang$core$Basics$toString(y)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		{ctor: '[]'});
+};
+var _kirchner$elm_pat$Svg_Extra$drawLineSegmentWith = F3(
+	function (callback, v, w) {
+		var line = A3(_elm_lang$core$Basics$flip, _elm_community$linear_algebra$Math_Vector2$sub, v, w);
+		var length = _elm_community$linear_algebra$Math_Vector2$length(line);
+		var angle = (A2(
+			_elm_lang$core$Basics$atan2,
+			_elm_community$linear_algebra$Math_Vector2$getY(line),
+			_elm_community$linear_algebra$Math_Vector2$getX(line)) * 180) / _elm_lang$core$Basics$pi;
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$svg$Svg$line,
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$x1(
+							_elm_lang$core$Basics$toString(
+								_elm_community$linear_algebra$Math_Vector2$getX(v))),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$y1(
+								_elm_lang$core$Basics$toString(
+									_elm_community$linear_algebra$Math_Vector2$getY(v))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$x2(
+									_elm_lang$core$Basics$toString(
+										_elm_community$linear_algebra$Math_Vector2$getX(w))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$y2(
+										_elm_lang$core$Basics$toString(
+											_elm_community$linear_algebra$Math_Vector2$getY(w))),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$blue),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$svg$Svg$rect,
+						{
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$x(
+								_elm_lang$core$Basics$toString(
+									_elm_community$linear_algebra$Math_Vector2$getX(v) - 5)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$y(
+									_elm_lang$core$Basics$toString(
+										_elm_community$linear_algebra$Math_Vector2$getY(v) - 5)),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$width(
+										_elm_lang$core$Basics$toString(length + 10)),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$height('10'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Events$onClick(callback),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$virtual_dom$VirtualDom$attribute,
+															'transform-origin',
+															A2(
+																_elm_lang$core$Basics_ops['++'],
+																_elm_lang$core$Basics$toString(
+																	_elm_community$linear_algebra$Math_Vector2$getX(v)),
+																A2(
+																	_elm_lang$core$Basics_ops['++'],
+																	'px ',
+																	A2(
+																		_elm_lang$core$Basics_ops['++'],
+																		_elm_lang$core$Basics$toString(
+																			_elm_community$linear_algebra$Math_Vector2$getY(v)),
+																		'px')))),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$svg$Svg_Attributes$transform(
+																A2(
+																	_elm_lang$core$Basics_ops['++'],
+																	'rotate(',
+																	A2(
+																		_elm_lang$core$Basics_ops['++'],
+																		_elm_lang$core$Basics$toString(angle),
+																		')'))),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _kirchner$elm_pat$Svg_Extra$drawLineSegment = F2(
+	function (v, w) {
+		return A2(
+			_elm_lang$svg$Svg$line,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$x1(
+					_elm_lang$core$Basics$toString(
+						_elm_community$linear_algebra$Math_Vector2$getX(v))),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$y1(
+						_elm_lang$core$Basics$toString(
+							_elm_community$linear_algebra$Math_Vector2$getY(v))),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$x2(
+							_elm_lang$core$Basics$toString(
+								_elm_community$linear_algebra$Math_Vector2$getX(w))),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$y2(
+								_elm_lang$core$Basics$toString(
+									_elm_community$linear_algebra$Math_Vector2$getY(w))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$blue),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			},
+			{ctor: '[]'});
+	});
+var _kirchner$elm_pat$Svg_Extra$drawArrow = F2(
+	function (v, w) {
+		return A2(
+			_elm_lang$svg$Svg$line,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$x1(
+					_elm_lang$core$Basics$toString(
+						_elm_community$linear_algebra$Math_Vector2$getX(v))),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$y1(
+						_elm_lang$core$Basics$toString(
+							_elm_community$linear_algebra$Math_Vector2$getY(v))),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$x2(
+							_elm_lang$core$Basics$toString(
+								_elm_community$linear_algebra$Math_Vector2$getX(w))),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$y2(
+								_elm_lang$core$Basics$toString(
+									_elm_community$linear_algebra$Math_Vector2$getY(w))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			{ctor: '[]'});
+	});
+var _kirchner$elm_pat$Svg_Extra$drawRectArrow = F2(
+	function (v, w) {
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_kirchner$elm_pat$Svg_Extra$drawArrow,
+					v,
+					A2(
+						_elm_community$linear_algebra$Math_Vector2$vec2,
+						_elm_community$linear_algebra$Math_Vector2$getX(w),
+						_elm_community$linear_algebra$Math_Vector2$getY(v))),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_kirchner$elm_pat$Svg_Extra$drawArrow,
+						A2(
+							_elm_community$linear_algebra$Math_Vector2$vec2,
+							_elm_community$linear_algebra$Math_Vector2$getX(w),
+							_elm_community$linear_algebra$Math_Vector2$getY(v)),
+						w),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _kirchner$elm_pat$Svg_Extra$drawSelector = F3(
+	function (strokeStyle, color, v) {
+		return A2(
+			_elm_lang$svg$Svg$circle,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$cx(
+					_elm_lang$core$Basics$toString(
+						_elm_community$linear_algebra$Math_Vector2$getX(v))),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$cy(
+						_elm_lang$core$Basics$toString(
+							_elm_community$linear_algebra$Math_Vector2$getY(v))),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$r('7'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$stroke(color),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$fill('none'),
+									_1: {
+										ctor: '::',
+										_0: function () {
+											var _p1 = strokeStyle;
+											if (_p1.ctor === 'Dashed') {
+												return _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5');
+											} else {
+												return _elm_lang$svg$Svg_Attributes$strokeDasharray('none');
+											}
+										}(),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			{ctor: '[]'});
+	});
+var _kirchner$elm_pat$Svg_Extra$drawPoint = F2(
+	function (color, v) {
+		return A2(
+			_elm_lang$svg$Svg$circle,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$cx(
+					_elm_lang$core$Basics$toString(
+						_elm_community$linear_algebra$Math_Vector2$getX(v))),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$cy(
+						_elm_lang$core$Basics$toString(
+							_elm_community$linear_algebra$Math_Vector2$getY(v))),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$r('3.5'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$fill(color),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			},
+			{ctor: '[]'});
+	});
+var _kirchner$elm_pat$Svg_Extra$ArcConfig = F2(
+	function (a, b) {
+		return {radius: a, label: b};
+	});
+var _kirchner$elm_pat$Svg_Extra$Solid = {ctor: 'Solid'};
+var _kirchner$elm_pat$Svg_Extra$Dashed = {ctor: 'Dashed'};
+
+var _kirchner$elm_pat$Types$equals = F2(
+	function (maybe, a) {
+		var _p0 = maybe;
+		if (_p0.ctor === 'Just') {
+			return _elm_lang$core$Native_Utils.eq(a, _p0._0) ? true : false;
+		} else {
+			return false;
+		}
+	});
+var _kirchner$elm_pat$Types$vec = F2(
+	function (x, y) {
+		return A2(
+			_elm_community$linear_algebra$Math_Vector2$vec2,
+			_elm_lang$core$Basics$toFloat(x),
+			_elm_lang$core$Basics$toFloat(y));
+	});
+var _kirchner$elm_pat$Types$svgToCanvas = F2(
+	function (viewPort, p) {
+		return {x: p.x + viewPort.x, y: p.y + viewPort.y};
+	});
+var _kirchner$elm_pat$Types$canvasToSvg = F2(
+	function (viewPort, p) {
+		return {x: p.x - viewPort.x, y: p.y - viewPort.y};
+	});
+var _kirchner$elm_pat$Types$toVec = function (p) {
+	return A2(
+		_elm_community$linear_algebra$Math_Vector2$vec2,
+		_elm_lang$core$Basics$toFloat(p.x),
+		_elm_lang$core$Basics$toFloat(p.y));
+};
+var _kirchner$elm_pat$Types$Position = F2(
+	function (a, b) {
+		return {x: a, y: b};
+	});
+var _kirchner$elm_pat$Types$ViewPort = F4(
+	function (a, b, c, d) {
+		return {x: a, y: b, width: c, height: d};
+	});
+
+var _kirchner$elm_pat$Events$positionDecoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_kirchner$elm_pat$Types$Position,
+	A2(_elm_lang$core$Json_Decode$field, 'offsetX', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'offsetY', _elm_lang$core$Json_Decode$int));
+var _kirchner$elm_pat$Events$onMouseDown = function (tagger) {
+	return A2(
+		_elm_lang$virtual_dom$VirtualDom$on,
+		'mousedown',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _kirchner$elm_pat$Events$positionDecoder));
+};
+var _kirchner$elm_pat$Events$onMove = function (tagger) {
+	return A2(
+		_elm_lang$virtual_dom$VirtualDom$on,
+		'mousemove',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _kirchner$elm_pat$Events$positionDecoder));
+};
+var _kirchner$elm_pat$Events$onClick = function (tagger) {
+	return A2(
+		_elm_lang$virtual_dom$VirtualDom$on,
+		'click',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _kirchner$elm_pat$Events$positionDecoder));
+};
+
+var _kirchner$elm_pat$Tools_Styles$rem = _rtfeldman$elm_css$Css$rem;
+var _kirchner$elm_pat$Tools_Styles$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('tool__');
+var _kirchner$elm_pat$Tools_Styles$id = _kirchner$elm_pat$Tools_Styles$_p0.id;
+var _kirchner$elm_pat$Tools_Styles$class = _kirchner$elm_pat$Tools_Styles$_p0.$class;
+var _kirchner$elm_pat$Tools_Styles$classList = _kirchner$elm_pat$Tools_Styles$_p0.classList;
+var _kirchner$elm_pat$Tools_Styles$MenuItemSelected = {ctor: 'MenuItemSelected'};
+var _kirchner$elm_pat$Tools_Styles$MenuItem = {ctor: 'MenuItem'};
+var _kirchner$elm_pat$Tools_Styles$MenuList = {ctor: 'MenuList'};
+var _kirchner$elm_pat$Tools_Styles$MenuTextfield = {ctor: 'MenuTextfield'};
+var _kirchner$elm_pat$Tools_Styles$MenuContainer = {ctor: 'MenuContainer'};
+var _kirchner$elm_pat$Tools_Styles$Button = {ctor: 'Button'};
+var _kirchner$elm_pat$Tools_Styles$IconContainer = {ctor: 'IconContainer'};
+var _kirchner$elm_pat$Tools_Styles$Textfield = {ctor: 'Textfield'};
+var _kirchner$elm_pat$Tools_Styles$ValueContainer = {ctor: 'ValueContainer'};
+var _kirchner$elm_pat$Tools_Styles$ToolBox = {ctor: 'ToolBox'};
+var _kirchner$elm_pat$Tools_Styles$css = function (_p1) {
+	return _rtfeldman$elm_css$Css$stylesheet(
+		A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'tool__', _p1));
+}(
+	{
+		ctor: '::',
+		_0: A2(
+			_rtfeldman$elm_css$Css$class,
+			_kirchner$elm_pat$Tools_Styles$ToolBox,
+			{
+				ctor: '::',
+				_0: _rtfeldman$elm_css$Css$backgroundColor(
+					_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base2)),
+				_1: {
+					ctor: '::',
+					_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'auto'),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$displayFlex,
+						_1: {ctor: '[]'}
+					}
+				}
+			}),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_rtfeldman$elm_css$Css$class,
+				_kirchner$elm_pat$Tools_Styles$ValueContainer,
+				{
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$displayFlex,
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$paddingLeft(
+								_kirchner$elm_pat$Tools_Styles$rem(0.3)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$paddingRight(
+									_kirchner$elm_pat$Tools_Styles$rem(0.3)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$margin(
+										_rtfeldman$elm_css$Css$px(2)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$border(_rtfeldman$elm_css$Css$zero),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$hover(
+												{
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$margin(_rtfeldman$elm_css$Css$zero),
+													_1: {
+														ctor: '::',
+														_0: A3(
+															_rtfeldman$elm_css$Css$border3,
+															_rtfeldman$elm_css$Css$px(2),
+															_rtfeldman$elm_css$Css$solid,
+															_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+														_1: {ctor: '[]'}
+													}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_rtfeldman$elm_css$Css$class,
+					_kirchner$elm_pat$Tools_Styles$Textfield,
+					{
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$borderColor(_rtfeldman$elm_css$Css$transparent),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$fontFamily(_rtfeldman$elm_css$Css$monospace),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$fontSize(
+									_kirchner$elm_pat$Tools_Styles$rem(1)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$lineHeight(
+										_kirchner$elm_pat$Tools_Styles$rem(1)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$width(
+											_kirchner$elm_pat$Tools_Styles$rem(20)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$backgroundColor(_rtfeldman$elm_css$Css$transparent),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$focus(
+													{
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$outline(_rtfeldman$elm_css$Css$none),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_rtfeldman$elm_css$Css$class,
+						_kirchner$elm_pat$Tools_Styles$IconContainer,
+						{
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$right(
+									_kirchner$elm_pat$Tools_Styles$rem(0.3)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$height(
+										_rtfeldman$elm_css$Css$pct(100)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$displayFlex,
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$flexFlow1(_rtfeldman$elm_css$Css$column),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$justifyContent(_rtfeldman$elm_css$Css$spaceAround),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_rtfeldman$elm_css$Css$class,
+							_kirchner$elm_pat$Tools_Styles$Button,
+							{
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$width(
+										_kirchner$elm_pat$Tools_Styles$rem(10)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$height(
+											_kirchner$elm_pat$Tools_Styles$rem(2)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$lineHeight(
+												_kirchner$elm_pat$Tools_Styles$rem(2)),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$color(
+													_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$backgroundColor(
+														_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base03)),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$hover(
+																{
+																	ctor: '::',
+																	_0: _rtfeldman$elm_css$Css$backgroundColor(
+																		_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base02)),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_rtfeldman$elm_css$Css$class,
+								_kirchner$elm_pat$Tools_Styles$MenuContainer,
+								{
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$left(
+											_rtfeldman$elm_css$Css$px(-2)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$top(
+												_rtfeldman$elm_css$Css$pct(100)),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$maxHeight(
+													_kirchner$elm_pat$Tools_Styles$rem(6)),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$width(
+														_rtfeldman$elm_css$Css$pct(100)),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$margin(_rtfeldman$elm_css$Css$zero),
+														_1: {
+															ctor: '::',
+															_0: A3(
+																_rtfeldman$elm_css$Css$border3,
+																_rtfeldman$elm_css$Css$px(2),
+																_rtfeldman$elm_css$Css$solid,
+																_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_rtfeldman$elm_css$Css$class,
+									_kirchner$elm_pat$Tools_Styles$MenuTextfield,
+									{
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$width(
+											_kirchner$elm_pat$Tools_Styles$rem(10)),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_rtfeldman$elm_css$Css$class,
+										_kirchner$elm_pat$Tools_Styles$MenuList,
+										{
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$width(
+												_rtfeldman$elm_css$Css$pct(100)),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$backgroundColor(
+													_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base2)),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$listStyle(_rtfeldman$elm_css$Css$none),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$padding(_rtfeldman$elm_css$Css$zero),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$margin(_rtfeldman$elm_css$Css$zero),
+															_1: {
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css$fontFamily(_rtfeldman$elm_css$Css$monospace),
+																_1: {
+																	ctor: '::',
+																	_0: _rtfeldman$elm_css$Css$fontSize(
+																		_kirchner$elm_pat$Tools_Styles$rem(1)),
+																	_1: {
+																		ctor: '::',
+																		_0: _rtfeldman$elm_css$Css$lineHeight(
+																			_kirchner$elm_pat$Tools_Styles$rem(1)),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_rtfeldman$elm_css$Css$class,
+											_kirchner$elm_pat$Tools_Styles$MenuItem,
+											{
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$padding(
+													_kirchner$elm_pat$Tools_Styles$rem(0.2)),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_rtfeldman$elm_css$Css$class,
+												_kirchner$elm_pat$Tools_Styles$MenuItemSelected,
+												{
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$backgroundColor(
+														_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+
+var _kirchner$elm_pat$Tools_Common$exprInput_ = F4(
+	function (autoFocus, name, e, callback) {
+		var deleteIcon = (!_elm_lang$core$Native_Utils.eq(e, _elm_lang$core$Maybe$Nothing)) ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _kirchner$elm_pat$Tools_Styles$class(
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Tools_Styles$IconContainer,
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_kirchner$elm_pat$Views_Common$iconSmall,
+						'delete',
+						callback('')),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		} : {ctor: '[]'};
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Tools_Styles$class(
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Tools_Styles$ValueContainer,
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onInput(callback),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$placeholder(
+									A2(
+										_elm_lang$core$Maybe$withDefault,
+										name,
+										A2(_elm_lang$core$Maybe$map, _kirchner$elm_pat$Expr$print, e))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$autofocus(autoFocus),
+									_1: {
+										ctor: '::',
+										_0: _kirchner$elm_pat$Tools_Styles$class(
+											{
+												ctor: '::',
+												_0: _kirchner$elm_pat$Tools_Styles$Textfield,
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				},
+				deleteIcon));
+	});
+var _kirchner$elm_pat$Tools_Common$exprInput = F3(
+	function (name, e, callback) {
+		var deleteIcon = (!_elm_lang$core$Native_Utils.eq(e, _elm_lang$core$Maybe$Nothing)) ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _kirchner$elm_pat$Tools_Styles$class(
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Tools_Styles$IconContainer,
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_kirchner$elm_pat$Views_Common$iconSmall,
+						'delete',
+						callback('')),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		} : {ctor: '[]'};
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Tools_Styles$class(
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Tools_Styles$ValueContainer,
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onInput(callback),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$placeholder(
+									A2(
+										_elm_lang$core$Maybe$withDefault,
+										name,
+										A2(_elm_lang$core$Maybe$map, _kirchner$elm_pat$Expr$print, e))),
+								_1: {
+									ctor: '::',
+									_0: _kirchner$elm_pat$Tools_Styles$class(
+										{
+											ctor: '::',
+											_0: _kirchner$elm_pat$Tools_Styles$Textfield,
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				},
+				deleteIcon));
+	});
+var _kirchner$elm_pat$Tools_Common$view = F5(
+	function (callbacks, data, state, point, elements) {
+		var addPoint = A2(
+			_elm_lang$core$Maybe$map,
+			callbacks.addPoint,
+			A2(point, data, state));
+		var button = function () {
+			var _p0 = addPoint;
+			if (_p0.ctor === 'Just') {
+				return {
+					ctor: '::',
+					_0: A2(_kirchner$elm_pat$Views_Common$iconSmall, 'add', _p0._0),
+					_1: {ctor: '[]'}
+				};
+			} else {
+				return {ctor: '[]'};
+			}
+		}();
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Tools_Styles$class(
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Tools_Styles$ToolBox,
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			elements);
+	});
+var _kirchner$elm_pat$Tools_Common$drawCursor = function (position) {
+	var _p1 = _elm_community$linear_algebra$Math_Vector2$toTuple(position);
+	var x = _p1._0;
+	var y = _p1._1;
+	return A2(
+		_elm_lang$svg$Svg$g,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_kirchner$elm_pat$Svg_Extra$drawPoint,
+				_kirchner$elm_pat$Styles_Colors$base0,
+				A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
+			_1: {
+				ctor: '::',
+				_0: A3(
+					_kirchner$elm_pat$Svg_Extra$drawSelector,
+					_kirchner$elm_pat$Svg_Extra$Solid,
+					_kirchner$elm_pat$Styles_Colors$base1,
+					A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _kirchner$elm_pat$Tools_Common$pointSelector_ = F4(
+	function (focusPoint, selectPoint, data, _p2) {
+		var _p3 = _p2;
+		var _p4 = _p3._0;
+		var draw = function (v) {
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$svg$Svg$circle,
+						{
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$cx(
+								_elm_lang$core$Basics$toString(
+									_elm_community$linear_algebra$Math_Vector2$getX(v))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$cy(
+									_elm_lang$core$Basics$toString(
+										_elm_community$linear_algebra$Math_Vector2$getY(v))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$r('5'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$svg$Svg_Events$onClick(
+													selectPoint(
+														_elm_lang$core$Maybe$Just(_p4))),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Events$onMouseOver(
+														focusPoint(
+															_elm_lang$core$Maybe$Just(_p4))),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Events$onMouseOut(
+															focusPoint(_elm_lang$core$Maybe$Nothing)),
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(_kirchner$elm_pat$Types$equals, data.focusedPoint, _p4) ? A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$red, v) : A2(
+							_elm_lang$svg$Svg$g,
+							{ctor: '[]'},
+							{ctor: '[]'}),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		return A2(
+			_elm_lang$core$Maybe$map,
+			draw,
+			A3(_kirchner$elm_pat$Point$position, data.store, data.variables, _p3._1));
+	});
+var _kirchner$elm_pat$Tools_Common$svgSelectPoint = F3(
+	function (focusPoint, selectPoint, data) {
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$List$filterMap,
+				A3(_kirchner$elm_pat$Tools_Common$pointSelector_, focusPoint, selectPoint, data),
+				_kirchner$elm_pat$Store$toList(data.store)));
+	});
+var _kirchner$elm_pat$Tools_Common$svgUpdateMouse = F3(
+	function (mouseClicked, updateCursorPosition, data) {
+		return A2(
+			_elm_lang$svg$Svg$rect,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				{
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$x(
+						_elm_lang$core$Basics$toString(data.viewPort.x)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$y(
+							_elm_lang$core$Basics$toString(data.viewPort.y)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$width(
+								_elm_lang$core$Basics$toString(data.viewPort.width)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$height(
+									_elm_lang$core$Basics$toString(data.viewPort.height)),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
+										_1: {
+											ctor: '::',
+											_0: _kirchner$elm_pat$Events$onMove(
+												function (_p5) {
+													return updateCursorPosition(
+														_elm_lang$core$Maybe$Just(_p5));
+												}),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$svg$Svg_Events$onMouseOut(
+													updateCursorPosition(_elm_lang$core$Maybe$Nothing)),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				_elm_community$maybe_extra$Maybe_Extra$toList(
+					A2(_elm_lang$core$Maybe$map, _elm_lang$svg$Svg_Events$onClick, mouseClicked))),
+			{ctor: '[]'});
+	});
+var _kirchner$elm_pat$Tools_Common$Data = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {store: a, pieceStore: b, variables: c, viewPort: d, cursorPosition: e, focusedPoint: f, pressedKeys: g, selectedPoints: h};
+	});
+var _kirchner$elm_pat$Tools_Common$Callbacks = F6(
+	function (a, b, c, d, e, f) {
+		return {addPoint: a, updateCursorPosition: b, focusPoint: c, selectPoint: d, clearSelection: e, extendPiece: f};
+	});
+
+var _kirchner$elm_pat$Tools_Absolute$verticalLine = F2(
+	function (data, state) {
+		return A2(
+			_elm_lang$core$Maybe$map,
+			_kirchner$elm_pat$Svg_Extra$drawVerticalLine,
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				_kirchner$elm_pat$Expr$compute(data.variables),
+				state.x));
+	});
+var _kirchner$elm_pat$Tools_Absolute$horizontalLine = F2(
+	function (data, state) {
+		return A2(
+			_elm_lang$core$Maybe$map,
+			_kirchner$elm_pat$Svg_Extra$drawHorizontalLine,
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				_kirchner$elm_pat$Expr$compute(data.variables),
+				state.y));
+	});
+var _kirchner$elm_pat$Tools_Absolute$newPoint = F2(
+	function (data, state) {
+		var yCursor = A2(
+			_elm_lang$core$Maybe$map,
+			function (_p0) {
+				var _p1 = _p0;
+				return _elm_lang$core$Basics$toFloat(_p1.y);
+			},
+			data.cursorPosition);
+		var xCursor = A2(
+			_elm_lang$core$Maybe$map,
+			function (_p2) {
+				var _p3 = _p2;
+				return _elm_lang$core$Basics$toFloat(_p3.x);
+			},
+			data.cursorPosition);
+		var yState = A2(
+			_elm_lang$core$Maybe$andThen,
+			_kirchner$elm_pat$Expr$compute(data.variables),
+			state.y);
+		var y = A2(_elm_community$maybe_extra$Maybe_Extra$or, yState, yCursor);
+		var xState = A2(
+			_elm_lang$core$Maybe$andThen,
+			_kirchner$elm_pat$Expr$compute(data.variables),
+			state.x);
+		var x = A2(_elm_community$maybe_extra$Maybe_Extra$or, xState, xCursor);
+		var draw = F2(
+			function (x, y) {
+				return A2(
+					_elm_lang$svg$Svg$g,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_kirchner$elm_pat$Svg_Extra$drawPoint,
+							_kirchner$elm_pat$Styles_Colors$red,
+							A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
+						_1: {
+							ctor: '::',
+							_0: A3(
+								_kirchner$elm_pat$Svg_Extra$drawSelector,
+								_kirchner$elm_pat$Svg_Extra$Solid,
+								_kirchner$elm_pat$Styles_Colors$red,
+								A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y)),
+							_1: {ctor: '[]'}
+						}
+					});
+			});
+		return A3(_elm_lang$core$Maybe$map2, draw, x, y);
+	});
+var _kirchner$elm_pat$Tools_Absolute$point = F2(
+	function (data, state) {
+		var yCursor = A2(
+			_elm_lang$core$Maybe$map,
+			function (_p4) {
+				var _p5 = _p4;
+				return _kirchner$elm_pat$Expr$Number(
+					_elm_lang$core$Basics$toFloat(_p5.y));
+			},
+			data.cursorPosition);
+		var y = A2(_elm_community$maybe_extra$Maybe_Extra$or, state.y, yCursor);
+		var xCursor = A2(
+			_elm_lang$core$Maybe$map,
+			function (_p6) {
+				var _p7 = _p6;
+				return _kirchner$elm_pat$Expr$Number(
+					_elm_lang$core$Basics$toFloat(_p7.x));
+			},
+			data.cursorPosition);
+		var x = A2(_elm_community$maybe_extra$Maybe_Extra$or, state.x, xCursor);
+		return A3(_elm_lang$core$Maybe$map2, _kirchner$elm_pat$Point$absolute, x, y);
+	});
+var _kirchner$elm_pat$Tools_Absolute$svg = F4(
+	function (callbacks, updateState, data, state) {
+		var addPoint = A2(
+			_elm_lang$core$Maybe$map,
+			callbacks.addPoint,
+			A2(_kirchner$elm_pat$Tools_Absolute$point, data, state));
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$List$filterMap,
+				_elm_lang$core$Basics$identity,
+				{
+					ctor: '::',
+					_0: A2(_kirchner$elm_pat$Tools_Absolute$newPoint, data, state),
+					_1: {
+						ctor: '::',
+						_0: A2(_kirchner$elm_pat$Tools_Absolute$horizontalLine, data, state),
+						_1: {
+							ctor: '::',
+							_0: A2(_kirchner$elm_pat$Tools_Absolute$verticalLine, data, state),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$core$Maybe$Just(
+									A3(_kirchner$elm_pat$Tools_Common$svgUpdateMouse, addPoint, callbacks.updateCursorPosition, data)),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}));
+	});
+var _kirchner$elm_pat$Tools_Absolute$view = F4(
+	function (callbacks, updateState, data, state) {
+		var updateY = function (_p8) {
+			return updateState(
+				function (s) {
+					return _elm_lang$core$Native_Utils.update(
+						state,
+						{
+							y: _kirchner$elm_pat$Expr$parse(s)
+						});
+				}(_p8));
+		};
+		var updateX = function (_p9) {
+			return updateState(
+				function (s) {
+					return _elm_lang$core$Native_Utils.update(
+						state,
+						{
+							x: _kirchner$elm_pat$Expr$parse(s)
+						});
+				}(_p9));
+		};
+		return A5(
+			_kirchner$elm_pat$Tools_Common$view,
+			callbacks,
+			data,
+			state,
+			_kirchner$elm_pat$Tools_Absolute$point,
+			{
+				ctor: '::',
+				_0: A3(_kirchner$elm_pat$Tools_Common$exprInput, 'x-coordinate', state.x, updateX),
+				_1: {
+					ctor: '::',
+					_0: A3(_kirchner$elm_pat$Tools_Common$exprInput, 'y-coordinate', state.y, updateY),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _kirchner$elm_pat$Tools_Absolute$initWith = F3(
+	function (id, x, y) {
+		return {
+			x: _elm_lang$core$Maybe$Just(x),
+			y: _elm_lang$core$Maybe$Just(y),
+			id: _elm_lang$core$Maybe$Just(id)
+		};
+	});
+var _kirchner$elm_pat$Tools_Absolute$init = {x: _elm_lang$core$Maybe$Nothing, y: _elm_lang$core$Maybe$Nothing, id: _elm_lang$core$Maybe$Nothing};
+var _kirchner$elm_pat$Tools_Absolute$State = F3(
+	function (a, b, c) {
+		return {x: a, y: b, id: c};
+	});
+
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$sectionConfig = function (_p0) {
+	var _p1 = _p0;
+	return {toId: _p1.toId, getData: _p1.getData, ul: _p1.ul, li: _p1.li};
+};
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewWithSectionsConfig = function (_p2) {
+	var _p3 = _p2;
+	return {toId: _p3.toId, ul: _p3.ul, li: _p3.li, section: _p3.section};
+};
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewConfig = function (_p4) {
+	var _p5 = _p4;
+	return {toId: _p5.toId, ul: _p5.ul, li: _p5.li};
+};
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$getPrevious = F3(
+	function (id, selectedId, resultId) {
+		return _elm_lang$core$Native_Utils.eq(selectedId, id) ? _elm_lang$core$Maybe$Just(id) : (_elm_lang$core$Native_Utils.eq(
+			A2(_elm_lang$core$Maybe$withDefault, '', resultId),
+			id) ? _elm_lang$core$Maybe$Just(selectedId) : resultId);
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$getNextItemId = F2(
+	function (ids, selectedId) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			selectedId,
+			A3(
+				_elm_lang$core$List$foldl,
+				_thebritican$elm_autocomplete$Autocomplete_Autocomplete$getPrevious(selectedId),
+				_elm_lang$core$Maybe$Nothing,
+				ids));
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$getPreviousItemId = F2(
+	function (ids, selectedId) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			selectedId,
+			A3(
+				_elm_lang$core$List$foldr,
+				_thebritican$elm_autocomplete$Autocomplete_Autocomplete$getPrevious(selectedId),
+				_elm_lang$core$Maybe$Nothing,
+				ids));
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$navigateWithKey = F3(
+	function (code, ids, maybeId) {
+		var _p6 = code;
+		switch (_p6) {
+			case 38:
+				return A2(
+					_elm_lang$core$Maybe$map,
+					_thebritican$elm_autocomplete$Autocomplete_Autocomplete$getPreviousItemId(ids),
+					maybeId);
+			case 40:
+				return A2(
+					_elm_lang$core$Maybe$map,
+					_thebritican$elm_autocomplete$Autocomplete_Autocomplete$getNextItemId(ids),
+					maybeId);
+			default:
+				return maybeId;
+		}
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$resetMouseStateWithId = F3(
+	function (separateSelections, id, state) {
+		return separateSelections ? {
+			key: state.key,
+			mouse: _elm_lang$core$Maybe$Just(id)
+		} : {
+			key: _elm_lang$core$Maybe$Just(id),
+			mouse: _elm_lang$core$Maybe$Just(id)
+		};
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$updateConfig = function (_p7) {
+	var _p8 = _p7;
+	return {toId: _p8.toId, onKeyDown: _p8.onKeyDown, onTooLow: _p8.onTooLow, onTooHigh: _p8.onTooHigh, onMouseEnter: _p8.onMouseEnter, onMouseLeave: _p8.onMouseLeave, onMouseClick: _p8.onMouseClick, separateSelections: _p8.separateSelections};
+};
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$empty = {key: _elm_lang$core$Maybe$Nothing, mouse: _elm_lang$core$Maybe$Nothing};
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$reset = F2(
+	function (_p10, _p9) {
+		var _p11 = _p10;
+		var _p12 = _p9;
+		return _p11.separateSelections ? {key: _elm_lang$core$Maybe$Nothing, mouse: _p12.mouse} : _thebritican$elm_autocomplete$Autocomplete_Autocomplete$empty;
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$resetToFirst = F3(
+	function (config, data, state) {
+		var _p13 = config;
+		var toId = _p13.toId;
+		var separateSelections = _p13.separateSelections;
+		var setFirstItem = F2(
+			function (datum, newState) {
+				return _elm_lang$core$Native_Utils.update(
+					newState,
+					{
+						key: _elm_lang$core$Maybe$Just(
+							toId(datum))
+					});
+			});
+		var _p14 = _elm_lang$core$List$head(data);
+		if (_p14.ctor === 'Nothing') {
+			return _thebritican$elm_autocomplete$Autocomplete_Autocomplete$empty;
+		} else {
+			var _p15 = _p14._0;
+			return separateSelections ? A2(
+				setFirstItem,
+				_p15,
+				A2(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$reset, config, state)) : A2(setFirstItem, _p15, _thebritican$elm_autocomplete$Autocomplete_Autocomplete$empty);
+		}
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$resetToFirstItem = F4(
+	function (config, data, howManyToShow, state) {
+		return A3(
+			_thebritican$elm_autocomplete$Autocomplete_Autocomplete$resetToFirst,
+			config,
+			A2(_elm_lang$core$List$take, howManyToShow, data),
+			state);
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$resetToLastItem = F4(
+	function (config, data, howManyToShow, state) {
+		var reversedData = _elm_lang$core$List$reverse(
+			A2(_elm_lang$core$List$take, howManyToShow, data));
+		return A3(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$resetToFirst, config, reversedData, state);
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$State = F2(
+	function (a, b) {
+		return {key: a, mouse: b};
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$UpdateConfig = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {onKeyDown: a, onTooLow: b, onTooHigh: c, onMouseEnter: d, onMouseLeave: e, onMouseClick: f, toId: g, separateSelections: h};
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$HtmlDetails = F2(
+	function (a, b) {
+		return {attributes: a, children: b};
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$ViewConfig = F3(
+	function (a, b, c) {
+		return {toId: a, ul: b, li: c};
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$ViewWithSectionsConfig = F4(
+	function (a, b, c, d) {
+		return {toId: a, ul: b, li: c, section: d};
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$SectionConfig = F4(
+	function (a, b, c, d) {
+		return {toId: a, getData: b, ul: c, li: d};
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$SectionNode = F3(
+	function (a, b, c) {
+		return {nodeType: a, attributes: b, children: c};
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$NoOp = {ctor: 'NoOp'};
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$mapNeverToMsg = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Attributes$map,
+		function (_p16) {
+			return _thebritican$elm_autocomplete$Autocomplete_Autocomplete$NoOp;
+		},
+		msg);
+};
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$MouseClick = function (a) {
+	return {ctor: 'MouseClick', _0: a};
+};
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$MouseLeave = function (a) {
+	return {ctor: 'MouseLeave', _0: a};
+};
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$MouseEnter = function (a) {
+	return {ctor: 'MouseEnter', _0: a};
+};
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewData = F3(
+	function (_p18, _p17, data) {
+		var _p19 = _p18;
+		var _p20 = _p17;
+		var id = _p19.toId(data);
+		var isSelected = function (maybeId) {
+			var _p21 = maybeId;
+			if (_p21.ctor === 'Just') {
+				return _elm_lang$core$Native_Utils.eq(_p21._0, id);
+			} else {
+				return false;
+			}
+		};
+		var listItemData = A3(
+			_p19.li,
+			isSelected(_p20.key),
+			isSelected(_p20.mouse),
+			data);
+		var customAttributes = A2(_elm_lang$core$List$map, _thebritican$elm_autocomplete$Autocomplete_Autocomplete$mapNeverToMsg, listItemData.attributes);
+		var customLiAttr = A2(
+			_elm_lang$core$List$append,
+			customAttributes,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onMouseEnter(
+					_thebritican$elm_autocomplete$Autocomplete_Autocomplete$MouseEnter(id)),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onMouseLeave(
+						_thebritican$elm_autocomplete$Autocomplete_Autocomplete$MouseLeave(id)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_thebritican$elm_autocomplete$Autocomplete_Autocomplete$MouseClick(id)),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+		return A2(
+			_elm_lang$html$Html$li,
+			customLiAttr,
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$html$Html$map(
+					function (html) {
+						return _thebritican$elm_autocomplete$Autocomplete_Autocomplete$NoOp;
+					}),
+				listItemData.children));
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewSection = F3(
+	function (config, state, section) {
+		var getKeyedItems = function (datum) {
+			return {
+				ctor: '_Tuple2',
+				_0: config.toId(datum),
+				_1: A3(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewData, config, state, datum)
+			};
+		};
+		var viewItemList = A2(
+			_elm_lang$html$Html_Keyed$ul,
+			A2(_elm_lang$core$List$map, _thebritican$elm_autocomplete$Autocomplete_Autocomplete$mapNeverToMsg, config.ul),
+			A2(
+				_elm_lang$core$List$map,
+				getKeyedItems,
+				config.section.getData(section)));
+		var sectionNode = config.section.li(section);
+		var attributes = A2(_elm_lang$core$List$map, _thebritican$elm_autocomplete$Autocomplete_Autocomplete$mapNeverToMsg, sectionNode.attributes);
+		var customChildren = A2(
+			_elm_lang$core$List$map,
+			_elm_lang$html$Html$map(
+				function (html) {
+					return _thebritican$elm_autocomplete$Autocomplete_Autocomplete$NoOp;
+				}),
+			sectionNode.children);
+		var children = A2(
+			_elm_lang$core$List$append,
+			customChildren,
+			{
+				ctor: '::',
+				_0: viewItemList,
+				_1: {ctor: '[]'}
+			});
+		return A2(
+			_elm_lang$html$Html$li,
+			attributes,
+			{
+				ctor: '::',
+				_0: A3(_elm_lang$html$Html$node, sectionNode.nodeType, attributes, children),
+				_1: {ctor: '[]'}
+			});
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewWithSections = F4(
+	function (config, howManyToShow, state, sections) {
+		var getKeyedItems = function (section) {
+			return {
+				ctor: '_Tuple2',
+				_0: config.section.toId(section),
+				_1: A3(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewSection, config, state, section)
+			};
+		};
+		return A2(
+			_elm_lang$html$Html_Keyed$ul,
+			A2(_elm_lang$core$List$map, _thebritican$elm_autocomplete$Autocomplete_Autocomplete$mapNeverToMsg, config.section.ul),
+			A2(_elm_lang$core$List$map, getKeyedItems, sections));
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewItem = F3(
+	function (_p23, _p22, data) {
+		var _p24 = _p23;
+		var _p25 = _p22;
+		var id = _p24.toId(data);
+		var isSelected = function (maybeId) {
+			var _p26 = maybeId;
+			if (_p26.ctor === 'Just') {
+				return _elm_lang$core$Native_Utils.eq(_p26._0, id);
+			} else {
+				return false;
+			}
+		};
+		var listItemData = A3(
+			_p24.li,
+			isSelected(_p25.key),
+			isSelected(_p25.mouse),
+			data);
+		var customAttributes = A2(_elm_lang$core$List$map, _thebritican$elm_autocomplete$Autocomplete_Autocomplete$mapNeverToMsg, listItemData.attributes);
+		var customLiAttr = A2(
+			_elm_lang$core$List$append,
+			customAttributes,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onMouseEnter(
+					_thebritican$elm_autocomplete$Autocomplete_Autocomplete$MouseEnter(id)),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onMouseLeave(
+						_thebritican$elm_autocomplete$Autocomplete_Autocomplete$MouseLeave(id)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_thebritican$elm_autocomplete$Autocomplete_Autocomplete$MouseClick(id)),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+		return A2(
+			_elm_lang$html$Html$li,
+			customLiAttr,
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$html$Html$map(
+					function (html) {
+						return _thebritican$elm_autocomplete$Autocomplete_Autocomplete$NoOp;
+					}),
+				listItemData.children));
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewList = F4(
+	function (config, howManyToShow, state, data) {
+		var getKeyedItems = function (datum) {
+			return {
+				ctor: '_Tuple2',
+				_0: config.toId(datum),
+				_1: A3(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewItem, config, state, datum)
+			};
+		};
+		var customUlAttr = A2(_elm_lang$core$List$map, _thebritican$elm_autocomplete$Autocomplete_Autocomplete$mapNeverToMsg, config.ul);
+		return A2(
+			_elm_lang$html$Html_Keyed$ul,
+			customUlAttr,
+			A2(
+				_elm_lang$core$List$map,
+				getKeyedItems,
+				A2(_elm_lang$core$List$take, howManyToShow, data)));
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$view = F4(
+	function (config, howManyToShow, state, data) {
+		return A4(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewList, config, howManyToShow, state, data);
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$WentTooHigh = {ctor: 'WentTooHigh'};
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$WentTooLow = {ctor: 'WentTooLow'};
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$update = F5(
+	function (config, msg, howManyToShow, state, data) {
+		update:
+		while (true) {
+			var _p27 = msg;
+			switch (_p27.ctor) {
+				case 'KeyDown':
+					var _p28 = _p27._0;
+					var boundedList = A2(
+						_elm_lang$core$List$take,
+						howManyToShow,
+						A2(_elm_lang$core$List$map, config.toId, data));
+					var newKey = A3(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$navigateWithKey, _p28, boundedList, state.key);
+					if (_elm_lang$core$Native_Utils.eq(newKey, state.key) && _elm_lang$core$Native_Utils.eq(_p28, 38)) {
+						var _v15 = config,
+							_v16 = _thebritican$elm_autocomplete$Autocomplete_Autocomplete$WentTooHigh,
+							_v17 = howManyToShow,
+							_v18 = state,
+							_v19 = data;
+						config = _v15;
+						msg = _v16;
+						howManyToShow = _v17;
+						state = _v18;
+						data = _v19;
+						continue update;
+					} else {
+						if (_elm_lang$core$Native_Utils.eq(newKey, state.key) && _elm_lang$core$Native_Utils.eq(_p28, 40)) {
+							var _v20 = config,
+								_v21 = _thebritican$elm_autocomplete$Autocomplete_Autocomplete$WentTooLow,
+								_v22 = howManyToShow,
+								_v23 = state,
+								_v24 = data;
+							config = _v20;
+							msg = _v21;
+							howManyToShow = _v22;
+							state = _v23;
+							data = _v24;
+							continue update;
+						} else {
+							if (config.separateSelections) {
+								return {
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
+										state,
+										{key: newKey}),
+									_1: A2(config.onKeyDown, _p28, newKey)
+								};
+							} else {
+								return {
+									ctor: '_Tuple2',
+									_0: {key: newKey, mouse: newKey},
+									_1: A2(config.onKeyDown, _p28, newKey)
+								};
+							}
+						}
+					}
+				case 'WentTooLow':
+					return {ctor: '_Tuple2', _0: state, _1: config.onTooLow};
+				case 'WentTooHigh':
+					return {ctor: '_Tuple2', _0: state, _1: config.onTooHigh};
+				case 'MouseEnter':
+					var _p29 = _p27._0;
+					return {
+						ctor: '_Tuple2',
+						_0: A3(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$resetMouseStateWithId, config.separateSelections, _p29, state),
+						_1: config.onMouseEnter(_p29)
+					};
+				case 'MouseLeave':
+					var _p30 = _p27._0;
+					return {
+						ctor: '_Tuple2',
+						_0: A3(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$resetMouseStateWithId, config.separateSelections, _p30, state),
+						_1: config.onMouseLeave(_p30)
+					};
+				case 'MouseClick':
+					var _p31 = _p27._0;
+					return {
+						ctor: '_Tuple2',
+						_0: A3(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$resetMouseStateWithId, config.separateSelections, _p31, state),
+						_1: config.onMouseClick(_p31)
+					};
+				default:
+					return {ctor: '_Tuple2', _0: state, _1: _elm_lang$core$Maybe$Nothing};
+			}
+		}
+	});
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$KeyDown = function (a) {
+	return {ctor: 'KeyDown', _0: a};
+};
+var _thebritican$elm_autocomplete$Autocomplete_Autocomplete$subscription = _elm_lang$keyboard$Keyboard$downs(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$KeyDown);
+
+var _thebritican$elm_autocomplete$Autocomplete$HtmlDetails = F2(
+	function (a, b) {
+		return {attributes: a, children: b};
+	});
+var _thebritican$elm_autocomplete$Autocomplete$SectionNode = F3(
+	function (a, b, c) {
+		return {nodeType: a, attributes: b, children: c};
+	});
+var _thebritican$elm_autocomplete$Autocomplete$State = function (a) {
+	return {ctor: 'State', _0: a};
+};
+var _thebritican$elm_autocomplete$Autocomplete$empty = _thebritican$elm_autocomplete$Autocomplete$State(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$empty);
+var _thebritican$elm_autocomplete$Autocomplete$reset = F2(
+	function (_p1, _p0) {
 		var _p2 = _p1;
-		var _p4 = _p2._1;
-		var _p3 = _p2._0;
-		var v = A3(_kirchner$elm_pat$Types$position, store, variables, _p4);
+		var _p3 = _p0;
+		return _thebritican$elm_autocomplete$Autocomplete$State(
+			A2(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$reset, _p2._0, _p3._0));
+	});
+var _thebritican$elm_autocomplete$Autocomplete$resetToFirstItem = F4(
+	function (_p5, data, howManyToShow, _p4) {
+		var _p6 = _p5;
+		var _p7 = _p4;
+		return _thebritican$elm_autocomplete$Autocomplete$State(
+			A4(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$resetToFirstItem, _p6._0, data, howManyToShow, _p7._0));
+	});
+var _thebritican$elm_autocomplete$Autocomplete$resetToLastItem = F4(
+	function (_p9, data, howManyToShow, _p8) {
+		var _p10 = _p9;
+		var _p11 = _p8;
+		return _thebritican$elm_autocomplete$Autocomplete$State(
+			A4(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$resetToLastItem, _p10._0, data, howManyToShow, _p11._0));
+	});
+var _thebritican$elm_autocomplete$Autocomplete$update = F5(
+	function (_p14, _p13, howManyToShow, _p12, data) {
+		var _p15 = _p14;
+		var _p16 = _p13;
+		var _p17 = _p12;
+		var _p18 = A5(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$update, _p15._0, _p16._0, howManyToShow, _p17._0, data);
+		var newState = _p18._0;
+		var maybeMsg = _p18._1;
+		return {
+			ctor: '_Tuple2',
+			_0: _thebritican$elm_autocomplete$Autocomplete$State(newState),
+			_1: maybeMsg
+		};
+	});
+var _thebritican$elm_autocomplete$Autocomplete$Msg = function (a) {
+	return {ctor: 'Msg', _0: a};
+};
+var _thebritican$elm_autocomplete$Autocomplete$subscription = A2(_elm_lang$core$Platform_Sub$map, _thebritican$elm_autocomplete$Autocomplete$Msg, _thebritican$elm_autocomplete$Autocomplete_Autocomplete$subscription);
+var _thebritican$elm_autocomplete$Autocomplete$view = F4(
+	function (_p20, howManyToShow, _p19, data) {
+		var _p21 = _p20;
+		var _p22 = _p19;
+		return A2(
+			_elm_lang$html$Html$map,
+			_thebritican$elm_autocomplete$Autocomplete$Msg,
+			A4(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$view, _p21._0, howManyToShow, _p22._0, data));
+	});
+var _thebritican$elm_autocomplete$Autocomplete$viewWithSections = F4(
+	function (_p24, howManyToShow, _p23, sections) {
+		var _p25 = _p24;
+		var _p26 = _p23;
+		return A2(
+			_elm_lang$html$Html$map,
+			_thebritican$elm_autocomplete$Autocomplete$Msg,
+			A4(_thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewWithSections, _p25._0, howManyToShow, _p26._0, sections));
+	});
+var _thebritican$elm_autocomplete$Autocomplete$UpdateConfig = function (a) {
+	return {ctor: 'UpdateConfig', _0: a};
+};
+var _thebritican$elm_autocomplete$Autocomplete$updateConfig = function (config) {
+	return _thebritican$elm_autocomplete$Autocomplete$UpdateConfig(
+		_thebritican$elm_autocomplete$Autocomplete_Autocomplete$updateConfig(config));
+};
+var _thebritican$elm_autocomplete$Autocomplete$ViewConfig = function (a) {
+	return {ctor: 'ViewConfig', _0: a};
+};
+var _thebritican$elm_autocomplete$Autocomplete$viewConfig = function (config) {
+	return _thebritican$elm_autocomplete$Autocomplete$ViewConfig(
+		_thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewConfig(config));
+};
+var _thebritican$elm_autocomplete$Autocomplete$ViewWithSectionsConfig = function (a) {
+	return {ctor: 'ViewWithSectionsConfig', _0: a};
+};
+var _thebritican$elm_autocomplete$Autocomplete$viewWithSectionsConfig = function (config) {
+	return _thebritican$elm_autocomplete$Autocomplete$ViewWithSectionsConfig(
+		function () {
+			var _p27 = config.section;
+			return _thebritican$elm_autocomplete$Autocomplete_Autocomplete$viewWithSectionsConfig(
+				_elm_lang$core$Native_Utils.update(
+					config,
+					{section: _p27._0}));
+		}());
+};
+var _thebritican$elm_autocomplete$Autocomplete$SectionConfig = function (a) {
+	return {ctor: 'SectionConfig', _0: a};
+};
+var _thebritican$elm_autocomplete$Autocomplete$sectionConfig = function (section) {
+	return _thebritican$elm_autocomplete$Autocomplete$SectionConfig(
+		_thebritican$elm_autocomplete$Autocomplete_Autocomplete$sectionConfig(section));
+};
+
+var _kirchner$elm_pat$Tools_Dropdown$pointEntry = F2(
+	function (id, point) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			'#',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(
+					_kirchner$elm_pat$Store$toInt(id)),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					': ',
+					_kirchner$elm_pat$Point$name(point))));
+	});
+var _kirchner$elm_pat$Tools_Dropdown$toId = function (_p0) {
+	var _p1 = _p0;
+	return _elm_lang$core$Basics$toString(
+		_kirchner$elm_pat$Store$toInt(_p1._0));
+};
+var _kirchner$elm_pat$Tools_Dropdown$viewConfig = _thebritican$elm_autocomplete$Autocomplete$viewConfig(
+	{
+		toId: _kirchner$elm_pat$Tools_Dropdown$toId,
+		ul: {
+			ctor: '::',
+			_0: _kirchner$elm_pat$Tools_Styles$class(
+				{
+					ctor: '::',
+					_0: _kirchner$elm_pat$Tools_Styles$MenuList,
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
+		li: F3(
+			function (keySelected, mouseSelected, _p2) {
+				var _p3 = _p2;
+				return {
+					attributes: {
+						ctor: '::',
+						_0: _kirchner$elm_pat$Tools_Styles$class(
+							{
+								ctor: '::',
+								_0: _kirchner$elm_pat$Tools_Styles$MenuItem,
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _kirchner$elm_pat$Tools_Styles$classList(
+								{
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: _kirchner$elm_pat$Tools_Styles$MenuItemSelected, _1: keySelected || mouseSelected},
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					},
+					children: {
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							A2(_kirchner$elm_pat$Tools_Dropdown$pointEntry, _p3._0, _p3._1)),
+						_1: {ctor: '[]'}
+					}
+				};
+			})
+	});
+var _kirchner$elm_pat$Tools_Dropdown$filteredPoints = F2(
+	function (query, data) {
+		var lowerQuery = _elm_lang$core$String$toLower(query);
+		var keepPoint = function (_p4) {
+			var _p5 = _p4;
+			return A2(
+				_elm_lang$core$String$contains,
+				lowerQuery,
+				_elm_lang$core$String$toLower(
+					A2(_kirchner$elm_pat$Tools_Dropdown$pointEntry, _p5._0, _p5._1)));
+		};
+		return A2(
+			_elm_lang$core$List$filter,
+			keepPoint,
+			_kirchner$elm_pat$Store$toList(data.store));
+	});
+var _kirchner$elm_pat$Tools_Dropdown$resetMenu = function (state) {
+	return _elm_lang$core$Native_Utils.update(
+		state,
+		{autoState: _thebritican$elm_autocomplete$Autocomplete$empty, showMenu: false});
+};
+var _kirchner$elm_pat$Tools_Dropdown$resetInput = function (state) {
+	return {
+		ctor: '_Tuple2',
+		_0: _kirchner$elm_pat$Tools_Dropdown$resetMenu(
+			_elm_lang$core$Native_Utils.update(
+				state,
+				{query: ''})),
+		_1: _elm_lang$core$Maybe$Nothing
+	};
+};
+var _kirchner$elm_pat$Tools_Dropdown$setQuery = F3(
+	function (data, state, idString) {
+		var maybeIdPoint = A2(
+			_elm_lang$core$Maybe$andThen,
+			function (id) {
+				return A2(
+					_elm_lang$core$Maybe$map,
+					function (point) {
+						return {
+							ctor: '_Tuple2',
+							_0: _kirchner$elm_pat$Store$fromInt(id),
+							_1: point
+						};
+					},
+					A2(
+						_kirchner$elm_pat$Store$get,
+						_kirchner$elm_pat$Store$fromInt(id),
+						data.store));
+			},
+			_elm_lang$core$Result$toMaybe(
+				_elm_lang$core$String$toInt(idString)));
+		var query = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (_p6) {
+					var _p7 = _p6;
+					return A2(_kirchner$elm_pat$Tools_Dropdown$pointEntry, _p7._0, _p7._1);
+				},
+				maybeIdPoint));
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Native_Utils.update(
+				state,
+				{query: query}),
+			_1: A2(
+				_elm_lang$core$Maybe$andThen,
+				function (id) {
+					return A2(
+						_elm_lang$core$Maybe$map,
+						function (point) {
+							return {
+								ctor: '_Tuple2',
+								_0: _kirchner$elm_pat$Store$fromInt(id),
+								_1: point
+							};
+						},
+						A2(
+							_kirchner$elm_pat$Store$get,
+							_kirchner$elm_pat$Store$fromInt(id),
+							data.store));
+				},
+				_elm_lang$core$Result$toMaybe(
+					_elm_lang$core$String$toInt(idString)))
+		};
+	});
+var _kirchner$elm_pat$Tools_Dropdown$init = {autoState: _thebritican$elm_autocomplete$Autocomplete$empty, howManyToShow: 5, query: '', showMenu: false};
+var _kirchner$elm_pat$Tools_Dropdown$State = F4(
+	function (a, b, c, d) {
+		return {autoState: a, howManyToShow: b, query: c, showMenu: d};
+	});
+var _kirchner$elm_pat$Tools_Dropdown$NoOp = {ctor: 'NoOp'};
+var _kirchner$elm_pat$Tools_Dropdown$HandleEscape = {ctor: 'HandleEscape'};
+var _kirchner$elm_pat$Tools_Dropdown$OnFocus = {ctor: 'OnFocus'};
+var _kirchner$elm_pat$Tools_Dropdown$Reset = {ctor: 'Reset'};
+var _kirchner$elm_pat$Tools_Dropdown$SelectPoint = function (a) {
+	return {ctor: 'SelectPoint', _0: a};
+};
+var _kirchner$elm_pat$Tools_Dropdown$updateConfig = _thebritican$elm_autocomplete$Autocomplete$updateConfig(
+	{
+		toId: _kirchner$elm_pat$Tools_Dropdown$toId,
+		onKeyDown: F2(
+			function (code, maybeId) {
+				return (_elm_lang$core$Native_Utils.eq(code, 38) || _elm_lang$core$Native_Utils.eq(code, 40)) ? A2(_elm_lang$core$Maybe$map, _kirchner$elm_pat$Tools_Dropdown$SelectPoint, maybeId) : (_elm_lang$core$Native_Utils.eq(code, 13) ? A2(_elm_lang$core$Maybe$map, _kirchner$elm_pat$Tools_Dropdown$SelectPoint, maybeId) : _elm_lang$core$Maybe$Just(_kirchner$elm_pat$Tools_Dropdown$Reset));
+			}),
+		onTooLow: _elm_lang$core$Maybe$Nothing,
+		onTooHigh: _elm_lang$core$Maybe$Nothing,
+		onMouseEnter: function (_p8) {
+			return _elm_lang$core$Maybe$Nothing;
+		},
+		onMouseLeave: function (_p9) {
+			return _elm_lang$core$Maybe$Nothing;
+		},
+		onMouseClick: function (id) {
+			return _elm_lang$core$Maybe$Just(
+				_kirchner$elm_pat$Tools_Dropdown$SelectPoint(id));
+		},
+		separateSelections: false
+	});
+var _kirchner$elm_pat$Tools_Dropdown$update = F4(
+	function (selectedPoint, data, msg, state) {
+		update:
+		while (true) {
+			var _p10 = msg;
+			switch (_p10.ctor) {
+				case 'SetQuery':
+					var _p11 = _p10._0;
+					var showMenu = !_elm_lang$core$List$isEmpty(
+						A2(_kirchner$elm_pat$Tools_Dropdown$filteredPoints, _p11, data));
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							state,
+							{query: _p11, showMenu: showMenu}),
+						_1: _elm_lang$core$Maybe$Nothing
+					};
+				case 'SetAutoState':
+					var _p12 = A5(
+						_thebritican$elm_autocomplete$Autocomplete$update,
+						_kirchner$elm_pat$Tools_Dropdown$updateConfig,
+						_p10._0,
+						state.howManyToShow,
+						state.autoState,
+						A2(_kirchner$elm_pat$Tools_Dropdown$filteredPoints, state.query, data));
+					var newAutoState = _p12._0;
+					var maybeMsg = _p12._1;
+					var newState = _elm_lang$core$Native_Utils.update(
+						state,
+						{autoState: newAutoState});
+					var _p13 = maybeMsg;
+					if (_p13.ctor === 'Nothing') {
+						return {ctor: '_Tuple2', _0: newState, _1: selectedPoint};
+					} else {
+						var _v6 = selectedPoint,
+							_v7 = data,
+							_v8 = _p13._0,
+							_v9 = newState;
+						selectedPoint = _v6;
+						data = _v7;
+						msg = _v8;
+						state = _v9;
+						continue update;
+					}
+				case 'Reset':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							state,
+							{
+								autoState: A2(_thebritican$elm_autocomplete$Autocomplete$reset, _kirchner$elm_pat$Tools_Dropdown$updateConfig, state.autoState)
+							}),
+						_1: _elm_lang$core$Maybe$Nothing
+					};
+				case 'SelectPoint':
+					var _p14 = A3(_kirchner$elm_pat$Tools_Dropdown$setQuery, data, state, _p10._0);
+					var dirtyState = _p14._0;
+					var selection = _p14._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _kirchner$elm_pat$Tools_Dropdown$resetMenu(dirtyState),
+						_1: selection
+					};
+				case 'OnFocus':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							state,
+							{showMenu: !state.showMenu}),
+						_1: _elm_lang$core$Maybe$Nothing
+					};
+				case 'HandleEscape':
+					var validOptions = !_elm_lang$core$List$isEmpty(
+						A2(_kirchner$elm_pat$Tools_Dropdown$filteredPoints, state.query, data));
+					var handleEscape = validOptions ? {
+						ctor: '_Tuple2',
+						_0: _kirchner$elm_pat$Tools_Dropdown$resetMenu(state),
+						_1: _elm_lang$core$Maybe$Nothing
+					} : _kirchner$elm_pat$Tools_Dropdown$resetInput(state);
+					var escapedState = function () {
+						var _p15 = selectedPoint;
+						if (_p15.ctor === 'Just') {
+							return _elm_lang$core$Native_Utils.eq(
+								state.query,
+								_elm_lang$core$Basics$toString(_p15._0._0)) ? _kirchner$elm_pat$Tools_Dropdown$resetInput(state) : handleEscape;
+						} else {
+							return handleEscape;
+						}
+					}();
+					return escapedState;
+				default:
+					return {ctor: '_Tuple2', _0: state, _1: selectedPoint};
+			}
+		}
+	});
+var _kirchner$elm_pat$Tools_Dropdown$SetAutoState = function (a) {
+	return {ctor: 'SetAutoState', _0: a};
+};
+var _kirchner$elm_pat$Tools_Dropdown$viewMenu = F2(
+	function (data, state) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Tools_Styles$class(
+					{
+						ctor: '::',
+						_0: _kirchner$elm_pat$Tools_Styles$MenuContainer,
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$map,
+					_kirchner$elm_pat$Tools_Dropdown$SetAutoState,
+					A4(
+						_thebritican$elm_autocomplete$Autocomplete$view,
+						_kirchner$elm_pat$Tools_Dropdown$viewConfig,
+						state.howManyToShow,
+						state.autoState,
+						A2(_kirchner$elm_pat$Tools_Dropdown$filteredPoints, state.query, data))),
+				_1: {ctor: '[]'}
+			});
+	});
+var _kirchner$elm_pat$Tools_Dropdown$SetQuery = function (a) {
+	return {ctor: 'SetQuery', _0: a};
+};
+var _kirchner$elm_pat$Tools_Dropdown$view = F3(
+	function (selectedPoint, data, state) {
+		var menu = (state.showMenu && (!_elm_lang$core$List$isEmpty(
+			A2(_kirchner$elm_pat$Tools_Dropdown$filteredPoints, state.query, data)))) ? A2(_kirchner$elm_pat$Tools_Dropdown$viewMenu, data, state) : A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{ctor: '[]'});
+		var query = function () {
+			var _p16 = selectedPoint;
+			if (_p16.ctor === 'Just') {
+				return A2(_kirchner$elm_pat$Tools_Dropdown$pointEntry, _p16._0._0, _p16._0._1);
+			} else {
+				return state.query;
+			}
+		}();
+		var fromResult = function (result) {
+			var _p17 = result;
+			if (_p17.ctor === 'Ok') {
+				return _elm_lang$core$Json_Decode$succeed(_p17._0);
+			} else {
+				return _elm_lang$core$Json_Decode$fail(_p17._0);
+			}
+		};
+		var dec = A2(
+			_elm_lang$core$Json_Decode$andThen,
+			fromResult,
+			A2(
+				_elm_lang$core$Json_Decode$map,
+				function (code) {
+					return (_elm_lang$core$Native_Utils.eq(code, 38) || _elm_lang$core$Native_Utils.eq(code, 40)) ? _elm_lang$core$Result$Ok(_kirchner$elm_pat$Tools_Dropdown$NoOp) : (_elm_lang$core$Native_Utils.eq(code, 27) ? _elm_lang$core$Result$Ok(_kirchner$elm_pat$Tools_Dropdown$HandleEscape) : _elm_lang$core$Result$Err('not handling that key'));
+				},
+				_elm_lang$html$Html_Events$keyCode));
+		var options = {preventDefault: true, stopPropagation: false};
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('tool__ValueContainer'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$input,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onInput(_kirchner$elm_pat$Tools_Dropdown$SetQuery),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onFocus(_kirchner$elm_pat$Tools_Dropdown$OnFocus),
+							_1: {
+								ctor: '::',
+								_0: A3(_elm_lang$html$Html_Events$onWithOptions, 'keydown', options, dec),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$value(query),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$placeholder('anchor point'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$autocomplete(false),
+											_1: {
+												ctor: '::',
+												_0: _kirchner$elm_pat$Tools_Styles$class(
+													{
+														ctor: '::',
+														_0: _kirchner$elm_pat$Tools_Styles$Textfield,
+														_1: {
+															ctor: '::',
+															_0: _kirchner$elm_pat$Tools_Styles$MenuTextfield,
+															_1: {ctor: '[]'}
+														}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: menu,
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+
+var _kirchner$elm_pat$Tools_Distance$snapAngle = F2(
+	function (count, angle) {
+		var divisor = (2 * _elm_lang$core$Basics$pi) / _elm_lang$core$Basics$toFloat(count);
+		return _elm_lang$core$Basics$toFloat(
+			_elm_lang$core$Basics$round(angle / divisor)) * divisor;
+	});
+var _kirchner$elm_pat$Tools_Distance$pointPosition = F3(
+	function (data, state, anchorPosition) {
+		var snap = function (angle) {
+			return A2(_elm_lang$core$List$member, _ohanhi$keyboard_extra$Keyboard_Extra$Shift, data.pressedKeys) ? A2(_kirchner$elm_pat$Tools_Distance$snapAngle, 8, angle) : angle;
+		};
+		var position = F2(
+			function (distance, angle) {
+				return A2(
+					_elm_community$linear_algebra$Math_Vector2$add,
+					anchorPosition,
+					A2(
+						_elm_community$linear_algebra$Math_Vector2$scale,
+						distance,
+						A2(
+							_elm_community$linear_algebra$Math_Vector2$vec2,
+							_elm_lang$core$Basics$cos(
+								snap(angle)),
+							_elm_lang$core$Basics$sin(
+								snap(angle)))));
+			});
+		var _p2 = A2(
+			_elm_lang$core$Maybe$map,
+			function (_p0) {
+				var _p1 = _p0;
+				return A2(
+					_elm_community$linear_algebra$Math_Vector2$vec2,
+					_elm_lang$core$Basics$toFloat(_p1.x),
+					_elm_lang$core$Basics$toFloat(_p1.y));
+			},
+			data.cursorPosition);
+		if (_p2.ctor === 'Just') {
+			var delta = A2(_elm_community$linear_algebra$Math_Vector2$sub, _p2._0, anchorPosition);
+			return _elm_lang$core$Maybe$Just(
+				A2(
+					position,
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						_elm_community$linear_algebra$Math_Vector2$length(delta),
+						A2(
+							_elm_lang$core$Maybe$andThen,
+							_kirchner$elm_pat$Expr$compute(data.variables),
+							state.distance)),
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						A2(
+							_elm_lang$core$Basics$atan2,
+							_elm_community$linear_algebra$Math_Vector2$getY(delta),
+							_elm_community$linear_algebra$Math_Vector2$getX(delta)),
+						A2(
+							_elm_lang$core$Maybe$andThen,
+							_kirchner$elm_pat$Expr$compute(data.variables),
+							state.angle))));
+		} else {
+			return A3(
+				_elm_lang$core$Maybe$map2,
+				position,
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					_kirchner$elm_pat$Expr$compute(data.variables),
+					state.distance),
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					_kirchner$elm_pat$Expr$compute(data.variables),
+					state.angle));
+		}
+	});
+var _kirchner$elm_pat$Tools_Distance$anchorPosition = F2(
+	function (data, state) {
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			A2(_kirchner$elm_pat$Point$position, data.store, data.variables),
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				A2(_elm_lang$core$Basics$flip, _kirchner$elm_pat$Store$get, data.store),
+				A2(_elm_lang$core$Maybe$map, _elm_lang$core$Tuple$first, state.selectedPoint)));
+	});
+var _kirchner$elm_pat$Tools_Distance$line = F2(
+	function (data, state) {
+		var draw = F2(
+			function (anchorPosition, angle) {
+				return A2(
+					_kirchner$elm_pat$Svg_Extra$drawArrow,
+					anchorPosition,
+					A2(
+						_elm_community$linear_algebra$Math_Vector2$add,
+						anchorPosition,
+						A2(
+							_elm_community$linear_algebra$Math_Vector2$scale,
+							10000,
+							A2(
+								_elm_community$linear_algebra$Math_Vector2$vec2,
+								_elm_lang$core$Basics$cos(angle),
+								_elm_lang$core$Basics$sin(angle)))));
+			});
+		var _p3 = A2(_kirchner$elm_pat$Tools_Distance$anchorPosition, data, state);
+		if (_p3.ctor === 'Just') {
+			return A2(
+				_elm_lang$core$Maybe$map,
+				draw(_p3._0),
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					_kirchner$elm_pat$Expr$compute(data.variables),
+					state.angle));
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _kirchner$elm_pat$Tools_Distance$circle = F2(
+	function (data, state) {
+		var draw = F2(
+			function (anchorPosition, distance) {
+				return A2(
+					_elm_lang$svg$Svg$circle,
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$cx(
+							_elm_lang$core$Basics$toString(
+								_elm_community$linear_algebra$Math_Vector2$getX(anchorPosition))),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$cy(
+								_elm_lang$core$Basics$toString(
+									_elm_community$linear_algebra$Math_Vector2$getY(anchorPosition))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$r(
+									_elm_lang$core$Basics$toString(distance)),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$fill('none'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					{ctor: '[]'});
+			});
+		var _p4 = A2(_kirchner$elm_pat$Tools_Distance$anchorPosition, data, state);
+		if (_p4.ctor === 'Just') {
+			return A2(
+				_elm_lang$core$Maybe$map,
+				draw(_p4._0),
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					_kirchner$elm_pat$Expr$compute(data.variables),
+					state.distance));
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _kirchner$elm_pat$Tools_Distance$newPoint = F2(
+	function (data, state) {
+		var format = _cuducos$elm_format_number$FormatNumber$format(
+			{decimals: 2, thousandSeparator: ' ', decimalSeparator: '.'});
+		var lerp = F3(
+			function (t, u, v) {
+				return A2(
+					_elm_community$linear_algebra$Math_Vector2$add,
+					A2(_elm_community$linear_algebra$Math_Vector2$scale, 1 - t, u),
+					A2(_elm_community$linear_algebra$Math_Vector2$scale, t, v));
+			});
+		var draw = function (anchorPosition) {
+			return A2(
+				_elm_lang$core$Maybe$map,
+				function (pointPosition) {
+					return A2(
+						_elm_lang$svg$Svg$g,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(_kirchner$elm_pat$Svg_Extra$drawPoint, _kirchner$elm_pat$Styles_Colors$red, pointPosition),
+							_1: {
+								ctor: '::',
+								_0: A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$red, pointPosition),
+								_1: {
+									ctor: '::',
+									_0: A2(_kirchner$elm_pat$Svg_Extra$drawArrow, anchorPosition, pointPosition),
+									_1: {
+										ctor: '::',
+										_0: A3(_kirchner$elm_pat$Svg_Extra$drawAngleArc, _kirchner$elm_pat$Svg_Extra$defaultArcConfig, anchorPosition, pointPosition),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_kirchner$elm_pat$Svg_Extra$label,
+												{
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Attributes$transform(
+														_kirchner$elm_pat$Svg_Extra$translate(
+															A3(lerp, 0.5, anchorPosition, pointPosition))),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$svg$Svg$text(
+														format(
+															_elm_community$linear_algebra$Math_Vector2$length(
+																A2(_elm_community$linear_algebra$Math_Vector2$sub, pointPosition, anchorPosition)))),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						});
+				},
+				A3(_kirchner$elm_pat$Tools_Distance$pointPosition, data, state, anchorPosition));
+		};
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			draw,
+			A2(_kirchner$elm_pat$Tools_Distance$anchorPosition, data, state));
+	});
+var _kirchner$elm_pat$Tools_Distance$point = F2(
+	function (data, state) {
+		var snap = function (angle) {
+			return A2(_elm_lang$core$List$member, _ohanhi$keyboard_extra$Keyboard_Extra$Shift, data.pressedKeys) ? A2(_kirchner$elm_pat$Tools_Distance$snapAngle, 8, angle) : angle;
+		};
+		var anchorId = A2(_elm_lang$core$Maybe$map, _elm_lang$core$Tuple$first, state.selectedPoint);
+		var anchorPosition = A2(
+			_elm_lang$core$Maybe$andThen,
+			A2(_kirchner$elm_pat$Point$position, data.store, data.variables),
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				A2(_elm_lang$core$Basics$flip, _kirchner$elm_pat$Store$get, data.store),
+				anchorId));
+		var cursorPosition = A2(
+			_elm_lang$core$Maybe$map,
+			function (_p5) {
+				var _p6 = _p5;
+				return A2(
+					_elm_community$linear_algebra$Math_Vector2$vec2,
+					_elm_lang$core$Basics$toFloat(_p6.x),
+					_elm_lang$core$Basics$toFloat(_p6.y));
+			},
+			data.cursorPosition);
+		var deltaCursor = A3(_elm_lang$core$Maybe$map2, _elm_community$linear_algebra$Math_Vector2$sub, cursorPosition, anchorPosition);
+		var distanceCursor = A2(
+			_elm_lang$core$Maybe$map,
+			_kirchner$elm_pat$Expr$Number,
+			A2(_elm_lang$core$Maybe$map, _elm_community$linear_algebra$Math_Vector2$length, deltaCursor));
+		var distance = A2(_elm_community$maybe_extra$Maybe_Extra$or, state.distance, distanceCursor);
+		var angleCursor = A2(
+			_elm_lang$core$Maybe$map,
+			_kirchner$elm_pat$Expr$Number,
+			A2(
+				_elm_lang$core$Maybe$map,
+				snap,
+				A2(
+					_elm_lang$core$Maybe$map,
+					function (delta) {
+						return A2(
+							_elm_lang$core$Basics$atan2,
+							_elm_community$linear_algebra$Math_Vector2$getY(delta),
+							_elm_community$linear_algebra$Math_Vector2$getX(delta));
+					},
+					deltaCursor)));
+		var angle = A2(_elm_community$maybe_extra$Maybe_Extra$or, state.angle, angleCursor);
+		return A4(_elm_lang$core$Maybe$map3, _kirchner$elm_pat$Point$distance, anchorId, distance, angle);
+	});
+var _kirchner$elm_pat$Tools_Distance$svg = F4(
+	function (callbacks, updateState, data, state) {
+		var _p7 = A2(_kirchner$elm_pat$Tools_Distance$anchorPosition, data, state);
+		if (_p7.ctor === 'Just') {
+			var addPoint = A2(
+				_elm_lang$core$Maybe$map,
+				callbacks.addPoint,
+				A2(_kirchner$elm_pat$Tools_Distance$point, data, state));
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				A2(
+					_elm_lang$core$List$filterMap,
+					_elm_lang$core$Basics$identity,
+					{
+						ctor: '::',
+						_0: A2(_kirchner$elm_pat$Tools_Distance$newPoint, data, state),
+						_1: {
+							ctor: '::',
+							_0: A2(_kirchner$elm_pat$Tools_Distance$circle, data, state),
+							_1: {
+								ctor: '::',
+								_0: A2(_kirchner$elm_pat$Tools_Distance$line, data, state),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$core$Maybe$Just(
+										A3(_kirchner$elm_pat$Tools_Common$svgUpdateMouse, addPoint, callbacks.updateCursorPosition, data)),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}));
+		} else {
+			var selectPoint = function (_p8) {
+				return updateState(
+					function (maybeId) {
+						return _elm_lang$core$Native_Utils.update(
+							state,
+							{
+								selectedPoint: function () {
+									var _p9 = maybeId;
+									if (_p9.ctor === 'Just') {
+										var _p10 = _p9._0;
+										return A2(
+											_elm_lang$core$Maybe$map,
+											function (point) {
+												return {ctor: '_Tuple2', _0: _p10, _1: point};
+											},
+											A2(_kirchner$elm_pat$Store$get, _p10, data.store));
+									} else {
+										return _elm_lang$core$Maybe$Nothing;
+									}
+								}()
+							});
+					}(_p8));
+			};
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A3(_kirchner$elm_pat$Tools_Common$svgSelectPoint, callbacks.focusPoint, selectPoint, data),
+					_1: {ctor: '[]'}
+				});
+		}
+	});
+var _kirchner$elm_pat$Tools_Distance$view = F4(
+	function (callbacks, updateState, data, state) {
+		var _p11 = function () {
+			var _p12 = {
+				ctor: '_Tuple2',
+				_0: data.cursorPosition,
+				_1: A2(_kirchner$elm_pat$Tools_Distance$anchorPosition, data, state)
+			};
+			if (((_p12.ctor === '_Tuple2') && (_p12._0.ctor === 'Just')) && (_p12._1.ctor === 'Just')) {
+				var _p13 = _p12._1._0;
+				var w = A3(
+					_elm_lang$core$Basics$flip,
+					_elm_community$linear_algebra$Math_Vector2$sub,
+					_kirchner$elm_pat$Types$toVec(_p12._0._0),
+					_p13);
+				var p = A3(_kirchner$elm_pat$Tools_Distance$pointPosition, data, state, _p13);
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Basics$toString(
+						_elm_community$linear_algebra$Math_Vector2$length(w)),
+					_1: _elm_lang$core$Basics$toString(
+						A2(
+							_elm_lang$core$Basics$atan2,
+							_elm_community$linear_algebra$Math_Vector2$getY(w),
+							_elm_community$linear_algebra$Math_Vector2$getX(w)))
+				};
+			} else {
+				return {ctor: '_Tuple2', _0: 'distance', _1: 'angle'};
+			}
+		}();
+		var distancePlaceholder = _p11._0;
+		var anglePlaceholder = _p11._1;
+		var updateAutoState = function (autoMsg) {
+			var _p14 = A4(_kirchner$elm_pat$Tools_Dropdown$update, state.selectedPoint, data, autoMsg, state.dropdownState);
+			var newDropdownState = _p14._0;
+			var newSelectedPoint = _p14._1;
+			return updateState(
+				_elm_lang$core$Native_Utils.update(
+					state,
+					{dropdownState: newDropdownState, selectedPoint: newSelectedPoint}));
+		};
+		var updateAngle = function (_p15) {
+			return updateState(
+				function (s) {
+					return _elm_lang$core$Native_Utils.update(
+						state,
+						{
+							angle: _kirchner$elm_pat$Expr$parse(s)
+						});
+				}(_p15));
+		};
+		var updateDistance = function (_p16) {
+			return updateState(
+				function (s) {
+					return _elm_lang$core$Native_Utils.update(
+						state,
+						{
+							distance: _kirchner$elm_pat$Expr$parse(s)
+						});
+				}(_p16));
+		};
+		return A5(
+			_kirchner$elm_pat$Tools_Common$view,
+			callbacks,
+			data,
+			state,
+			_kirchner$elm_pat$Tools_Distance$point,
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$map,
+					updateAutoState,
+					A3(_kirchner$elm_pat$Tools_Dropdown$view, state.selectedPoint, data, state.dropdownState)),
+				_1: {
+					ctor: '::',
+					_0: A4(_kirchner$elm_pat$Tools_Common$exprInput_, true, distancePlaceholder, state.distance, updateDistance),
+					_1: {
+						ctor: '::',
+						_0: A3(_kirchner$elm_pat$Tools_Common$exprInput, anglePlaceholder, state.angle, updateAngle),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _kirchner$elm_pat$Tools_Distance$initWith = F4(
+	function (id, anchor, distance, angle) {
+		return {
+			distance: _elm_lang$core$Maybe$Just(distance),
+			angle: _elm_lang$core$Maybe$Just(angle),
+			id: _elm_lang$core$Maybe$Just(id),
+			dropdownState: _kirchner$elm_pat$Tools_Dropdown$init,
+			selectedPoint: _elm_lang$core$Maybe$Nothing
+		};
+	});
+var _kirchner$elm_pat$Tools_Distance$init = function (data) {
+	return {
+		distance: _elm_lang$core$Maybe$Nothing,
+		angle: _elm_lang$core$Maybe$Nothing,
+		id: _elm_lang$core$Maybe$Nothing,
+		dropdownState: _kirchner$elm_pat$Tools_Dropdown$init,
+		selectedPoint: function () {
+			var _p17 = _elm_lang$core$List$head(data.selectedPoints);
+			if (_p17.ctor === 'Just') {
+				var _p19 = _p17._0;
+				var _p18 = A2(_kirchner$elm_pat$Store$get, _p19, data.store);
+				if (_p18.ctor === 'Just') {
+					return _elm_lang$core$Maybe$Just(
+						{ctor: '_Tuple2', _0: _p19, _1: _p18._0});
+				} else {
+					return _elm_lang$core$Maybe$Nothing;
+				}
+			} else {
+				return _elm_lang$core$Maybe$Nothing;
+			}
+		}()
+	};
+};
+var _kirchner$elm_pat$Tools_Distance$State = F5(
+	function (a, b, c, d, e) {
+		return {distance: a, angle: b, id: c, dropdownState: d, selectedPoint: e};
+	});
+
+var _kirchner$elm_pat$Tools_ExtendPiece$lineSegments = F2(
+	function (data, state) {
+		var _p0 = {
+			ctor: '_Tuple3',
+			_0: data.cursorPosition,
+			_1: A2(
+				_elm_lang$core$Maybe$andThen,
+				A2(_kirchner$elm_pat$Point$positionById, data.store, data.variables),
+				data.focusedPoint),
+			_2: A2(
+				_elm_lang$core$Maybe$andThen,
+				_kirchner$elm_pat$Piece$next(state.segment),
+				A2(_kirchner$elm_pat$Store$get, state.piece, data.pieceStore))
+		};
+		_v0_2:
+		do {
+			if (_p0.ctor === '_Tuple3') {
+				if (_p0._0.ctor === 'Just') {
+					if (_p0._2.ctor === 'Just') {
+						var c = A3(_kirchner$elm_pat$Point$positionById, data.store, data.variables, _p0._2._0);
+						var b = _kirchner$elm_pat$Types$toVec(_p0._0._0);
+						var a = A3(_kirchner$elm_pat$Point$positionById, data.store, data.variables, state.segment);
+						var _p1 = {ctor: '_Tuple2', _0: a, _1: c};
+						if (((_p1.ctor === '_Tuple2') && (_p1._0.ctor === 'Just')) && (_p1._1.ctor === 'Just')) {
+							return _elm_lang$core$Maybe$Just(
+								A2(
+									_elm_lang$svg$Svg$g,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: A2(_kirchner$elm_pat$Svg_Extra$drawLineSegment, _p1._0._0, b),
+										_1: {
+											ctor: '::',
+											_0: A2(_kirchner$elm_pat$Svg_Extra$drawLineSegment, b, _p1._1._0),
+											_1: {ctor: '[]'}
+										}
+									}));
+						} else {
+							return _elm_lang$core$Maybe$Nothing;
+						}
+					} else {
+						break _v0_2;
+					}
+				} else {
+					if ((_p0._1.ctor === 'Just') && (_p0._2.ctor === 'Just')) {
+						var _p3 = _p0._1._0;
+						var c = A3(_kirchner$elm_pat$Point$positionById, data.store, data.variables, _p0._2._0);
+						var a = A3(_kirchner$elm_pat$Point$positionById, data.store, data.variables, state.segment);
+						var _p2 = {ctor: '_Tuple2', _0: a, _1: c};
+						if (((_p2.ctor === '_Tuple2') && (_p2._0.ctor === 'Just')) && (_p2._1.ctor === 'Just')) {
+							return _elm_lang$core$Maybe$Just(
+								A2(
+									_elm_lang$svg$Svg$g,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: A2(_kirchner$elm_pat$Svg_Extra$drawLineSegment, _p2._0._0, _p3),
+										_1: {
+											ctor: '::',
+											_0: A2(_kirchner$elm_pat$Svg_Extra$drawLineSegment, _p3, _p2._1._0),
+											_1: {ctor: '[]'}
+										}
+									}));
+						} else {
+							return _elm_lang$core$Maybe$Nothing;
+						}
+					} else {
+						break _v0_2;
+					}
+				}
+			} else {
+				break _v0_2;
+			}
+		} while(false);
+		return _elm_lang$core$Maybe$Nothing;
+	});
+var _kirchner$elm_pat$Tools_ExtendPiece$svg = F3(
+	function (callbacks, data, state) {
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$List$filterMap,
+				_elm_lang$core$Basics$identity,
+				{
+					ctor: '::',
+					_0: A2(_kirchner$elm_pat$Tools_ExtendPiece$lineSegments, data, state),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Maybe$Just(
+							A3(_kirchner$elm_pat$Tools_Common$svgUpdateMouse, _elm_lang$core$Maybe$Nothing, callbacks.updateCursorPosition, data)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$core$Maybe$Just(
+								A3(
+									_kirchner$elm_pat$Tools_Common$svgSelectPoint,
+									callbacks.focusPoint,
+									A2(callbacks.extendPiece, state.piece, state.segment),
+									data)),
+							_1: {ctor: '[]'}
+						}
+					}
+				}));
+	});
+var _kirchner$elm_pat$Tools_ExtendPiece$init = F2(
+	function (piece, segment) {
+		return {piece: piece, segment: segment};
+	});
+var _kirchner$elm_pat$Tools_ExtendPiece$State = F2(
+	function (a, b) {
+		return {piece: a, segment: b};
+	});
+
+var _kirchner$elm_pat$Tools_Relative$pointPosition = F3(
+	function (data, state, anchorPosition) {
+		var y = A2(
+			_elm_lang$core$Maybe$map,
+			function (y) {
+				return y + _elm_community$linear_algebra$Math_Vector2$getY(anchorPosition);
+			},
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				_kirchner$elm_pat$Expr$compute(data.variables),
+				state.y));
+		var x = A2(
+			_elm_lang$core$Maybe$map,
+			function (x) {
+				return x + _elm_community$linear_algebra$Math_Vector2$getX(anchorPosition);
+			},
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				_kirchner$elm_pat$Expr$compute(data.variables),
+				state.x));
+		var _p0 = data.cursorPosition;
+		if (_p0.ctor === 'Just') {
+			var _p1 = _p0._0;
+			return _elm_lang$core$Maybe$Just(
+				A2(
+					_elm_community$linear_algebra$Math_Vector2$vec2,
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						_elm_lang$core$Basics$toFloat(_p1.x),
+						x),
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						_elm_lang$core$Basics$toFloat(_p1.y),
+						y)));
+		} else {
+			return A3(_elm_lang$core$Maybe$map2, _elm_community$linear_algebra$Math_Vector2$vec2, x, y);
+		}
+	});
+var _kirchner$elm_pat$Tools_Relative$anchorPosition = F2(
+	function (data, state) {
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			A2(_kirchner$elm_pat$Point$position, data.store, data.variables),
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				A2(_elm_lang$core$Basics$flip, _kirchner$elm_pat$Store$get, data.store),
+				A2(_elm_lang$core$Maybe$map, _elm_lang$core$Tuple$first, state.selectedPoint)));
+	});
+var _kirchner$elm_pat$Tools_Relative$verticalLine = F3(
+	function (data, state, anchorPosition) {
+		return A2(
+			_elm_lang$core$Maybe$map,
+			function (x) {
+				return _kirchner$elm_pat$Svg_Extra$drawVerticalLine(
+					x + _elm_community$linear_algebra$Math_Vector2$getX(anchorPosition));
+			},
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				_kirchner$elm_pat$Expr$compute(data.variables),
+				state.x));
+	});
+var _kirchner$elm_pat$Tools_Relative$horizontalLine = F3(
+	function (data, state, anchorPosition) {
+		return A2(
+			_elm_lang$core$Maybe$map,
+			function (y) {
+				return _kirchner$elm_pat$Svg_Extra$drawHorizontalLine(
+					y + _elm_community$linear_algebra$Math_Vector2$getY(anchorPosition));
+			},
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				_kirchner$elm_pat$Expr$compute(data.variables),
+				state.y));
+	});
+var _kirchner$elm_pat$Tools_Relative$newPoint = F2(
+	function (data, state) {
+		var draw = function (anchorPosition) {
+			return A2(
+				_elm_lang$core$Maybe$map,
+				function (pointPosition) {
+					return A2(
+						_elm_lang$svg$Svg$g,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(_kirchner$elm_pat$Svg_Extra$drawPoint, _kirchner$elm_pat$Styles_Colors$red, pointPosition),
+							_1: {
+								ctor: '::',
+								_0: A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$red, pointPosition),
+								_1: {
+									ctor: '::',
+									_0: A2(_kirchner$elm_pat$Svg_Extra$drawRectArrow, anchorPosition, pointPosition),
+									_1: {ctor: '[]'}
+								}
+							}
+						});
+				},
+				A3(_kirchner$elm_pat$Tools_Relative$pointPosition, data, state, anchorPosition));
+		};
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			draw,
+			A2(_kirchner$elm_pat$Tools_Relative$anchorPosition, data, state));
+	});
+var _kirchner$elm_pat$Tools_Relative$point = F2(
+	function (data, state) {
+		var yCursor = A2(
+			_elm_lang$core$Maybe$map,
+			function (_p2) {
+				var _p3 = _p2;
+				return _elm_lang$core$Basics$toFloat(_p3.y);
+			},
+			data.cursorPosition);
+		var xCursor = A2(
+			_elm_lang$core$Maybe$map,
+			function (_p4) {
+				var _p5 = _p4;
+				return _elm_lang$core$Basics$toFloat(_p5.x);
+			},
+			data.cursorPosition);
+		var anchorId = A2(_elm_lang$core$Maybe$map, _elm_lang$core$Tuple$first, state.selectedPoint);
+		var anchorPosition = A2(
+			_elm_lang$core$Maybe$andThen,
+			A2(_kirchner$elm_pat$Point$position, data.store, data.variables),
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				A2(_elm_lang$core$Basics$flip, _kirchner$elm_pat$Store$get, data.store),
+				anchorId));
+		var xOffsetCursor = A3(
+			_elm_lang$core$Maybe$map2,
+			F2(
+				function (x, anchor) {
+					return _kirchner$elm_pat$Expr$Number(
+						x - _elm_community$linear_algebra$Math_Vector2$getX(anchor));
+				}),
+			xCursor,
+			anchorPosition);
+		var xOffset = A2(_elm_community$maybe_extra$Maybe_Extra$or, state.x, xOffsetCursor);
+		var yOffsetCursor = A3(
+			_elm_lang$core$Maybe$map2,
+			F2(
+				function (y, anchor) {
+					return _kirchner$elm_pat$Expr$Number(
+						y - _elm_community$linear_algebra$Math_Vector2$getY(anchor));
+				}),
+			yCursor,
+			anchorPosition);
+		var yOffset = A2(_elm_community$maybe_extra$Maybe_Extra$or, state.y, yOffsetCursor);
+		return A4(_elm_lang$core$Maybe$map3, _kirchner$elm_pat$Point$relative, anchorId, xOffset, yOffset);
+	});
+var _kirchner$elm_pat$Tools_Relative$svg = F4(
+	function (callbacks, updateState, data, state) {
+		var _p6 = A2(_kirchner$elm_pat$Tools_Relative$anchorPosition, data, state);
+		if (_p6.ctor === 'Just') {
+			var _p7 = _p6._0;
+			var addPoint = A2(
+				_elm_lang$core$Maybe$map,
+				callbacks.addPoint,
+				A2(_kirchner$elm_pat$Tools_Relative$point, data, state));
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				A2(
+					_elm_lang$core$List$filterMap,
+					_elm_lang$core$Basics$identity,
+					{
+						ctor: '::',
+						_0: A2(_kirchner$elm_pat$Tools_Relative$newPoint, data, state),
+						_1: {
+							ctor: '::',
+							_0: A3(_kirchner$elm_pat$Tools_Relative$horizontalLine, data, state, _p7),
+							_1: {
+								ctor: '::',
+								_0: A3(_kirchner$elm_pat$Tools_Relative$verticalLine, data, state, _p7),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$core$Maybe$Just(
+										A3(_kirchner$elm_pat$Tools_Common$svgUpdateMouse, addPoint, callbacks.updateCursorPosition, data)),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}));
+		} else {
+			var selectPoint = function (_p8) {
+				return updateState(
+					function (maybeId) {
+						return _elm_lang$core$Native_Utils.update(
+							state,
+							{
+								selectedPoint: function () {
+									var _p9 = maybeId;
+									if (_p9.ctor === 'Just') {
+										var _p10 = _p9._0;
+										return A2(
+											_elm_lang$core$Maybe$map,
+											function (point) {
+												return {ctor: '_Tuple2', _0: _p10, _1: point};
+											},
+											A2(_kirchner$elm_pat$Store$get, _p10, data.store));
+									} else {
+										return _elm_lang$core$Maybe$Nothing;
+									}
+								}()
+							});
+					}(_p8));
+			};
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A3(_kirchner$elm_pat$Tools_Common$svgSelectPoint, callbacks.focusPoint, selectPoint, data),
+					_1: {ctor: '[]'}
+				});
+		}
+	});
+var _kirchner$elm_pat$Tools_Relative$view = F4(
+	function (callbacks, updateStateCallback, data, state) {
+		var updateAutoState = function (autoMsg) {
+			var _p11 = A4(_kirchner$elm_pat$Tools_Dropdown$update, state.selectedPoint, data, autoMsg, state.dropdownState);
+			var newDropdownState = _p11._0;
+			var newSelectedPoint = _p11._1;
+			return updateStateCallback(
+				_elm_lang$core$Native_Utils.update(
+					state,
+					{dropdownState: newDropdownState, selectedPoint: newSelectedPoint}));
+		};
+		var updateY = function (_p12) {
+			return updateStateCallback(
+				function (s) {
+					return _elm_lang$core$Native_Utils.update(
+						state,
+						{
+							y: _kirchner$elm_pat$Expr$parse(s)
+						});
+				}(_p12));
+		};
+		var updateX = function (_p13) {
+			return updateStateCallback(
+				function (s) {
+					return _elm_lang$core$Native_Utils.update(
+						state,
+						{
+							x: _kirchner$elm_pat$Expr$parse(s)
+						});
+				}(_p13));
+		};
+		return A5(
+			_kirchner$elm_pat$Tools_Common$view,
+			callbacks,
+			data,
+			state,
+			_kirchner$elm_pat$Tools_Relative$point,
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$map,
+					updateAutoState,
+					A3(_kirchner$elm_pat$Tools_Dropdown$view, state.selectedPoint, data, state.dropdownState)),
+				_1: {
+					ctor: '::',
+					_0: A3(_kirchner$elm_pat$Tools_Common$exprInput, 'horizontal distance', state.x, updateX),
+					_1: {
+						ctor: '::',
+						_0: A3(_kirchner$elm_pat$Tools_Common$exprInput, 'vertical distance', state.y, updateY),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _kirchner$elm_pat$Tools_Relative$initWith = F4(
+	function (id, anchor, x, y) {
+		return {
+			x: _elm_lang$core$Maybe$Just(x),
+			y: _elm_lang$core$Maybe$Just(y),
+			id: _elm_lang$core$Maybe$Just(id),
+			dropdownState: _kirchner$elm_pat$Tools_Dropdown$init,
+			selectedPoint: _elm_lang$core$Maybe$Nothing
+		};
+	});
+var _kirchner$elm_pat$Tools_Relative$init = function (data) {
+	return {
+		x: _elm_lang$core$Maybe$Nothing,
+		y: _elm_lang$core$Maybe$Nothing,
+		id: _elm_lang$core$Maybe$Nothing,
+		dropdownState: _kirchner$elm_pat$Tools_Dropdown$init,
+		selectedPoint: function () {
+			var _p14 = _elm_lang$core$List$head(data.selectedPoints);
+			if (_p14.ctor === 'Just') {
+				var _p16 = _p14._0;
+				var _p15 = A2(_kirchner$elm_pat$Store$get, _p16, data.store);
+				if (_p15.ctor === 'Just') {
+					return _elm_lang$core$Maybe$Just(
+						{ctor: '_Tuple2', _0: _p16, _1: _p15._0});
+				} else {
+					return _elm_lang$core$Maybe$Nothing;
+				}
+			} else {
+				return _elm_lang$core$Maybe$Nothing;
+			}
+		}()
+	};
+};
+var _kirchner$elm_pat$Tools_Relative$State = F5(
+	function (a, b, c, d, e) {
+		return {x: a, y: b, id: c, dropdownState: d, selectedPoint: e};
+	});
+
+var _kirchner$elm_pat$Model$Model = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return function (m) {
+													return {store: a, pieceStore: b, variables: c, newName: d, newValue: e, tool: f, viewPort: g, drag: h, cursorPosition: i, focusedPoint: j, pressedKeys: k, selectedPoints: l, fileBrowser: m};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _kirchner$elm_pat$Model$Drag = F2(
+	function (a, b) {
+		return {start: a, current: b};
+	});
+var _kirchner$elm_pat$Model$None = {ctor: 'None'};
+var _kirchner$elm_pat$Model$defaultModel = {
+	store: _kirchner$elm_pat$Store$empty,
+	pieceStore: _kirchner$elm_pat$Store$empty,
+	variables: _elm_lang$core$Dict$empty,
+	newName: _elm_lang$core$Maybe$Nothing,
+	newValue: _elm_lang$core$Maybe$Nothing,
+	tool: _kirchner$elm_pat$Model$None,
+	viewPort: {x: -320, y: -320, width: 640, height: 640},
+	drag: _elm_lang$core$Maybe$Nothing,
+	cursorPosition: _elm_lang$core$Maybe$Nothing,
+	focusedPoint: _elm_lang$core$Maybe$Nothing,
+	pressedKeys: {ctor: '[]'},
+	selectedPoints: {ctor: '[]'},
+	fileBrowser: _kirchner$elm_pat$FileBrowser$defaultModel
+};
+var _kirchner$elm_pat$Model$ExtendPiece = function (a) {
+	return {ctor: 'ExtendPiece', _0: a};
+};
+var _kirchner$elm_pat$Model$Distance = function (a) {
+	return {ctor: 'Distance', _0: a};
+};
+var _kirchner$elm_pat$Model$Relative = function (a) {
+	return {ctor: 'Relative', _0: a};
+};
+var _kirchner$elm_pat$Model$Absolute = function (a) {
+	return {ctor: 'Absolute', _0: a};
+};
+
+var _kirchner$elm_pat$File$decodeVariables = _elm_lang$core$Json_Decode$dict(_kirchner$elm_pat$Expr$decode);
+var _kirchner$elm_pat$File$encodeVariables = function (variables) {
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Dict$values(
+			A2(
+				_elm_lang$core$Dict$map,
+				F2(
+					function (id, expr) {
+						return {
+							ctor: '_Tuple2',
+							_0: id,
+							_1: _kirchner$elm_pat$Expr$encode(expr)
+						};
+					}),
+				variables)));
+};
+var _kirchner$elm_pat$File$encode = function (model) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'store',
+				_1: A2(_kirchner$elm_pat$Store$encode, _kirchner$elm_pat$Point$encode, model.store)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'pieceStore',
+					_1: A2(_kirchner$elm_pat$Store$encode, _kirchner$elm_pat$Piece$encode, model.pieceStore)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'variables',
+						_1: _kirchner$elm_pat$File$encodeVariables(model.variables)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'selectedPoints',
+							_1: _elm_lang$core$Json_Encode$list(
+								A2(_elm_lang$core$List$map, _kirchner$elm_pat$Store$encodeId, model.selectedPoints))
+						},
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		});
+};
+var _kirchner$elm_pat$File$save = function (model) {
+	return {store: model.store, pieceStore: model.pieceStore, variables: model.variables, selectedPoints: model.selectedPoints};
+};
+var _kirchner$elm_pat$File$store = function (_p0) {
+	return _kirchner$elm_pat$File$encode(
+		_kirchner$elm_pat$File$save(_p0));
+};
+var _kirchner$elm_pat$File$load_ = F2(
+	function (file, defaultModel) {
+		return _elm_lang$core$Native_Utils.update(
+			defaultModel,
+			{store: file.store, pieceStore: file.pieceStore, variables: file.variables, selectedPoints: file.selectedPoints});
+	});
+var _kirchner$elm_pat$File$load = function (file) {
+	return A2(_kirchner$elm_pat$File$load_, file, _kirchner$elm_pat$Model$defaultModel);
+};
+var _kirchner$elm_pat$File$defaultFile = {
+	store: _kirchner$elm_pat$Store$empty,
+	pieceStore: _kirchner$elm_pat$Store$empty,
+	variables: _elm_lang$core$Dict$empty,
+	selectedPoints: {ctor: '[]'}
+};
+var _kirchner$elm_pat$File$File = F4(
+	function (a, b, c, d) {
+		return {store: a, pieceStore: b, variables: c, selectedPoints: d};
+	});
+var _kirchner$elm_pat$File$decode = A5(
+	_elm_lang$core$Json_Decode$map4,
+	_kirchner$elm_pat$File$File,
+	A2(
+		_elm_lang$core$Json_Decode$at,
+		{
+			ctor: '::',
+			_0: 'store',
+			_1: {ctor: '[]'}
+		},
+		_kirchner$elm_pat$Store$decode(_kirchner$elm_pat$Point$decode)),
+	A2(
+		_elm_lang$core$Json_Decode$at,
+		{
+			ctor: '::',
+			_0: 'pieceStore',
+			_1: {ctor: '[]'}
+		},
+		_kirchner$elm_pat$Store$decode(_kirchner$elm_pat$Piece$decode)),
+	A2(
+		_elm_lang$core$Json_Decode$at,
+		{
+			ctor: '::',
+			_0: 'variables',
+			_1: {ctor: '[]'}
+		},
+		_kirchner$elm_pat$File$decodeVariables),
+	A2(
+		_elm_lang$core$Json_Decode$at,
+		{
+			ctor: '::',
+			_0: 'selectedPoints',
+			_1: {ctor: '[]'}
+		},
+		_elm_lang$core$Json_Decode$list(_kirchner$elm_pat$Store$decodeId)));
+var _kirchner$elm_pat$File$restore = F2(
+	function (value, defaultModel) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			defaultModel,
+			_elm_lang$core$Result$toMaybe(
+				A2(
+					_elm_lang$core$Result$map,
+					function (file) {
+						return A2(_kirchner$elm_pat$File$load_, file, defaultModel);
+					},
+					A2(_elm_lang$core$Json_Decode$decodeValue, _kirchner$elm_pat$File$decode, value))));
+	});
+
+var _kirchner$elm_pat$Tools_Between$view = F4(
+	function (callbacks, updateState, data, state) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{ctor: '[]'});
+	});
+var _kirchner$elm_pat$Tools_Between$svg = F4(
+	function (callbacks, updateState, data, state) {
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{ctor: '[]'},
+			{ctor: '[]'});
+	});
+var _kirchner$elm_pat$Tools_Between$point = F2(
+	function (data, state) {
+		return _elm_lang$core$Maybe$Nothing;
+	});
+var _kirchner$elm_pat$Tools_Between$init = function (data) {
+	return {firstDropdown: _kirchner$elm_pat$Tools_Dropdown$init, first: _elm_lang$core$Maybe$Nothing, lastDropdown: _kirchner$elm_pat$Tools_Dropdown$init, last: _elm_lang$core$Maybe$Nothing, ratio: _elm_lang$core$Maybe$Nothing};
+};
+var _kirchner$elm_pat$Tools_Between$State = F5(
+	function (a, b, c, d, e) {
+		return {firstDropdown: a, first: b, lastDropdown: c, last: d, ratio: e};
+	});
+
+var _kirchner$elm_pat$Editor$getViewPort = F2(
+	function (oldViewPort, drag) {
+		var _p0 = drag;
+		if (_p0.ctor === 'Nothing') {
+			return oldViewPort;
+		} else {
+			var _p2 = _p0._0.start;
+			var _p1 = _p0._0.current;
+			return _elm_lang$core$Native_Utils.update(
+				oldViewPort,
+				{x: oldViewPort.x - (_p1.x - _p2.x), y: oldViewPort.y - (_p1.y - _p2.y)});
+		}
+	});
+var _kirchner$elm_pat$Editor$updateStorage = F3(
+	function (ports, _p4, _p3) {
+		var _p5 = _p3;
+		var _p6 = _p5._0;
+		return {
+			ctor: '_Tuple2',
+			_0: _p6,
+			_1: _elm_lang$core$Platform_Cmd$batch(
+				{
+					ctor: '::',
+					_0: ports.serialize(
+						_kirchner$elm_pat$File$store(_p6)),
+					_1: {
+						ctor: '::',
+						_0: _p5._1,
+						_1: {ctor: '[]'}
+					}
+				})
+		};
+	});
+var _kirchner$elm_pat$Editor$updateAutoFocus = F3(
+	function (ports, oldModel, _p7) {
+		var _p8 = _p7;
+		var _p10 = _p8._0;
+		var _p9 = _p8._1;
+		return {
+			ctor: '_Tuple2',
+			_0: _p10,
+			_1: (_elm_lang$core$Native_Utils.eq(oldModel.tool, _kirchner$elm_pat$Model$None) && (!_elm_lang$core$Native_Utils.eq(_p10.tool, _kirchner$elm_pat$Model$None))) ? _elm_lang$core$Platform_Cmd$batch(
+				{
+					ctor: '::',
+					_0: ports.autofocus(
+						{ctor: '_Tuple0'}),
+					_1: {
+						ctor: '::',
+						_0: _p9,
+						_1: {ctor: '[]'}
+					}
+				}) : _p9
+		};
+	});
+var _kirchner$elm_pat$Editor$allTools = function (data) {
+	return {
+		ctor: '::',
+		_0: _kirchner$elm_pat$Model$Absolute(_kirchner$elm_pat$Tools_Absolute$init),
+		_1: {
+			ctor: '::',
+			_0: _kirchner$elm_pat$Model$Relative(
+				_kirchner$elm_pat$Tools_Relative$init(data)),
+			_1: {
+				ctor: '::',
+				_0: _kirchner$elm_pat$Model$Distance(
+					_kirchner$elm_pat$Tools_Distance$init(data)),
+				_1: {ctor: '[]'}
+			}
+		}
+	};
+};
+var _kirchner$elm_pat$Editor$toolDescription = function (tool) {
+	var _p11 = tool;
+	switch (_p11.ctor) {
+		case 'Absolute':
+			return 'add a point given by absolute coordinates';
+		case 'Relative':
+			return 'relative';
+		case 'Distance':
+			return 'distance';
+		case 'ExtendPiece':
+			return 'extend piece';
+		default:
+			return 'none';
+	}
+};
+var _kirchner$elm_pat$Editor$toolName = function (tool) {
+	var _p12 = tool;
+	switch (_p12.ctor) {
+		case 'Absolute':
+			return 'absolute';
+		case 'Relative':
+			return 'relative';
+		case 'Distance':
+			return 'distance';
+		case 'ExtendPiece':
+			return 'extend piece';
+		default:
+			return 'none';
+	}
+};
+var _kirchner$elm_pat$Editor$data = function (model) {
+	return {
+		store: model.store,
+		pieceStore: model.pieceStore,
+		variables: model.variables,
+		viewPort: A2(_kirchner$elm_pat$Editor$getViewPort, model.viewPort, model.drag),
+		cursorPosition: model.cursorPosition,
+		focusedPoint: model.focusedPoint,
+		pressedKeys: model.pressedKeys,
+		selectedPoints: model.selectedPoints
+	};
+};
+var _kirchner$elm_pat$Editor$Flags = function (a) {
+	return {file0: a};
+};
+var _kirchner$elm_pat$Editor$Ports = F2(
+	function (a, b) {
+		return {autofocus: a, serialize: b};
+	});
+var _kirchner$elm_pat$Editor$LoadRemoteFileError = function (a) {
+	return {ctor: 'LoadRemoteFileError', _0: a};
+};
+var _kirchner$elm_pat$Editor$LoadRemoteFile = function (a) {
+	return {ctor: 'LoadRemoteFile', _0: a};
+};
+var _kirchner$elm_pat$Editor$RestoreSession = function (a) {
+	return {ctor: 'RestoreSession', _0: a};
+};
+var _kirchner$elm_pat$Editor$update = F3(
+	function (ports, msg, model) {
+		return function (_p13) {
+			return A3(
+				_kirchner$elm_pat$Editor$updateStorage,
+				ports,
+				model,
+				A3(_kirchner$elm_pat$Editor$updateAutoFocus, ports, model, _p13));
+		}(
+			function () {
+				var _p14 = msg;
+				switch (_p14.ctor) {
+					case 'LoadRemoteFile':
+						var handle = function (_p15) {
+							return function (result) {
+								var _p16 = result;
+								if (_p16.ctor === 'Ok') {
+									return _p16._0;
+								} else {
+									return _p16._0;
+								}
+							}(
+								A2(
+									_elm_lang$core$Result$mapError,
+									_kirchner$elm_pat$Editor$LoadRemoteFileError,
+									A2(_elm_lang$core$Result$map, _kirchner$elm_pat$Editor$RestoreSession, _p15)));
+						};
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							model,
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$http$Http$send,
+									handle,
+									A2(_elm_lang$http$Http$get, _p14._0, _kirchner$elm_pat$File$decode)),
+								_1: {ctor: '[]'}
+							});
+					case 'RestoreSession':
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							A2(_kirchner$elm_pat$File$load_, _p14._0, model),
+							{ctor: '[]'});
+					case 'LoadRemoteFileError':
+						var _p17 = A2(_elm_lang$core$Debug$log, 'loadRemoteFileError', _p14._0);
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							model,
+							{ctor: '[]'});
+					case 'ClearSession':
+						return A3(
+							_kirchner$elm_pat$Editor$update,
+							ports,
+							_kirchner$elm_pat$Editor$RestoreSession(_kirchner$elm_pat$File$defaultFile),
+							model);
+					case 'FileBrowserMsg':
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									fileBrowser: A2(_kirchner$elm_pat$FileBrowser$update, _p14._0, model.fileBrowser)
+								}),
+							{ctor: '[]'});
+					case 'UpdateTool':
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{tool: _p14._0}),
+							{ctor: '[]'});
+					case 'AddPoint':
+						var _p18 = A2(_kirchner$elm_pat$Store$insert, _p14._0, model.store);
+						var id = _p18._0;
+						var newStore = _p18._1;
+						var name = A2(
+							_elm_lang$core$Basics_ops['++'],
+							'point #',
+							_elm_lang$core$Basics$toString(
+								_kirchner$elm_pat$Store$toInt(id)));
+						var storeWithNamedPoint = A3(
+							_kirchner$elm_pat$Store$update,
+							id,
+							_elm_lang$core$Maybe$map(
+								_kirchner$elm_pat$Point$setName(name)),
+							newStore);
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									store: storeWithNamedPoint,
+									tool: _kirchner$elm_pat$Model$None,
+									cursorPosition: _elm_lang$core$Maybe$Nothing,
+									focusedPoint: _elm_lang$core$Maybe$Nothing,
+									selectedPoints: {
+										ctor: '::',
+										_0: id,
+										_1: {ctor: '[]'}
+									}
+								}),
+							{ctor: '[]'});
+					case 'UpdatePoint':
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									store: A3(
+										_kirchner$elm_pat$Store$update,
+										_p14._0,
+										function (_p19) {
+											return _elm_lang$core$Maybe$Just(_p14._1);
+										},
+										model.store),
+									tool: _kirchner$elm_pat$Model$None
+								}),
+							{ctor: '[]'});
+					case 'DeletePoint':
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									store: A2(_kirchner$elm_pat$Store$remove, _p14._0, model.store)
+								}),
+							{ctor: '[]'});
+					case 'NameUpdated':
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									newName: _kirchner$elm_pat$Expr$parseVariable(_p14._0)
+								}),
+							{ctor: '[]'});
+					case 'ValueUpdated':
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									newValue: _kirchner$elm_pat$Expr$parse(_p14._0)
+								}),
+							{ctor: '[]'});
+					case 'AddVariable':
+						var _p20 = {ctor: '_Tuple2', _0: model.newName, _1: model.newValue};
+						if (((_p20.ctor === '_Tuple2') && (_p20._0.ctor === 'Just')) && (_p20._1.ctor === 'Just')) {
+							return A2(
+								_elm_lang$core$Platform_Cmd_ops['!'],
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{
+										variables: A3(_elm_lang$core$Dict$insert, _p20._0._0, _p20._1._0, model.variables),
+										newName: _elm_lang$core$Maybe$Nothing,
+										newValue: _elm_lang$core$Maybe$Nothing
+									}),
+								{ctor: '[]'});
+						} else {
+							return A2(
+								_elm_lang$core$Platform_Cmd_ops['!'],
+								model,
+								{ctor: '[]'});
+						}
+					case 'Resize':
+						var _p21 = _p14._0;
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									viewPort: {x: (_p21.width / -2) | 0, y: (_p21.height / -2) | 0, width: _p21.width, height: _p21.height}
+								}),
+							{ctor: '[]'});
+					case 'DragStart':
+						var _p22 = _p14._0;
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									drag: _elm_lang$core$Maybe$Just(
+										A2(_kirchner$elm_pat$Model$Drag, _p22, _p22))
+								}),
+							{ctor: '[]'});
+					case 'DragAt':
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									drag: A2(
+										_elm_lang$core$Maybe$map,
+										function (_p23) {
+											var _p24 = _p23;
+											return A2(_kirchner$elm_pat$Model$Drag, _p24.start, _p14._0);
+										},
+										model.drag)
+								}),
+							{ctor: '[]'});
+					case 'DragStop':
+						var selectedPoints = function () {
+							var _p25 = model.drag;
+							if (_p25.ctor === 'Just') {
+								var _p26 = _p25._0;
+								return _elm_lang$core$Native_Utils.eq(_p26.start, _p26.current) ? {ctor: '[]'} : model.selectedPoints;
+							} else {
+								return model.selectedPoints;
+							}
+						}();
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									drag: _elm_lang$core$Maybe$Nothing,
+									viewPort: A2(_kirchner$elm_pat$Editor$getViewPort, model.viewPort, model.drag),
+									selectedPoints: selectedPoints
+								}),
+							{ctor: '[]'});
+					case 'UpdateCursorPosition':
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									cursorPosition: A2(
+										_elm_lang$core$Maybe$map,
+										_kirchner$elm_pat$Types$svgToCanvas(model.viewPort),
+										_p14._0)
+								}),
+							{ctor: '[]'});
+					case 'FocusPoint':
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{focusedPoint: _p14._0}),
+							{ctor: '[]'});
+					case 'KeyMsg':
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									pressedKeys: A2(_ohanhi$keyboard_extra$Keyboard_Extra$update, _p14._0, model.pressedKeys)
+								}),
+							{ctor: '[]'});
+					case 'KeyDown':
+						var _p27 = _p14._0;
+						switch (_p27.ctor) {
+							case 'CharP':
+								var _p28 = A2(
+									_elm_lang$core$Maybe$map,
+									function (piece) {
+										return _elm_lang$core$Tuple$second(
+											A2(_kirchner$elm_pat$Store$insert, piece, model.pieceStore));
+									},
+									A3(_kirchner$elm_pat$Piece$fromList, model.store, model.variables, model.selectedPoints));
+								if (_p28.ctor === 'Just') {
+									return A2(
+										_elm_lang$core$Platform_Cmd_ops['!'],
+										_elm_lang$core$Native_Utils.update(
+											model,
+											{pieceStore: _p28._0}),
+										{ctor: '[]'});
+								} else {
+									return A2(
+										_elm_lang$core$Platform_Cmd_ops['!'],
+										model,
+										{ctor: '[]'});
+								}
+							case 'CharA':
+								return A2(
+									_elm_lang$core$Platform_Cmd_ops['!'],
+									_elm_lang$core$Native_Utils.update(
+										model,
+										{
+											tool: _kirchner$elm_pat$Model$Absolute(_kirchner$elm_pat$Tools_Absolute$init)
+										}),
+									{ctor: '[]'});
+							case 'CharE':
+								return A2(
+									_elm_lang$core$Platform_Cmd_ops['!'],
+									_elm_lang$core$Native_Utils.update(
+										model,
+										{
+											tool: A2(_elm_lang$core$List$member, _ohanhi$keyboard_extra$Keyboard_Extra$Shift, model.pressedKeys) ? _kirchner$elm_pat$Model$Distance(
+												_kirchner$elm_pat$Tools_Distance$init(
+													_kirchner$elm_pat$Editor$data(model))) : _kirchner$elm_pat$Model$Relative(
+												_kirchner$elm_pat$Tools_Relative$init(
+													_kirchner$elm_pat$Editor$data(model)))
+										}),
+									{ctor: '[]'});
+							case 'Escape':
+								return A2(
+									_elm_lang$core$Platform_Cmd_ops['!'],
+									_elm_lang$core$Native_Utils.update(
+										model,
+										{tool: _kirchner$elm_pat$Model$None, cursorPosition: _elm_lang$core$Maybe$Nothing}),
+									{ctor: '[]'});
+							default:
+								return A2(
+									_elm_lang$core$Platform_Cmd_ops['!'],
+									model,
+									{ctor: '[]'});
+						}
+					case 'SelectPoint':
+						var _p29 = _p14._0;
+						if (_p29.ctor === 'Just') {
+							var _p30 = _p29._0;
+							return A2(_elm_lang$core$List$member, _ohanhi$keyboard_extra$Keyboard_Extra$Shift, model.pressedKeys) ? A2(
+								_elm_lang$core$Platform_Cmd_ops['!'],
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{
+										selectedPoints: A2(_elm_lang$core$List$member, _p30, model.selectedPoints) ? A2(
+											_elm_lang$core$List$filter,
+											F2(
+												function (x, y) {
+													return !_elm_lang$core$Native_Utils.eq(x, y);
+												})(_p30),
+											model.selectedPoints) : {ctor: '::', _0: _p30, _1: model.selectedPoints}
+									}),
+								{ctor: '[]'}) : A2(
+								_elm_lang$core$Platform_Cmd_ops['!'],
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{
+										selectedPoints: {
+											ctor: '::',
+											_0: _p30,
+											_1: {ctor: '[]'}
+										}
+									}),
+								{ctor: '[]'});
+						} else {
+							return A2(
+								_elm_lang$core$Platform_Cmd_ops['!'],
+								model,
+								{ctor: '[]'});
+						}
+					case 'ClearSelection':
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									selectedPoints: {ctor: '[]'}
+								}),
+							{ctor: '[]'});
+					default:
+						var _p31 = _p14._2;
+						if (_p31.ctor === 'Just') {
+							var updatePiece = _elm_lang$core$Maybe$map(
+								A4(_kirchner$elm_pat$Piece$insertAfter, model.store, model.variables, _p31._0, _p14._1));
+							return A2(
+								_elm_lang$core$Platform_Cmd_ops['!'],
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{
+										pieceStore: A3(_kirchner$elm_pat$Store$update, _p14._0, updatePiece, model.pieceStore),
+										tool: _kirchner$elm_pat$Model$None
+									}),
+								{ctor: '[]'});
+						} else {
+							return A2(
+								_elm_lang$core$Platform_Cmd_ops['!'],
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{tool: _kirchner$elm_pat$Model$None}),
+								{ctor: '[]'});
+						}
+				}
+			}());
+	});
+var _kirchner$elm_pat$Editor$ClearSession = {ctor: 'ClearSession'};
+var _kirchner$elm_pat$Editor$FileBrowserMsg = function (a) {
+	return {ctor: 'FileBrowserMsg', _0: a};
+};
+var _kirchner$elm_pat$Editor$ExtendPieceMsg = F3(
+	function (a, b, c) {
+		return {ctor: 'ExtendPieceMsg', _0: a, _1: b, _2: c};
+	});
+var _kirchner$elm_pat$Editor$ClearSelection = {ctor: 'ClearSelection'};
+var _kirchner$elm_pat$Editor$SelectPoint = function (a) {
+	return {ctor: 'SelectPoint', _0: a};
+};
+var _kirchner$elm_pat$Editor$KeyDown = function (a) {
+	return {ctor: 'KeyDown', _0: a};
+};
+var _kirchner$elm_pat$Editor$KeyMsg = function (a) {
+	return {ctor: 'KeyMsg', _0: a};
+};
+var _kirchner$elm_pat$Editor$FocusPoint = function (a) {
+	return {ctor: 'FocusPoint', _0: a};
+};
+var _kirchner$elm_pat$Editor$UpdateCursorPosition = function (a) {
+	return {ctor: 'UpdateCursorPosition', _0: a};
+};
+var _kirchner$elm_pat$Editor$DragStop = function (a) {
+	return {ctor: 'DragStop', _0: a};
+};
+var _kirchner$elm_pat$Editor$DragAt = function (a) {
+	return {ctor: 'DragAt', _0: a};
+};
+var _kirchner$elm_pat$Editor$DragStart = function (a) {
+	return {ctor: 'DragStart', _0: a};
+};
+var _kirchner$elm_pat$Editor$Resize = function (a) {
+	return {ctor: 'Resize', _0: a};
+};
+var _kirchner$elm_pat$Editor$init = function (flags) {
+	var restoredModel = function () {
+		var _p32 = flags.file0;
+		if (_p32.ctor === 'Just') {
+			return A2(_kirchner$elm_pat$File$restore, _p32._0, _kirchner$elm_pat$Model$defaultModel);
+		} else {
+			return _kirchner$elm_pat$Model$defaultModel;
+		}
+	}();
+	return A2(
+		_elm_lang$core$Platform_Cmd_ops['!'],
+		restoredModel,
+		{
+			ctor: '::',
+			_0: A2(_elm_lang$core$Task$perform, _kirchner$elm_pat$Editor$Resize, _elm_lang$window$Window$size),
+			_1: {ctor: '[]'}
+		});
+};
+var _kirchner$elm_pat$Editor$subscriptions = function (model) {
+	var _p33 = model.drag;
+	if (_p33.ctor === 'Nothing') {
+		return _elm_lang$core$Platform_Sub$batch(
+			{
+				ctor: '::',
+				_0: _elm_lang$window$Window$resizes(_kirchner$elm_pat$Editor$Resize),
+				_1: {
+					ctor: '::',
+					_0: A2(_elm_lang$core$Platform_Sub$map, _kirchner$elm_pat$Editor$KeyMsg, _ohanhi$keyboard_extra$Keyboard_Extra$subscriptions),
+					_1: {
+						ctor: '::',
+						_0: _ohanhi$keyboard_extra$Keyboard_Extra$downs(_kirchner$elm_pat$Editor$KeyDown),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	} else {
+		return _elm_lang$core$Platform_Sub$batch(
+			{
+				ctor: '::',
+				_0: _elm_lang$window$Window$resizes(_kirchner$elm_pat$Editor$Resize),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$mouse$Mouse$moves(_kirchner$elm_pat$Editor$DragAt),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$mouse$Mouse$ups(_kirchner$elm_pat$Editor$DragStop),
+						_1: {
+							ctor: '::',
+							_0: A2(_elm_lang$core$Platform_Sub$map, _kirchner$elm_pat$Editor$KeyMsg, _ohanhi$keyboard_extra$Keyboard_Extra$subscriptions),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			});
+	}
+};
+var _kirchner$elm_pat$Editor$AddVariable = {ctor: 'AddVariable'};
+var _kirchner$elm_pat$Editor$NameUpdated = function (a) {
+	return {ctor: 'NameUpdated', _0: a};
+};
+var _kirchner$elm_pat$Editor$ValueUpdated = function (a) {
+	return {ctor: 'ValueUpdated', _0: a};
+};
+var _kirchner$elm_pat$Editor$DeletePoint = function (a) {
+	return {ctor: 'DeletePoint', _0: a};
+};
+var _kirchner$elm_pat$Editor$UpdatePoint = F2(
+	function (a, b) {
+		return {ctor: 'UpdatePoint', _0: a, _1: b};
+	});
+var _kirchner$elm_pat$Editor$AddPoint = function (a) {
+	return {ctor: 'AddPoint', _0: a};
+};
+var _kirchner$elm_pat$Editor$callbacks = {addPoint: _kirchner$elm_pat$Editor$AddPoint, updateCursorPosition: _kirchner$elm_pat$Editor$UpdateCursorPosition, focusPoint: _kirchner$elm_pat$Editor$FocusPoint, selectPoint: _kirchner$elm_pat$Editor$SelectPoint, clearSelection: _kirchner$elm_pat$Editor$ClearSelection, extendPiece: _kirchner$elm_pat$Editor$ExtendPieceMsg};
+var _kirchner$elm_pat$Editor$UpdateTool = function (a) {
+	return {ctor: 'UpdateTool', _0: a};
+};
+
+var _kirchner$elm_pat$Styles_Editor$rem = _rtfeldman$elm_css$Css$rem;
+var _kirchner$elm_pat$Styles_Editor$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('editor__');
+var _kirchner$elm_pat$Styles_Editor$id = _kirchner$elm_pat$Styles_Editor$_p0.id;
+var _kirchner$elm_pat$Styles_Editor$class = _kirchner$elm_pat$Styles_Editor$_p0.$class;
+var _kirchner$elm_pat$Styles_Editor$classList = _kirchner$elm_pat$Styles_Editor$_p0.classList;
+var _kirchner$elm_pat$Styles_Editor$ContainerTopRight = {ctor: 'ContainerTopRight'};
+var _kirchner$elm_pat$Styles_Editor$ContainerBottomRight = {ctor: 'ContainerBottomRight'};
+var _kirchner$elm_pat$Styles_Editor$ContainerBottomLeft = {ctor: 'ContainerBottomLeft'};
+var _kirchner$elm_pat$Styles_Editor$ContainerTopLeft = {ctor: 'ContainerTopLeft'};
+var _kirchner$elm_pat$Styles_Editor$ContainerTopLeftLeft = {ctor: 'ContainerTopLeftLeft'};
+var _kirchner$elm_pat$Styles_Editor$Container = {ctor: 'Container'};
+var _kirchner$elm_pat$Styles_Editor$MouseMove = {ctor: 'MouseMove'};
+var _kirchner$elm_pat$Styles_Editor$Main = {ctor: 'Main'};
+var _kirchner$elm_pat$Styles_Editor$css = function () {
+	var $class = _rtfeldman$elm_css$Css$class;
+	return function (_p1) {
+		return _rtfeldman$elm_css$Css$stylesheet(
+			A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'editor__', _p1));
+	}(
+		{
+			ctor: '::',
+			_0: _rtfeldman$elm_css$Css_Elements$body(
+				{
+					ctor: '::',
+					_0: _rtfeldman$elm_css$Css$margin(_rtfeldman$elm_css$Css$zero),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$overflow(_rtfeldman$elm_css$Css$hidden),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					$class,
+					_kirchner$elm_pat$Styles_Editor$Main,
+					{
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						$class,
+						_kirchner$elm_pat$Styles_Editor$MouseMove,
+						{
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$move),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							$class,
+							_kirchner$elm_pat$Styles_Editor$Container,
+							{
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$padding(
+									_kirchner$elm_pat$Styles_Editor$rem(0.3)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$borderRadius(
+										_rtfeldman$elm_css$Css$px(4)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$color(
+											_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$backgroundColor(
+												_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base2)),
+											_1: {
+												ctor: '::',
+												_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'auto'),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								$class,
+								_kirchner$elm_pat$Styles_Editor$ContainerTopLeftLeft,
+								{
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$top(
+											_kirchner$elm_pat$Styles_Editor$rem(1)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$left(
+												_kirchner$elm_pat$Styles_Editor$rem(1)),
+											_1: {ctor: '[]'}
+										}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									$class,
+									_kirchner$elm_pat$Styles_Editor$ContainerTopLeft,
+									{
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$top(
+												_kirchner$elm_pat$Styles_Editor$rem(1)),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$left(
+													_kirchner$elm_pat$Styles_Editor$rem(5)),
+												_1: {ctor: '[]'}
+											}
+										}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										$class,
+										_kirchner$elm_pat$Styles_Editor$ContainerTopRight,
+										{
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$right(
+													_kirchner$elm_pat$Styles_Editor$rem(1)),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$top(
+														_kirchner$elm_pat$Styles_Editor$rem(1)),
+													_1: {ctor: '[]'}
+												}
+											}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											$class,
+											_kirchner$elm_pat$Styles_Editor$ContainerBottomLeft,
+											{
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$bottom(
+														_kirchner$elm_pat$Styles_Editor$rem(1)),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$left(
+															_kirchner$elm_pat$Styles_Editor$rem(1)),
+														_1: {ctor: '[]'}
+													}
+												}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												$class,
+												_kirchner$elm_pat$Styles_Editor$ContainerBottomRight,
+												{
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$bottom(
+															_kirchner$elm_pat$Styles_Editor$rem(1)),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$right(
+																_kirchner$elm_pat$Styles_Editor$rem(1)),
+															_1: {ctor: '[]'}
+														}
+													}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+}();
+
+var _kirchner$elm_pat$View_Canvas$pieceHelper = F5(
+	function (extendPiece, _p0, rest, veryFirst, drawn) {
+		pieceHelper:
+		while (true) {
+			var _p1 = _p0;
+			var _p5 = _p1._0;
+			var _p4 = _p1._1;
+			var _p2 = rest;
+			if (_p2.ctor === '::') {
+				var _p3 = _p2._0._1;
+				var _v2 = extendPiece,
+					_v3 = {ctor: '_Tuple2', _0: _p2._0._0, _1: _p3},
+					_v4 = _p2._1,
+					_v5 = veryFirst,
+					_v6 = {
+					ctor: '::',
+					_0: A3(
+						_kirchner$elm_pat$Svg_Extra$drawLineSegmentWith,
+						extendPiece(_p5),
+						_p4,
+						_p3),
+					_1: drawn
+				};
+				extendPiece = _v2;
+				_p0 = _v3;
+				rest = _v4;
+				veryFirst = _v5;
+				drawn = _v6;
+				continue pieceHelper;
+			} else {
+				return {
+					ctor: '::',
+					_0: A3(
+						_kirchner$elm_pat$Svg_Extra$drawLineSegmentWith,
+						extendPiece(_p5),
+						_p4,
+						_elm_lang$core$Tuple$second(veryFirst)),
+					_1: drawn
+				};
+			}
+		}
+	});
+var _kirchner$elm_pat$View_Canvas$piecePath = F2(
+	function (_p6, rest) {
+		var _p7 = _p6;
+		var _p11 = _p7._1;
+		var l = F2(
+			function (_p8, restD) {
+				var _p9 = _p8;
+				var _p10 = _p9._1;
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					'L ',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(
+							_elm_community$linear_algebra$Math_Vector2$getX(_p10)),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							' ',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(
+									_elm_community$linear_algebra$Math_Vector2$getY(_p10)),
+								A2(_elm_lang$core$Basics_ops['++'], ' ', restD)))));
+			});
+		var restD = A3(_elm_lang$core$List$foldl, l, '', rest);
+		return A2(
+			_elm_lang$svg$Svg$path,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$d(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'M ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(
+								_elm_community$linear_algebra$Math_Vector2$getX(_p11)),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								' ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(
+										_elm_community$linear_algebra$Math_Vector2$getY(_p11)),
+									A2(_elm_lang$core$Basics_ops['++'], ' ', restD)))))),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$fill(_kirchner$elm_pat$Styles_Colors$blue),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$opacity('0.2'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$pointerEvents('none'),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			},
+			{ctor: '[]'});
+	});
+var _kirchner$elm_pat$View_Canvas$piece = F3(
+	function (extendPiece, data, _p12) {
+		var _p13 = _p12;
+		var _p17 = _p13._1;
+		var segments = A2(
+			_elm_community$list_extra$List_Extra$zip,
+			_kirchner$elm_pat$Piece$toList(_p17),
+			A2(
+				_elm_lang$core$List$filterMap,
+				A2(_kirchner$elm_pat$Point$positionById, data.store, data.variables),
+				_kirchner$elm_pat$Piece$toList(_p17)));
+		var _p14 = segments;
+		if (_p14.ctor === '::') {
+			var _p16 = _p14._1;
+			var _p15 = _p14._0;
+			return {
+				ctor: '::',
+				_0: A2(_kirchner$elm_pat$View_Canvas$piecePath, _p15, _p16),
+				_1: A5(
+					_kirchner$elm_pat$View_Canvas$pieceHelper,
+					extendPiece(_p13._0),
+					_p15,
+					_p16,
+					_p15,
+					{ctor: '[]'})
+			};
+		} else {
+			return {ctor: '[]'};
+		}
+	});
+var _kirchner$elm_pat$View_Canvas$pieces = F2(
+	function (extendPiece, data) {
+		return A2(
+			_elm_lang$core$List$map,
+			_elm_lang$svg$Svg$g(
+				{ctor: '[]'}),
+			A2(
+				_elm_lang$core$List$map,
+				A2(_kirchner$elm_pat$View_Canvas$piece, extendPiece, data),
+				_kirchner$elm_pat$Store$toList(data.pieceStore)));
+	});
+var _kirchner$elm_pat$View_Canvas$point = F2(
+	function (data, point) {
+		var handlers = {
+			withAbsolute: F3(
+				function (point, _p19, _p18) {
+					return A2(
+						_elm_lang$core$Maybe$map,
+						_kirchner$elm_pat$Svg_Extra$drawPoint(_kirchner$elm_pat$Styles_Colors$base0),
+						A3(_kirchner$elm_pat$Point$position, data.store, data.variables, point));
+				}),
+			withRelative: F4(
+				function (point, anchorId, _p21, _p20) {
+					var draw = F2(
+						function (v, w) {
+							return A2(
+								_elm_lang$svg$Svg$g,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: A2(_kirchner$elm_pat$Svg_Extra$drawPoint, _kirchner$elm_pat$Styles_Colors$base0, w),
+									_1: {
+										ctor: '::',
+										_0: A2(_kirchner$elm_pat$Svg_Extra$drawRectArrow, v, w),
+										_1: {ctor: '[]'}
+									}
+								});
+						});
+					return A3(
+						_elm_lang$core$Maybe$map2,
+						draw,
+						A3(_kirchner$elm_pat$Point$positionById, data.store, data.variables, anchorId),
+						A3(_kirchner$elm_pat$Point$position, data.store, data.variables, point));
+				}),
+			withDistance: F4(
+				function (point, anchorId, _p23, _p22) {
+					var draw = F2(
+						function (v, w) {
+							return A2(
+								_elm_lang$svg$Svg$g,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: A2(_kirchner$elm_pat$Svg_Extra$drawPoint, _kirchner$elm_pat$Styles_Colors$base0, w),
+									_1: {
+										ctor: '::',
+										_0: A2(_kirchner$elm_pat$Svg_Extra$drawArrow, v, w),
+										_1: {ctor: '[]'}
+									}
+								});
+						});
+					return A3(
+						_elm_lang$core$Maybe$map2,
+						draw,
+						A3(_kirchner$elm_pat$Point$positionById, data.store, data.variables, anchorId),
+						A3(_kirchner$elm_pat$Point$position, data.store, data.variables, point));
+				}),
+			withBetween: F4(
+				function (_p27, _p26, _p25, _p24) {
+					return _elm_lang$core$Maybe$Just(
+						A2(
+							_elm_lang$svg$Svg$g,
+							{ctor: '[]'},
+							{ctor: '[]'}));
+				})
+		};
+		return A2(_kirchner$elm_pat$Point$dispatch, handlers, point);
+	});
+var _kirchner$elm_pat$View_Canvas$points = function (data) {
+	return A2(
+		_elm_lang$core$List$filterMap,
+		_kirchner$elm_pat$View_Canvas$point(data),
+		_kirchner$elm_pat$Store$values(data.store));
+};
+var _kirchner$elm_pat$View_Canvas$origin = A2(
+	_elm_lang$svg$Svg$g,
+	{ctor: '[]'},
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_lang$svg$Svg$line,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$x1('-10'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$y1('0'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$x2('10'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$y2('0'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$green),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			},
+			{ctor: '[]'}),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$svg$Svg$line,
+				{
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$x1('0'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$y1('-10'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$x2('0'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$y2('10'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$green),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {ctor: '[]'}
+		}
+	});
+var _kirchner$elm_pat$View_Canvas$viewSelectedPoint = F3(
+	function (data, first, id) {
+		var position = A2(
+			_elm_lang$core$Maybe$andThen,
+			A2(_kirchner$elm_pat$Point$position, data.store, data.variables),
+			A2(_kirchner$elm_pat$Store$get, id, data.store));
+		var _p28 = position;
+		if (_p28.ctor === 'Just') {
+			var _p29 = _p28._0;
+			return _elm_lang$core$Maybe$Just(
+				A2(
+					_elm_lang$svg$Svg$g,
+					{ctor: '[]'},
+					first ? {
+						ctor: '::',
+						_0: A2(_kirchner$elm_pat$Svg_Extra$drawPoint, _kirchner$elm_pat$Styles_Colors$red, _p29),
+						_1: {
+							ctor: '::',
+							_0: A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$red, _p29),
+							_1: {ctor: '[]'}
+						}
+					} : {
+						ctor: '::',
+						_0: A2(_kirchner$elm_pat$Svg_Extra$drawPoint, _kirchner$elm_pat$Styles_Colors$yellow, _p29),
+						_1: {
+							ctor: '::',
+							_0: A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$yellow, _p29),
+							_1: {ctor: '[]'}
+						}
+					}));
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _kirchner$elm_pat$View_Canvas$viewSelectedPoints = function (data) {
+	var tail = function (list) {
+		var _p30 = _elm_lang$core$List$tail(list);
+		if (_p30.ctor === 'Just') {
+			return _p30._0;
+		} else {
+			return {ctor: '[]'};
+		}
+	};
+	return A2(
+		_elm_lang$svg$Svg$g,
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$List$filterMap,
+			_elm_lang$core$Basics$identity,
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$core$Maybe$andThen,
+					A2(_kirchner$elm_pat$View_Canvas$viewSelectedPoint, data, true),
+					_elm_lang$core$List$head(data.selectedPoints)),
+				_1: A2(
+					_elm_lang$core$List$map,
+					A2(_kirchner$elm_pat$View_Canvas$viewSelectedPoint, data, false),
+					tail(data.selectedPoints))
+			}));
+};
+var _kirchner$elm_pat$View_Canvas$dragArea = F2(
+	function (startDrag, viewPort) {
+		return A2(
+			_elm_lang$svg$Svg$rect,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$x(
+					_elm_lang$core$Basics$toString(viewPort.x)),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$y(
+						_elm_lang$core$Basics$toString(viewPort.y)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$width(
+							_elm_lang$core$Basics$toString(viewPort.width)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$height(
+								_elm_lang$core$Basics$toString(viewPort.height)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$strokeWidth('0'),
+									_1: {
+										ctor: '::',
+										_0: _kirchner$elm_pat$Events$onMouseDown(startDrag),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			{ctor: '[]'});
+	});
+var _kirchner$elm_pat$View_Canvas$grid = F2(
+	function (config, viewPort) {
+		var color = function (k) {
+			return _elm_lang$core$Native_Utils.eq(
+				A2(_elm_lang$core$Basics_ops['%'], k, config.highlight),
+				0) ? config.color2 : config.color1;
+		};
+		var dy = viewPort.y + ((viewPort.height / 2) | 0);
+		var dx = viewPort.x + ((viewPort.width / 2) | 0);
+		var translationOffset = A2(
+			_elm_community$linear_algebra$Math_Vector2$vec2,
+			_elm_lang$core$Basics$toFloat(dx),
+			_elm_lang$core$Basics$toFloat(dy));
+		var correctionOffset = A2(
+			_elm_community$linear_algebra$Math_Vector2$vec2,
+			_elm_lang$core$Basics$toFloat(
+				A2(_elm_lang$core$Basics_ops['%'], 0 - dx, config.offset)),
+			_elm_lang$core$Basics$toFloat(
+				A2(_elm_lang$core$Basics_ops['%'], 0 - dy, config.offset)));
+		var pr = function (u) {
+			return A2(
+				_elm_community$linear_algebra$Math_Vector2$add,
+				correctionOffset,
+				A2(_elm_community$linear_algebra$Math_Vector2$add, translationOffset, u));
+		};
+		var translation = pr(
+			A2(_elm_community$linear_algebra$Math_Vector2$vec2, 0, 0));
+		var tx = _elm_community$linear_algebra$Math_Vector2$getX(translation);
+		var ty = _elm_community$linear_algebra$Math_Vector2$getY(translation);
+		var n = A2(
+			F2(
+				function (x, y) {
+					return x + y;
+				}),
+			4,
+			(A2(_elm_lang$core$Basics$max, viewPort.height, viewPort.width) / config.offset) | 0);
+		var nh = (n / 2) | 0;
+		var y = _elm_lang$core$Basics$toFloat(viewPort.height + (2 * config.offset)) / 2;
+		var x = _elm_lang$core$Basics$toFloat(viewPort.width + (2 * config.offset)) / 2;
+		var line = F3(
+			function (color, u, v) {
+				return A2(
+					_elm_lang$svg$Svg$line,
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$x1(
+							_elm_lang$core$Basics$toString(
+								_elm_community$linear_algebra$Math_Vector2$getX(u))),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$y1(
+								_elm_lang$core$Basics$toString(
+									_elm_community$linear_algebra$Math_Vector2$getY(u))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$x2(
+									_elm_lang$core$Basics$toString(
+										_elm_community$linear_algebra$Math_Vector2$getX(v))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$y2(
+										_elm_lang$core$Basics$toString(
+											_elm_community$linear_algebra$Math_Vector2$getY(v))),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$stroke(color),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					},
+					{ctor: '[]'});
+			});
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$transform(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'translate(',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(tx),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								',',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(ty),
+									')'))))),
+				_1: {ctor: '[]'}
+			},
+			_elm_lang$core$List$concat(
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$core$List$map,
+						function (k_) {
+							var y = _elm_lang$core$Basics$toFloat((k_ - nh) * config.offset);
+							var u = A2(_elm_community$linear_algebra$Math_Vector2$vec2, 0 - x, y);
+							var k = (_elm_lang$core$Basics$floor(
+								_elm_community$linear_algebra$Math_Vector2$getY(
+									pr(u))) / config.offset) | 0;
+							var v = A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y);
+							return A3(
+								line,
+								color(k),
+								u,
+								v);
+						},
+						A2(_elm_lang$core$List$range, 0, n)),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$core$List$map,
+							function (k_) {
+								var x = _elm_lang$core$Basics$toFloat((k_ - nh) * config.offset);
+								var u = A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, 0 - y);
+								var k = (_elm_lang$core$Basics$floor(
+									_elm_community$linear_algebra$Math_Vector2$getX(
+										pr(u))) / config.offset) | 0;
+								var v = A2(_elm_community$linear_algebra$Math_Vector2$vec2, x, y);
+								return A3(
+									line,
+									color(k),
+									u,
+									v);
+							},
+							A2(_elm_lang$core$List$range, 0, n)),
+						_1: {ctor: '[]'}
+					}
+				}));
+	});
+var _kirchner$elm_pat$View_Canvas$defaultGridConfig = {offset: 50, unit: 'mm', color1: 'rgba(0,0,0,0.08)', color2: 'rgba(0,0,0,0.24)', highlight: 5};
+var _kirchner$elm_pat$View_Canvas$view = F7(
+	function (tool, startDrag, focusPoint, selectPoint, extendPiece, data, pieceStore) {
+		var viewBoxString = A2(
+			_elm_lang$core$String$join,
+			' ',
+			{
+				ctor: '::',
+				_0: _elm_lang$core$Basics$toString(data.viewPort.x),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Basics$toString(data.viewPort.y),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Basics$toString(data.viewPort.width),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$core$Basics$toString(data.viewPort.height),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			});
+		return A2(
+			_elm_lang$svg$Svg$svg,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$viewBox(viewBoxString),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'background-color', _1: _kirchner$elm_pat$Styles_Colors$base3},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'width',
+									_1: _elm_lang$core$Basics$toString(data.viewPort.width)
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'height',
+										_1: _elm_lang$core$Basics$toString(data.viewPort.height)
+									},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'user-select', _1: 'none'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: '-moz-user-select', _1: 'none'},
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: A2(_kirchner$elm_pat$View_Canvas$grid, _kirchner$elm_pat$View_Canvas$defaultGridConfig, data.viewPort),
+				_1: {
+					ctor: '::',
+					_0: _kirchner$elm_pat$View_Canvas$origin,
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$svg$Svg$g,
+							{ctor: '[]'},
+							_kirchner$elm_pat$View_Canvas$points(data)),
+						_1: {
+							ctor: '::',
+							_0: _kirchner$elm_pat$View_Canvas$viewSelectedPoints(data),
+							_1: {
+								ctor: '::',
+								_0: A2(_kirchner$elm_pat$View_Canvas$dragArea, startDrag, data.viewPort),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$svg$Svg$g,
+										{ctor: '[]'},
+										A2(_kirchner$elm_pat$View_Canvas$pieces, extendPiece, data)),
+									_1: {
+										ctor: '::',
+										_0: A3(_kirchner$elm_pat$Tools_Common$svgSelectPoint, focusPoint, selectPoint, data),
+										_1: {
+											ctor: '::',
+											_0: tool,
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+	});
+var _kirchner$elm_pat$View_Canvas$GridConfig = F5(
+	function (a, b, c, d, e) {
+		return {unit: a, color1: b, color2: c, highlight: d, offset: e};
+	});
+
+var _kirchner$elm_pat$Styles_PointTable$rem = _rtfeldman$elm_css$Css$rem;
+var _kirchner$elm_pat$Styles_PointTable$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('point-table__');
+var _kirchner$elm_pat$Styles_PointTable$id = _kirchner$elm_pat$Styles_PointTable$_p0.id;
+var _kirchner$elm_pat$Styles_PointTable$class = _kirchner$elm_pat$Styles_PointTable$_p0.$class;
+var _kirchner$elm_pat$Styles_PointTable$classList = _kirchner$elm_pat$Styles_PointTable$_p0.classList;
+var _kirchner$elm_pat$Styles_PointTable$Icon = {ctor: 'Icon'};
+var _kirchner$elm_pat$Styles_PointTable$IconButton = {ctor: 'IconButton'};
+var _kirchner$elm_pat$Styles_PointTable$CellAction = {ctor: 'CellAction'};
+var _kirchner$elm_pat$Styles_PointTable$CellType = {ctor: 'CellType'};
+var _kirchner$elm_pat$Styles_PointTable$CellCoordinate = {ctor: 'CellCoordinate'};
+var _kirchner$elm_pat$Styles_PointTable$CellName = {ctor: 'CellName'};
+var _kirchner$elm_pat$Styles_PointTable$CellId = {ctor: 'CellId'};
+var _kirchner$elm_pat$Styles_PointTable$RowSelectedLast = {ctor: 'RowSelectedLast'};
+var _kirchner$elm_pat$Styles_PointTable$RowSelected = {ctor: 'RowSelected'};
+var _kirchner$elm_pat$Styles_PointTable$Row = {ctor: 'Row'};
+var _kirchner$elm_pat$Styles_PointTable$Table = {ctor: 'Table'};
+var _kirchner$elm_pat$Styles_PointTable$css = function () {
+	var $class = _rtfeldman$elm_css$Css$class;
+	return function (_p1) {
+		return _rtfeldman$elm_css$Css$stylesheet(
+			A2(_rtfeldman$elm_css$Css_Namespace$namespace, 'point-table__', _p1));
+	}(
+		{
+			ctor: '::',
+			_0: A2(
+				$class,
+				_kirchner$elm_pat$Styles_PointTable$Table,
+				{
+					ctor: '::',
+					_0: A2(_rtfeldman$elm_css$Css$property, 'pointer-events', 'auto'),
+					_1: {
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$fontFamily(_rtfeldman$elm_css$Css$monospace),
+						_1: {
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$fontSize(
+								_rtfeldman$elm_css$Css$px(16)),
+							_1: {
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$lineHeight(
+									_kirchner$elm_pat$Styles_PointTable$rem(1)),
+								_1: {
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$borderCollapse(_rtfeldman$elm_css$Css$collapse),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$children(
+											{
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css_Elements$tr(
+													{
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$children(
+															{
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css_Elements$th(
+																	{
+																		ctor: '::',
+																		_0: _rtfeldman$elm_css$Css$paddingLeft(
+																			_kirchner$elm_pat$Styles_PointTable$rem(0.3)),
+																		_1: {
+																			ctor: '::',
+																			_0: _rtfeldman$elm_css$Css$paddingRight(
+																				_kirchner$elm_pat$Styles_PointTable$rem(0.3)),
+																			_1: {
+																				ctor: '::',
+																				_0: _rtfeldman$elm_css$Css$paddingTop(
+																					_kirchner$elm_pat$Styles_PointTable$rem(0.5)),
+																				_1: {
+																					ctor: '::',
+																					_0: _rtfeldman$elm_css$Css$paddingBottom(
+																						_kirchner$elm_pat$Styles_PointTable$rem(0.5)),
+																					_1: {
+																						ctor: '::',
+																						_0: A3(
+																							_rtfeldman$elm_css$Css$borderBottom3,
+																							_rtfeldman$elm_css$Css$px(1),
+																							_rtfeldman$elm_css$Css$solid,
+																							_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
+																						_1: {
+																							ctor: '::',
+																							_0: _rtfeldman$elm_css$Css$fontWeight(_rtfeldman$elm_css$Css$bold),
+																							_1: {ctor: '[]'}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}),
+																_1: {
+																	ctor: '::',
+																	_0: _rtfeldman$elm_css$Css_Elements$td(
+																		{
+																			ctor: '::',
+																			_0: _rtfeldman$elm_css$Css$paddingLeft(
+																				_kirchner$elm_pat$Styles_PointTable$rem(0.3)),
+																			_1: {
+																				ctor: '::',
+																				_0: _rtfeldman$elm_css$Css$paddingRight(
+																					_kirchner$elm_pat$Styles_PointTable$rem(0.3)),
+																				_1: {
+																					ctor: '::',
+																					_0: _rtfeldman$elm_css$Css$paddingTop(
+																						_kirchner$elm_pat$Styles_PointTable$rem(0.5)),
+																					_1: {
+																						ctor: '::',
+																						_0: _rtfeldman$elm_css$Css$paddingBottom(
+																							_kirchner$elm_pat$Styles_PointTable$rem(0.5)),
+																						_1: {ctor: '[]'}
+																					}
+																				}
+																			}
+																		}),
+																	_1: {ctor: '[]'}
+																}
+															}),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					$class,
+					_kirchner$elm_pat$Styles_PointTable$RowSelected,
+					{
+						ctor: '::',
+						_0: _rtfeldman$elm_css$Css$color(
+							_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$yellow)),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						$class,
+						_kirchner$elm_pat$Styles_PointTable$RowSelectedLast,
+						{
+							ctor: '::',
+							_0: _rtfeldman$elm_css$Css$color(
+								_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$orange)),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							$class,
+							_kirchner$elm_pat$Styles_PointTable$CellId,
+							{
+								ctor: '::',
+								_0: _rtfeldman$elm_css$Css$width(
+									_kirchner$elm_pat$Styles_PointTable$rem(1)),
+								_1: {
+									ctor: '::',
+									_0: A3(
+										_rtfeldman$elm_css$Css$borderRight3,
+										_rtfeldman$elm_css$Css$px(1),
+										_rtfeldman$elm_css$Css$solid,
+										_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$right),
+										_1: {ctor: '[]'}
+									}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								$class,
+								_kirchner$elm_pat$Styles_PointTable$CellName,
+								{
+									ctor: '::',
+									_0: _rtfeldman$elm_css$Css$width(
+										_kirchner$elm_pat$Styles_PointTable$rem(5)),
+									_1: {
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$left),
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									$class,
+									_kirchner$elm_pat$Styles_PointTable$CellCoordinate,
+									{
+										ctor: '::',
+										_0: _rtfeldman$elm_css$Css$width(
+											_kirchner$elm_pat$Styles_PointTable$rem(3)),
+										_1: {
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$right),
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										$class,
+										_kirchner$elm_pat$Styles_PointTable$CellType,
+										{
+											ctor: '::',
+											_0: _rtfeldman$elm_css$Css$width(
+												_kirchner$elm_pat$Styles_PointTable$rem(6)),
+											_1: {
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
+												_1: {ctor: '[]'}
+											}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											$class,
+											_kirchner$elm_pat$Styles_PointTable$CellAction,
+											{
+												ctor: '::',
+												_0: _rtfeldman$elm_css$Css$width(
+													_kirchner$elm_pat$Styles_PointTable$rem(1)),
+												_1: {
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$textAlign(_rtfeldman$elm_css$Css$center),
+													_1: {ctor: '[]'}
+												}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												$class,
+												_kirchner$elm_pat$Styles_PointTable$IconButton,
+												{
+													ctor: '::',
+													_0: _rtfeldman$elm_css$Css$width(
+														_kirchner$elm_pat$Styles_PointTable$rem(1)),
+													_1: {
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$height(
+															_kirchner$elm_pat$Styles_PointTable$rem(1)),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$borderRadius(
+																_rtfeldman$elm_css$Css$pct(50)),
+															_1: {
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css$color(
+																	_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base0)),
+																_1: {
+																	ctor: '::',
+																	_0: _rtfeldman$elm_css$Css$backgroundColor(_rtfeldman$elm_css$Css$transparent),
+																	_1: {
+																		ctor: '::',
+																		_0: _rtfeldman$elm_css$Css$cursor(_rtfeldman$elm_css$Css$pointer),
+																		_1: {
+																			ctor: '::',
+																			_0: _rtfeldman$elm_css$Css$hover(
+																				{
+																					ctor: '::',
+																					_0: _rtfeldman$elm_css$Css$backgroundColor(
+																						_rtfeldman$elm_css$Css$hex(_kirchner$elm_pat$Styles_Colors$base3)),
+																					_1: {ctor: '[]'}
+																				}),
+																			_1: {
+																				ctor: '::',
+																				_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$relative),
+																				_1: {ctor: '[]'}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													$class,
+													_kirchner$elm_pat$Styles_PointTable$Icon,
+													{
+														ctor: '::',
+														_0: _rtfeldman$elm_css$Css$important(
+															_rtfeldman$elm_css$Css$fontSize(
+																_kirchner$elm_pat$Styles_PointTable$rem(0.6))),
+														_1: {
+															ctor: '::',
+															_0: _rtfeldman$elm_css$Css$important(
+																_rtfeldman$elm_css$Css$lineHeight(
+																	_kirchner$elm_pat$Styles_PointTable$rem(0.6))),
+															_1: {
+																ctor: '::',
+																_0: _rtfeldman$elm_css$Css$position(_rtfeldman$elm_css$Css$absolute),
+																_1: {
+																	ctor: '::',
+																	_0: _rtfeldman$elm_css$Css$top(
+																		_rtfeldman$elm_css$Css$pct(50)),
+																	_1: {
+																		ctor: '::',
+																		_0: _rtfeldman$elm_css$Css$left(
+																			_rtfeldman$elm_css$Css$pct(50)),
+																		_1: {
+																			ctor: '::',
+																			_0: _rtfeldman$elm_css$Css$transform(
+																				A2(
+																					_rtfeldman$elm_css$Css$translate2,
+																					_rtfeldman$elm_css$Css$pct(-50),
+																					_rtfeldman$elm_css$Css$pct(-50))),
+																			_1: {ctor: '[]'}
+																		}
+																	}
+																}
+															}
+														}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+}();
+
+var _kirchner$elm_pat$Views_PointTable$printPoint = F2(
+	function (variables, point) {
+		var handlers = {
+			withAbsolute: F3(
+				function (_p2, _p1, _p0) {
+					return 'absolute';
+				}),
+			withRelative: F4(
+				function (_p6, _p5, _p4, _p3) {
+					return 'relative';
+				}),
+			withDistance: F4(
+				function (_p10, _p9, _p8, _p7) {
+					return 'distance';
+				}),
+			withBetween: F4(
+				function (_p14, _p13, _p12, _p11) {
+					return 'between';
+				})
+		};
+		return A2(_kirchner$elm_pat$Point$dispatch, handlers, point);
+	});
+var _kirchner$elm_pat$Views_PointTable$viewPointEntry = F2(
+	function (data, _p15) {
+		var _p16 = _p15;
+		var _p18 = _p16._1;
+		var _p17 = _p16._0;
+		var isSelectedLast = _elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$Maybe$Just(_p17),
+			_elm_lang$core$List$head(data.selectedPoints));
+		var isSelected = A2(_elm_lang$core$List$member, _p17, data.selectedPoints);
+		var v = A3(_kirchner$elm_pat$Point$position, data.store, data.variables, _p18);
 		var x = A2(
 			_elm_lang$core$Maybe$withDefault,
 			'',
@@ -20618,7 +26787,27 @@ var _kirchner$elm_pat$Views_PointTable$viewPointEntry = F3(
 					A2(_elm_lang$core$Maybe$map, _elm_community$linear_algebra$Math_Vector2$getY, v))));
 		return A2(
 			_elm_lang$html$Html$tr,
-			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _kirchner$elm_pat$Styles_PointTable$class(
+					A2(
+						_elm_lang$core$List$filterMap,
+						_elm_lang$core$Basics$identity,
+						{
+							ctor: '::',
+							_0: _elm_lang$core$Maybe$Just(_kirchner$elm_pat$Styles_PointTable$Row),
+							_1: {
+								ctor: '::',
+								_0: isSelected ? _elm_lang$core$Maybe$Just(_kirchner$elm_pat$Styles_PointTable$RowSelected) : _elm_lang$core$Maybe$Nothing,
+								_1: {
+									ctor: '::',
+									_0: isSelectedLast ? _elm_lang$core$Maybe$Just(_kirchner$elm_pat$Styles_PointTable$RowSelectedLast) : _elm_lang$core$Maybe$Nothing,
+									_1: {ctor: '[]'}
+								}
+							}
+						})),
+				_1: {ctor: '[]'}
+			},
 			{
 				ctor: '::',
 				_0: A2(
@@ -20636,7 +26825,8 @@ var _kirchner$elm_pat$Views_PointTable$viewPointEntry = F3(
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text(
-							_elm_lang$core$Basics$toString(_p3)),
+							_elm_lang$core$Basics$toString(
+								_kirchner$elm_pat$Store$toInt(_p17))),
 						_1: {ctor: '[]'}
 					}),
 				_1: {
@@ -20648,14 +26838,15 @@ var _kirchner$elm_pat$Views_PointTable$viewPointEntry = F3(
 							_0: _kirchner$elm_pat$Styles_PointTable$class(
 								{
 									ctor: '::',
-									_0: _kirchner$elm_pat$Styles_PointTable$CellCoordinate,
+									_0: _kirchner$elm_pat$Styles_PointTable$CellName,
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(x),
+							_0: _elm_lang$html$Html$text(
+								_kirchner$elm_pat$Point$name(_p18)),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -20674,7 +26865,7 @@ var _kirchner$elm_pat$Views_PointTable$viewPointEntry = F3(
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text(y),
+								_0: _elm_lang$html$Html$text(x),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -20686,15 +26877,14 @@ var _kirchner$elm_pat$Views_PointTable$viewPointEntry = F3(
 									_0: _kirchner$elm_pat$Styles_PointTable$class(
 										{
 											ctor: '::',
-											_0: _kirchner$elm_pat$Styles_PointTable$CellType,
+											_0: _kirchner$elm_pat$Styles_PointTable$CellCoordinate,
 											_1: {ctor: '[]'}
 										}),
 									_1: {ctor: '[]'}
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										A2(_kirchner$elm_pat$Views_PointTable$printPoint, variables, _p4)),
+									_0: _elm_lang$html$Html$text(y),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -20706,17 +26896,15 @@ var _kirchner$elm_pat$Views_PointTable$viewPointEntry = F3(
 										_0: _kirchner$elm_pat$Styles_PointTable$class(
 											{
 												ctor: '::',
-												_0: _kirchner$elm_pat$Styles_PointTable$CellAction,
+												_0: _kirchner$elm_pat$Styles_PointTable$CellType,
 												_1: {ctor: '[]'}
 											}),
 										_1: {ctor: '[]'}
 									},
 									{
 										ctor: '::',
-										_0: A2(
-											_kirchner$elm_pat$Views_Common$iconSmall,
-											'edit',
-											_kirchner$elm_pat$Editor$SelectPoint(_p3)),
+										_0: _elm_lang$html$Html$text(
+											A2(_kirchner$elm_pat$Views_PointTable$printPoint, data.variables, _p18)),
 										_1: {ctor: '[]'}
 									}),
 								_1: {
@@ -20738,7 +26926,7 @@ var _kirchner$elm_pat$Views_PointTable$viewPointEntry = F3(
 											_0: A2(
 												_kirchner$elm_pat$Views_Common$iconSmall,
 												'delete',
-												_kirchner$elm_pat$Editor$DeletePoint(_p3)),
+												_kirchner$elm_pat$Editor$DeletePoint(_p17)),
 											_1: {ctor: '[]'}
 										}),
 									_1: {ctor: '[]'}
@@ -20749,26 +26937,44 @@ var _kirchner$elm_pat$Views_PointTable$viewPointEntry = F3(
 				}
 			});
 	});
-var _kirchner$elm_pat$Views_PointTable$view = F2(
-	function (variables, store) {
-		return A2(
-			_elm_lang$html$Html$table,
-			{
-				ctor: '::',
-				_0: _kirchner$elm_pat$Styles_PointTable$class(
-					{
-						ctor: '::',
-						_0: _kirchner$elm_pat$Styles_PointTable$Table,
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$tr,
-					{ctor: '[]'},
-					{
+var _kirchner$elm_pat$Views_PointTable$view = function (data) {
+	return A2(
+		_elm_lang$html$Html$table,
+		{
+			ctor: '::',
+			_0: _kirchner$elm_pat$Styles_PointTable$class(
+				{
+					ctor: '::',
+					_0: _kirchner$elm_pat$Styles_PointTable$Table,
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$tr,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$th,
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Styles_PointTable$class(
+								{
+									ctor: '::',
+									_0: _kirchner$elm_pat$Styles_PointTable$CellId,
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('#'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$th,
@@ -20777,14 +26983,14 @@ var _kirchner$elm_pat$Views_PointTable$view = F2(
 								_0: _kirchner$elm_pat$Styles_PointTable$class(
 									{
 										ctor: '::',
-										_0: _kirchner$elm_pat$Styles_PointTable$CellId,
+										_0: _kirchner$elm_pat$Styles_PointTable$CellName,
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('#'),
+								_0: _elm_lang$html$Html$text('name'),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -20855,34 +27061,19 @@ var _kirchner$elm_pat$Views_PointTable$view = F2(
 												_1: {ctor: '[]'}
 											},
 											{ctor: '[]'}),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$th,
-												{
-													ctor: '::',
-													_0: _kirchner$elm_pat$Styles_PointTable$class(
-														{
-															ctor: '::',
-															_0: _kirchner$elm_pat$Styles_PointTable$CellAction,
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
-												},
-												{ctor: '[]'}),
-											_1: {ctor: '[]'}
-										}
+										_1: {ctor: '[]'}
 									}
 								}
 							}
 						}
-					}),
-				_1: A2(
-					_elm_lang$core$List$map,
-					A2(_kirchner$elm_pat$Views_PointTable$viewPointEntry, variables, store),
-					_elm_lang$core$Dict$toList(store))
-			});
-	});
+					}
+				}),
+			_1: A2(
+				_elm_lang$core$List$map,
+				_kirchner$elm_pat$Views_PointTable$viewPointEntry(data),
+				_kirchner$elm_pat$Store$toList(data.store))
+		});
+};
 
 var _kirchner$elm_pat$Styles_ToolBox$rem = _rtfeldman$elm_css$Css$rem;
 var _kirchner$elm_pat$Styles_ToolBox$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('tool-box__');
@@ -20918,7 +27109,7 @@ var _kirchner$elm_pat$Styles_ToolBox$css = function () {
 		});
 }();
 
-var _kirchner$elm_pat$Views_ToolBox$view = function () {
+var _kirchner$elm_pat$Views_ToolBox$view = function (data) {
 	var button = function (tool) {
 		return A2(
 			_kirchner$elm_pat$Views_Common$iconBig,
@@ -20937,8 +27128,11 @@ var _kirchner$elm_pat$Views_ToolBox$view = function () {
 				}),
 			_1: {ctor: '[]'}
 		},
-		A2(_elm_lang$core$List$map, button, _kirchner$elm_pat$Editor$allTools));
-}();
+		A2(
+			_elm_lang$core$List$map,
+			button,
+			_kirchner$elm_pat$Editor$allTools(data)));
+};
 
 var _kirchner$elm_pat$Styles_VariableTable$rem = _rtfeldman$elm_css$Css$rem;
 var _kirchner$elm_pat$Styles_VariableTable$_p0 = _rtfeldman$elm_css_helpers$Html_CssHelpers$withNamespace('variable-table__');
@@ -21642,10 +27836,8 @@ var _kirchner$elm_pat$Views_VariableTable$view = F3(
 				}));
 	});
 
-var _kirchner$elm_pat$View$drawTool = F6(
-	function (viewPort, variables, store, cursorPosition, focusedPoint, tool) {
-		var callbacks = {addPoint: _kirchner$elm_pat$Editor$AddPoint, updateCursorPosition: _kirchner$elm_pat$Editor$UpdateCursorPosition, focusPoint: _kirchner$elm_pat$Editor$FocusPoint};
-		var data = {store: store, variables: variables, viewPort: viewPort, cursorPosition: cursorPosition, focusedPoint: focusedPoint};
+var _kirchner$elm_pat$View$drawTool = F3(
+	function (callbacks, data, tool) {
 		var _p0 = tool;
 		switch (_p0.ctor) {
 			case 'Absolute':
@@ -21654,7 +27846,7 @@ var _kirchner$elm_pat$View$drawTool = F6(
 					callbacks,
 					function (_p1) {
 						return _kirchner$elm_pat$Editor$UpdateTool(
-							_kirchner$elm_pat$Editor$Absolute(_p1));
+							_kirchner$elm_pat$Model$Absolute(_p1));
 					},
 					data,
 					_p0._0);
@@ -21664,7 +27856,7 @@ var _kirchner$elm_pat$View$drawTool = F6(
 					callbacks,
 					function (_p2) {
 						return _kirchner$elm_pat$Editor$UpdateTool(
-							_kirchner$elm_pat$Editor$Relative(_p2));
+							_kirchner$elm_pat$Model$Relative(_p2));
 					},
 					data,
 					_p0._0);
@@ -21674,10 +27866,12 @@ var _kirchner$elm_pat$View$drawTool = F6(
 					callbacks,
 					function (_p3) {
 						return _kirchner$elm_pat$Editor$UpdateTool(
-							_kirchner$elm_pat$Editor$Distance(_p3));
+							_kirchner$elm_pat$Model$Distance(_p3));
 					},
 					data,
 					_p0._0);
+			case 'ExtendPiece':
+				return A3(_kirchner$elm_pat$Tools_ExtendPiece$svg, callbacks, data, _p0._0);
 			default:
 				return A2(
 					_elm_lang$svg$Svg$g,
@@ -21686,18 +27880,27 @@ var _kirchner$elm_pat$View$drawTool = F6(
 		}
 	});
 var _kirchner$elm_pat$View$viewCanvas = function (model) {
-	return A5(
+	return A7(
 		_kirchner$elm_pat$View_Canvas$view,
-		A6(_kirchner$elm_pat$View$drawTool, model.viewPort, model.variables, model.store, model.cursorPosition, model.focusedPoint, model.tool),
+		A3(
+			_kirchner$elm_pat$View$drawTool,
+			_kirchner$elm_pat$Editor$callbacks,
+			_kirchner$elm_pat$Editor$data(model),
+			model.tool),
 		_kirchner$elm_pat$Editor$DragStart,
-		A2(_kirchner$elm_pat$Editor$getViewPort, model.viewPort, model.drag),
-		model.store,
-		model.variables);
+		_kirchner$elm_pat$Editor$FocusPoint,
+		_kirchner$elm_pat$Editor$SelectPoint,
+		F2(
+			function (id, segment) {
+				return _kirchner$elm_pat$Editor$UpdateTool(
+					_kirchner$elm_pat$Model$ExtendPiece(
+						A2(_kirchner$elm_pat$Tools_ExtendPiece$init, id, segment)));
+			}),
+		_kirchner$elm_pat$Editor$data(model),
+		model.pieceStore);
 };
-var _kirchner$elm_pat$View$viewToolInfo = F5(
-	function (viewPort, variables, store, cursorPosition, tool) {
-		var callbacks = {addPoint: _kirchner$elm_pat$Editor$AddPoint, updateCursorPosition: _kirchner$elm_pat$Editor$UpdateCursorPosition, focusPoint: _kirchner$elm_pat$Editor$FocusPoint};
-		var data = {store: store, variables: variables, viewPort: viewPort, cursorPosition: cursorPosition, focusedPoint: _elm_lang$core$Maybe$Nothing};
+var _kirchner$elm_pat$View$viewToolInfo = F3(
+	function (callbacks, data, tool) {
 		var _p4 = tool;
 		switch (_p4.ctor) {
 			case 'Absolute':
@@ -21725,7 +27928,7 @@ var _kirchner$elm_pat$View$viewToolInfo = F5(
 								callbacks,
 								function (_p5) {
 									return _kirchner$elm_pat$Editor$UpdateTool(
-										_kirchner$elm_pat$Editor$Absolute(_p5));
+										_kirchner$elm_pat$Model$Absolute(_p5));
 								},
 								data,
 								_p4._0),
@@ -21756,7 +27959,7 @@ var _kirchner$elm_pat$View$viewToolInfo = F5(
 								callbacks,
 								function (_p6) {
 									return _kirchner$elm_pat$Editor$UpdateTool(
-										_kirchner$elm_pat$Editor$Relative(_p6));
+										_kirchner$elm_pat$Model$Relative(_p6));
 								},
 								data,
 								_p4._0),
@@ -21787,17 +27990,20 @@ var _kirchner$elm_pat$View$viewToolInfo = F5(
 								callbacks,
 								function (_p7) {
 									return _kirchner$elm_pat$Editor$UpdateTool(
-										_kirchner$elm_pat$Editor$Distance(_p7));
+										_kirchner$elm_pat$Model$Distance(_p7));
 								},
 								data,
 								_p4._0),
 							_1: {ctor: '[]'}
 						}));
+			case 'ExtendPiece':
+				return _elm_lang$core$Maybe$Nothing;
 			default:
 				return _elm_lang$core$Maybe$Nothing;
 		}
 	});
 var _kirchner$elm_pat$View$view = function (model) {
+	var data = _kirchner$elm_pat$Editor$data(model);
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -21847,36 +28053,43 @@ var _kirchner$elm_pat$View$view = function (model) {
 						},
 						{
 							ctor: '::',
-							_0: _kirchner$elm_pat$Views_ToolBox$view,
+							_0: _kirchner$elm_pat$Views_ToolBox$view(data),
 							_1: {ctor: '[]'}
 						})),
 				_1: {
 					ctor: '::',
-					_0: A5(_kirchner$elm_pat$View$viewToolInfo, model.viewPort, model.variables, model.store, model.cursorPosition, model.tool),
+					_0: _elm_lang$core$Maybe$Just(
+						A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _kirchner$elm_pat$Styles_Editor$class(
+									{
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_Editor$Container,
+										_1: {
+											ctor: '::',
+											_0: _kirchner$elm_pat$Styles_Editor$ContainerTopRight,
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_kirchner$elm_pat$FileBrowser$view,
+									{
+										lift: _kirchner$elm_pat$Editor$FileBrowserMsg,
+										clearSession: _elm_lang$core$Maybe$Just(_kirchner$elm_pat$Editor$ClearSession),
+										loadRemoteFile: _elm_lang$core$Maybe$Just(_kirchner$elm_pat$Editor$LoadRemoteFile)
+									},
+									data),
+								_1: {ctor: '[]'}
+							})),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$core$Maybe$Just(
-							A2(
-								_elm_lang$html$Html$div,
-								{
-									ctor: '::',
-									_0: _kirchner$elm_pat$Styles_Editor$class(
-										{
-											ctor: '::',
-											_0: _kirchner$elm_pat$Styles_Editor$Container,
-											_1: {
-												ctor: '::',
-												_0: _kirchner$elm_pat$Styles_Editor$ContainerBottomLeft,
-												_1: {ctor: '[]'}
-											}
-										}),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: A2(_kirchner$elm_pat$Views_PointTable$view, model.variables, model.store),
-									_1: {ctor: '[]'}
-								})),
+						_0: A3(_kirchner$elm_pat$View$viewToolInfo, _kirchner$elm_pat$Editor$callbacks, data, model.tool),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$core$Maybe$Just(
@@ -21890,7 +28103,7 @@ var _kirchner$elm_pat$View$view = function (model) {
 												_0: _kirchner$elm_pat$Styles_Editor$Container,
 												_1: {
 													ctor: '::',
-													_0: _kirchner$elm_pat$Styles_Editor$ContainerBottomRight,
+													_0: _kirchner$elm_pat$Styles_Editor$ContainerBottomLeft,
 													_1: {ctor: '[]'}
 												}
 											}),
@@ -21898,14 +28111,39 @@ var _kirchner$elm_pat$View$view = function (model) {
 									},
 									{
 										ctor: '::',
-										_0: A3(_kirchner$elm_pat$Views_VariableTable$view, model.variables, model.newName, model.newValue),
+										_0: _kirchner$elm_pat$Views_PointTable$view(data),
 										_1: {ctor: '[]'}
 									})),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$core$Maybe$Just(
-									_kirchner$elm_pat$View$viewCanvas(model)),
-								_1: {ctor: '[]'}
+									A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _kirchner$elm_pat$Styles_Editor$class(
+												{
+													ctor: '::',
+													_0: _kirchner$elm_pat$Styles_Editor$Container,
+													_1: {
+														ctor: '::',
+														_0: _kirchner$elm_pat$Styles_Editor$ContainerBottomRight,
+														_1: {ctor: '[]'}
+													}
+												}),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A3(_kirchner$elm_pat$Views_VariableTable$view, model.variables, model.newName, model.newValue),
+											_1: {ctor: '[]'}
+										})),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$core$Maybe$Just(
+										_kirchner$elm_pat$View$viewCanvas(model)),
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}
@@ -21913,8 +28151,43 @@ var _kirchner$elm_pat$View$view = function (model) {
 			}));
 };
 
-var _kirchner$elm_pat$App$main = _elm_lang$html$Html$program(
-	{init: _kirchner$elm_pat$Editor$init, update: _kirchner$elm_pat$Editor$update, subscriptions: _kirchner$elm_pat$Editor$subscriptions, view: _kirchner$elm_pat$View$view})();
+var _kirchner$elm_pat$App$autofocus = _elm_lang$core$Native_Platform.outgoingPort(
+	'autofocus',
+	function (v) {
+		return null;
+	});
+var _kirchner$elm_pat$App$serialize = _elm_lang$core$Native_Platform.outgoingPort(
+	'serialize',
+	function (v) {
+		return v;
+	});
+var _kirchner$elm_pat$App$ports = {autofocus: _kirchner$elm_pat$App$autofocus, serialize: _kirchner$elm_pat$App$serialize};
+var _kirchner$elm_pat$App$main = _elm_lang$html$Html$programWithFlags(
+	{
+		init: _kirchner$elm_pat$Editor$init,
+		update: _kirchner$elm_pat$Editor$update(_kirchner$elm_pat$App$ports),
+		subscriptions: _kirchner$elm_pat$Editor$subscriptions,
+		view: _kirchner$elm_pat$View$view
+	})(
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (file0) {
+			return _elm_lang$core$Json_Decode$succeed(
+				{file0: file0});
+		},
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'file0',
+			_elm_lang$core$Json_Decode$oneOf(
+				{
+					ctor: '::',
+					_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
+					_1: {
+						ctor: '::',
+						_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$value),
+						_1: {ctor: '[]'}
+					}
+				}))));
 
 var Elm = {};
 Elm['App'] = Elm['App'] || {};

@@ -1,10 +1,46 @@
-.absoluteToolBox {
+.tool__ToolBox {
     background-color: #eee8d5;
-    width: 10rem;
     pointer-events: auto;
+    display: flex;
 }
 
-.absoluteButton {
+.tool__ValueContainer {
+    position: relative;
+    display: flex;
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+    margin: 2px;
+    border: 0;
+}
+
+.tool__ValueContainer:hover {
+    margin: 0;
+    border: 2px solid #839496;
+}
+
+.tool__Textfield {
+    border-color: transparent;
+    font-family: monospace;
+    font-size: 1rem;
+    line-height: 1rem;
+    width: 20rem;
+    background-color: transparent;
+}
+
+.tool__Textfield:focus {
+    outline: none;
+}
+
+.tool__IconContainer {
+    position: absolute;
+    right: 0.3rem;
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+    justify-content: space-around;
+}
+
+.tool__Button {
     text-align: center;
     width: 10rem;
     height: 2rem;
@@ -14,67 +50,39 @@
     cursor: pointer;
 }
 
-.absoluteButton:hover {
+.tool__Button:hover {
     background-color: #073642;
 }
 
-.absoluteTextfield {
-    border-color: transparent;
-    font-family: monospace;
-    font-size: 1rem;
-    line-height: 1rem;
-    width: 4.8rem;
-    background-color: transparent;
-}
-
-.absoluteTextfield:focus {
-    outline: none;
-    border-color: #073642;
-}
-
-.absoluteRow {
-    display: flex;
-    flex-flow: row;
-    width: 10rem;
-    align-items: stretch;
-}
-
-.absoluteColumn {
-    display: flex;
-    align-items: baseline;
-    padding: 0.2rem;
-    font-family: monospace;
-    font-size: 1rem;
-    line-height: 1rem;
-}
-
-.absoluteIconButton {
-    font-size: 1rem;
-    line-height: 1rem;
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 50%;
-    color: #839496;
-    background-color: transparent;
-    cursor: pointer;
-    position: relative;
-}
-
-.absoluteIconButton:hover {
-    background-color: #073642;
-}
-
-.absoluteIcon {
-    font-size: 0.9rem;
-    line-height: 0.9rem;
+.tool__MenuContainer {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    left: -2px;
+    top: 100%;
+    max-height: 6rem;
+    width: 100%;
+    margin: 0;
+    border: 2px solid #839496;
 }
 
-.absoluteVariableName {
+.tool__MenuTextfield {
+    width: 10rem;
+}
+
+.tool__MenuList {
+    width: 100%;
+    background-color: #eee8d5;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-family: monospace;
     font-size: 1rem;
     line-height: 1rem;
-    padding-right: 0.4rem;
+}
+
+.tool__MenuItem {
+    padding: 0.2rem;
+}
+
+.tool__MenuItemSelected {
+    background-color: #fdf6e3;
 }

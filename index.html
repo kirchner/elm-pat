@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="tool_box.css">
     <link rel="stylesheet" href="point_table.css">
     <link rel="stylesheet" href="variable_table.css">
+    <link rel="stylesheet" href="file_browser.css">
     <script type="text/javascript" src="elm.js"></script>
     <style type="text/css">
         input[type=number]::-webkit-inner-spin-button,
@@ -27,7 +28,35 @@
     <div id="elm-landing-pad"></div>
 
     <script type="text/javascript">
-      var app = Elm.App.embed(document.getElementById("elm-landing-pad"));
+      // we need the contextmenu for debugging
+      //document.addEventListener('contextmenu', function(e) {
+      //  e.preventDefault();
+      //});
+
+      var file0 = null;
+      try {
+        file0 = JSON.parse(localStorage.getItem('file0'));
+      } catch(e) {
+        localStorage.removeItem('file0');
+      }
+      var flags =
+        { file0: file0
+        };
+      var app = Elm.App.embed(document.getElementById("elm-landing-pad"), flags);
+
+      app.ports.serialize.subscribe(function(file) {
+          console.log(JSON.stringify(file));
+          localStorage.setItem('file0', JSON.stringify(file));
+      });
+
+      app.ports.autofocus.subscribe(function() {
+        window.requestAnimationFrame(function() {
+          var node = document.querySelector('[autofocus]');
+          if (node && (node != document.activeElement)) {
+              document.querySelector('[autofocus]').focus();
+          }
+        });
+      });
     </script>
   </body>
 </html>

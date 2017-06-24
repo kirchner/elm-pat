@@ -1,0 +1,24 @@
+.file-browser__FileBrowser {
+    position: relative;
+}
+
+.file-browser__FileBrowserFileLink {
+    position: relative;
+    background-color: #fdf6e3;
+    color: #93a1a1;
+    cursor: pointer;
+    padding: 0.2rem;
+    margin: 0.05rem;
+}
+
+.file-browser__FileBrowserFileLink:hover {
+    background-color: #eee8d5;
+    color: #93a1a1;
+}
+
+.file-browser__FileBrowserFileLinkWrapper {
+    display: flex;
+    flex-flow: column;
+    align-items: stretch;
+    width: 16rem;
+}

@@ -22,10 +22,23 @@
     padding-bottom: 0.5rem;
 }
 
+.point-table__RowSelected {
+    color: #b58900;
+}
+
+.point-table__RowSelectedLast {
+    color: #cb4b16;
+}
+
 .point-table__CellId {
     width: 1rem;
     border-right: 1px solid #fdf6e3;
     text-align: right;
+}
+
+.point-table__CellName {
+    width: 5rem;
+    text-align: left;
 }
 
 .point-table__CellCoordinate {

@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    overflow: hidden;
 }
 
 .editor__Main {
@@ -28,6 +29,12 @@ body {
     position: absolute;
     top: 1rem;
     left: 5rem;
+}
+
+.editor__ContainerTopRight {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
 }
 
 .editor__ContainerBottomLeft {
