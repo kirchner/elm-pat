@@ -21,6 +21,7 @@ import Styles.Editor
         )
 import Svg exposing (Svg)
 import Tools.Absolute as Absolute
+import Tools.Between as Between
 import Tools.Common
     exposing
         ( Callbacks
@@ -101,6 +102,12 @@ viewToolInfo callbacks data tool =
                     [ class [ Container, ContainerTopLeft ] ]
                     [ Distance.view callbacks (UpdateTool << Distance) data state ]
 
+        Between state ->
+            Just <|
+                Html.div
+                    [ class [ Container, ContainerTopLeft ] ]
+                    [ Between.view callbacks (UpdateTool << Between) data state ]
+
         ExtendPiece _ ->
             Nothing
 
@@ -142,6 +149,9 @@ drawTool callbacks data tool =
 
         Distance state ->
             Distance.svg callbacks (UpdateTool << Distance) data state
+
+        Between state ->
+            Between.svg callbacks (UpdateTool << Between) data state
 
         ExtendPiece state ->
             ExtendPiece.svg callbacks data state

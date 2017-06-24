@@ -6,6 +6,7 @@ module Svg.Extra
         , drawAngleArc
         , drawArrow
         , drawHorizontalLine
+        , drawLine
         , drawLineSegment
         , drawLineSegmentWith
         , drawPoint
@@ -69,6 +70,36 @@ drawArrow v w =
         , Svg.y1 (toString (getY v))
         , Svg.x2 (toString (getX w))
         , Svg.y2 (toString (getY w))
+        , Svg.strokeWidth "1"
+        , Svg.stroke Colors.base1
+        , Svg.strokeDasharray "5, 5"
+        ]
+        []
+
+
+drawLine : Vec2 -> Vec2 -> Svg msg
+drawLine v w =
+    let
+        delta =
+            w
+                |> sub v
+                |> normalize
+
+        newV =
+            delta
+                |> scale 100000
+                |> add v
+
+        newW =
+            delta
+                |> scale -100000
+                |> add w
+    in
+    Svg.line
+        [ Svg.x1 (toString (getX newV))
+        , Svg.y1 (toString (getY newV))
+        , Svg.x2 (toString (getX newW))
+        , Svg.y2 (toString (getY newW))
         , Svg.strokeWidth "1"
         , Svg.stroke Colors.base1
         , Svg.strokeDasharray "5, 5"

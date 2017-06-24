@@ -86,6 +86,9 @@ toolName tool =
         Distance _ ->
             "distance"
 
+        Between _ ->
+            "between"
+
         ExtendPiece _ ->
             "extend piece"
 
@@ -105,6 +108,9 @@ toolDescription tool =
         Distance _ ->
             "distance"
 
+        Between _ ->
+            "between"
+
         ExtendPiece _ ->
             "extend piece"
 
@@ -117,6 +123,7 @@ allTools data =
     [ Absolute Absolute.init
     , Relative (Relative.init data)
     , Distance (Distance.init data)
+    , Between (Between.init data)
     ]
 
 
@@ -353,6 +360,9 @@ update ports msg model =
 
                     Keyboard.CharA ->
                         { model | tool = Absolute Absolute.init } ! []
+
+                    Keyboard.CharB ->
+                        { model | tool = Between (Between.init (data model)) } ! []
 
                     Keyboard.CharE ->
                         { model

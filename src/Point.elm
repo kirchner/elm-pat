@@ -163,7 +163,7 @@ position store variables (Point { name, data }) =
 
         Between idA idB ratio ->
             Maybe.map2
-                (\v w -> sub w v |> scale ratio |> add w)
+                (\v w -> sub w v |> scale ratio |> add v)
                 (lookUp idA)
                 (lookUp idB)
 

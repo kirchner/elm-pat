@@ -319,8 +319,19 @@ point data point =
                         (Point.positionById data.store data.variables anchorId)
                         (Point.position data.store data.variables point)
             , withBetween =
-                \_ _ _ _ ->
-                    Just (Svg.g [] [])
+                \point firstId lastId _ ->
+                    let
+                        draw v p q =
+                            Svg.g []
+                                [ Svg.drawLine p q
+                                , Svg.drawPoint Colors.base0 v
+                                ]
+                    in
+                    Maybe.map3
+                        draw
+                        (Point.position data.store data.variables point)
+                        (Point.positionById data.store data.variables firstId)
+                        (Point.positionById data.store data.variables lastId)
             }
     in
     Point.dispatch handlers point

@@ -21,6 +21,7 @@ import Piece exposing (Piece)
 import Point exposing (Point)
 import Store exposing (Id, Store)
 import Tools.Absolute as Absolute
+import Tools.Between as Between
 import Tools.Distance as Distance
 import Tools.ExtendPiece as ExtendPiece
 import Tools.Relative as Relative
@@ -71,6 +72,7 @@ type Tool
     = Absolute Absolute.State
     | Relative Relative.State
     | Distance Distance.State
+    | Between Between.State
     | ExtendPiece ExtendPiece.State
     | None
 
