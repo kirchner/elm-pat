@@ -21,4 +21,6 @@
     flex-flow: column;
     align-items: stretch;
     width: 16rem;
+    max-height: 16rem;
+    overflow-y: auto;
 }

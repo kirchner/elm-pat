@@ -41,10 +41,14 @@ body {
     position: absolute;
     bottom: 1rem;
     left: 1rem;
+    max-height: 13rem;
+    overflow-y: auto;
 }
 
 .editor__ContainerBottomRight {
     position: absolute;
     bottom: 1rem;
     right: 1rem;
+    max-height: 13rem;
+    overflow-y: auto;
 }

@@ -1,7 +1,7 @@
 .variable-table__Table {
     pointer-events: auto;
     font-family: monospace;
-    font-size: 16px;
+    font-size: 12px;
     line-height: 1rem;
     border-collapse: collapse;
 }
@@ -19,7 +19,7 @@
     padding-right: 0.3rem;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
-    vertical-align: top;
+    vertical-align: middle;
 }
 
 .variable-table__CellSign {
@@ -75,7 +75,7 @@
     border-color: transparent;
     border: 0;
     font-family: monospace;
-    font-size: 16px;
+    font-size: 12px;
     line-height: 1rem;
     width: 6rem;
     background-color: transparent;

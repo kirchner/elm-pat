@@ -1,7 +1,7 @@
 .point-table__Table {
     pointer-events: auto;
     font-family: monospace;
-    font-size: 16px;
+    font-size: 12px;
     line-height: 1rem;
     border-collapse: collapse;
 }

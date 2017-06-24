@@ -45,8 +45,11 @@
       var app = Elm.App.embed(document.getElementById("elm-landing-pad"), flags);
 
       app.ports.serialize.subscribe(function(file) {
-          console.log(JSON.stringify(file));
           localStorage.setItem('file0', JSON.stringify(file));
+      });
+
+      app.ports.dumpFile0.subscribe(function() {
+          console.log(localStorage.getItem('file0'));
       });
 
       app.ports.autofocus.subscribe(function() {

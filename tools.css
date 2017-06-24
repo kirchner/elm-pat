@@ -21,7 +21,7 @@
 .tool__Textfield {
     border-color: transparent;
     font-family: monospace;
-    font-size: 1rem;
+    font-size: 12px;
     line-height: 1rem;
     width: 20rem;
     background-color: transparent;
@@ -85,4 +85,36 @@
 
 .tool__MenuItemSelected {
     background-color: #fdf6e3;
+}
+
+.tool__SwitchContainer {
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+}
+
+.tool__SwitchChoice {
+    font-family: monospace;
+    font-size: 1rem;
+    line-height: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 2rem;
+    margin: 2px;
+    border: 0;
+}
+
+.tool__SwitchChoice:hover {
+    margin: 0;
+    border: 2px solid #839496;
+}
+
+.tool__SwitchChoiceSelected {
+    background-color: #839496;
+    color: #eee8d5;
+    margin: 0;
+    border: 2px solid #839496;
 }
