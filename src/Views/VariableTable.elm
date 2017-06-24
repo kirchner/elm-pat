@@ -13,15 +13,22 @@ import Styles.VariableTable
         , classList
         )
 import Views.Common exposing (iconSmall)
+import Tools.Styles
 
 
-view : Dict String E -> Maybe String -> Maybe E -> Html Msg
-view variables newName newValue =
+type alias Callbacks =
+    { setVariableName : String -> String -> Msg
+    , setVariableValue : String -> String -> Msg
+    }
+
+
+view : Callbacks -> Dict String E -> Maybe String -> Maybe E -> Html Msg
+view callbacks variables newName newValue =
     table
         [ class [ Table ] ]
         ((variables
             |> Dict.toList
-            |> List.map (viewVariable variables)
+            |> List.map (viewVariable callbacks variables)
          )
             ++ [ tr
                     []
@@ -64,19 +71,54 @@ view variables newName newValue =
         )
 
 
-viewVariable : Dict String E -> ( String, E ) -> Html Msg
-viewVariable variables ( name, expr ) =
+viewVariable : Callbacks -> Dict String E -> ( String, E ) -> Html Msg
+viewVariable callbacks variables ( name, expr ) =
     tr
         []
         [ td
             [ class [ CellName ] ]
-            [ text name ]
+            [ let
+                  deleteIcon =
+                    div
+                      [ Tools.Styles.class [ Tools.Styles.IconContainer ] ]
+                      [ iconSmall "delete" (callbacks.setVariableName name "") ]
+              in
+              Html.div
+                  [ Tools.Styles.class [ Tools.Styles.ValueContainer ] ]
+                  ([ Html.input
+                      [ onInput (callbacks.setVariableName name)
+                      , Html.placeholder name
+                      , Html.value name -- TODO: broken
+                      , Tools.Styles.class [ Tools.Styles.Textfield ]
+                      ]
+                      []
+                   , deleteIcon
+                   ]
+                  )
+            ]
+
+
         , cellSign "="
         , td
             [ class [ CellFormula ] ]
-            [ expr
-                |> Expr.print
-                |> text
+            [ let
+                  deleteIcon =
+                    div
+                      [ Tools.Styles.class [ Tools.Styles.IconContainer ] ]
+                      [ iconSmall "delete" (callbacks.setVariableValue name "") ]
+              in
+              Html.div
+                  [ Tools.Styles.class [ Tools.Styles.ValueContainer ] ]
+                  ([ Html.input
+                      [ onInput (callbacks.setVariableValue name)
+                      , Html.placeholder (Expr.print expr)
+                      , Html.value (Expr.print expr) -- TODO: broken
+                      , Tools.Styles.class [ Tools.Styles.Textfield ]
+                      ]
+                      []
+                   , deleteIcon
+                   ]
+                  )
             ]
         , cellSign "="
         , td

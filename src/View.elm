@@ -72,7 +72,14 @@ view model =
     , Just <|
         Html.div
             [ class [ Container, ContainerBottomRight ] ]
-            [ VariableTable.view model.variables model.newName model.newValue ]
+            [ VariableTable.view
+                  { setVariableName = SetVariableName
+                  , setVariableValue = SetVariableValue
+                  }
+                  model.variables
+                  model.newName
+                  model.newValue
+            ]
     , Just <| viewCanvas model
     ]
         |> List.filterMap identity

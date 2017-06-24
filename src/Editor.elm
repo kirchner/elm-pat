@@ -165,6 +165,8 @@ type Msg
     | Redo
     | DumpFile0
     | SetPointName (Id Point) String
+    | SetVariableName String String
+    | SetVariableValue String String
 
 
 type alias Flags =
@@ -200,6 +202,23 @@ update ports msg model =
         >> updateStorage ports model
     <|
         case msg of
+            SetVariableName id name ->
+                { model | variables =
+                    case Dict.get id model.variables of
+                        Just expr ->
+                            model.variables
+                            |> Dict.insert name expr
+                            |> Dict.remove id
+                        Nothing ->
+                            model.variables
+                }
+                    ! []
+            SetVariableValue id value ->
+                case Expr.parse value of
+                    Just expr ->
+                        { model | variables = Dict.insert id expr model.variables } ! []
+                    Nothing ->
+                        model ! []
             SetPointName id name ->
                 { model | store = Store.update id (Maybe.map (Point.setName name)) model.store
                 }
