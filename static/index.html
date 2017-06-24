@@ -27,6 +27,10 @@
     <div id="elm-landing-pad"></div>
 
     <script type="text/javascript">
+      document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+      });
+
       var app = Elm.App.embed(document.getElementById("elm-landing-pad"));
 
       app.ports.autofocus.subscribe(function() {

@@ -94,7 +94,7 @@ point data state =
                 |> Maybe.map Number
 
         snap angle =
-            if List.member Keyboard.Control data.pressedKeys then
+            if List.member Keyboard.Shift data.pressedKeys then
                 snapAngle 8 angle
             else
                 angle
@@ -232,10 +232,31 @@ view callbacks updateState data state =
 
         updateAngle =
             (\s -> { state | angle = parse s }) >> updateState
+
+        ( distancePlaceholder, anglePlaceholder ) =
+            case ( data.cursorPosition, anchorPosition data state ) of
+                ( Just mousePosition, Just anchorPosition ) ->
+                    let
+                        p =
+                            pointPosition data state anchorPosition
+
+                        w =
+                            anchorPosition
+                                |> flip sub (toVec mousePosition)
+                    in
+                    ( w
+                        |> length
+                        |> toString
+                    , atan2 (getY w) (getX w)
+                        |> toString
+                    )
+
+                _ ->
+                    ( "distance", "angle" )
     in
     [ idDropdown data state.anchor updateAnchor
-    , exprInput_ True "distance" state.distance updateDistance
-    , exprInput "angle" state.angle updateAngle
+    , exprInput_ True distancePlaceholder state.distance updateDistance
+    , exprInput anglePlaceholder state.angle updateAngle
     ]
         |> Tools.view callbacks data state point
 
@@ -261,7 +282,7 @@ pointPosition data state anchorPosition =
                 |> add anchorPosition
 
         snap angle =
-            if List.member Keyboard.Control data.pressedKeys then
+            if List.member Keyboard.Shift data.pressedKeys then
                 snapAngle 8 angle
             else
                 angle
