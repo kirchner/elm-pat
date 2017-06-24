@@ -15,6 +15,11 @@ type Class
     | Textfield
     | IconContainer
     | Button
+    | MenuContainer
+    | MenuTextfield
+    | MenuList
+    | MenuItem
+    | MenuItemSelected
 
 
 { id, class, classList } =
@@ -37,7 +42,7 @@ css =
             , border zero
             , hover
                 [ margin zero
-                , border3 (px 2) solid (hex base3)
+                , border3 (px 2) solid (hex base0)
                 ]
             ]
         , Css.class Textfield
@@ -68,6 +73,32 @@ css =
             , cursor pointer
             , hover
                 [ backgroundColor (hex base02) ]
+            ]
+        , Css.class MenuContainer
+            [ position absolute
+            , left (px -2)
+            , top (pct 100)
+            , maxHeight (rem 6)
+            , width (pct 100)
+            , margin zero
+            , border3 (px 2) solid (hex base0)
+            ]
+        , Css.class MenuTextfield
+            [ width (rem 10) ]
+        , Css.class MenuList
+            [ width (pct 100)
+            , backgroundColor (hex base2)
+            , listStyle none
+            , padding zero
+            , margin zero
+            , fontFamily monospace
+            , fontSize (rem 1)
+            , lineHeight (rem 1)
+            ]
+        , Css.class MenuItem
+            [ padding (rem 0.2) ]
+        , Css.class MenuItemSelected
+            [ backgroundColor (hex base3)
             ]
         ]
 

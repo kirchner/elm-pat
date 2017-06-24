@@ -290,9 +290,8 @@ filteredPoints query data =
             String.toLower query
 
         keepPoint ( id, point ) =
-            id
-                |> Store.toInt
-                |> toString
+            pointEntry id point
+                |> String.toLower
                 |> String.contains lowerQuery
     in
     data.store
@@ -466,46 +465,38 @@ viewPointSelect selectedPoint data state =
                     state.query
 
         menu =
-            if state.showMenu then
-                [ viewMenu data state ]
+            if
+                state.showMenu
+                    && not
+                        (filteredPoints state.query data
+                            |> List.isEmpty
+                        )
+            then
+                viewMenu data state
             else
-                []
+                Html.div [] []
     in
     Html.div
         [ Html.class "tool__ValueContainer"
         ]
-        [ List.append
-            [ Html.input
-                [ Html.onInput SetQuery
-                , Html.onFocus OnFocus
-                , Html.onWithOptions "keydown" options dec
-                , Html.value query
-                , Html.placeholder "anchor point"
-                , Html.autocomplete False
-                , Html.style
-                    [ ( "border-color", "transparent" )
-                    , ( "font-family", "monospace" )
-                    , ( "font-size", "1rem" )
-                    , ( "line-height", "1rem" )
-                    , ( "width", "10rem" )
-                    , ( "background-color", "transparent" )
-                    ]
-                ]
-                []
+        [ Html.input
+            [ Html.onInput SetQuery
+            , Html.onFocus OnFocus
+            , Html.onWithOptions "keydown" options dec
+            , Html.value query
+            , Html.placeholder "anchor point"
+            , Html.autocomplete False
+            , class [ Textfield, MenuTextfield ]
             ]
-            menu
-            |> Html.div []
+            []
+        , menu
         ]
 
 
 viewMenu : Data -> DropdownState -> Html DropdownMsg
 viewMenu data state =
     Html.div
-        [ Html.style
-            [ ( "position", "relative" )
-            , ( "width", "100%" )
-            ]
-        ]
+        [ class [ MenuContainer ] ]
         [ filteredPoints state.query data
             |> Autocomplete.view
                 viewConfig
@@ -515,36 +506,31 @@ viewMenu data state =
         ]
 
 
+pointEntry : Id Point -> Point -> String
+pointEntry id point =
+    "#"
+        ++ (id |> Store.toInt |> toString)
+        ++ ": "
+        ++ (point |> Point.name)
+
+
 viewConfig : Autocomplete.ViewConfig ( Id Point, Point )
 viewConfig =
-    let
-        entry id point =
-            "#"
-                ++ (id |> Store.toInt |> toString)
-                ++ ": "
-                ++ (point |> Point.name)
-    in
     Autocomplete.viewConfig
         { toId =
             \( id, point ) -> id |> toString
-        , ul =
-            [ Html.style
-                [ ( "position", "absolute" )
-                , ( "width", "100%" )
-                , ( "background-color", "#999" )
-                , ( "list-style", "none" )
-                , ( "padding", "0" )
-                , ( "margin", "0" )
-                ]
-            ]
+        , ul = [ class [ MenuList ] ]
         , li =
-            \_ _ ( id, point ) ->
+            \keySelected mouseSelected ( id, point ) ->
                 { attributes =
-                    [ Html.style
-                        []
+                    [ class [ MenuItem ]
+                    , classList
+                        [ ( MenuItemSelected
+                          , keySelected || mouseSelected
+                          )
+                        ]
                     ]
-                , children =
-                    [ entry id point |> Html.text ]
+                , children = [ pointEntry id point |> Html.text ]
                 }
         }
 
