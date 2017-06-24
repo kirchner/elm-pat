@@ -154,6 +154,7 @@ type Msg
     | KeyMsg Keyboard.Msg
     | KeyDown Keyboard.Key
     | SelectPoint (Maybe (Id Point))
+    | DeselectPoint (Maybe (Id Point))
     | ClearSelection
     | ExtendPieceMsg (Id Piece) (Id Point) (Maybe (Id Point))
     | FileBrowserMsg FileBrowser.Msg
@@ -465,6 +466,18 @@ update ports msg model =
                                 ! []
                         else
                             { model | selectedPoints = [ id ] } ! []
+
+                    Nothing ->
+                        model ! []
+
+            DeselectPoint maybeId ->
+                case maybeId of
+                    Just id ->
+                        { model
+                            | selectedPoints =
+                                List.filter ((/=) id) model.selectedPoints
+                        }
+                            ! []
 
                     Nothing ->
                         model ! []

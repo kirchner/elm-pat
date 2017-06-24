@@ -22,6 +22,8 @@ import Json.Encode as Json
 
 type alias Callbacks =
     { setName : Id Point -> String -> Msg
+    , selectPoint : Id Point -> Msg
+    , deselectPoint : Id Point -> Msg
     }
 
 
@@ -34,6 +36,9 @@ view callbacks data =
             [ th
                 [ class [ CellId ] ]
                 [ text "#" ]
+            , th
+                [ class [ CellId ] ] -- <- TODO
+                [ text "o" ]
             , th
                 [ class [ CellName ] ]
                 [ text "name" ]
@@ -105,6 +110,19 @@ viewPointEntry callbacks data ( id, point ) =
         [ td
             [ class [ CellId ] ]
             [ text (id |> Store.toInt |> toString) ]
+        , td
+            [ class [ CellId ] ] -- <- TODO
+            [ a 
+              [ Html.onClick ((if isSelected then callbacks.deselectPoint else callbacks.selectPoint) id)
+              ]
+              [ i
+                [ Html.class "material-icons"
+                ]
+                [ text <|
+                  if isSelected then "radio_button_checked" else "radio_button_unchecked"
+                ]
+              ]
+            ]
         , td
             [ class [ CellName ] ]
             [ let

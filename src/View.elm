@@ -68,7 +68,13 @@ view model =
     , Just <|
         Html.div
             [ class [ Container, ContainerBottomLeft ] ]
-            [ PointTable.view { setName = SetPointName } data ]
+            [ PointTable.view
+                  { setName = SetPointName
+                  , selectPoint = SelectPoint << Just
+                  , deselectPoint = DeselectPoint << Just
+                  }
+                  data
+            ]
     , Just <|
         Html.div
             [ class [ Container, ContainerBottomRight ] ]
