@@ -22813,7 +22813,7 @@ var _kirchner$elm_pat$Tools_Styles$css = function (_p1) {
 									_1: {
 										ctor: '::',
 										_0: _rtfeldman$elm_css$Css$width(
-											_kirchner$elm_pat$Tools_Styles$rem(20)),
+											_kirchner$elm_pat$Tools_Styles$rem(12)),
 										_1: {
 											ctor: '::',
 											_0: _rtfeldman$elm_css$Css$backgroundColor(_rtfeldman$elm_css$Css$transparent),
