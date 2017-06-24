@@ -1,8 +1,13 @@
 module Point
     exposing
-        ( Point(..)
+        ( Handlers
+        , Point
         , Ratio
         , absolute
+        , between
+        , dispatch
+        , distance
+        , name
         , position
         , positionById
         , relative
@@ -22,6 +27,13 @@ import Json.Encode as Encode exposing (Value)
 
 
 type Point
+    = Point
+        { name : String
+        , data : PointData
+        }
+
+
+type PointData
     = Absolute E E
     | Relative (Id Point) E E
     | Distance (Id Point) E E
@@ -32,14 +44,73 @@ type alias Ratio =
     Float
 
 
-absolute : Vec2 -> Point
-absolute v =
-    Absolute (Number (getX v)) (Number (getY v))
+name : Point -> String
+name (Point point) =
+    point.name
 
 
-relative : Id Point -> Vec2 -> Point
-relative id v =
-    Relative id (Number (getX v)) (Number (getY v))
+
+{- constructors -}
+
+
+absolute : E -> E -> Point
+absolute x y =
+    Point
+        { name = ""
+        , data = Absolute x y
+        }
+
+
+relative : Id Point -> E -> E -> Point
+relative id x y =
+    Point
+        { name = ""
+        , data = Relative id x y
+        }
+
+
+distance : Id Point -> E -> E -> Point
+distance id angle distance =
+    Point
+        { name = ""
+        , data = Distance id angle distance
+        }
+
+
+between : Id Point -> Id Point -> Ratio -> Point
+between first last ratio =
+    Point
+        { name = ""
+        , data = Between first last ratio
+        }
+
+
+
+{- dispatch -}
+
+
+type alias Handlers a =
+    { withAbsolute : Point -> E -> E -> a
+    , withRelative : Point -> Id Point -> E -> E -> a
+    , withDistance : Point -> Id Point -> E -> E -> a
+    , withBetween : Point -> Id Point -> Id Point -> Ratio -> a
+    }
+
+
+dispatch : Handlers a -> Point -> a
+dispatch handlers ((Point { name, data }) as point) =
+    case data of
+        Absolute x y ->
+            handlers.withAbsolute point x y
+
+        Relative id x y ->
+            handlers.withRelative point id x y
+
+        Distance id angle distance ->
+            handlers.withDistance point id angle distance
+
+        Between first last ratio ->
+            handlers.withBetween point first last ratio
 
 
 
@@ -53,13 +124,13 @@ positionById store variables id =
 
 
 position : Store Point -> Dict String E -> Point -> Maybe Vec2
-position store variables point =
+position store variables (Point { name, data }) =
     let
         lookUp id =
             Store.get id store
                 |> Maybe.andThen (position store variables)
     in
-    case point of
+    case data of
         Absolute x y ->
             Maybe.map2 vec2
                 (compute variables x)

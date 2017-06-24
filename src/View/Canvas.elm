@@ -278,39 +278,44 @@ points data =
 
 point : Data -> Point -> Maybe (Svg msg)
 point data point =
-    case point of
-        Point.Absolute _ _ ->
-            Point.position data.store data.variables point
-                |> Maybe.map (Svg.drawPoint Colors.base0)
-
-        Point.Relative id _ _ ->
-            let
-                draw v w =
-                    Svg.g []
-                        [ Svg.drawPoint Colors.base0 w
-                        , Svg.drawRectArrow v w
-                        ]
-            in
-            Maybe.map2
-                draw
-                (Point.positionById data.store data.variables id)
-                (Point.position data.store data.variables point)
-
-        Point.Distance id _ _ ->
-            let
-                draw v w =
-                    Svg.g []
-                        [ Svg.drawPoint Colors.base0 w
-                        , Svg.drawArrow v w
-                        ]
-            in
-            Maybe.map2
-                draw
-                (Point.positionById data.store data.variables id)
-                (Point.position data.store data.variables point)
-
-        Point.Between idA idB _ ->
-            Just (Svg.g [] [])
+    let
+        handlers =
+            { withAbsolute =
+                \point _ _ ->
+                    Point.position data.store data.variables point
+                        |> Maybe.map (Svg.drawPoint Colors.base0)
+            , withRelative =
+                \point anchorId _ _ ->
+                    let
+                        draw v w =
+                            Svg.g []
+                                [ Svg.drawPoint Colors.base0 w
+                                , Svg.drawRectArrow v w
+                                ]
+                    in
+                    Maybe.map2
+                        draw
+                        (Point.positionById data.store data.variables anchorId)
+                        (Point.position data.store data.variables point)
+            , withDistance =
+                \point anchorId _ _ ->
+                    let
+                        draw v w =
+                            Svg.g []
+                                [ Svg.drawPoint Colors.base0 w
+                                , Svg.drawArrow v w
+                                ]
+                    in
+                    Maybe.map2
+                        draw
+                        (Point.positionById data.store data.variables anchorId)
+                        (Point.position data.store data.variables point)
+            , withBetween =
+                \_ _ _ _ ->
+                    Just (Svg.g [] [])
+            }
+    in
+    Point.dispatch handlers point
 
 
 pieces : (Id Piece -> Id Point -> msg) -> Data -> List (Svg msg)

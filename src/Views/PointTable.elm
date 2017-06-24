@@ -28,6 +28,9 @@ view data =
                 [ class [ CellId ] ]
                 [ text "#" ]
             , th
+                [ class [ CellName ] ]
+                [ text "name" ]
+            , th
                 [ class [ CellCoordinate ] ]
                 [ text "x" ]
             , th
@@ -94,7 +97,10 @@ viewPointEntry data ( id, point ) =
         ]
         [ td
             [ class [ CellId ] ]
-            [ text (toString id) ]
+            [ text (id |> Store.toInt |> toString) ]
+        , td
+            [ class [ CellName ] ]
+            [ point |> Point.name |> text ]
         , td
             [ class [ CellCoordinate ] ]
             [ text x ]
@@ -116,15 +122,12 @@ viewPointEntry data ( id, point ) =
 
 printPoint : Dict String E -> Point -> String
 printPoint variables point =
-    case point of
-        Point.Absolute _ _ ->
-            "absolute"
-
-        Point.Relative _ _ _ ->
-            "relative"
-
-        Point.Distance _ _ _ ->
-            "distance"
-
-        _ ->
-            toString point
+    let
+        handlers =
+            { withAbsolute = \_ _ _ -> "absolute"
+            , withRelative = \_ _ _ _ -> "relative"
+            , withDistance = \_ _ _ _ -> "distance"
+            , withBetween = \_ _ _ _ -> "between"
+            }
+    in
+    Point.dispatch handlers point

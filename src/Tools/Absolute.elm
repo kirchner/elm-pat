@@ -73,7 +73,7 @@ point data state =
         y =
             yCursor |> Maybe.or state.y
     in
-    Maybe.map2 Point.Absolute x y
+    Maybe.map2 Point.absolute x y
 
 
 

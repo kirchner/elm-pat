@@ -108,7 +108,7 @@ point data state =
         angle =
             angleCursor |> Maybe.or state.angle
     in
-    Maybe.map3 Point.Distance anchorId distance angle
+    Maybe.map3 Point.distance anchorId distance angle
 
 
 

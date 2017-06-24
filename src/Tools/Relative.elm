@@ -115,7 +115,7 @@ point data state =
         yOffset =
             yOffsetCursor |> Maybe.or state.y
     in
-    Maybe.map3 Point.Relative anchorId xOffset yOffset
+    Maybe.map3 Point.relative anchorId xOffset yOffset
 
 
 

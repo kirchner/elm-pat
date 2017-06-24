@@ -20,6 +20,7 @@ type Class
     | RowSelected
     | RowSelectedLast
     | CellId
+    | CellName
     | CellCoordinate
     | CellType
     | CellAction
@@ -74,6 +75,10 @@ css =
                 [ width (rem 1)
                 , borderRight3 (px 1) solid (hex base3)
                 , textAlign right
+                ]
+            , class CellName
+                [ width (rem 5)
+                , textAlign left
                 ]
             , class CellCoordinate
                 [ width (rem 3)
