@@ -22,6 +22,7 @@ import Styles.Editor
 import Svg exposing (Svg)
 import Tools.Absolute as Absolute
 import Tools.Between as Between
+import Tools.CircleIntersection as CircleIntersection
 import Tools.Common
     exposing
         ( Callbacks
@@ -112,6 +113,13 @@ viewToolInfo callbacks data tool =
                     [ class [ Container, ContainerTopLeft ] ]
                     [ Between.view callbacks (UpdateTool << Between) data state ]
 
+        CircleIntersection state ->
+            Just <|
+                Html.div
+                    [ class [ Container, ContainerTopLeft ] ]
+                    [ CircleIntersection.view callbacks (UpdateTool << CircleIntersection) data state ]
+
+
         ExtendPiece _ ->
             Nothing
 
@@ -157,6 +165,9 @@ drawTool callbacks data tool =
 
         Between state ->
             Between.svg callbacks (UpdateTool << Between) data state
+
+        CircleIntersection state ->
+            CircleIntersection.svg callbacks (UpdateTool << CircleIntersection) data state
 
         ExtendPiece state ->
             ExtendPiece.svg callbacks data state

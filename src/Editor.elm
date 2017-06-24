@@ -36,6 +36,7 @@ import Store exposing (Id, Store)
 import Task
 import Tools.Absolute as Absolute
 import Tools.Between as Between
+import Tools.CircleIntersection as CircleIntersection
 import Tools.Common
     exposing
         ( Callbacks
@@ -90,6 +91,9 @@ toolName tool =
         Between _ ->
             "between"
 
+        CircleIntersection _ ->
+            "circle intersection"
+
         ExtendPiece _ ->
             "extend piece"
 
@@ -112,6 +116,9 @@ toolDescription tool =
         Between _ ->
             "between"
 
+        CircleIntersection _ ->
+            "circle intersection"
+
         ExtendPiece _ ->
             "extend piece"
 
@@ -125,6 +132,7 @@ allTools data =
     , Relative (Relative.init data)
     , Distance (Distance.init data)
     , Between (Between.init data)
+    , CircleIntersection (CircleIntersection.init data)
     ]
 
 

@@ -126,6 +126,7 @@ printPoint variables point =
             , withRelative = \_ _ _ _ -> "relative"
             , withDistance = \_ _ _ _ -> "distance"
             , withBetween = \_ _ _ _ -> "between"
+            , withCircleIntersection = \_ _ _ _ _ _ -> "circleIntersection"
             }
     in
     Point.dispatch handlers point

@@ -1,10 +1,12 @@
 module Point
     exposing
-        ( Handlers
+        ( Choice(..)
+        , Handlers
         , Point
         , Ratio
         , absolute
         , between
+        , circleIntersection
         , decode
         , dispatch
         , distance
@@ -39,10 +41,30 @@ type PointData
     | Relative (Id Point) E E
     | Distance (Id Point) E E
     | Between (Id Point) (Id Point) Ratio
+    | CircleIntersection (Id Point) E (Id Point) E Choice
 
 
 type alias Ratio =
     Float
+
+
+type Choice
+    = LeftMost
+    | RightMost
+
+
+decodeChoice : Decoder Choice
+decodeChoice =
+    Decode.float
+        |> Decode.andThen
+            (\float ->
+                if float == -1 then
+                    Decode.succeed LeftMost
+                else if float == 1 then
+                    Decode.succeed RightMost
+                else
+                    Decode.fail "not a proper choice"
+            )
 
 
 name : Point -> String
@@ -92,6 +114,14 @@ between first last ratio =
         }
 
 
+circleIntersection : Id Point -> E -> Id Point -> E -> Choice -> Point
+circleIntersection first firstRadius last lastRadius choice =
+    Point
+        { name = ""
+        , data = CircleIntersection first firstRadius last lastRadius choice
+        }
+
+
 
 {- dispatch -}
 
@@ -101,6 +131,7 @@ type alias Handlers a =
     , withRelative : Point -> Id Point -> E -> E -> a
     , withDistance : Point -> Id Point -> E -> E -> a
     , withBetween : Point -> Id Point -> Id Point -> Ratio -> a
+    , withCircleIntersection : Point -> Id Point -> E -> Id Point -> E -> Choice -> a
     }
 
 
@@ -118,6 +149,9 @@ dispatch handlers ((Point { name, data }) as point) =
 
         Between first last ratio ->
             handlers.withBetween point first last ratio
+
+        CircleIntersection first firstRadius last lastRadius choice ->
+            handlers.withCircleIntersection point first firstRadius last lastRadius choice
 
 
 
@@ -167,6 +201,62 @@ position store variables (Point { name, data }) =
                 (lookUp idA)
                 (lookUp idB)
 
+        CircleIntersection idA rA idB rB choice ->
+            let
+                maybeDelta =
+                    Maybe.map2
+                        (\a b -> b |> flip sub a)
+                        maybeA
+                        (lookUp idB)
+
+                maybeA =
+                    lookUp idA
+            in
+            case
+                ( maybeA
+                , maybeDelta
+                , compute variables rA
+                , compute variables rB
+                )
+            of
+                ( Just a, Just delta, Just rA, Just rB ) ->
+                    let
+                        distSquared =
+                            delta |> lengthSquared
+
+                        dist =
+                            delta |> length
+
+                        z =
+                            (rB ^ 2 - rA ^ 2 - distSquared)
+                                / (-2 * dist)
+
+                        h =
+                            factor * sqrt (rA ^ 2 - z)
+
+                        factor =
+                            case choice of
+                                LeftMost ->
+                                    -1
+
+                                RightMost ->
+                                    1
+
+                        deltaPerp =
+                            vec2 (getY delta) (-1 * getX delta)
+                                |> normalize
+
+                        position =
+                            deltaPerp
+                                |> scale h
+                                |> add (delta |> normalize |> scale z)
+                                |> add a
+                    in
+                    Just position
+
+                _ ->
+                    Nothing
+
 
 
 -- SERIALIZATION
@@ -202,6 +292,18 @@ encode (Point point) =
 
                 Between id0 id1 ratio ->
                     def "between" (Expr.Number 0.0) (Expr.Number 0.0) (Store.idUnsafe 0) id0 id1 ratio
+
+                CircleIntersection id0 e0 id1 e1 choice ->
+                    let
+                        ratio =
+                            case choice of
+                                LeftMost ->
+                                    -1
+
+                                RightMost ->
+                                    1
+                    in
+                    def "circleIntersection" e0 e1 (Store.idUnsafe 0) id0 id1 ratio
     in
     Encode.object
         [ ( "name", encodeName )
@@ -239,6 +341,14 @@ decode =
                                     (Decode.at [ "id0" ] Store.decodeId)
                                     (Decode.at [ "id1" ] Store.decodeId)
                                     (Decode.at [ "ratio" ] Decode.float)
+
+                            "circleIntersection" ->
+                                Decode.map5 CircleIntersection
+                                    (Decode.at [ "id0" ] Store.decodeId)
+                                    (Decode.at [ "e0" ] Expr.decode)
+                                    (Decode.at [ "id1" ] Store.decodeId)
+                                    (Decode.at [ "e1" ] Expr.decode)
+                                    (Decode.at [ "ratio" ] decodeChoice)
 
                             _ ->
                                 Decode.fail "decodePoint: mailformed input"

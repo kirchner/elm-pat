@@ -345,6 +345,23 @@ point data point =
                         (Point.position data.store data.variables point)
                         (Point.positionById data.store data.variables firstId)
                         (Point.positionById data.store data.variables lastId)
+
+            , withCircleIntersection =
+                \point firstId _ lastId _ _ ->
+                    let
+                        draw v p q =
+                            Svg.g []
+                                [ Svg.drawArrow p v
+                                , Svg.drawArrow v q
+                                , Svg.drawPoint Colors.base0 v
+                                ]
+                    in
+                    Maybe.map3
+                        draw
+                        (Point.position data.store data.variables point)
+                        (Point.positionById data.store data.variables firstId)
+                        (Point.positionById data.store data.variables lastId)
+
             }
     in
     Point.dispatch handlers point

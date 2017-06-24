@@ -23,6 +23,7 @@ import Point exposing (Point)
 import Store exposing (Id, Store)
 import Tools.Absolute as Absolute
 import Tools.Between as Between
+import Tools.CircleIntersection as CircleIntersection
 import Tools.Distance as Distance
 import Tools.ExtendPiece as ExtendPiece
 import Tools.Relative as Relative
@@ -93,6 +94,7 @@ type Tool
     | Distance Distance.State
     | Between Between.State
     | ExtendPiece ExtendPiece.State
+    | CircleIntersection CircleIntersection.State
     | None
 
 
