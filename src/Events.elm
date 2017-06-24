@@ -31,8 +31,8 @@ onMouseDown tagger =
 positionDecoder : Decoder Position
 positionDecoder =
     map2 Position
-        (field "offsetX" int)
-        (field "offsetY" int)
+        (field "clientX" int)
+        (field "clientY" int)
 
 
 onWheel : (Float -> msg) -> VirtualDom.Property msg
