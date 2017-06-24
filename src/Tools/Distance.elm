@@ -18,6 +18,8 @@ import Html.Events as Html
 import Keyboard.Extra as Keyboard
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
+import Point exposing (Point)
+import Store exposing (Id, Store)
 import Styles.Colors as Colors exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
@@ -35,14 +37,13 @@ import Tools.Common as Tools
         )
 import Tools.Styles exposing (..)
 import Types exposing (..)
-import Point exposing (Point)
 
 
 type alias State =
     { anchor : Maybe String
     , distance : Maybe E
     , angle : Maybe E
-    , id : Maybe Point.Id
+    , id : Maybe (Id Point)
     }
 
 
@@ -55,7 +56,7 @@ init data =
     }
 
 
-initWith : Point.Id -> Point.Id -> E -> E -> State
+initWith : Id Point -> Id Point -> E -> E -> State
 initWith id anchor distance angle =
     { anchor = Just (toString anchor)
     , distance = Just distance
@@ -74,10 +75,11 @@ point data state =
         anchorId =
             state.anchor
                 |> Maybe.andThen (String.toInt >> Result.toMaybe)
+                |> Maybe.map Store.fromInt
 
         anchorPosition =
             anchorId
-                |> Maybe.andThen (flip Dict.get data.store)
+                |> Maybe.andThen (flip Store.get data.store)
                 |> Maybe.andThen (Point.position data.store data.variables)
 
         deltaCursor =
@@ -270,7 +272,8 @@ anchorPosition : Data -> State -> Maybe Vec2
 anchorPosition data state =
     state.anchor
         |> Maybe.andThen (String.toInt >> Result.toMaybe)
-        |> Maybe.andThen (flip Dict.get data.store)
+        |> Maybe.map Store.fromInt
+        |> Maybe.andThen (flip Store.get data.store)
         |> Maybe.andThen (Point.position data.store data.variables)
 
 

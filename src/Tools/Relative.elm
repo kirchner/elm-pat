@@ -17,6 +17,8 @@ import Html.Attributes as Html
 import Html.Events as Html
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
+import Point exposing (Point)
+import Store exposing (Id, Store)
 import Styles.Colors as Colors exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
@@ -35,15 +37,14 @@ import Tools.Common as Tools
         )
 import Tools.Styles exposing (..)
 import Types exposing (..)
-import Point exposing (Point)
 
 
 type alias State =
     { x : Maybe E
     , y : Maybe E
-    , id : Maybe Point.Id
+    , id : Maybe (Id Point)
     , dropdownState : Tools.DropdownState
-    , selectedPoint : Maybe ( Int, Point )
+    , selectedPoint : Maybe ( Id Point, Point )
     }
 
 
@@ -56,7 +57,7 @@ init data =
     , selectedPoint =
         case List.head data.selectedPoints of
             Just id ->
-                case Dict.get id data.store of
+                case Store.get id data.store of
                     Just point ->
                         Just ( id, point )
 
@@ -68,7 +69,7 @@ init data =
     }
 
 
-initWith : Point.Id -> Point.Id -> E -> E -> State
+initWith : Id Point -> Id Point -> E -> E -> State
 initWith id anchor x y =
     { x = Just x
     , y = Just y
@@ -87,7 +88,7 @@ point data state =
 
         anchorPosition =
             anchorId
-                |> Maybe.andThen (flip Dict.get data.store)
+                |> Maybe.andThen (flip Store.get data.store)
                 |> Maybe.andThen (Point.position data.store data.variables)
 
         xCursor =
@@ -145,7 +146,7 @@ svg callbacks updateState data state =
                             | selectedPoint =
                                 case maybeId of
                                     Just id ->
-                                        Dict.get id data.store
+                                        Store.get id data.store
                                             |> Maybe.map (\point -> ( id, point ))
 
                                     Nothing ->
@@ -236,7 +237,7 @@ anchorPosition : Data -> State -> Maybe Vec2
 anchorPosition data state =
     state.selectedPoint
         |> Maybe.map Tuple.first
-        |> Maybe.andThen (flip Dict.get data.store)
+        |> Maybe.andThen (flip Store.get data.store)
         |> Maybe.andThen (Point.position data.store data.variables)
 
 

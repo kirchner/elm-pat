@@ -27,7 +27,9 @@ import Keyboard.Extra exposing (Key)
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
 import Piece exposing (..)
+import Point exposing (Point)
 import Set exposing (Set)
+import Store exposing (Id, Store)
 import Styles.Colors as Colors
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
@@ -36,29 +38,27 @@ import Svg.Extra as Svg
 import Tools.Styles exposing (..)
 import Types exposing (..)
 import Views.Common exposing (iconSmall)
-import Point exposing (Point)
-import Store exposing (Store, Id)
 
 
 type alias Data =
-    { store : Point.Store
+    { store : Store Point
     , pieceStore : Store Piece
     , variables : Dict String E
     , viewPort : ViewPort
     , cursorPosition : Maybe Position
-    , focusedPoint : Maybe Point.Id
+    , focusedPoint : Maybe (Id Point)
     , pressedKeys : List Key
-    , selectedPoints : List Point.Id
+    , selectedPoints : List (Id Point)
     }
 
 
 type alias Callbacks msg =
     { addPoint : Point -> msg
     , updateCursorPosition : Maybe Position -> msg
-    , focusPoint : Maybe Point.Id -> msg
-    , selectPoint : Maybe Point.Id -> msg
+    , focusPoint : Maybe (Id Point) -> msg
+    , selectPoint : Maybe (Id Point) -> msg
     , clearSelection : msg
-    , extendPiece : Id Piece -> Point.Id -> Maybe Point.Id -> msg
+    , extendPiece : Id Piece -> Id Point -> Maybe (Id Point) -> msg
     }
 
 
@@ -86,18 +86,22 @@ svgUpdateMouse mouseClicked updateCursorPosition data =
         []
 
 
-svgSelectPoint : (Maybe Point.Id -> msg) -> (Maybe Point.Id -> msg) -> Data -> Svg msg
+svgSelectPoint :
+    (Maybe (Id Point) -> msg)
+    -> (Maybe (Id Point) -> msg)
+    -> Data
+    -> Svg msg
 svgSelectPoint focusPoint selectPoint data =
-    Dict.toList data.store
+    Store.toList data.store
         |> List.filterMap (pointSelector_ focusPoint selectPoint data)
         |> Svg.g []
 
 
 pointSelector_ :
-    (Maybe Point.Id -> msg)
-    -> (Maybe Point.Id -> msg)
+    (Maybe (Id Point) -> msg)
+    -> (Maybe (Id Point) -> msg)
     -> Data
-    -> ( Point.Id, Point )
+    -> ( Id Point, Point )
     -> Maybe (Svg msg)
 pointSelector_ focusPoint selectPoint data ( id, point ) =
     let
@@ -245,7 +249,11 @@ initDropdownState =
     }
 
 
-setQuery : Data -> DropdownState -> String -> ( DropdownState, Maybe ( Int, Point ) )
+setQuery :
+    Data
+    -> DropdownState
+    -> String
+    -> ( DropdownState, Maybe ( Id Point, Point ) )
 setQuery data state id =
     ( { state | query = id }
     , id
@@ -253,13 +261,13 @@ setQuery data state id =
         |> Result.toMaybe
         |> Maybe.andThen
             (\id ->
-                Dict.get id data.store
-                    |> Maybe.map (\point -> ( id, point ))
+                Store.get (Store.fromInt id) data.store
+                    |> Maybe.map (\point -> ( Store.fromInt id, point ))
             )
     )
 
 
-resetInput : DropdownState -> ( DropdownState, Maybe ( Int, Point ) )
+resetInput : DropdownState -> ( DropdownState, Maybe ( Id Point, Point ) )
 resetInput state =
     ( { state | query = "" }
         |> resetMenu
@@ -275,18 +283,20 @@ resetMenu state =
     }
 
 
-filteredPoints : String -> Data -> List ( Int, Point )
+filteredPoints : String -> Data -> List ( Id Point, Point )
 filteredPoints query data =
     let
         lowerQuery =
             String.toLower query
 
         keepPoint ( id, point ) =
-            toString id
+            id
+                |> Store.toInt
+                |> toString
                 |> String.contains lowerQuery
     in
     data.store
-        |> Dict.toList
+        |> Store.toList
         |> List.filter keepPoint
 
 
@@ -301,11 +311,11 @@ type DropdownMsg
 
 
 updateDropdownState :
-    Maybe ( Int, Point )
+    Maybe ( Id Point, Point )
     -> Data
     -> DropdownMsg
     -> DropdownState
-    -> ( DropdownState, Maybe ( Int, Point ) )
+    -> ( DropdownState, Maybe ( Id Point, Point ) )
 updateDropdownState selectedPoint data autoMsg state =
     case autoMsg of
         SetQuery newQuery ->
@@ -391,7 +401,7 @@ updateDropdownState selectedPoint data autoMsg state =
             ( state, selectedPoint )
 
 
-updateConfig : Autocomplete.UpdateConfig DropdownMsg ( Int, Point )
+updateConfig : Autocomplete.UpdateConfig DropdownMsg ( Id Point, Point )
 updateConfig =
     Autocomplete.updateConfig
         { toId = Tuple.first >> toString
@@ -414,7 +424,11 @@ updateConfig =
         }
 
 
-viewPointSelect : Maybe ( Int, Point ) -> Data -> DropdownState -> Html DropdownMsg
+viewPointSelect :
+    Maybe ( Id Point, Point )
+    -> Data
+    -> DropdownState
+    -> Html DropdownMsg
 viewPointSelect selectedPoint data state =
     let
         options =
@@ -501,7 +515,7 @@ viewMenu data state =
         ]
 
 
-viewConfig : Autocomplete.ViewConfig ( Int, Point )
+viewConfig : Autocomplete.ViewConfig ( Id Point, Point )
 viewConfig =
     Autocomplete.viewConfig
         { toId = Tuple.first >> toString
@@ -531,7 +545,7 @@ idDropdown : Data -> Maybe String -> (Maybe String -> msg) -> Html msg
 idDropdown data anchor updateAnchor =
     let
         items =
-            Dict.keys data.store
+            Store.intKeys data.store
                 |> List.map toString
                 |> List.map
                     (\id ->

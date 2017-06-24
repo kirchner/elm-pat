@@ -9,7 +9,7 @@ import List.Extra as List
 import Math.Vector2 exposing (..)
 import Piece exposing (..)
 import Point exposing (Point)
-import Store exposing (Store, Id)
+import Store exposing (Id, Store)
 import Styles.Colors as Colors
 import Svg exposing (Svg, path)
 import Svg.Attributes as Svg
@@ -26,9 +26,9 @@ import Types exposing (..)
 view :
     Svg msg
     -> (Position -> msg)
-    -> (Maybe Point.Id -> msg)
-    -> (Maybe Point.Id -> msg)
-    -> (Id Piece -> Int -> msg)
+    -> (Maybe (Id Point) -> msg)
+    -> (Maybe (Id Point) -> msg)
+    -> (Id Piece -> Id Point -> msg)
     -> Data
     -> Store Piece
     -> Html msg
@@ -221,11 +221,11 @@ viewSelectedPoints data =
         |> Svg.g []
 
 
-viewSelectedPoint : Data -> Bool -> Point.Id -> Maybe (Svg msg)
+viewSelectedPoint : Data -> Bool -> Id Point -> Maybe (Svg msg)
 viewSelectedPoint data first id =
     let
         position =
-            Dict.get id data.store
+            Store.get id data.store
                 |> Maybe.andThen (Point.position data.store data.variables)
     in
     case position of
@@ -272,7 +272,7 @@ origin =
 
 points : Data -> List (Svg msg)
 points data =
-    Dict.values data.store
+    Store.values data.store
         |> List.filterMap (point data)
 
 
@@ -313,14 +313,18 @@ point data point =
             Just (Svg.g [] [])
 
 
-pieces : (Id Piece -> Int -> msg) -> Data -> List (Svg msg)
+pieces : (Id Piece -> Id Point -> msg) -> Data -> List (Svg msg)
 pieces extendPiece data =
     Store.toList data.pieceStore
         |> List.map (piece extendPiece data)
         |> List.map (Svg.g [])
 
 
-piece : (Id Piece -> Int -> msg) -> Data -> ( Id Piece, Piece ) -> List (Svg msg)
+piece :
+    (Id Piece -> Id Point -> msg)
+    -> Data
+    -> ( Id Piece, Piece )
+    -> List (Svg msg)
 piece extendPiece data ( id, piece ) =
     let
         segments =
@@ -337,7 +341,7 @@ piece extendPiece data ( id, piece ) =
             []
 
 
-piecePath : ( Int, Vec2 ) -> List ( Int, Vec2 ) -> Svg msg
+piecePath : ( Id Point, Vec2 ) -> List ( Id Point, Vec2 ) -> Svg msg
 piecePath ( _, first ) rest =
     let
         restD =
@@ -369,10 +373,10 @@ piecePath ( _, first ) rest =
 
 
 pieceHelper :
-    (Int -> msg)
-    -> ( Int, Vec2 )
-    -> List ( Int, Vec2 )
-    -> ( Int, Vec2 )
+    (Id Point -> msg)
+    -> ( Id Point, Vec2 )
+    -> List ( Id Point, Vec2 )
+    -> ( Id Point, Vec2 )
     -> List (Svg msg)
     -> List (Svg msg)
 pieceHelper extendPiece ( firstId, first ) rest veryFirst drawn =

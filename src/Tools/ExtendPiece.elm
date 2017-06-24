@@ -26,11 +26,11 @@ import Types exposing (..)
 
 type alias State =
     { piece : Id Piece
-    , segment : Int
+    , segment : Id Point
     }
 
 
-init : Id Piece -> Int -> State
+init : Id Piece -> Id Point -> State
 init piece segment =
     { piece = piece
     , segment = segment

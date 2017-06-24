@@ -45,8 +45,7 @@ import Window
 
 
 type alias Model =
-    { store : Point.Store
-    , nextId : Point.Id
+    { store : Store Point
     , pieceStore : Store Piece
     , variables : Dict String E
     , newName : Maybe String
@@ -55,9 +54,9 @@ type alias Model =
     , viewPort : ViewPort
     , drag : Maybe Drag
     , cursorPosition : Maybe Position
-    , focusedPoint : Maybe Point.Id
+    , focusedPoint : Maybe (Id Point)
     , pressedKeys : List Key
-    , selectedPoints : List Point.Id
+    , selectedPoints : List (Id Point)
     }
 
 
@@ -148,8 +147,8 @@ type alias Drag =
 type Msg
     = UpdateTool Tool
     | AddPoint Point
-    | UpdatePoint Point.Id Point
-    | DeletePoint Point.Id
+    | UpdatePoint (Id Point) Point
+    | DeletePoint (Id Point)
     | ValueUpdated String
     | NameUpdated String
     | AddVariable
@@ -158,18 +157,17 @@ type Msg
     | DragAt Position
     | DragStop Position
     | UpdateCursorPosition (Maybe Position)
-    | FocusPoint (Maybe Point.Id)
+    | FocusPoint (Maybe (Id Point))
     | KeyMsg Keyboard.Msg
     | KeyDown Keyboard.Key
-    | SelectPoint (Maybe Point.Id)
+    | SelectPoint (Maybe (Id Point))
     | ClearSelection
-    | ExtendPieceMsg (Id Piece) Point.Id (Maybe Point.Id)
+    | ExtendPieceMsg (Id Piece) (Id Point) (Maybe (Id Point))
 
 
 init : ( Model, Cmd Msg )
 init =
-    { store = Point.emptyStore
-    , nextId = Point.firstId
+    { store = Store.empty
     , pieceStore = Store.empty
     , variables = Dict.empty
     , newName = Nothing
@@ -203,26 +201,29 @@ update ports msg model =
                 { model | tool = tool } ! []
 
             AddPoint point ->
+                let
+                    ( id, newStore ) =
+                        Store.insert point model.store
+                in
                 { model
-                    | store = Dict.insert model.nextId point model.store
-                    , nextId = model.nextId + 1
+                    | store = newStore
                     , tool = None
                     , cursorPosition = Nothing
                     , focusedPoint = Nothing
-                    , selectedPoints = [ model.nextId ]
+                    , selectedPoints = [ id ]
                 }
                     ! []
 
             UpdatePoint id point ->
                 { model
-                    | store = Dict.update id (\_ -> Just point) model.store
+                    | store = Store.update id (\_ -> Just point) model.store
                     , tool = None
                 }
                     ! []
 
             DeletePoint id ->
                 { model
-                    | store = Dict.remove id model.store
+                    | store = Store.remove id model.store
                 }
                     ! []
 
@@ -322,6 +323,7 @@ update ports msg model =
                                 |> Maybe.map
                                     (\piece ->
                                         Store.insert piece model.pieceStore
+                                            |> Tuple.second
                                     )
                         of
                             Just pieceStore ->

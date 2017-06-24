@@ -8,6 +8,7 @@ import Html.Attributes as Html
 import Html.Events exposing (..)
 import Math.Vector2 exposing (..)
 import Point exposing (Point)
+import Store exposing (Id, Store)
 import Styles.PointTable
     exposing
         ( Class(..)
@@ -44,13 +45,13 @@ view data =
                 []
             ]
             :: (data.store
-                    |> Dict.toList
+                    |> Store.toList
                     |> List.map (viewPointEntry data)
                )
         )
 
 
-viewPointEntry : Data -> ( Point.Id, Point ) -> Html Msg
+viewPointEntry : Data -> ( Id Point, Point ) -> Html Msg
 viewPointEntry data ( id, point ) =
     let
         v =

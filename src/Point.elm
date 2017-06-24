@@ -1,12 +1,8 @@
 module Point
     exposing
-        ( Id
-        , Point(..)
-        , Store
+        ( Point(..)
         , Ratio
         , absolute
-        , emptyStore
-        , firstId
         , position
         , positionById
         , relative
@@ -15,6 +11,7 @@ module Point
 import Dict exposing (Dict)
 import Expr exposing (E(..), compute)
 import Math.Vector2 exposing (..)
+import Store exposing (Id, Store)
 
 
 {- point -}
@@ -22,9 +19,9 @@ import Math.Vector2 exposing (..)
 
 type Point
     = Absolute E E
-    | Relative Id E E
-    | Distance Id E E
-    | Between Id Id Ratio
+    | Relative (Id Point) E E
+    | Distance (Id Point) E E
+    | Between (Id Point) (Id Point) Ratio
 
 
 type alias Ratio =
@@ -36,48 +33,26 @@ absolute v =
     Absolute (Number (getX v)) (Number (getY v))
 
 
-relative : Id -> Vec2 -> Point
+relative : Id Point -> Vec2 -> Point
 relative id v =
     Relative id (Number (getX v)) (Number (getY v))
-
-
-
-{- point store -}
-
-
-type alias Store =
-    Dict Id Point
-
-
-type alias Id =
-    Int
-
-
-emptyStore : Store
-emptyStore =
-    Dict.empty
-
-
-firstId : Id
-firstId =
-    0
 
 
 
 {- helpers -}
 
 
-positionById : Store -> Dict String E -> Id -> Maybe Vec2
+positionById : Store Point -> Dict String E -> Id Point -> Maybe Vec2
 positionById store variables id =
-    Dict.get id store
+    Store.get id store
         |> Maybe.andThen (position store variables)
 
 
-position : Store -> Dict String E -> Point -> Maybe Vec2
+position : Store Point -> Dict String E -> Point -> Maybe Vec2
 position store variables point =
     let
         lookUp id =
-            Dict.get id store
+            Store.get id store
                 |> Maybe.andThen (position store variables)
     in
     case point of
