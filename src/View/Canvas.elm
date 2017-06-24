@@ -1,8 +1,6 @@
 module View.Canvas exposing (view)
 
-import Dict exposing (..)
 import Events
-import Expr exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Html
 import List.Extra as List
@@ -13,7 +11,6 @@ import Store exposing (Id, Store)
 import Styles.Colors as Colors
 import Svg exposing (Svg, path)
 import Svg.Attributes as Svg
-import Svg.Events as Svg
 import Svg.Extra as Svg
 import Tools.Common
     exposing
@@ -63,6 +60,16 @@ view tool startDrag focusPoint selectPoint extendPiece data pieceStore =
         ]
 
 
+type alias GridConfig =
+    { unit : String
+    , color1 : String
+    , color2 : String
+    , highlight : Int
+    , offset : Int
+    }
+
+
+defaultGridConfig : GridConfig
 defaultGridConfig =
     { offset = 50
     , unit = "mm"
@@ -72,6 +79,7 @@ defaultGridConfig =
     }
 
 
+grid : GridConfig -> ViewPort -> Svg msg
 grid config viewPort =
     let
         line color u v =

@@ -9,21 +9,17 @@ module Tools.Common
         , view
         )
 
-import Autocomplete
 import Dict exposing (Dict)
-import Dropdown
 import Events
 import Expr exposing (..)
 import Html exposing (Html, map)
 import Html.Attributes as Html
 import Html.Events as Html
-import Json.Decode as Json
 import Keyboard.Extra exposing (Key)
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
 import Piece exposing (..)
 import Point exposing (Point)
-import Set exposing (Set)
 import Store exposing (Id, Store)
 import Styles.Colors as Colors
 import Svg exposing (Svg)

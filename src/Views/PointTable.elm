@@ -4,8 +4,6 @@ import Dict exposing (..)
 import Editor exposing (Msg(..))
 import Expr exposing (..)
 import Html exposing (..)
-import Html.Attributes as Html
-import Html.Events exposing (..)
 import Math.Vector2 exposing (..)
 import Point exposing (Point)
 import Store exposing (Id, Store)

@@ -167,10 +167,12 @@ drawVerticalLine x =
         []
 
 
+translate : Vec2 -> String
 translate u =
     translate2 (getX u) (getY u)
 
 
+translate2 : x -> y -> String
 translate2 x y =
     "translate(" ++ toString x ++ "," ++ toString y ++ ")"
 
@@ -181,6 +183,7 @@ type alias ArcConfig =
     }
 
 
+defaultArcConfig : ArcConfig
 defaultArcConfig =
     { radius = 65
     , label = True

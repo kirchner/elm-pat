@@ -1,7 +1,7 @@
 module Types
     exposing
-        ( ViewPort
-        , Position
+        ( Position
+        , ViewPort
         , canvasToSvg
         , equals
         , svgToCanvas
@@ -9,8 +9,6 @@ module Types
         , vec
         )
 
-import Dict exposing (Dict)
-import Expr exposing (..)
 import Math.Vector2 exposing (..)
 
 

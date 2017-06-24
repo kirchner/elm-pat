@@ -1,8 +1,8 @@
 module Editor
     exposing
-        ( Msg(..)
+        ( Flags
+        , Msg(..)
         , Ports
-        , Flags
         , allTools
         , callbacks
         , data
@@ -23,33 +23,32 @@ import Expr
         , parse
         , parseVariable
         )
+import File exposing (File)
+import FileBrowser exposing (FileBrowser)
+import Http
+import Json.Decode exposing (Value)
 import Keyboard.Extra as Keyboard exposing (Key)
-import Math.Vector2 exposing (..)
+import Model exposing (..)
 import Mouse
 import Piece exposing (Piece)
 import Point exposing (Point)
-import Set exposing (Set)
 import Store exposing (Id, Store)
 import Task
 import Tools.Absolute as Absolute
-import Model exposing (..)
-import File exposing (File)
+import Tools.Between as Between
 import Tools.Common
     exposing
         ( Callbacks
         , Data
         )
 import Tools.Distance as Distance
-import Tools.ExtendPiece as ExtendPiece
 import Tools.Relative as Relative
 import Types exposing (..)
 import Window
-import Json.Decode exposing (Value)
-import FileBrowser exposing (FileBrowser)
-import Http
 
 
 -- TODO: move most? of this to Model:
+
 
 data : Model -> Data
 data model =
@@ -148,8 +147,8 @@ type Msg
 
 
 type alias Flags =
-  { file0 : Maybe Value
-  }
+    { file0 : Maybe Value
+    }
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -159,6 +158,7 @@ init flags =
             case flags.file0 of
                 Just file ->
                     File.restore file defaultModel
+
                 Nothing ->
                     defaultModel
     in
@@ -174,27 +174,32 @@ type alias Ports =
 update : Ports -> Msg -> Model -> ( Model, Cmd Msg )
 update ports msg model =
     updateAutoFocus ports model
-    >> updateStorage ports model <|
+        >> updateStorage ports model
+    <|
         case msg of
             LoadRemoteFile url ->
                 let
                     handle =
                         Result.map RestoreSession
-                        >> Result.mapError LoadRemoteFileError
-                        >> (\result ->
-                               case result of
-                                   Ok x -> x
-                                   Err x -> x
-                           )
+                            >> Result.mapError LoadRemoteFileError
+                            >> (\result ->
+                                    case result of
+                                        Ok x ->
+                                            x
+
+                                        Err x ->
+                                            x
+                               )
                 in
-                model !  [ Http.send handle (Http.get url File.decode) ]
+                model ! [ Http.send handle (Http.get url File.decode) ]
 
             RestoreSession file ->
                 File.load_ file model ! []
 
             LoadRemoteFileError httpError ->
                 let
-                    _ = Debug.log "loadRemoteFileError" httpError
+                    _ =
+                        Debug.log "loadRemoteFileError" httpError
                 in
                 model ! []
 
@@ -203,6 +208,7 @@ update ports msg model =
 
             FileBrowserMsg fileBrowserMsg ->
                 { model | fileBrowser = FileBrowser.update fileBrowserMsg model.fileBrowser } ! []
+
             UpdateTool tool ->
                 { model | tool = tool } ! []
 
@@ -412,6 +418,7 @@ update ports msg model =
                         { model | tool = None } ! []
 
 
+updateAutoFocus : Ports -> Model -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 updateAutoFocus ports oldModel ( model, cmd ) =
     ( model
     , if (oldModel.tool == None) && (model.tool /= None) then

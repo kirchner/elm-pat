@@ -6,7 +6,6 @@ import Expr exposing (..)
 import Html exposing (..)
 import Html.Attributes as Html
 import Html.Events exposing (..)
-import Math.Vector2 exposing (..)
 import Styles.VariableTable
     exposing
         ( Class(..)
@@ -14,7 +13,6 @@ import Styles.VariableTable
         , classList
         )
 import Views.Common exposing (iconSmall)
-import Point
 
 
 view : Dict String E -> Maybe String -> Maybe E -> Html Msg

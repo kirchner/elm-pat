@@ -1,9 +1,9 @@
 module Model
     exposing
-        ( Model
-        , defaultModel
+        ( Drag
+        , Model
         , Tool(..)
-        , Drag
+        , defaultModel
         )
 
 {- internal -}
@@ -15,26 +15,16 @@ import Expr
         , parse
         , parseVariable
         )
+import FileBrowser exposing (FileBrowser)
 import Keyboard.Extra as Keyboard exposing (Key)
-import Math.Vector2 exposing (..)
-import Mouse
 import Piece exposing (Piece)
 import Point exposing (Point)
-import Set exposing (Set)
-import Task
+import Store exposing (Id, Store)
 import Tools.Absolute as Absolute
-import Tools.Common
-    exposing
-        ( Callbacks
-        , Data
-        )
 import Tools.Distance as Distance
 import Tools.ExtendPiece as ExtendPiece
 import Tools.Relative as Relative
 import Types exposing (..)
-import Window
-import Store exposing (Id, Store)
-import FileBrowser exposing (FileBrowser)
 
 
 type alias Model =

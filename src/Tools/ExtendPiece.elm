@@ -5,14 +5,10 @@ module Tools.ExtendPiece
         , svg
         )
 
-import Dict
 import Piece exposing (..)
 import Point exposing (Point)
 import Store exposing (Id, Store)
-import Styles.Colors as Colors
 import Svg exposing (Svg)
-import Svg.Attributes as Svg
-import Svg.Events as Svg
 import Svg.Extra as Svg
 import Tools.Common as Tools
     exposing

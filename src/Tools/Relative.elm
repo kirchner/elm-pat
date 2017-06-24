@@ -7,22 +7,14 @@ module Tools.Relative
         , view
         )
 
-import Css
-import Dict exposing (Dict)
-import Dropdown
-import Events
 import Expr exposing (..)
 import Html exposing (Html, map)
-import Html.Attributes as Html
-import Html.Events as Html
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
 import Point exposing (Point)
 import Store exposing (Id, Store)
 import Styles.Colors as Colors exposing (..)
 import Svg exposing (Svg)
-import Svg.Attributes as Svg
-import Svg.Events as Svg
 import Svg.Extra as Svg
 import Tools.Common as Tools
     exposing
@@ -33,8 +25,6 @@ import Tools.Common as Tools
         , svgUpdateMouse
         )
 import Tools.Dropdown as Dropdown
-import Tools.Styles exposing (..)
-import Types exposing (..)
 
 
 type alias State =
@@ -195,7 +185,7 @@ verticalLine data state anchorPosition =
 {- view -}
 
 
-view : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
+view : Callbacks msg -> (State -> msg) -> Data -> State -> Html msg
 view callbacks updateStateCallback data state =
     let
         updateX =

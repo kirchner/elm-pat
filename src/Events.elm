@@ -8,7 +8,6 @@ module Events
 {- internal -}
 
 import Json.Decode exposing (..)
-import Platform exposing (Task)
 import Types exposing (Position)
 import VirtualDom exposing (on)
 
