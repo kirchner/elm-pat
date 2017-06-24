@@ -53,7 +53,7 @@ css =
             , fontFamily monospace
             , fontSize (px 12)
             , lineHeight (rem 1)
-            , width (rem 20)
+            , width (rem 12)
             , backgroundColor transparent
             , focus
                 [ outline none ]
