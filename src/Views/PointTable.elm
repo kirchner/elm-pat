@@ -4,7 +4,10 @@ import Dict exposing (..)
 import Editor exposing (Msg(..))
 import Expr exposing (..)
 import Html exposing (..)
+import Html.Attributes as Html
+import Html.Events as Html
 import Math.Vector2 exposing (..)
+import Tools.Styles
 import Point exposing (Point)
 import Store exposing (Id, Store)
 import Styles.PointTable
@@ -14,10 +17,16 @@ import Styles.PointTable
         )
 import Tools.Common exposing (Data)
 import Views.Common exposing (iconSmall)
+import Json.Encode as Json
 
 
-view : Data -> Html Msg
-view data =
+type alias Callbacks =
+    { setName : Id Point -> String -> Msg
+    }
+
+
+view : Callbacks -> Data -> Html Msg
+view callbacks data =
     table
         [ class [ Table ] ]
         (tr
@@ -47,13 +56,13 @@ view data =
             ]
             :: (data.store
                     |> Store.toList
-                    |> List.map (viewPointEntry data)
+                    |> List.map (viewPointEntry callbacks data)
                )
         )
 
 
-viewPointEntry : Data -> ( Id Point, Point ) -> Html Msg
-viewPointEntry data ( id, point ) =
+viewPointEntry : Callbacks -> Data -> ( Id Point, Point ) -> Html Msg
+viewPointEntry callbacks data ( id, point ) =
     let
         v =
             Point.position data.store data.variables point
@@ -98,7 +107,25 @@ viewPointEntry data ( id, point ) =
             [ text (id |> Store.toInt |> toString) ]
         , td
             [ class [ CellName ] ]
-            [ point |> Point.name |> text ]
+            [ let
+                  deleteIcon =
+                    Html.div
+                      [ Tools.Styles.class [ Tools.Styles.IconContainer ] ]
+                      [ iconSmall "delete" (callbacks.setName id "") ]
+              in
+              Html.div
+                  [ Tools.Styles.class [ Tools.Styles.ValueContainer ] ]
+                  ([ Html.input
+                      [ Html.onInput (callbacks.setName id)
+                      , Html.placeholder (Point.name point)
+                      , Html.value (Point.name point) -- TODO: broken
+                      , Tools.Styles.class [ Tools.Styles.Textfield ]
+                      ]
+                      []
+                   , deleteIcon
+                   ]
+                  )
+            ]
         , td
             [ class [ CellCoordinate ] ]
             [ text x ]

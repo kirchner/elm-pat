@@ -164,6 +164,7 @@ type Msg
     | Undo
     | Redo
     | DumpFile0
+    | SetPointName (Id Point) String
 
 
 type alias Flags =
@@ -199,6 +200,10 @@ update ports msg model =
         >> updateStorage ports model
     <|
         case msg of
+            SetPointName id name ->
+                { model | store = Store.update id (Maybe.map (Point.setName name)) model.store
+                }
+                    ! []
             DumpFile0 ->
                 model ! [ ports.dumpFile0 () ]
             Undo ->

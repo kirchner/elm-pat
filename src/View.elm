@@ -68,7 +68,7 @@ view model =
     , Just <|
         Html.div
             [ class [ Container, ContainerBottomLeft ] ]
-            [ PointTable.view data ]
+            [ PointTable.view { setName = SetPointName } data ]
     , Just <|
         Html.div
             [ class [ Container, ContainerBottomRight ] ]
