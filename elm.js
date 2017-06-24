@@ -21107,7 +21107,7 @@ var _kirchner$elm_pat$Point$position = F3(
 						function (v, w) {
 							return A2(
 								_elm_community$linear_algebra$Math_Vector2$add,
-								w,
+								v,
 								A2(
 									_elm_community$linear_algebra$Math_Vector2$scale,
 									_p6._2,
@@ -21833,6 +21833,59 @@ var _kirchner$elm_pat$Svg_Extra$drawLineSegment = F2(
 			},
 			{ctor: '[]'});
 	});
+var _kirchner$elm_pat$Svg_Extra$drawLine = F2(
+	function (v, w) {
+		var delta = _elm_community$linear_algebra$Math_Vector2$normalize(
+			A2(_elm_community$linear_algebra$Math_Vector2$sub, v, w));
+		var newV = A2(
+			_elm_community$linear_algebra$Math_Vector2$add,
+			v,
+			A2(_elm_community$linear_algebra$Math_Vector2$scale, 100000, delta));
+		var newW = A2(
+			_elm_community$linear_algebra$Math_Vector2$add,
+			w,
+			A2(_elm_community$linear_algebra$Math_Vector2$scale, -100000, delta));
+		return A2(
+			_elm_lang$svg$Svg$line,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$x1(
+					_elm_lang$core$Basics$toString(
+						_elm_community$linear_algebra$Math_Vector2$getX(newV))),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$y1(
+						_elm_lang$core$Basics$toString(
+							_elm_community$linear_algebra$Math_Vector2$getY(newV))),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$x2(
+							_elm_lang$core$Basics$toString(
+								_elm_community$linear_algebra$Math_Vector2$getX(newW))),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$y2(
+								_elm_lang$core$Basics$toString(
+									_elm_community$linear_algebra$Math_Vector2$getY(newW))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$stroke(_kirchner$elm_pat$Styles_Colors$base1),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$strokeDasharray('5, 5'),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			{ctor: '[]'});
+	});
 var _kirchner$elm_pat$Svg_Extra$drawArrow = F2(
 	function (v, w) {
 		return A2(
@@ -22003,13 +22056,28 @@ var _kirchner$elm_pat$Types$vec = F2(
 			_elm_lang$core$Basics$toFloat(x),
 			_elm_lang$core$Basics$toFloat(y));
 	});
-var _kirchner$elm_pat$Types$svgToCanvas = F2(
-	function (viewPort, p) {
-		return {x: p.x + viewPort.x, y: p.y + viewPort.y};
-	});
 var _kirchner$elm_pat$Types$canvasToSvg = F2(
 	function (viewPort, p) {
-		return {x: p.x - viewPort.x, y: p.y - viewPort.y};
+		return {x: (p.x - viewPort.offset.x) + ((viewPort.width / 2) | 0), y: (p.y - viewPort.offset.y) + ((viewPort.height / 2) | 0)};
+	});
+var _kirchner$elm_pat$Types$virtualHeight = function (viewPort) {
+	return _elm_lang$core$Basics$floor(
+		_elm_lang$core$Basics$toFloat(viewPort.height) * viewPort.zoom);
+};
+var _kirchner$elm_pat$Types$virtualWidth = function (viewPort) {
+	return _elm_lang$core$Basics$floor(
+		_elm_lang$core$Basics$toFloat(viewPort.width) * viewPort.zoom);
+};
+var _kirchner$elm_pat$Types$svgToCanvas = F2(
+	function (viewPort, p) {
+		var py = _elm_lang$core$Basics$floor(
+			viewPort.zoom * _elm_lang$core$Basics$toFloat(p.y));
+		var px = _elm_lang$core$Basics$floor(
+			viewPort.zoom * _elm_lang$core$Basics$toFloat(p.x));
+		return {
+			x: (px + viewPort.offset.x) - ((_kirchner$elm_pat$Types$virtualWidth(viewPort) / 2) | 0),
+			y: (py + viewPort.offset.y) - ((_kirchner$elm_pat$Types$virtualHeight(viewPort) / 2) | 0)
+		};
 	});
 var _kirchner$elm_pat$Types$toVec = function (p) {
 	return A2(
@@ -22023,9 +22091,20 @@ var _kirchner$elm_pat$Types$Position = F2(
 	});
 var _kirchner$elm_pat$Types$ViewPort = F4(
 	function (a, b, c, d) {
-		return {x: a, y: b, width: c, height: d};
+		return {offset: a, width: b, height: c, zoom: d};
 	});
 
+var _kirchner$elm_pat$Events$onWheel = function (onZoom) {
+	var ignoreDefaults = A2(_elm_lang$virtual_dom$VirtualDom$Options, true, true);
+	return A3(
+		_elm_lang$virtual_dom$VirtualDom$onWithOptions,
+		'wheel',
+		ignoreDefaults,
+		A2(
+			_elm_lang$core$Json_Decode$map,
+			onZoom,
+			A2(_elm_lang$core$Json_Decode$field, 'deltaY', _elm_lang$core$Json_Decode$float)));
+};
 var _kirchner$elm_pat$Events$positionDecoder = A3(
 	_elm_lang$core$Json_Decode$map2,
 	_kirchner$elm_pat$Types$Position,
@@ -22674,6 +22753,7 @@ var _kirchner$elm_pat$Tools_Common$svgSelectPoint = F3(
 	});
 var _kirchner$elm_pat$Tools_Common$svgUpdateMouse = F3(
 	function (mouseClicked, updateCursorPosition, data) {
+		var viewPort = data.viewPort;
 		return A2(
 			_elm_lang$svg$Svg$rect,
 			A2(
@@ -22681,19 +22761,23 @@ var _kirchner$elm_pat$Tools_Common$svgUpdateMouse = F3(
 				{
 					ctor: '::',
 					_0: _elm_lang$svg$Svg_Attributes$x(
-						_elm_lang$core$Basics$toString(data.viewPort.x)),
+						_elm_lang$core$Basics$toString(
+							viewPort.offset.x - ((_kirchner$elm_pat$Types$virtualWidth(viewPort) / 2) | 0))),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$svg$Svg_Attributes$y(
-							_elm_lang$core$Basics$toString(data.viewPort.y)),
+							_elm_lang$core$Basics$toString(
+								viewPort.offset.y - ((_kirchner$elm_pat$Types$virtualHeight(viewPort) / 2) | 0))),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$svg$Svg_Attributes$width(
-								_elm_lang$core$Basics$toString(data.viewPort.width)),
+								_elm_lang$core$Basics$toString(
+									_kirchner$elm_pat$Types$virtualWidth(viewPort))),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$svg$Svg_Attributes$height(
-									_elm_lang$core$Basics$toString(data.viewPort.height)),
+									_elm_lang$core$Basics$toString(
+										_kirchner$elm_pat$Types$virtualHeight(viewPort))),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
@@ -23850,6 +23934,343 @@ var _kirchner$elm_pat$Tools_Dropdown$view = F3(
 			});
 	});
 
+var _kirchner$elm_pat$Tools_Between$position = F3(
+	function (data, state, maybeId) {
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			A2(_kirchner$elm_pat$Point$position, data.store, data.variables),
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				A2(_elm_lang$core$Basics$flip, _kirchner$elm_pat$Store$get, data.store),
+				maybeId));
+	});
+var _kirchner$elm_pat$Tools_Between$lastPosition = F2(
+	function (data, state) {
+		return A3(
+			_kirchner$elm_pat$Tools_Between$position,
+			data,
+			state,
+			A2(_elm_lang$core$Maybe$map, _elm_lang$core$Tuple$first, state.last));
+	});
+var _kirchner$elm_pat$Tools_Between$firstPosition = F2(
+	function (data, state) {
+		return A3(
+			_kirchner$elm_pat$Tools_Between$position,
+			data,
+			state,
+			A2(_elm_lang$core$Maybe$map, _elm_lang$core$Tuple$first, state.first));
+	});
+var _kirchner$elm_pat$Tools_Between$ratio = F5(
+	function (data, state, firstPosition, lastPosition, cursorPosition) {
+		var project = F2(
+			function (v, w) {
+				return A2(
+					_elm_community$linear_algebra$Math_Vector2$scale,
+					A2(_elm_community$linear_algebra$Math_Vector2$dot, v, w) / _elm_community$linear_algebra$Math_Vector2$lengthSquared(w),
+					w);
+			});
+		var deltaCursor = A3(
+			_elm_lang$core$Basics$flip,
+			_elm_community$linear_algebra$Math_Vector2$sub,
+			firstPosition,
+			_kirchner$elm_pat$Types$toVec(cursorPosition));
+		var deltaAnchors = A3(_elm_lang$core$Basics$flip, _elm_community$linear_algebra$Math_Vector2$sub, firstPosition, lastPosition);
+		var pointPosition = A2(
+			_elm_community$linear_algebra$Math_Vector2$add,
+			firstPosition,
+			A2(project, deltaCursor, deltaAnchors));
+		var ratio = _elm_community$linear_algebra$Math_Vector2$length(
+			A3(_elm_lang$core$Basics$flip, _elm_community$linear_algebra$Math_Vector2$sub, firstPosition, pointPosition)) / _elm_community$linear_algebra$Math_Vector2$length(
+			A3(_elm_lang$core$Basics$flip, _elm_community$linear_algebra$Math_Vector2$sub, firstPosition, lastPosition));
+		return ratio;
+	});
+var _kirchner$elm_pat$Tools_Between$newPoint = F4(
+	function (data, state, firstPosition, lastPosition) {
+		var maybeRatio = A2(
+			_elm_community$maybe_extra$Maybe_Extra$or,
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				_kirchner$elm_pat$Expr$compute(data.variables),
+				state.ratio),
+			A2(
+				_elm_lang$core$Maybe$map,
+				A4(_kirchner$elm_pat$Tools_Between$ratio, data, state, firstPosition, lastPosition),
+				data.cursorPosition));
+		var _p0 = maybeRatio;
+		if (_p0.ctor === 'Just') {
+			var pointPosition = A2(
+				_elm_community$linear_algebra$Math_Vector2$add,
+				firstPosition,
+				A2(
+					_elm_community$linear_algebra$Math_Vector2$scale,
+					_p0._0,
+					A3(_elm_lang$core$Basics$flip, _elm_community$linear_algebra$Math_Vector2$sub, firstPosition, lastPosition)));
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(_kirchner$elm_pat$Svg_Extra$drawPoint, _kirchner$elm_pat$Styles_Colors$red, pointPosition),
+					_1: {
+						ctor: '::',
+						_0: A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$red, pointPosition),
+						_1: {ctor: '[]'}
+					}
+				});
+		} else {
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{ctor: '[]'},
+				{ctor: '[]'});
+		}
+	});
+var _kirchner$elm_pat$Tools_Between$point = F2(
+	function (data, state) {
+		var _p1 = {
+			ctor: '_Tuple2',
+			_0: A2(_kirchner$elm_pat$Tools_Between$firstPosition, data, state),
+			_1: A2(_kirchner$elm_pat$Tools_Between$lastPosition, data, state)
+		};
+		if (((_p1.ctor === '_Tuple2') && (_p1._0.ctor === 'Just')) && (_p1._1.ctor === 'Just')) {
+			var maybeRatio = A2(
+				_elm_community$maybe_extra$Maybe_Extra$or,
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					_kirchner$elm_pat$Expr$compute(data.variables),
+					state.ratio),
+				A2(
+					_elm_lang$core$Maybe$map,
+					A4(_kirchner$elm_pat$Tools_Between$ratio, data, state, _p1._0._0, _p1._1._0),
+					data.cursorPosition));
+			var _p2 = maybeRatio;
+			if (_p2.ctor === 'Just') {
+				return A3(
+					_elm_lang$core$Maybe$map2,
+					F2(
+						function (first, last) {
+							return A3(_kirchner$elm_pat$Point$between, first, last, _p2._0);
+						}),
+					A2(_elm_lang$core$Maybe$map, _elm_lang$core$Tuple$first, state.first),
+					A2(_elm_lang$core$Maybe$map, _elm_lang$core$Tuple$first, state.last));
+			} else {
+				return _elm_lang$core$Maybe$Nothing;
+			}
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _kirchner$elm_pat$Tools_Between$svg = F4(
+	function (callbacks, updateState, data, state) {
+		var _p3 = {
+			ctor: '_Tuple2',
+			_0: A2(_kirchner$elm_pat$Tools_Between$firstPosition, data, state),
+			_1: A2(_kirchner$elm_pat$Tools_Between$lastPosition, data, state)
+		};
+		if (_p3._0.ctor === 'Just') {
+			if (_p3._1.ctor === 'Just') {
+				var _p5 = _p3._1._0;
+				var _p4 = _p3._0._0;
+				var addPoint = A2(
+					_elm_lang$core$Maybe$map,
+					callbacks.addPoint,
+					A2(_kirchner$elm_pat$Tools_Between$point, data, state));
+				return A2(
+					_elm_lang$svg$Svg$g,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$red, _p4),
+						_1: {
+							ctor: '::',
+							_0: A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$red, _p5),
+							_1: {
+								ctor: '::',
+								_0: A2(_kirchner$elm_pat$Svg_Extra$drawLine, _p4, _p5),
+								_1: {
+									ctor: '::',
+									_0: A4(_kirchner$elm_pat$Tools_Between$newPoint, data, state, _p4, _p5),
+									_1: {
+										ctor: '::',
+										_0: A3(_kirchner$elm_pat$Tools_Common$svgUpdateMouse, addPoint, callbacks.updateCursorPosition, data),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					});
+			} else {
+				var selectPoint = function (_p6) {
+					return updateState(
+						function (maybeId) {
+							return _elm_lang$core$Native_Utils.update(
+								state,
+								{
+									last: function () {
+										var _p7 = maybeId;
+										if (_p7.ctor === 'Just') {
+											var _p8 = _p7._0;
+											return A2(
+												_elm_lang$core$Maybe$map,
+												function (point) {
+													return {ctor: '_Tuple2', _0: _p8, _1: point};
+												},
+												A2(_kirchner$elm_pat$Store$get, _p8, data.store));
+										} else {
+											return _elm_lang$core$Maybe$Nothing;
+										}
+									}()
+								});
+						}(_p6));
+				};
+				return A2(
+					_elm_lang$svg$Svg$g,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$red, _p3._0._0),
+						_1: {
+							ctor: '::',
+							_0: A3(_kirchner$elm_pat$Tools_Common$svgSelectPoint, callbacks.focusPoint, selectPoint, data),
+							_1: {ctor: '[]'}
+						}
+					});
+			}
+		} else {
+			if (_p3._1.ctor === 'Just') {
+				var selectPoint = function (_p9) {
+					return updateState(
+						function (maybeId) {
+							return _elm_lang$core$Native_Utils.update(
+								state,
+								{
+									first: function () {
+										var _p10 = maybeId;
+										if (_p10.ctor === 'Just') {
+											var _p11 = _p10._0;
+											return A2(
+												_elm_lang$core$Maybe$map,
+												function (point) {
+													return {ctor: '_Tuple2', _0: _p11, _1: point};
+												},
+												A2(_kirchner$elm_pat$Store$get, _p11, data.store));
+										} else {
+											return _elm_lang$core$Maybe$Nothing;
+										}
+									}()
+								});
+						}(_p9));
+				};
+				return A2(
+					_elm_lang$svg$Svg$g,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$red, _p3._1._0),
+						_1: {
+							ctor: '::',
+							_0: A3(_kirchner$elm_pat$Tools_Common$svgSelectPoint, callbacks.focusPoint, selectPoint, data),
+							_1: {ctor: '[]'}
+						}
+					});
+			} else {
+				var selectPoint = function (_p12) {
+					return updateState(
+						function (maybeId) {
+							return _elm_lang$core$Native_Utils.update(
+								state,
+								{
+									first: function () {
+										var _p13 = maybeId;
+										if (_p13.ctor === 'Just') {
+											var _p14 = _p13._0;
+											return A2(
+												_elm_lang$core$Maybe$map,
+												function (point) {
+													return {ctor: '_Tuple2', _0: _p14, _1: point};
+												},
+												A2(_kirchner$elm_pat$Store$get, _p14, data.store));
+										} else {
+											return _elm_lang$core$Maybe$Nothing;
+										}
+									}()
+								});
+						}(_p12));
+				};
+				return A2(
+					_elm_lang$svg$Svg$g,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A3(_kirchner$elm_pat$Tools_Common$svgSelectPoint, callbacks.focusPoint, selectPoint, data),
+						_1: {ctor: '[]'}
+					});
+			}
+		}
+	});
+var _kirchner$elm_pat$Tools_Between$view = F4(
+	function (callbacks, updateState, data, state) {
+		var updateRatio = function (_p15) {
+			return updateState(
+				function (s) {
+					return _elm_lang$core$Native_Utils.update(
+						state,
+						{
+							ratio: _kirchner$elm_pat$Expr$parse(s)
+						});
+				}(_p15));
+		};
+		var updateLastDropdown = function (msg) {
+			var _p16 = A4(_kirchner$elm_pat$Tools_Dropdown$update, state.last, data, msg, state.lastDropdown);
+			var newLastDropdown = _p16._0;
+			var newLast = _p16._1;
+			return updateState(
+				_elm_lang$core$Native_Utils.update(
+					state,
+					{lastDropdown: newLastDropdown, last: newLast}));
+		};
+		var updateFirstDropdown = function (msg) {
+			var _p17 = A4(_kirchner$elm_pat$Tools_Dropdown$update, state.first, data, msg, state.firstDropdown);
+			var newFirstDropdown = _p17._0;
+			var newFirst = _p17._1;
+			return updateState(
+				_elm_lang$core$Native_Utils.update(
+					state,
+					{firstDropdown: newFirstDropdown, first: newFirst}));
+		};
+		return A5(
+			_kirchner$elm_pat$Tools_Common$view,
+			callbacks,
+			data,
+			state,
+			_kirchner$elm_pat$Tools_Between$point,
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$map,
+					updateFirstDropdown,
+					A3(_kirchner$elm_pat$Tools_Dropdown$view, state.first, data, state.firstDropdown)),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$map,
+						updateLastDropdown,
+						A3(_kirchner$elm_pat$Tools_Dropdown$view, state.last, data, state.lastDropdown)),
+					_1: {
+						ctor: '::',
+						_0: A3(_kirchner$elm_pat$Tools_Common$exprInput, 'ratio', state.ratio, updateRatio),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _kirchner$elm_pat$Tools_Between$init = function (data) {
+	return {firstDropdown: _kirchner$elm_pat$Tools_Dropdown$init, first: _elm_lang$core$Maybe$Nothing, lastDropdown: _kirchner$elm_pat$Tools_Dropdown$init, last: _elm_lang$core$Maybe$Nothing, ratio: _elm_lang$core$Maybe$Nothing};
+};
+var _kirchner$elm_pat$Tools_Between$State = F5(
+	function (a, b, c, d, e) {
+		return {firstDropdown: a, first: b, lastDropdown: c, last: d, ratio: e};
+	});
+
 var _kirchner$elm_pat$Tools_Distance$snapAngle = F2(
 	function (count, angle) {
 		var divisor = (2 * _elm_lang$core$Basics$pi) / _elm_lang$core$Basics$toFloat(count);
@@ -24777,7 +25198,12 @@ var _kirchner$elm_pat$Model$defaultModel = {
 	newName: _elm_lang$core$Maybe$Nothing,
 	newValue: _elm_lang$core$Maybe$Nothing,
 	tool: _kirchner$elm_pat$Model$None,
-	viewPort: {x: -320, y: -320, width: 640, height: 640},
+	viewPort: {
+		offset: {x: 0, y: 0},
+		width: 640,
+		height: 640,
+		zoom: 1
+	},
 	drag: _elm_lang$core$Maybe$Nothing,
 	cursorPosition: _elm_lang$core$Maybe$Nothing,
 	focusedPoint: _elm_lang$core$Maybe$Nothing,
@@ -24787,6 +25213,9 @@ var _kirchner$elm_pat$Model$defaultModel = {
 };
 var _kirchner$elm_pat$Model$ExtendPiece = function (a) {
 	return {ctor: 'ExtendPiece', _0: a};
+};
+var _kirchner$elm_pat$Model$Between = function (a) {
+	return {ctor: 'Between', _0: a};
 };
 var _kirchner$elm_pat$Model$Distance = function (a) {
 	return {ctor: 'Distance', _0: a};
@@ -24926,32 +25355,6 @@ var _kirchner$elm_pat$File$restore = F2(
 					A2(_elm_lang$core$Json_Decode$decodeValue, _kirchner$elm_pat$File$decode, value))));
 	});
 
-var _kirchner$elm_pat$Tools_Between$view = F4(
-	function (callbacks, updateState, data, state) {
-		return A2(
-			_elm_lang$html$Html$div,
-			{ctor: '[]'},
-			{ctor: '[]'});
-	});
-var _kirchner$elm_pat$Tools_Between$svg = F4(
-	function (callbacks, updateState, data, state) {
-		return A2(
-			_elm_lang$svg$Svg$g,
-			{ctor: '[]'},
-			{ctor: '[]'});
-	});
-var _kirchner$elm_pat$Tools_Between$point = F2(
-	function (data, state) {
-		return _elm_lang$core$Maybe$Nothing;
-	});
-var _kirchner$elm_pat$Tools_Between$init = function (data) {
-	return {firstDropdown: _kirchner$elm_pat$Tools_Dropdown$init, first: _elm_lang$core$Maybe$Nothing, lastDropdown: _kirchner$elm_pat$Tools_Dropdown$init, last: _elm_lang$core$Maybe$Nothing, ratio: _elm_lang$core$Maybe$Nothing};
-};
-var _kirchner$elm_pat$Tools_Between$State = F5(
-	function (a, b, c, d, e) {
-		return {firstDropdown: a, first: b, lastDropdown: c, last: d, ratio: e};
-	});
-
 var _kirchner$elm_pat$Editor$getViewPort = F2(
 	function (oldViewPort, drag) {
 		var _p0 = drag;
@@ -24960,9 +25363,14 @@ var _kirchner$elm_pat$Editor$getViewPort = F2(
 		} else {
 			var _p2 = _p0._0.start;
 			var _p1 = _p0._0.current;
+			var deltaY = _elm_lang$core$Basics$floor(
+				oldViewPort.zoom * _elm_lang$core$Basics$toFloat(_p1.y - _p2.y));
+			var deltaX = _elm_lang$core$Basics$floor(
+				oldViewPort.zoom * _elm_lang$core$Basics$toFloat(_p1.x - _p2.x));
+			var offset = {x: oldViewPort.offset.x - deltaX, y: oldViewPort.offset.y - deltaY};
 			return _elm_lang$core$Native_Utils.update(
 				oldViewPort,
-				{x: oldViewPort.x - (_p1.x - _p2.x), y: oldViewPort.y - (_p1.y - _p2.y)});
+				{offset: offset});
 		}
 	});
 var _kirchner$elm_pat$Editor$updateStorage = F3(
@@ -25018,7 +25426,12 @@ var _kirchner$elm_pat$Editor$allTools = function (data) {
 				ctor: '::',
 				_0: _kirchner$elm_pat$Model$Distance(
 					_kirchner$elm_pat$Tools_Distance$init(data)),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: _kirchner$elm_pat$Model$Between(
+						_kirchner$elm_pat$Tools_Between$init(data)),
+					_1: {ctor: '[]'}
+				}
 			}
 		}
 	};
@@ -25032,6 +25445,8 @@ var _kirchner$elm_pat$Editor$toolDescription = function (tool) {
 			return 'relative';
 		case 'Distance':
 			return 'distance';
+		case 'Between':
+			return 'between';
 		case 'ExtendPiece':
 			return 'extend piece';
 		default:
@@ -25047,6 +25462,8 @@ var _kirchner$elm_pat$Editor$toolName = function (tool) {
 			return 'relative';
 		case 'Distance':
 			return 'distance';
+		case 'Between':
+			return 'between';
 		case 'ExtendPiece':
 			return 'extend piece';
 		default:
@@ -25252,8 +25669,36 @@ var _kirchner$elm_pat$Editor$update = F3(
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
-									viewPort: {x: (_p21.width / -2) | 0, y: (_p21.height / -2) | 0, width: _p21.width, height: _p21.height}
+									viewPort: function () {
+										var def = model.viewPort;
+										return _elm_lang$core$Native_Utils.update(
+											def,
+											{width: _p21.width, height: _p21.height});
+									}()
 								}),
+							{ctor: '[]'});
+					case 'Zoom':
+						var newZoom = A3(
+							_elm_lang$core$Basics$clamp,
+							0.5,
+							5,
+							A2(
+								F2(
+									function (x, y) {
+										return x + y;
+									}),
+								_p14._0 * 5.0e-3,
+								model.viewPort.zoom));
+						var newViewPort = function (viewPort) {
+							return _elm_lang$core$Native_Utils.update(
+								viewPort,
+								{zoom: newZoom});
+						}(model.viewPort);
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{viewPort: newViewPort}),
 							{ctor: '[]'});
 					case 'DragStart':
 						var _p22 = _p14._0;
@@ -25360,6 +25805,17 @@ var _kirchner$elm_pat$Editor$update = F3(
 										model,
 										{
 											tool: _kirchner$elm_pat$Model$Absolute(_kirchner$elm_pat$Tools_Absolute$init)
+										}),
+									{ctor: '[]'});
+							case 'CharB':
+								return A2(
+									_elm_lang$core$Platform_Cmd_ops['!'],
+									_elm_lang$core$Native_Utils.update(
+										model,
+										{
+											tool: _kirchner$elm_pat$Model$Between(
+												_kirchner$elm_pat$Tools_Between$init(
+													_kirchner$elm_pat$Editor$data(model)))
 										}),
 									{ctor: '[]'});
 							case 'CharE':
@@ -25489,6 +25945,9 @@ var _kirchner$elm_pat$Editor$DragAt = function (a) {
 };
 var _kirchner$elm_pat$Editor$DragStart = function (a) {
 	return {ctor: 'DragStart', _0: a};
+};
+var _kirchner$elm_pat$Editor$Zoom = function (a) {
+	return {ctor: 'Zoom', _0: a};
 };
 var _kirchner$elm_pat$Editor$Resize = function (a) {
 	return {ctor: 'Resize', _0: a};
@@ -25969,12 +26428,28 @@ var _kirchner$elm_pat$View_Canvas$point = F2(
 						A3(_kirchner$elm_pat$Point$position, data.store, data.variables, point));
 				}),
 			withBetween: F4(
-				function (_p27, _p26, _p25, _p24) {
-					return _elm_lang$core$Maybe$Just(
-						A2(
-							_elm_lang$svg$Svg$g,
-							{ctor: '[]'},
-							{ctor: '[]'}));
+				function (point, firstId, lastId, _p24) {
+					var draw = F3(
+						function (v, p, q) {
+							return A2(
+								_elm_lang$svg$Svg$g,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: A2(_kirchner$elm_pat$Svg_Extra$drawLine, p, q),
+									_1: {
+										ctor: '::',
+										_0: A2(_kirchner$elm_pat$Svg_Extra$drawPoint, _kirchner$elm_pat$Styles_Colors$base0, v),
+										_1: {ctor: '[]'}
+									}
+								});
+						});
+					return A4(
+						_elm_lang$core$Maybe$map3,
+						draw,
+						A3(_kirchner$elm_pat$Point$position, data.store, data.variables, point),
+						A3(_kirchner$elm_pat$Point$positionById, data.store, data.variables, firstId),
+						A3(_kirchner$elm_pat$Point$positionById, data.store, data.variables, lastId));
 				})
 		};
 		return A2(_kirchner$elm_pat$Point$dispatch, handlers, point);
@@ -26057,27 +26532,27 @@ var _kirchner$elm_pat$View_Canvas$viewSelectedPoint = F3(
 			_elm_lang$core$Maybe$andThen,
 			A2(_kirchner$elm_pat$Point$position, data.store, data.variables),
 			A2(_kirchner$elm_pat$Store$get, id, data.store));
-		var _p28 = position;
-		if (_p28.ctor === 'Just') {
-			var _p29 = _p28._0;
+		var _p25 = position;
+		if (_p25.ctor === 'Just') {
+			var _p26 = _p25._0;
 			return _elm_lang$core$Maybe$Just(
 				A2(
 					_elm_lang$svg$Svg$g,
 					{ctor: '[]'},
 					first ? {
 						ctor: '::',
-						_0: A2(_kirchner$elm_pat$Svg_Extra$drawPoint, _kirchner$elm_pat$Styles_Colors$red, _p29),
+						_0: A2(_kirchner$elm_pat$Svg_Extra$drawPoint, _kirchner$elm_pat$Styles_Colors$red, _p26),
 						_1: {
 							ctor: '::',
-							_0: A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$red, _p29),
+							_0: A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$red, _p26),
 							_1: {ctor: '[]'}
 						}
 					} : {
 						ctor: '::',
-						_0: A2(_kirchner$elm_pat$Svg_Extra$drawPoint, _kirchner$elm_pat$Styles_Colors$yellow, _p29),
+						_0: A2(_kirchner$elm_pat$Svg_Extra$drawPoint, _kirchner$elm_pat$Styles_Colors$yellow, _p26),
 						_1: {
 							ctor: '::',
-							_0: A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$yellow, _p29),
+							_0: A3(_kirchner$elm_pat$Svg_Extra$drawSelector, _kirchner$elm_pat$Svg_Extra$Solid, _kirchner$elm_pat$Styles_Colors$yellow, _p26),
 							_1: {ctor: '[]'}
 						}
 					}));
@@ -26087,9 +26562,9 @@ var _kirchner$elm_pat$View_Canvas$viewSelectedPoint = F3(
 	});
 var _kirchner$elm_pat$View_Canvas$viewSelectedPoints = function (data) {
 	var tail = function (list) {
-		var _p30 = _elm_lang$core$List$tail(list);
-		if (_p30.ctor === 'Just') {
-			return _p30._0;
+		var _p27 = _elm_lang$core$List$tail(list);
+		if (_p27.ctor === 'Just') {
+			return _p27._0;
 		} else {
 			return {ctor: '[]'};
 		}
@@ -26119,19 +26594,23 @@ var _kirchner$elm_pat$View_Canvas$dragArea = F2(
 			{
 				ctor: '::',
 				_0: _elm_lang$svg$Svg_Attributes$x(
-					_elm_lang$core$Basics$toString(viewPort.x)),
+					_elm_lang$core$Basics$toString(
+						viewPort.offset.x - ((_kirchner$elm_pat$Types$virtualWidth(viewPort) / 2) | 0))),
 				_1: {
 					ctor: '::',
 					_0: _elm_lang$svg$Svg_Attributes$y(
-						_elm_lang$core$Basics$toString(viewPort.y)),
+						_elm_lang$core$Basics$toString(
+							viewPort.offset.y - ((_kirchner$elm_pat$Types$virtualHeight(viewPort) / 2) | 0))),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$svg$Svg_Attributes$width(
-							_elm_lang$core$Basics$toString(viewPort.width)),
+							_elm_lang$core$Basics$toString(
+								_kirchner$elm_pat$Types$virtualWidth(viewPort))),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$svg$Svg_Attributes$height(
-								_elm_lang$core$Basics$toString(viewPort.height)),
+								_elm_lang$core$Basics$toString(
+									_kirchner$elm_pat$Types$virtualHeight(viewPort))),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$svg$Svg_Attributes$fill('transparent'),
@@ -26158,8 +26637,8 @@ var _kirchner$elm_pat$View_Canvas$grid = F2(
 				A2(_elm_lang$core$Basics_ops['%'], k, config.highlight),
 				0) ? config.color2 : config.color1;
 		};
-		var dy = viewPort.y + ((viewPort.height / 2) | 0);
-		var dx = viewPort.x + ((viewPort.width / 2) | 0);
+		var dy = viewPort.offset.y;
+		var dx = viewPort.offset.x;
 		var translationOffset = A2(
 			_elm_community$linear_algebra$Math_Vector2$vec2,
 			_elm_lang$core$Basics$toFloat(dx),
@@ -26186,10 +26665,15 @@ var _kirchner$elm_pat$View_Canvas$grid = F2(
 					return x + y;
 				}),
 			4,
-			(A2(_elm_lang$core$Basics$max, viewPort.height, viewPort.width) / config.offset) | 0);
+			(A2(
+				_elm_lang$core$Basics$max,
+				_kirchner$elm_pat$Types$virtualHeight(viewPort),
+				_kirchner$elm_pat$Types$virtualWidth(viewPort)) / config.offset) | 0);
 		var nh = (n / 2) | 0;
-		var y = _elm_lang$core$Basics$toFloat(viewPort.height + (2 * config.offset)) / 2;
-		var x = _elm_lang$core$Basics$toFloat(viewPort.width + (2 * config.offset)) / 2;
+		var y = _elm_lang$core$Basics$toFloat(
+			_kirchner$elm_pat$Types$virtualHeight(viewPort) + (2 * config.offset)) / 2;
+		var x = _elm_lang$core$Basics$toFloat(
+			_kirchner$elm_pat$Types$virtualWidth(viewPort) + (2 * config.offset)) / 2;
 		var line = F3(
 			function (color, u, v) {
 				return A2(
@@ -26287,28 +26771,36 @@ var _kirchner$elm_pat$View_Canvas$grid = F2(
 				}));
 	});
 var _kirchner$elm_pat$View_Canvas$defaultGridConfig = {offset: 50, unit: 'mm', color1: 'rgba(0,0,0,0.08)', color2: 'rgba(0,0,0,0.24)', highlight: 5};
-var _kirchner$elm_pat$View_Canvas$view = F7(
-	function (tool, startDrag, focusPoint, selectPoint, extendPiece, data, pieceStore) {
-		var viewBoxString = A2(
-			_elm_lang$core$String$join,
-			' ',
-			{
-				ctor: '::',
-				_0: _elm_lang$core$Basics$toString(data.viewPort.x),
-				_1: {
+var _kirchner$elm_pat$View_Canvas$view = F8(
+	function (tool, startDrag, focusPoint, selectPoint, extendPiece, updateZoom, data, pieceStore) {
+		var viewBoxString = function () {
+			var dy = data.viewPort.offset.y;
+			var dx = data.viewPort.offset.x;
+			var hh = (_kirchner$elm_pat$Types$virtualHeight(data.viewPort) / 2) | 0;
+			var wh = (_kirchner$elm_pat$Types$virtualWidth(data.viewPort) / 2) | 0;
+			return A2(
+				_elm_lang$core$String$join,
+				' ',
+				{
 					ctor: '::',
-					_0: _elm_lang$core$Basics$toString(data.viewPort.y),
+					_0: _elm_lang$core$Basics$toString(dx - wh),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$core$Basics$toString(data.viewPort.width),
+						_0: _elm_lang$core$Basics$toString(dy - hh),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$core$Basics$toString(data.viewPort.height),
-							_1: {ctor: '[]'}
+							_0: _elm_lang$core$Basics$toString(
+								_kirchner$elm_pat$Types$virtualWidth(data.viewPort)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$core$Basics$toString(
+									_kirchner$elm_pat$Types$virtualHeight(data.viewPort)),
+								_1: {ctor: '[]'}
+							}
 						}
 					}
-				}
-			});
+				});
+		}();
 		return A2(
 			_elm_lang$svg$Svg$svg,
 			{
@@ -26322,31 +26814,19 @@ var _kirchner$elm_pat$View_Canvas$view = F7(
 							_0: {ctor: '_Tuple2', _0: 'background-color', _1: _kirchner$elm_pat$Styles_Colors$base3},
 							_1: {
 								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: 'width',
-									_1: _elm_lang$core$Basics$toString(data.viewPort.width)
-								},
+								_0: {ctor: '_Tuple2', _0: 'user-select', _1: 'none'},
 								_1: {
 									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'height',
-										_1: _elm_lang$core$Basics$toString(data.viewPort.height)
-									},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'user-select', _1: 'none'},
-										_1: {
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: '-moz-user-select', _1: 'none'},
-											_1: {ctor: '[]'}
-										}
-									}
+									_0: {ctor: '_Tuple2', _0: '-moz-user-select', _1: 'none'},
+									_1: {ctor: '[]'}
 								}
 							}
 						}),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _kirchner$elm_pat$Events$onWheel(updateZoom),
+						_1: {ctor: '[]'}
+					}
 				}
 			},
 			{
@@ -27870,6 +28350,16 @@ var _kirchner$elm_pat$View$drawTool = F3(
 					},
 					data,
 					_p0._0);
+			case 'Between':
+				return A4(
+					_kirchner$elm_pat$Tools_Between$svg,
+					callbacks,
+					function (_p4) {
+						return _kirchner$elm_pat$Editor$UpdateTool(
+							_kirchner$elm_pat$Model$Between(_p4));
+					},
+					data,
+					_p0._0);
 			case 'ExtendPiece':
 				return A3(_kirchner$elm_pat$Tools_ExtendPiece$svg, callbacks, data, _p0._0);
 			default:
@@ -27880,7 +28370,7 @@ var _kirchner$elm_pat$View$drawTool = F3(
 		}
 	});
 var _kirchner$elm_pat$View$viewCanvas = function (model) {
-	return A7(
+	return A8(
 		_kirchner$elm_pat$View_Canvas$view,
 		A3(
 			_kirchner$elm_pat$View$drawTool,
@@ -27896,13 +28386,14 @@ var _kirchner$elm_pat$View$viewCanvas = function (model) {
 					_kirchner$elm_pat$Model$ExtendPiece(
 						A2(_kirchner$elm_pat$Tools_ExtendPiece$init, id, segment)));
 			}),
+		_kirchner$elm_pat$Editor$Zoom,
 		_kirchner$elm_pat$Editor$data(model),
 		model.pieceStore);
 };
 var _kirchner$elm_pat$View$viewToolInfo = F3(
 	function (callbacks, data, tool) {
-		var _p4 = tool;
-		switch (_p4.ctor) {
+		var _p5 = tool;
+		switch (_p5.ctor) {
 			case 'Absolute':
 				return _elm_lang$core$Maybe$Just(
 					A2(
@@ -27926,12 +28417,12 @@ var _kirchner$elm_pat$View$viewToolInfo = F3(
 							_0: A4(
 								_kirchner$elm_pat$Tools_Absolute$view,
 								callbacks,
-								function (_p5) {
+								function (_p6) {
 									return _kirchner$elm_pat$Editor$UpdateTool(
-										_kirchner$elm_pat$Model$Absolute(_p5));
+										_kirchner$elm_pat$Model$Absolute(_p6));
 								},
 								data,
-								_p4._0),
+								_p5._0),
 							_1: {ctor: '[]'}
 						}));
 			case 'Relative':
@@ -27957,12 +28448,12 @@ var _kirchner$elm_pat$View$viewToolInfo = F3(
 							_0: A4(
 								_kirchner$elm_pat$Tools_Relative$view,
 								callbacks,
-								function (_p6) {
+								function (_p7) {
 									return _kirchner$elm_pat$Editor$UpdateTool(
-										_kirchner$elm_pat$Model$Relative(_p6));
+										_kirchner$elm_pat$Model$Relative(_p7));
 								},
 								data,
-								_p4._0),
+								_p5._0),
 							_1: {ctor: '[]'}
 						}));
 			case 'Distance':
@@ -27988,12 +28479,43 @@ var _kirchner$elm_pat$View$viewToolInfo = F3(
 							_0: A4(
 								_kirchner$elm_pat$Tools_Distance$view,
 								callbacks,
-								function (_p7) {
+								function (_p8) {
 									return _kirchner$elm_pat$Editor$UpdateTool(
-										_kirchner$elm_pat$Model$Distance(_p7));
+										_kirchner$elm_pat$Model$Distance(_p8));
 								},
 								data,
-								_p4._0),
+								_p5._0),
+							_1: {ctor: '[]'}
+						}));
+			case 'Between':
+				return _elm_lang$core$Maybe$Just(
+					A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _kirchner$elm_pat$Styles_Editor$class(
+								{
+									ctor: '::',
+									_0: _kirchner$elm_pat$Styles_Editor$Container,
+									_1: {
+										ctor: '::',
+										_0: _kirchner$elm_pat$Styles_Editor$ContainerTopLeft,
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A4(
+								_kirchner$elm_pat$Tools_Between$view,
+								callbacks,
+								function (_p9) {
+									return _kirchner$elm_pat$Editor$UpdateTool(
+										_kirchner$elm_pat$Model$Between(_p9));
+								},
+								data,
+								_p5._0),
 							_1: {ctor: '[]'}
 						}));
 			case 'ExtendPiece':
