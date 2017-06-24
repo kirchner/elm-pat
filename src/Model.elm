@@ -34,6 +34,7 @@ import Tools.Relative as Relative
 import Types exposing (..)
 import Window
 import Store exposing (Id, Store)
+import FileBrowser exposing (FileBrowser)
 
 
 type alias Model =
@@ -49,6 +50,7 @@ type alias Model =
     , focusedPoint : Maybe (Id Point)
     , pressedKeys : List Key
     , selectedPoints : List (Id Point)
+    , fileBrowser : FileBrowser
     }
 
 
@@ -71,6 +73,7 @@ defaultModel =
     , focusedPoint = Nothing
     , pressedKeys = []
     , selectedPoints = []
+    , fileBrowser = FileBrowser.defaultModel
     }
 
 

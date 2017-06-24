@@ -44,6 +44,8 @@ import Tools.Relative as Relative
 import Types exposing (..)
 import Window
 import Json.Decode exposing (Value)
+import FileBrowser exposing (FileBrowser)
+import Http
 
 
 -- TODO: move most? of this to Model:
@@ -137,6 +139,11 @@ type Msg
     | SelectPoint (Maybe (Id Point))
     | ClearSelection
     | ExtendPieceMsg (Id Piece) (Id Point) (Maybe (Id Point))
+    | FileBrowserMsg FileBrowser.Msg
+    | ClearSession
+    | RestoreSession File
+    | LoadRemoteFile String
+    | LoadRemoteFileError Http.Error
 
 
 type alias Flags =
@@ -168,6 +175,33 @@ update ports msg model =
     updateAutoFocus ports model
     >> updateStorage ports model <|
         case msg of
+            LoadRemoteFile url ->
+                let
+                    handle =
+                        Result.map RestoreSession
+                        >> Result.mapError LoadRemoteFileError
+                        >> (\result ->
+                               case result of
+                                   Ok x -> x
+                                   Err x -> x
+                           )
+                in
+                model !  [ Http.send handle (Http.get url File.decode) ]
+
+            RestoreSession file ->
+                File.load_ file model ! []
+
+            LoadRemoteFileError httpError ->
+                let
+                    _ = Debug.log "loadRemoteFileError" httpError
+                in
+                model ! []
+
+            ClearSession ->
+                update ports (RestoreSession File.defaultFile) model
+
+            FileBrowserMsg fileBrowserMsg ->
+                { model | fileBrowser = FileBrowser.update fileBrowserMsg model.fileBrowser } ! []
             UpdateTool tool ->
                 { model | tool = tool } ! []
 

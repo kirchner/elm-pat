@@ -22,6 +22,7 @@ type Class
     | ContainerTopLeft
     | ContainerBottomLeft
     | ContainerBottomRight
+    | ContainerTopRight
 
 
 { id, class, classList } =
@@ -58,6 +59,11 @@ css =
             [ position absolute
             , top (rem 1)
             , left (rem 5)
+            ]
+        , class ContainerTopRight
+            [ position absolute
+            , right (rem 1)
+            , top (rem 1)
             ]
         , class ContainerBottomLeft
             [ position absolute

@@ -45,6 +45,7 @@ import View.Canvas as Canvas
 import Views.PointTable as PointTable
 import Views.ToolBox as ToolBox
 import Views.VariableTable as VariableTable
+import FileBrowser exposing (FileBrowser)
 
 
 {- main view -}
@@ -60,6 +61,16 @@ view model =
         Html.div
             [ class [ Container, ContainerTopLeftLeft ] ]
             [ ToolBox.view data ]
+    , Just <|
+        Html.div
+            [ class [ Container, ContainerTopRight ] ]
+            [ FileBrowser.view
+                  { lift = FileBrowserMsg
+                  , clearSession = Just ClearSession
+                  , loadRemoteFile = Just LoadRemoteFile
+                  }
+                  data
+            ]
     , viewToolInfo callbacks data model.tool
     , Just <|
         Html.div

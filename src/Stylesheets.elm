@@ -7,6 +7,7 @@ import Styles.VariableTable
 import Styles.ToolBox
 import Styles.Editor
 import Styles.Common
+import Styles.FileBrowser
 
 
 port files : CssFileStructure -> Cmd msg
@@ -21,6 +22,7 @@ fileStructure =
         , ( "point_table.css", Css.File.compile [ Styles.PointTable.css ] )
         , ( "variable_table.css", Css.File.compile [ Styles.VariableTable.css ] )
         , ( "tool_box.css", Css.File.compile [ Styles.ToolBox.css ] )
+        , ( "file_browser.css", Css.File.compile [ Styles.FileBrowser.css ] )
         ]
 
 
