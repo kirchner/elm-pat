@@ -20,10 +20,10 @@ module Svg.Extra
 import FormatNumber
 import Math.Vector2 exposing (..)
 import Styles.Colors as Colors
-import Svg as Svg_
-import Svg exposing (Svg)
+import Svg exposing (Svg, path)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
+import VirtualDom
 
 
 drawPoint : String -> Vec2 -> Svg msg
@@ -91,6 +91,16 @@ drawLineSegment v w =
 
 drawLineSegmentWith : msg -> Vec2 -> Vec2 -> Svg msg
 drawLineSegmentWith callback v w =
+    let
+        line =
+            w |> flip sub v
+
+        length =
+            line |> Math.Vector2.length
+
+        angle =
+            atan2 (getY line) (getX line) * 180 / Basics.pi
+    in
     Svg.g []
         [ Svg.line
             [ Svg.x1 (toString (getX v))
@@ -101,14 +111,21 @@ drawLineSegmentWith callback v w =
             , Svg.stroke Colors.blue
             ]
             []
-        , Svg.line
-            [ Svg.x1 (toString (getX v))
-            , Svg.y1 (toString (getY v))
-            , Svg.x2 (toString (getX w))
-            , Svg.y2 (toString (getY w))
-            , Svg.strokeWidth "4"
-            , Svg.stroke "transparent"
+        , Svg.rect
+            [ Svg.x (toString (getX v - 5))
+            , Svg.y (toString (getY v - 5))
+            , Svg.width (toString (length + 10))
+            , Svg.height "10"
+            , Svg.strokeWidth "0"
+            , Svg.fill "transparent"
             , Svg.onClick callback
+            , VirtualDom.attribute "transform-origin"
+                (toString (getX v)
+                    ++ "px "
+                    ++ toString (getY v)
+                    ++ "px"
+                )
+            , Svg.transform ("rotate(" ++ toString angle ++ ")")
             ]
             []
         ]
@@ -196,7 +213,7 @@ drawAngleArc config anchorPosition pointPosition =
     Svg.g
         [ Svg.transform (translate anchorPosition)
         ]
-        [ Svg_.path
+        [ path
             [ Svg.d <|
                 String.join " "
                     [ "M0,0"
