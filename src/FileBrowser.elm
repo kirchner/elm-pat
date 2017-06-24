@@ -32,6 +32,7 @@ type alias Callbacks a msg =
     , restoreSession : Maybe (a -> msg)
     , undo : Maybe msg
     , redo : Maybe msg
+    , dumpFile0 : Maybe msg
     }
 
 
@@ -110,6 +111,9 @@ view callbacks undoList =
               ]
             , [ iconBig "redo" <|
                     Maybe.withDefault (callbacks.lift NoOp) callbacks.redo
+              ]
+            , [ iconBig "file_download" <|
+                    Maybe.withDefault (callbacks.lift NoOp) callbacks.dumpFile0
               ]
             ]
         )

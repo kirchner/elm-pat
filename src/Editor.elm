@@ -155,6 +155,7 @@ type Msg
     | LoadRemoteFileError Http.Error
     | Undo
     | Redo
+    | DumpFile0
 
 
 type alias Flags =
@@ -179,6 +180,7 @@ init flags =
 type alias Ports =
     { autofocus : () -> Cmd Msg
     , serialize : Value -> Cmd Msg
+    , dumpFile0 : () -> Cmd Msg
     }
 
 
@@ -189,6 +191,8 @@ update ports msg model =
         >> updateStorage ports model
     <|
         case msg of
+            DumpFile0 ->
+                model ! [ ports.dumpFile0 () ]
             Undo ->
                 { model | undoList = UndoList.undo model.undoList } ! []
             Redo ->

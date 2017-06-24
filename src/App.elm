@@ -31,6 +31,7 @@ ports : Ports
 ports =
     { autofocus = autofocus
     , serialize = serialize
+    , dumpFile0 = dumpFile0
     }
 
 
@@ -38,3 +39,6 @@ port autofocus : () -> Cmd msg
 
 
 port serialize : Value -> Cmd msg
+
+
+port dumpFile0 : () -> Cmd msg

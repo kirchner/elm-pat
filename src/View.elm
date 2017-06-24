@@ -59,6 +59,7 @@ view model =
                 , restoreSession = Just RestoreSession
                 , undo = Just Undo
                 , redo = Just Redo
+                , dumpFile0 = Just DumpFile0
                 }
                 model.undoList
             ]
