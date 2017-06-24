@@ -144,6 +144,28 @@ view callbacks updateState data state =
                     | lastDropdown = newLastDropdown
                     , last = newLast
                 }
+
+        updateChoice =
+            (\id ->
+                if id == 0 then
+                    { state | choice = LeftMost }
+                else if id == 1 then
+                    { state | choice = RightMost }
+                else
+                    state
+            )
+                >> updateState
+
+        choices =
+            [ "a", "b" ]
+
+        switchState =
+            case state.choice of
+                LeftMost ->
+                    0
+
+                RightMost ->
+                    1
     in
     [ Dropdown.view state.first data state.firstDropdown
         |> map updateFirstDropdown
@@ -151,6 +173,7 @@ view callbacks updateState data state =
     , Dropdown.view state.last data state.lastDropdown
         |> map updateLastDropdown
     , Tools.Common.exprInput "last radius" state.lastRadius updateLastRadius
+    , Tools.Common.switch choices switchState updateChoice
     ]
         |> Tools.Common.view callbacks data state point
 

@@ -6,6 +6,7 @@ module Tools.Common
         , exprInput_
         , svgSelectPoint
         , svgUpdateMouse
+        , switch
         , view
         )
 
@@ -221,3 +222,21 @@ exprInput_ autoFocus name e callback =
          ]
             ++ deleteIcon
         )
+
+
+switch : List String -> Int -> (Int -> msg) -> Html msg
+switch choices state updateState =
+    let
+        viewState index title =
+            Html.div
+                [ class [ SwitchChoice ]
+                , classList
+                    [ ( SwitchChoiceSelected , index == state) ]
+                , Html.onClick (updateState index)
+                ]
+                [ Html.text title ]
+    in
+    choices
+        |> List.indexedMap viewState
+        |> Html.div
+            [ class [ SwitchContainer ] ]

@@ -20,6 +20,9 @@ type Class
     | MenuList
     | MenuItem
     | MenuItemSelected
+    | SwitchContainer
+    | SwitchChoice
+    | SwitchChoiceSelected
 
 
 { id, class, classList } =
@@ -99,6 +102,34 @@ css =
             [ padding (rem 0.2) ]
         , Css.class MenuItemSelected
             [ backgroundColor (hex base3)
+            ]
+        , Css.class SwitchContainer
+            [ displayFlex
+            , alignItems stretch
+            , position relative
+            , paddingLeft (rem 0.3)
+            , paddingRight (rem 0.3)
+            ]
+        , Css.class SwitchChoice
+            [ fontFamily monospace
+            , fontSize (rem 1)
+            , lineHeight (rem 1)
+            , displayFlex
+            , alignItems center
+            , justifyContent spaceAround
+            , width (rem 2)
+            , margin (px 2)
+            , border zero
+            , hover
+                [ margin zero
+                , border3 (px 2) solid (hex base0)
+                ]
+            ]
+        , Css.class SwitchChoiceSelected
+            [ backgroundColor (hex base0)
+            , color (hex base2)
+            , margin zero
+            , border3 (px 2) solid (hex base0)
             ]
         ]
 
