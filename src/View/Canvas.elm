@@ -9,7 +9,7 @@ import List.Extra as List
 import Math.Vector2 exposing (..)
 import Piece exposing (..)
 import Styles.Colors as Colors
-import Svg exposing (Svg)
+import Svg exposing (Svg, path)
 import Svg.Attributes as Svg
 import Svg.Events as Svg
 import Svg.Extra as Svg
@@ -328,10 +328,42 @@ piece extendPiece data ( id, piece ) =
     in
     case segments of
         first :: rest ->
-            pieceHelper (extendPiece id) first rest first []
+            piecePath first rest
+                :: pieceHelper (extendPiece id) first rest first []
 
         [] ->
             []
+
+
+piecePath : ( Int, Vec2 ) -> List ( Int, Vec2 ) -> Svg msg
+piecePath ( _, first ) rest =
+    let
+        restD =
+            List.foldl l "" rest
+
+        l ( _, v ) restD =
+            "L "
+                ++ toString (getX v)
+                ++ " "
+                ++ toString (getY v)
+                ++ " "
+                ++ restD
+    in
+    path
+        [ Svg.d
+            ("M "
+                ++ toString (getX first)
+                ++ " "
+                ++ toString (getY first)
+                ++ " "
+                ++ restD
+            )
+        , Svg.fill Colors.blue
+        , Svg.strokeWidth "0"
+        , Svg.opacity "0.2"
+        , Svg.pointerEvents "none"
+        ]
+        []
 
 
 pieceHelper :
