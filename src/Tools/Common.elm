@@ -517,8 +517,16 @@ viewMenu data state =
 
 viewConfig : Autocomplete.ViewConfig ( Id Point, Point )
 viewConfig =
+    let
+        entry id point =
+            "#"
+                ++ (id |> Store.toInt |> toString)
+                ++ ": "
+                ++ (point |> Point.name)
+    in
     Autocomplete.viewConfig
-        { toId = Tuple.first >> toString
+        { toId =
+            \( id, point ) -> id |> toString
         , ul =
             [ Html.style
                 [ ( "position", "absolute" )
@@ -536,7 +544,7 @@ viewConfig =
                         []
                     ]
                 , children =
-                    [ Html.text ("point " ++ toString id) ]
+                    [ entry id point |> Html.text ]
                 }
         }
 
