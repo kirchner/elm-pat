@@ -10,6 +10,7 @@
     "dependencies": {
         "abadi199/elm-input-extra": "5.2.0 <= v < 6.0.0",
         "cuducos/elm-format-number": "4.0.2 <= v < 5.0.0",
+        "elm-community/array-extra": "1.0.2 <= v < 2.0.0",
         "elm-community/linear-algebra": "1.1.0 <= v < 2.0.0",
         "elm-community/list-extra": "6.1.0 <= v < 7.0.0",
         "elm-community/maybe-extra": "4.0.0 <= v < 5.0.0",
@@ -22,9 +23,8 @@
         "elm-lang/virtual-dom": "2.0.4 <= v < 3.0.0",
         "elm-lang/window": "1.0.1 <= v < 2.0.0",
         "elm-tools/parser": "2.0.1 <= v < 3.0.0",
+        "kirchner/elm-selectize": "2.0.5 <= v < 3.0.0",
         "ohanhi/keyboard-extra": "3.0.4 <= v < 4.0.0",
-        "rtfeldman/elm-css": "8.2.0 <= v < 9.0.0",
-        "rtfeldman/elm-css-helpers": "2.1.0 <= v < 3.0.0",
         "thebritican/elm-autocomplete": "4.0.3 <= v < 5.0.0"
     },
     "elm-version": "0.18.0 <= v < 0.19.0"

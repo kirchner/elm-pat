@@ -8,8 +8,8 @@ module Events
 
 {- internal -}
 
+import Data.Position exposing (Position)
 import Json.Decode exposing (..)
-import Types exposing (Position)
 import VirtualDom exposing (on)
 
 

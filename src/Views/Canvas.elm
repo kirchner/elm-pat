@@ -1,44 +1,43 @@
-module View.Canvas exposing (view)
+module Views.Canvas exposing (view)
 
+import Data.Piece as Piece exposing (..)
+import Data.Point as Point exposing (Point)
+import Data.Position as Position exposing (Position)
+import Data.Store as Store exposing (Id, Store)
+import Data.ViewPort as ViewPort exposing (ViewPort)
 import Events
 import Html exposing (Html)
 import Html.Attributes as Html
 import List.Extra as List
 import Math.Vector2 exposing (..)
-import Piece exposing (..)
-import Point exposing (Point)
-import Store exposing (Id, Store)
 import Styles.Colors as Colors
 import Svg exposing (Svg, path)
 import Svg.Attributes as Svg
-import Svg.Extra as Svg
-import Tools.Common
-    exposing
-        ( Data
-        , svgSelectPoint
-        )
-import Types exposing (..)
+import Svgs.Extra as Extra
+import Svgs.SelectPoint as SelectPoint
+import Tools.Data exposing (Data)
 
 
 view :
-    Svg msg
-    -> (Position -> msg)
-    -> (Maybe (Id Point) -> msg)
-    -> (Maybe (Id Point) -> msg)
-    -> (Id Piece -> Id Point -> msg)
-    -> (Float -> msg)
-    -> Data
+    { startDrag : Position -> msg
+    , focusPoint : Maybe (Id Point) -> msg
+    , selectPoint : Maybe (Id Point) -> msg
+    , extendPiece : Id Piece -> Id Point -> msg
+    , updateZoom : Float -> msg
+    }
     -> Store Piece
+    -> Svg msg
+    -> Data
     -> Html msg
-view tool startDrag focusPoint selectPoint extendPiece updateZoom data pieceStore =
+view { startDrag, focusPoint, selectPoint, extendPiece, updateZoom } pieceStore tool data =
     let
         viewBoxString =
             let
                 wh =
-                    virtualWidth data.viewPort // 2
+                    ViewPort.virtualWidth data.viewPort // 2
 
                 hh =
-                    virtualHeight data.viewPort // 2
+                    ViewPort.virtualHeight data.viewPort // 2
 
                 dx =
                     data.viewPort.offset.x
@@ -49,8 +48,8 @@ view tool startDrag focusPoint selectPoint extendPiece updateZoom data pieceStor
             String.join " "
                 [ toString (dx - wh)
                 , toString (dy - hh)
-                , toString (virtualWidth data.viewPort)
-                , toString (virtualHeight data.viewPort)
+                , toString (ViewPort.virtualWidth data.viewPort)
+                , toString (ViewPort.virtualHeight data.viewPort)
                 ]
     in
     Svg.svg
@@ -68,7 +67,7 @@ view tool startDrag focusPoint selectPoint extendPiece updateZoom data pieceStor
         , viewSelectedPoints data
         , dragArea startDrag data.viewPort
         , Svg.g [] (pieces extendPiece data)
-        , svgSelectPoint focusPoint selectPoint data
+        , SelectPoint.svg focusPoint selectPoint data
         , tool
         ]
 
@@ -106,15 +105,15 @@ grid config viewPort =
                 []
 
         x =
-            toFloat (virtualWidth viewPort + 2 * config.offset) / 2
+            toFloat (ViewPort.virtualWidth viewPort + 2 * config.offset) / 2
 
         y =
-            toFloat (virtualHeight viewPort + 2 * config.offset) / 2
+            toFloat (ViewPort.virtualHeight viewPort + 2 * config.offset) / 2
 
         -- n satisfies:
         --    2 * n * config.offset > ((max viewPort.height viewPort.width) / 2)
         n =
-            max (virtualHeight viewPort) (virtualWidth viewPort)
+            max (ViewPort.virtualHeight viewPort) (ViewPort.virtualWidth viewPort)
                 // config.offset
                 |> (+) 4
 
@@ -209,10 +208,10 @@ grid config viewPort =
 dragArea : (Position -> msg) -> ViewPort -> Svg msg
 dragArea startDrag viewPort =
     Svg.rect
-        [ Svg.x (toString (viewPort.offset.x - (virtualWidth viewPort // 2)))
-        , Svg.y (toString (viewPort.offset.y - (virtualHeight viewPort // 2)))
-        , Svg.width (toString (virtualWidth viewPort))
-        , Svg.height (toString (virtualHeight viewPort))
+        [ Svg.x (toString (viewPort.offset.x - (ViewPort.virtualWidth viewPort // 2)))
+        , Svg.y (toString (viewPort.offset.y - (ViewPort.virtualHeight viewPort // 2)))
+        , Svg.width (toString (ViewPort.virtualWidth viewPort))
+        , Svg.height (toString (ViewPort.virtualHeight viewPort))
         , Svg.fill "transparent"
         , Svg.strokeWidth "0"
         , Events.onMouseDown startDrag
@@ -254,12 +253,12 @@ viewSelectedPoint data first id =
             Just <|
                 Svg.g []
                     (if first then
-                        [ Svg.drawPoint Colors.red position
-                        , Svg.drawSelector Svg.Solid Colors.red position
+                        [ Extra.drawPoint Colors.red position
+                        , Extra.drawSelector Extra.Solid Colors.red position
                         ]
                      else
-                        [ Svg.drawPoint Colors.yellow position
-                        , Svg.drawSelector Svg.Solid Colors.yellow position
+                        [ Extra.drawPoint Colors.yellow position
+                        , Extra.drawSelector Extra.Solid Colors.yellow position
                         ]
                     )
 
@@ -304,14 +303,14 @@ point data point =
             { withAbsolute =
                 \point _ _ ->
                     Point.position data.store data.variables point
-                        |> Maybe.map (Svg.drawPoint Colors.base0)
+                        |> Maybe.map (Extra.drawPoint Colors.base0)
             , withRelative =
                 \point anchorId _ _ ->
                     let
                         draw v w =
                             Svg.g []
-                                [ Svg.drawPoint Colors.base0 w
-                                , Svg.drawRectArrow v w
+                                [ Extra.drawPoint Colors.base0 w
+                                , Extra.drawRectArrow v w
                                 ]
                     in
                     Maybe.map2
@@ -323,8 +322,8 @@ point data point =
                     let
                         draw v w =
                             Svg.g []
-                                [ Svg.drawPoint Colors.base0 w
-                                , Svg.drawArrow v w
+                                [ Extra.drawPoint Colors.base0 w
+                                , Extra.drawArrow v w
                                 ]
                     in
                     Maybe.map2
@@ -336,8 +335,8 @@ point data point =
                     let
                         draw v p q =
                             Svg.g []
-                                [ Svg.drawLine p q
-                                , Svg.drawPoint Colors.base0 v
+                                [ Extra.drawLine p q
+                                , Extra.drawPoint Colors.base0 v
                                 ]
                     in
                     Maybe.map3
@@ -345,15 +344,14 @@ point data point =
                         (Point.position data.store data.variables point)
                         (Point.positionById data.store data.variables firstId)
                         (Point.positionById data.store data.variables lastId)
-
             , withCircleIntersection =
                 \point firstId _ lastId _ _ ->
                     let
                         draw v p q =
                             Svg.g []
-                                [ Svg.drawArrow p v
-                                , Svg.drawArrow v q
-                                , Svg.drawPoint Colors.base0 v
+                                [ Extra.drawArrow p v
+                                , Extra.drawArrow v q
+                                , Extra.drawPoint Colors.base0 v
                                 ]
                     in
                     Maybe.map3
@@ -361,7 +359,6 @@ point data point =
                         (Point.position data.store data.variables point)
                         (Point.positionById data.store data.variables firstId)
                         (Point.positionById data.store data.variables lastId)
-
             }
     in
     Point.dispatch handlers point
@@ -436,8 +433,8 @@ pieceHelper :
 pieceHelper extendPiece ( firstId, first ) rest veryFirst drawn =
     case rest of
         ( secondId, second ) :: veryRest ->
-            (Svg.drawLineSegmentWith (extendPiece firstId) first second :: drawn)
+            (Extra.drawLineSegmentWith (extendPiece firstId) first second :: drawn)
                 |> pieceHelper extendPiece ( secondId, second ) veryRest veryFirst
 
         [] ->
-            Svg.drawLineSegmentWith (extendPiece firstId) first (Tuple.second veryFirst) :: drawn
+            Extra.drawLineSegmentWith (extendPiece firstId) first (Tuple.second veryFirst) :: drawn

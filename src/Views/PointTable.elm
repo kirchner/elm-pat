@@ -1,62 +1,70 @@
 module Views.PointTable exposing (view)
 
-import Dict exposing (..)
-import Editor exposing (Msg(..))
-import Expr exposing (..)
-import Html exposing (..)
-import Html.Attributes as Html
-import Html.Events as Html
+import Data.Expr exposing (E)
+import Data.Point as Point exposing (Point)
+import Data.Store as Store exposing (Id, Store)
+import Dict exposing (Dict)
+import Html exposing (Html)
+import Html.Attributes as Attributes
+import Html.Events as Events
 import Math.Vector2 exposing (..)
-import Tools.Styles
-import Point exposing (Point)
-import Store exposing (Id, Store)
-import Styles.PointTable
-    exposing
-        ( Class(..)
-        , class
-        )
-import Tools.Common exposing (Data)
-import Views.Common exposing (iconSmall)
-import Json.Encode as Json
+import Tools.Data exposing (Data)
+import Views.Common as Common
 
 
-type alias Callbacks =
-    { setName : Id Point -> String -> Msg
-    , selectPoint : Id Point -> Msg
-    , deselectPoint : Id Point -> Msg
+type alias Callbacks msg =
+    { setName : Id Point -> String -> msg
+    , selectPoint : Id Point -> msg
+    , deselectPoint : Id Point -> msg
+    , deletePoint : Id Point -> msg
     }
 
 
-view : Callbacks -> Data -> Html Msg
+view : Callbacks msg -> Data -> Html msg
 view callbacks data =
-    table
-        [ class [ Table ] ]
-        (tr
+    Html.table
+        [ Attributes.class "point-table__table" ]
+        (Html.tr
             []
-            [ th
-                [ class [ CellId ] ]
-                [ text "#" ]
-            , th
-                [ class [ CellId ] ] -- <- TODO
-                [ text "o" ]
-            , th
-                [ class [ CellName ] ]
-                [ text "name" ]
-            , th
-                [ class [ CellCoordinate ] ]
-                [ text "x" ]
-            , th
-                [ class [ CellCoordinate ] ]
-                [ text "y" ]
-            , th
-                [ class [ CellType ] ]
+            [ Html.th
+                [ Attributes.class "point-table__cell"
+                , Attributes.class "point-table__cell--id"
+                ]
+                [ Html.text "#" ]
+            , Html.th
+                [ Attributes.class "point-table__cell"
+                , Attributes.class "point-table__cell--id"
+                ]
+                -- <- TODO
+                [ Html.text "o" ]
+            , Html.th
+                [ Attributes.class "point-table__cell"
+                , Attributes.class "point-table__cell--name"
+                ]
+                [ Html.text "name" ]
+            , Html.th
+                [ Attributes.class "point-table__cell"
+                , Attributes.class "point-table__cell--coordinate"
+                ]
+                [ Html.text "x" ]
+            , Html.th
+                [ Attributes.class "point-table__cell"
+                , Attributes.class "point-table__cell--coordinate"
+                ]
+                [ Html.text "y" ]
+            , Html.th
+                [ Attributes.class "point-table__cell"
+                , Attributes.class "point-table__cell--type"
+                ]
                 []
 
             --, th
             --    [ class [ CellAction ] ]
             --    []
-            , th
-                [ class [ CellAction ] ]
+            , Html.th
+                [ Attributes.class "point-table__cell"
+                , Attributes.class "point-table__cell--action"
+                ]
                 []
             ]
             :: (data.store
@@ -66,7 +74,7 @@ view callbacks data =
         )
 
 
-viewPointEntry : Callbacks -> Data -> ( Id Point, Point ) -> Html Msg
+viewPointEntry : Callbacks msg -> Data -> ( Id Point, Point ) -> Html msg
 viewPointEntry callbacks data ( id, point ) =
     let
         v =
@@ -92,74 +100,90 @@ viewPointEntry callbacks data ( id, point ) =
         isSelectedLast =
             Just id == List.head data.selectedPoints
     in
-    tr
-        [ class
-            ([ Just Row
-             , if isSelected then
-                Just RowSelected
-               else
-                Nothing
-             , if isSelectedLast then
-                Just RowSelectedLast
-               else
-                Nothing
-             ]
-                |> List.filterMap identity
-            )
-        ]
-        [ td
-            [ class [ CellId ] ]
-            [ text (id |> Store.toInt |> toString) ]
-        , td
-            [ class [ CellId ] ] -- <- TODO
-            [ a 
-              [ Html.onClick ((if isSelected then callbacks.deselectPoint else callbacks.selectPoint) id)
-              ]
-              [ i
-                [ Html.class "material-icons"
-                ]
-                [ text <|
-                  if isSelected then "radio_button_checked" else "radio_button_unchecked"
-                ]
-              ]
+    Html.tr
+        [ Attributes.class "point-table__row"
+        , Attributes.classList
+            [ ( "point-table__selected", isSelected )
+            , ( "point-table__selected-last", isSelectedLast )
             ]
-        , td
-            [ class [ CellName ] ]
+        ]
+        [ Html.td
+            [ Attributes.class "point-table__cell"
+            , Attributes.class "point-table__cell--id"
+            ]
+            [ Html.text (id |> Store.toInt |> toString) ]
+        , Html.td
+            [ Attributes.class "point-table__cell"
+            , Attributes.class "point-table__cell--id"
+            ]
+            -- <- TODO
+            [ Html.a
+                [ Events.onClick
+                    ((if isSelected then
+                        callbacks.deselectPoint
+                      else
+                        callbacks.selectPoint
+                     )
+                        id
+                    )
+                ]
+                [ Html.i
+                    [ Attributes.class "material-icons"
+                    ]
+                    [ Html.text <|
+                        if isSelected then
+                            "radio_button_checked"
+                        else
+                            "radio_button_unchecked"
+                    ]
+                ]
+            ]
+        , Html.td
+            [ Attributes.class "point-table__cell"
+            , Attributes.class "point-table__cell--name"
+            ]
             [ let
-                  deleteIcon =
+                deleteIcon =
                     Html.div
-                      [ Tools.Styles.class [ Tools.Styles.IconContainer ] ]
-                      [ iconSmall "delete" (callbacks.setName id "") ]
+                        [ Attributes.class "tool__icon-container" ]
+                        [ Common.iconSmall "delete" (callbacks.setName id "") ]
               in
               Html.div
-                  [ Tools.Styles.class [ Tools.Styles.ValueContainer ] ]
-                  ([ Html.input
-                      [ Html.onInput (callbacks.setName id)
-                      , Html.placeholder (Point.name point)
-                      , Html.value (Point.name point) -- TODO: broken
-                      , Tools.Styles.class [ Tools.Styles.Textfield ]
-                      ]
-                      []
-                   , deleteIcon
-                   ]
-                  )
+                [ Attributes.class "tool__value-container" ]
+                [ Html.input
+                    [ Attributes.class "tool__textfield"
+                    , Events.onInput (callbacks.setName id)
+                    , Attributes.placeholder (Point.name point)
+                    , Attributes.value (Point.name point) -- TODO: broken
+                    ]
+                    []
+                , deleteIcon
+                ]
             ]
-        , td
-            [ class [ CellCoordinate ] ]
-            [ text x ]
-        , td
-            [ class [ CellCoordinate ] ]
-            [ text y ]
-        , td
-            [ class [ CellType ] ]
-            [ text (printPoint data.variables point) ]
+        , Html.td
+            [ Attributes.class "point-table__cell"
+            , Attributes.class "point-table__cell--coordinate"
+            ]
+            [ Html.text x ]
+        , Html.td
+            [ Attributes.class "point-table__cell"
+            , Attributes.class "point-table__cell--coordinate"
+            ]
+            [ Html.text y ]
+        , Html.td
+            [ Attributes.class "point-table__cell"
+            , Attributes.class "point-table__cell--type"
+            ]
+            [ Html.text (printPoint data.variables point) ]
 
         --, td
         --    [ class [ CellAction ] ]
-        --    [ iconSmall "edit" (SelectPoint id) ]
-        , td
-            [ class [ CellAction ] ]
-            [ iconSmall "delete" (DeletePoint id) ]
+        --    [ Common.iconSmall "edit" (SelectPoint id) ]
+        , Html.td
+            [ Attributes.class "point-table__cell"
+            , Attributes.class "point-table__cell--action"
+            ]
+            [ Common.iconSmall "delete" (callbacks.deletePoint id) ]
         ]
 
 

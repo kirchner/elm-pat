@@ -1,75 +1,69 @@
 module Tools.Between
     exposing
-        ( State
+        ( Msg
+        , State
         , init
         , svg
+        , update
         , view
         )
 
-import Expr exposing (E)
+import Data.Expr as Expr exposing (E)
+import Data.Point as Point exposing (Point)
+import Data.Position as Position exposing (Position)
+import Data.Store as Store exposing (Id, Store)
 import Html exposing (Html, map)
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
-import Point exposing (Point)
-import Store exposing (Id, Store)
 import Styles.Colors as Colors
 import Svg exposing (Svg)
-import Svg.Extra as Svg
-import Tools.Common exposing (Callbacks, Data)
-import Tools.Dropdown as Dropdown
-import Types exposing (Position, toVec)
+import Svgs.Extra as Extra
+import Svgs.SelectPoint as SelectPoint
+import Svgs.UpdateMouse as UpdateMouse
+import Tools.Callbacks exposing (Callbacks)
+import Tools.Data exposing (Data)
+import Tools.PointMenu as PointMenu
+import Views.ExprInput as ExprInput
+import Views.Tool as Tool
 
 
 type alias State =
-    { firstDropdown : Dropdown.State
-    , first : Maybe ( Id Point, Point )
-    , lastDropdown : Dropdown.State
-    , last : Maybe ( Id Point, Point )
-    , ratio : Maybe E
+    { ratio : Maybe E
+    , points : PointMenu.SelectablePoints
     }
 
 
 init : Data -> State
 init data =
-    { firstDropdown = Dropdown.init
-    , first = Nothing
-    , lastDropdown = Dropdown.init
-    , last = Nothing
-    , ratio = Nothing
+    { ratio = Nothing
+    , points = PointMenu.init 2 data
     }
 
 
-point : Data -> State -> Maybe Point
-point data state =
-    case ( firstPosition data state, lastPosition data state ) of
-        ( Just firstPosition, Just lastPosition ) ->
-            let
-                maybeRatio =
-                    data.cursorPosition
-                        |> Maybe.map (ratio data state firstPosition lastPosition)
-                        |> Maybe.or
-                            (state.ratio
-                                |> Maybe.andThen (Expr.compute data.variables)
-                            )
-            in
-            case maybeRatio of
-                Just ratio ->
-                    Maybe.map2
-                        (\first last ->
-                            Point.between first last ratio
-                        )
-                        (state.first |> Maybe.map Tuple.first)
-                        (state.last |> Maybe.map Tuple.first)
 
-                Nothing ->
-                    Nothing
+---- UPDATE
 
-        _ ->
-            Nothing
+
+type Msg
+    = UpdateRatio String
+    | PointMenuMsg PointMenu.Msg
+
+
+update : Callbacks msg -> Msg -> State -> ( State, Cmd Msg, Maybe msg )
+update callbacks msg state =
+    case msg of
+        UpdateRatio string ->
+            ( { state | ratio = Expr.parse string }
+            , Cmd.none
+            , Nothing
+            )
+
+        PointMenuMsg msg ->
+            PointMenu.update callbacks.selectPoint PointMenuMsg msg state
 
 
 
-{- svg -}
+---- SVG
 
 
 svg : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
@@ -82,11 +76,11 @@ svg callbacks updateState data state =
                         |> Maybe.map callbacks.addPoint
             in
             Svg.g []
-                [ Svg.drawSelector Svg.Solid Colors.red firstPosition
-                , Svg.drawSelector Svg.Solid Colors.red lastPosition
-                , Svg.drawLine firstPosition lastPosition
+                [ Extra.drawSelector Extra.Solid Colors.red firstPosition
+                , Extra.drawSelector Extra.Solid Colors.red lastPosition
+                , Extra.drawLine firstPosition lastPosition
                 , newPoint data state firstPosition lastPosition
-                , Tools.Common.svgUpdateMouse addPoint
+                , UpdateMouse.svg addPoint
                     callbacks.updateCursorPosition
                     data
                 ]
@@ -94,66 +88,36 @@ svg callbacks updateState data state =
         ( Just firstPosition, Nothing ) ->
             let
                 selectPoint =
-                    (\maybeId ->
-                        { state
-                            | last =
-                                case maybeId of
-                                    Just id ->
-                                        Store.get id data.store
-                                            |> Maybe.map (\point -> ( id, point ))
-
-                                    Nothing ->
-                                        Nothing
-                        }
-                    )
+                    Maybe.map (\id -> PointMenu.selectPoint 1 id data state)
+                        >> Maybe.withDefault state
                         >> updateState
             in
             Svg.g []
-                [ Svg.drawSelector Svg.Solid Colors.red firstPosition
-                , Tools.Common.svgSelectPoint callbacks.focusPoint selectPoint data
+                [ Extra.drawSelector Extra.Solid Colors.red firstPosition
+                , SelectPoint.svg callbacks.focusPoint selectPoint data
                 ]
 
         ( Nothing, Just lastPosition ) ->
             let
                 selectPoint =
-                    (\maybeId ->
-                        { state
-                            | first =
-                                case maybeId of
-                                    Just id ->
-                                        Store.get id data.store
-                                            |> Maybe.map (\point -> ( id, point ))
-
-                                    Nothing ->
-                                        Nothing
-                        }
-                    )
+                    Maybe.map (\id -> PointMenu.selectPoint 0 id data state)
+                        >> Maybe.withDefault state
                         >> updateState
             in
             Svg.g []
-                [ Svg.drawSelector Svg.Solid Colors.red lastPosition
-                , Tools.Common.svgSelectPoint callbacks.focusPoint selectPoint data
+                [ Extra.drawSelector Extra.Solid Colors.red lastPosition
+                , SelectPoint.svg callbacks.focusPoint selectPoint data
                 ]
 
         ( Nothing, Nothing ) ->
             let
                 selectPoint =
-                    (\maybeId ->
-                        { state
-                            | first =
-                                case maybeId of
-                                    Just id ->
-                                        Store.get id data.store
-                                            |> Maybe.map (\point -> ( id, point ))
-
-                                    Nothing ->
-                                        Nothing
-                        }
-                    )
+                    Maybe.map (\id -> PointMenu.selectPoint 0 id data state)
+                        >> Maybe.withDefault state
                         >> updateState
             in
             Svg.g []
-                [ Tools.Common.svgSelectPoint callbacks.focusPoint selectPoint data ]
+                [ SelectPoint.svg callbacks.focusPoint selectPoint data ]
 
 
 newPoint : Data -> State -> Vec2 -> Vec2 -> Svg msg
@@ -177,8 +141,8 @@ newPoint data state firstPosition lastPosition =
                         |> add firstPosition
             in
             Svg.g []
-                [ Svg.drawPoint Colors.red pointPosition
-                , Svg.drawSelector Svg.Solid Colors.red pointPosition
+                [ Extra.drawPoint Colors.red pointPosition
+                , Extra.drawSelector Extra.Solid Colors.red pointPosition
                 ]
 
         Nothing ->
@@ -186,50 +150,49 @@ newPoint data state firstPosition lastPosition =
 
 
 
-{- view -}
+---- VIEW
 
 
-view : Callbacks msg -> (State -> msg) -> Data -> State -> Html msg
-view callbacks updateState data state =
-    let
-        updateFirstDropdown msg =
-            let
-                ( newFirstDropdown, newFirst ) =
-                    state.firstDropdown
-                        |> Dropdown.update state.first data msg
-            in
-            updateState
-                { state
-                    | firstDropdown = newFirstDropdown
-                    , first = newFirst
-                }
-
-        updateLastDropdown msg =
-            let
-                ( newLastDropdown, newLast ) =
-                    state.lastDropdown
-                        |> Dropdown.update state.last data msg
-            in
-            updateState
-                { state
-                    | lastDropdown = newLastDropdown
-                    , last = newLast
-                }
-
-        updateRatio =
-            (\s -> { state | ratio = Expr.parse s }) >> updateState
-    in
-    [ Dropdown.view state.first data state.firstDropdown
-        |> map updateFirstDropdown
-    , Dropdown.view state.last data state.lastDropdown
-        |> map updateLastDropdown
-    , Tools.Common.exprInput "ratio" state.ratio updateRatio
+view : Callbacks msg -> Data -> State -> Html Msg
+view callbacks data state =
+    [ PointMenu.view 0 state |> Html.map PointMenuMsg
+    , PointMenu.view 1 state |> Html.map PointMenuMsg
+    , ExprInput.view "ratio" state.ratio UpdateRatio
     ]
-        |> Tools.Common.view callbacks data state point
+        |> Tool.view callbacks data state point
 
 
 
-{- compute positions -}
+---- COMPUTATIONS
+
+
+point : Data -> State -> Maybe Point
+point data state =
+    case ( firstPosition data state, lastPosition data state ) of
+        ( Just firstPosition, Just lastPosition ) ->
+            let
+                maybeRatio =
+                    data.cursorPosition
+                        |> Maybe.map (ratio data state firstPosition lastPosition)
+                        |> Maybe.or
+                            (state.ratio
+                                |> Maybe.andThen (Expr.compute data.variables)
+                            )
+            in
+            case maybeRatio of
+                Just ratio ->
+                    Maybe.map2
+                        (\first last ->
+                            Point.between first last ratio
+                        )
+                        (state |> PointMenu.selectedPoint 0 |> Maybe.map Tuple.first)
+                        (state |> PointMenu.selectedPoint 1 |> Maybe.map Tuple.first)
+
+                Nothing ->
+                    Nothing
+
+        _ ->
+            Nothing
 
 
 ratio : Data -> State -> Vec2 -> Vec2 -> Position -> Float
@@ -239,7 +202,7 @@ ratio data state firstPosition lastPosition cursorPosition =
             lastPosition |> flip sub firstPosition
 
         deltaCursor =
-            toVec cursorPosition |> flip sub firstPosition
+            Position.toVec cursorPosition |> flip sub firstPosition
 
         project v w =
             w |> scale (dot v w / lengthSquared w)
@@ -257,14 +220,16 @@ ratio data state firstPosition lastPosition cursorPosition =
 
 firstPosition : Data -> State -> Maybe Vec2
 firstPosition data state =
-    state.first
+    state
+        |> PointMenu.selectedPoint 0
         |> Maybe.map Tuple.first
         |> position data state
 
 
 lastPosition : Data -> State -> Maybe Vec2
 lastPosition data state =
-    state.last
+    state
+        |> PointMenu.selectedPoint 1
         |> Maybe.map Tuple.first
         |> position data state
 

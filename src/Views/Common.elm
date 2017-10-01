@@ -4,37 +4,38 @@ module Views.Common
         , iconSmall
         )
 
-import Html exposing (..)
-import Html.Attributes as Html
-import Html.Events exposing (..)
-import Styles.Common
-    exposing
-        ( Class(..)
-        , class
-        )
+import Html exposing (Html)
+import Html.Attributes as Attributes
+import Html.Events as Events
 
 
 iconBig : String -> msg -> Html msg
 iconBig name callback =
-    div
-        [ class [ IconButtonBig ] ]
-        [ i
-            [ Html.class "material-icons"
-            , onClick callback
-            , class [ IconBig ]
+    Html.div
+        [ Attributes.class "icon-button"
+        , Attributes.class "icon-button--big"
+        ]
+        [ Html.i
+            [ Attributes.class "icon"
+            , Attributes.class "icon--big"
+            , Attributes.class "material-icons"
+            , Events.onClick callback
             ]
-            [ text name ]
+            [ Html.text name ]
         ]
 
 
 iconSmall : String -> msg -> Html msg
 iconSmall name callback =
-    div
-        [ class [ IconButtonSmall ] ]
-        [ i
-            [ Html.class "material-icons"
-            , onClick callback
-            , class [ IconSmall ]
+    Html.div
+        [ Attributes.class "icon-button"
+        , Attributes.class "icon-button--small"
+        ]
+        [ Html.i
+            [ Attributes.class "icon"
+            , Attributes.class "icon--small"
+            , Attributes.class "material-icons"
+            , Events.onClick callback
             ]
-            [ text name ]
+            [ Html.text name ]
         ]

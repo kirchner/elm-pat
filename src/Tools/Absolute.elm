@@ -1,33 +1,31 @@
 module Tools.Absolute
     exposing
-        ( State
+        ( Msg
+        , State
         , init
-        , initWith
         , svg
+        , update
         , view
         )
 
-import Expr exposing (..)
+import Data.Expr exposing (..)
+import Data.Point as Point exposing (Point)
+import Html exposing (Html)
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
-import Point exposing (Point)
-import Store exposing (Id, Store)
 import Styles.Colors as Colors exposing (..)
 import Svg exposing (Svg)
-import Svg.Extra as Svg
-import Tools.Common as Tools
-    exposing
-        ( Callbacks
-        , Data
-        , exprInput
-        , svgUpdateMouse
-        )
+import Svgs.Extra as Extra
+import Svgs.UpdateMouse as UpdateMouse
+import Tools.Callbacks exposing (Callbacks)
+import Tools.Data exposing (Data)
+import Views.ExprInput as ExprInput
+import Views.Tool as Tool
 
 
 type alias State =
     { x : Maybe E
     , y : Maybe E
-    , id : Maybe (Id Point)
     }
 
 
@@ -35,40 +33,30 @@ init : State
 init =
     { x = Nothing
     , y = Nothing
-    , id = Nothing
     }
 
 
-initWith : Id Point -> E -> E -> State
-initWith id x y =
-    { x = Just x
-    , y = Just y
-    , id = Just id
-    }
+
+---- UPDATE
 
 
-point : Data -> State -> Maybe Point
-point data state =
-    let
-        xCursor =
-            data.cursorPosition
-                |> Maybe.map (\{ x, y } -> Number (toFloat x))
+type Msg
+    = UpdateX String
+    | UpdateY String
 
-        yCursor =
-            data.cursorPosition
-                |> Maybe.map (\{ x, y } -> Number (toFloat y))
 
-        x =
-            xCursor |> Maybe.or state.x
+update : Msg -> State -> State
+update msg state =
+    case msg of
+        UpdateX string ->
+            { state | x = parse string }
 
-        y =
-            yCursor |> Maybe.or state.y
-    in
-    Maybe.map2 Point.absolute x y
+        UpdateY string ->
+            { state | y = parse string }
 
 
 
-{- canvas -}
+---- SVG
 
 
 svg : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
@@ -80,7 +68,7 @@ svg callbacks updateState data state =
     [ newPoint data state
     , horizontalLine data state
     , verticalLine data state
-    , Just (svgUpdateMouse addPoint callbacks.updateCursorPosition data)
+    , Just (UpdateMouse.svg addPoint callbacks.updateCursorPosition data)
     ]
         |> List.filterMap identity
         |> Svg.g []
@@ -91,8 +79,8 @@ newPoint data state =
     let
         draw x y =
             Svg.g []
-                [ Svg.drawPoint Colors.red (vec2 x y)
-                , Svg.drawSelector Svg.Solid Colors.red (vec2 x y)
+                [ Extra.drawPoint Colors.red (vec2 x y)
+                , Extra.drawSelector Extra.Solid Colors.red (vec2 x y)
                 ]
 
         xState =
@@ -122,30 +110,47 @@ horizontalLine : Data -> State -> Maybe (Svg msg)
 horizontalLine data state =
     state.y
         |> Maybe.andThen (compute data.variables)
-        |> Maybe.map Svg.drawHorizontalLine
+        |> Maybe.map Extra.drawHorizontalLine
 
 
 verticalLine : Data -> State -> Maybe (Svg msg)
 verticalLine data state =
     state.x
         |> Maybe.andThen (compute data.variables)
-        |> Maybe.map Svg.drawVerticalLine
+        |> Maybe.map Extra.drawVerticalLine
 
 
 
-{- view -}
+---- VIEW
 
 
-view : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
-view callbacks updateState data state =
-    let
-        updateX =
-            (\s -> { state | x = parse s }) >> updateState
-
-        updateY =
-            (\s -> { state | y = parse s }) >> updateState
-    in
-    [ exprInput "x-coordinate" state.x updateX
-    , exprInput "y-coordinate" state.y updateY
+view : Callbacks msg -> Data -> State -> Html Msg
+view callbacks data state =
+    [ ExprInput.view "x-coordinate" state.x UpdateX
+    , ExprInput.view "y-coordinate" state.y UpdateY
     ]
-        |> Tools.view callbacks data state point
+        |> Tool.view callbacks data state point
+
+
+
+---- COMPUTATIONS
+
+
+point : Data -> State -> Maybe Point
+point data state =
+    let
+        xCursor =
+            data.cursorPosition
+                |> Maybe.map (\{ x, y } -> Number (toFloat x))
+
+        yCursor =
+            data.cursorPosition
+                |> Maybe.map (\{ x, y } -> Number (toFloat y))
+
+        x =
+            xCursor |> Maybe.or state.x
+
+        y =
+            yCursor |> Maybe.or state.y
+    in
+    Maybe.map2 Point.absolute x y

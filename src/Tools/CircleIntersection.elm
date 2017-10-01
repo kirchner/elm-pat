@@ -1,68 +1,94 @@
 module Tools.CircleIntersection
     exposing
-        ( State
+        ( Msg
+        , State
         , init
         , svg
+        , update
         , view
         )
 
-import Expr exposing (E)
+import Data.Expr as Expr exposing (E)
+import Data.Point as Point exposing (Choice(..), Point)
+import Data.Store as Store exposing (Id, Store)
 import Html exposing (Html, map)
 import Math.Vector2 exposing (..)
-import Maybe.Extra as Maybe
-import Point exposing (Choice(..), Point)
-import Store exposing (Id, Store)
 import Styles.Colors as Colors
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
-import Svg.Extra as Svg
-import Tools.Common exposing (Callbacks, Data)
-import Tools.Dropdown as Dropdown
-import Types exposing (Position, toVec)
+import Svgs.Extra as Extra
+import Svgs.UpdateMouse as UpdateMouse
+import Tools.Callbacks exposing (Callbacks)
+import Tools.Data exposing (Data)
+import Tools.PointMenu as PointMenu
+import Views.ExprInput as ExprInput
+import Views.Switch as Switch
+import Views.Tool as Tool
 
 
 type alias State =
-    { firstDropdown : Dropdown.State
-    , first : Maybe ( Id Point, Point )
-    , lastDropdown : Dropdown.State
-    , last : Maybe ( Id Point, Point )
-    , firstRadius : Maybe E
+    { firstRadius : Maybe E
     , lastRadius : Maybe E
     , choice : Choice
+    , points : PointMenu.SelectablePoints
     }
 
 
 init : Data -> State
 init data =
-    { firstDropdown = Dropdown.init
-    , first = Nothing
-    , lastDropdown = Dropdown.init
-    , last = Nothing
-    , firstRadius = Nothing
+    { firstRadius = Nothing
     , lastRadius = Nothing
     , choice = LeftMost
+    , points = PointMenu.init 2 data
     }
 
 
-point : Data -> State -> Maybe Point
-point data state =
-    case
-        ( state.first |> Maybe.map Tuple.first
-        , state.firstRadius
-        , state.last |> Maybe.map Tuple.first
-        , state.lastRadius
-        )
-    of
-        ( Just first, Just firstRadius, Just last, Just lastRadius ) ->
-            Point.circleIntersection first firstRadius last lastRadius state.choice
-                |> Just
 
-        _ ->
-            Nothing
+---- UPDATE
 
 
+type Msg
+    = UpdateFirstRadius String
+    | UpdateLastRadius String
+    | UpdateChoice Int
+    | PointMenuMsg PointMenu.Msg
 
-{- svg -}
+
+update : Callbacks msg -> Msg -> State -> ( State, Cmd Msg, Maybe msg )
+update callbacks msg state =
+    case msg of
+        UpdateFirstRadius string ->
+            ( { state | firstRadius = Expr.parse string }
+            , Cmd.none
+            , Nothing
+            )
+
+        UpdateLastRadius string ->
+            ( { state | lastRadius = Expr.parse string }
+            , Cmd.none
+            , Nothing
+            )
+
+        UpdateChoice id ->
+            ( case id of
+                0 ->
+                    { state | choice = LeftMost }
+
+                1 ->
+                    { state | choice = RightMost }
+
+                _ ->
+                    state
+            , Cmd.none
+            , Nothing
+            )
+
+        PointMenuMsg msg ->
+            PointMenu.update callbacks.selectPoint PointMenuMsg msg state
+
+
+
+---- SVG
 
 
 svg : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
@@ -80,12 +106,12 @@ svg callbacks updateState data state =
                     point data state |> Maybe.map callbacks.addPoint
             in
             Svg.g []
-                [ Svg.drawSelector Svg.Solid Colors.red firstPosition
+                [ Extra.drawSelector Extra.Solid Colors.red firstPosition
                 , drawCircle firstPosition firstRadius
-                , Svg.drawSelector Svg.Solid Colors.red lastPosition
+                , Extra.drawSelector Extra.Solid Colors.red lastPosition
                 , drawCircle lastPosition lastRadius
-                , Svg.drawLine firstPosition lastPosition
-                , Tools.Common.svgUpdateMouse addPoint
+                , Extra.drawLine firstPosition lastPosition
+                , UpdateMouse.svg addPoint
                     callbacks.updateCursorPosition
                     data
                 ]
@@ -109,53 +135,12 @@ drawCircle center radius =
 
 
 
-{- view -}
+---- VIEW
 
 
-view : Callbacks msg -> (State -> msg) -> Data -> State -> Html msg
-view callbacks updateState data state =
+view : Callbacks msg -> Data -> State -> Html Msg
+view callbacks data state =
     let
-        updateFirstRadius =
-            (\s -> { state | firstRadius = Expr.parse s }) >> updateState
-
-        updateLastRadius =
-            (\s -> { state | lastRadius = Expr.parse s }) >> updateState
-
-        updateFirstDropdown msg =
-            let
-                ( newFirstDropdown, newFirst ) =
-                    state.firstDropdown
-                        |> Dropdown.update state.first data msg
-            in
-            updateState
-                { state
-                    | firstDropdown = newFirstDropdown
-                    , first = newFirst
-                }
-
-        updateLastDropdown msg =
-            let
-                ( newLastDropdown, newLast ) =
-                    state.lastDropdown
-                        |> Dropdown.update state.last data msg
-            in
-            updateState
-                { state
-                    | lastDropdown = newLastDropdown
-                    , last = newLast
-                }
-
-        updateChoice =
-            (\id ->
-                if id == 0 then
-                    { state | choice = LeftMost }
-                else if id == 1 then
-                    { state | choice = RightMost }
-                else
-                    state
-            )
-                >> updateState
-
         choices =
             [ "a", "b" ]
 
@@ -167,31 +152,48 @@ view callbacks updateState data state =
                 RightMost ->
                     1
     in
-    [ Dropdown.view state.first data state.firstDropdown
-        |> map updateFirstDropdown
-    , Tools.Common.exprInput "first radius" state.firstRadius updateFirstRadius
-    , Dropdown.view state.last data state.lastDropdown
-        |> map updateLastDropdown
-    , Tools.Common.exprInput "last radius" state.lastRadius updateLastRadius
-    , Tools.Common.switch choices switchState updateChoice
+    [ PointMenu.view 0 state |> Html.map PointMenuMsg
+    , ExprInput.view "first radius" state.firstRadius UpdateFirstRadius
+    , PointMenu.view 1 state |> Html.map PointMenuMsg
+    , ExprInput.view "last radius" state.lastRadius UpdateLastRadius
+    , Switch.view choices switchState UpdateChoice
     ]
-        |> Tools.Common.view callbacks data state point
+        |> Tool.view callbacks data state point
 
 
 
-{- positions -}
+---- COMPUTATIONS
+
+
+point : Data -> State -> Maybe Point
+point data state =
+    case
+        ( state |> PointMenu.selectedPoint 0 |> Maybe.map Tuple.first
+        , state.firstRadius
+        , state |> PointMenu.selectedPoint 1 |> Maybe.map Tuple.first
+        , state.lastRadius
+        )
+    of
+        ( Just first, Just firstRadius, Just last, Just lastRadius ) ->
+            Point.circleIntersection first firstRadius last lastRadius state.choice
+                |> Just
+
+        _ ->
+            Nothing
 
 
 firstPosition : Data -> State -> Maybe Vec2
 firstPosition data state =
-    state.first
+    state
+        |> PointMenu.selectedPoint 0
         |> Maybe.map Tuple.first
         |> position data state
 
 
 lastPosition : Data -> State -> Maybe Vec2
 lastPosition data state =
-    state.last
+    state
+        |> PointMenu.selectedPoint 1
         |> Maybe.map Tuple.first
         |> position data state
 

@@ -5,19 +5,16 @@ module Tools.ExtendPiece
         , svg
         )
 
-import Piece exposing (..)
-import Point exposing (Point)
-import Store exposing (Id, Store)
+import Data.Piece as Piece exposing (..)
+import Data.Point as Point exposing (Point)
+import Data.Position as Position
+import Data.Store as Store exposing (Id, Store)
 import Svg exposing (Svg)
-import Svg.Extra as Svg
-import Tools.Common as Tools
-    exposing
-        ( Callbacks
-        , Data
-        , svgSelectPoint
-        , svgUpdateMouse
-        )
-import Types exposing (..)
+import Svgs.Extra as Extra
+import Svgs.SelectPoint as SelectPoint
+import Svgs.UpdateMouse as UpdateMouse
+import Tools.Callbacks exposing (Callbacks)
+import Tools.Data exposing (Data)
 
 
 type alias State =
@@ -36,9 +33,9 @@ init piece segment =
 svg : Callbacks msg -> Data -> State -> Svg msg
 svg callbacks data state =
     [ lineSegments data state
-    , Just (svgUpdateMouse Nothing callbacks.updateCursorPosition data)
+    , Just (UpdateMouse.svg Nothing callbacks.updateCursorPosition data)
     , Just <|
-        svgSelectPoint callbacks.focusPoint
+        SelectPoint.svg callbacks.focusPoint
             (callbacks.extendPiece state.piece state.segment)
             data
     ]
@@ -62,7 +59,7 @@ lineSegments data state =
                     Point.positionById data.store data.variables state.segment
 
                 b =
-                    toVec position
+                    Position.toVec position
 
                 c =
                     Point.positionById data.store data.variables next
@@ -71,8 +68,8 @@ lineSegments data state =
                 ( Just a, Just c ) ->
                     Just <|
                         Svg.g []
-                            [ Svg.drawLineSegment a b
-                            , Svg.drawLineSegment b c
+                            [ Extra.drawLineSegment a b
+                            , Extra.drawLineSegment b c
                             ]
 
                 _ ->
@@ -90,8 +87,8 @@ lineSegments data state =
                 ( Just a, Just c ) ->
                     Just <|
                         Svg.g []
-                            [ Svg.drawLineSegment a b
-                            , Svg.drawLineSegment b c
+                            [ Extra.drawLineSegment a b
+                            , Extra.drawLineSegment b c
                             ]
 
                 _ ->

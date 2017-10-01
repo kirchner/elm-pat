@@ -1,43 +1,39 @@
 module Tools.Distance
     exposing
-        ( State
+        ( Msg
+        , State
         , init
-        , initWith
         , svg
+        , update
         , view
         )
 
-import Expr exposing (..)
+import Data.Expr exposing (..)
+import Data.Point as Point exposing (Point)
+import Data.Position as Position
+import Data.Store as Store exposing (Id, Store)
 import FormatNumber
 import Html exposing (Html, map)
 import Keyboard.Extra as Keyboard
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
-import Point exposing (Point)
-import Store exposing (Id, Store)
 import Styles.Colors as Colors exposing (..)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
-import Svg.Extra as Svg
-import Tools.Common as Tools
-    exposing
-        ( Callbacks
-        , Data
-        , exprInput
-        , exprInput_
-        , svgSelectPoint
-        , svgUpdateMouse
-        )
-import Tools.Dropdown as Dropdown
-import Types exposing (..)
+import Svgs.Extra as Extra
+import Svgs.SelectPoint as SelectPoint
+import Svgs.UpdateMouse as UpdateMouse
+import Tools.Callbacks exposing (Callbacks)
+import Tools.Data exposing (Data)
+import Tools.PointMenu as PointMenu
+import Views.ExprInput as ExprInput
+import Views.Tool as Tool
 
 
 type alias State =
     { distance : Maybe E
     , angle : Maybe E
-    , id : Maybe (Id Point)
-    , dropdownState : Dropdown.State
-    , selectedPoint : Maybe ( Id Point, Point )
+    , points : PointMenu.SelectablePoints
     }
 
 
@@ -45,80 +41,41 @@ init : Data -> State
 init data =
     { distance = Nothing
     , angle = Nothing
-    , id = Nothing
-    , dropdownState = Dropdown.init
-    , selectedPoint =
-        case List.head data.selectedPoints of
-            Just id ->
-                case Store.get id data.store of
-                    Just point ->
-                        Just ( id, point )
-
-                    Nothing ->
-                        Nothing
-
-            Nothing ->
-                Nothing
+    , points = PointMenu.init 1 data
     }
 
 
-initWith : Id Point -> Id Point -> E -> E -> State
-initWith id anchor distance angle =
-    { distance = Just distance
-    , angle = Just angle
-    , id = Just id
-    , dropdownState = Dropdown.init
-    , selectedPoint = Nothing
-    }
+
+---- UPDATE
 
 
-point : Data -> State -> Maybe Point
-point data state =
-    let
-        cursorPosition =
-            data.cursorPosition
-                |> Maybe.map (\{ x, y } -> vec2 (toFloat x) (toFloat y))
+type Msg
+    = UpdateDistance String
+    | UpdateAngle String
+    | PointMenuMsg PointMenu.Msg
 
-        anchorId =
-            state.selectedPoint
-                |> Maybe.map Tuple.first
 
-        anchorPosition =
-            anchorId
-                |> Maybe.andThen (flip Store.get data.store)
-                |> Maybe.andThen (Point.position data.store data.variables)
+update : Callbacks msg -> Msg -> State -> ( State, Cmd Msg, Maybe msg )
+update callbacks msg state =
+    case msg of
+        UpdateDistance string ->
+            ( { state | distance = parse string }
+            , Cmd.none
+            , Nothing
+            )
 
-        deltaCursor =
-            Maybe.map2 sub cursorPosition anchorPosition
+        UpdateAngle string ->
+            ( { state | angle = parse string }
+            , Cmd.none
+            , Nothing
+            )
 
-        distanceCursor =
-            deltaCursor
-                |> Maybe.map length
-                |> Maybe.map Number
-
-        angleCursor =
-            deltaCursor
-                |> Maybe.map (\delta -> atan2 (getY delta) (getX delta))
-                |> Maybe.map snap
-                |> Maybe.map Number
-
-        snap angle =
-            if List.member Keyboard.Shift data.pressedKeys then
-                snapAngle 8 angle
-            else
-                angle
-
-        distance =
-            distanceCursor |> Maybe.or state.distance
-
-        angle =
-            angleCursor |> Maybe.or state.angle
-    in
-    Maybe.map3 Point.distance anchorId distance angle
+        PointMenuMsg msg ->
+            PointMenu.update callbacks.selectPoint PointMenuMsg msg state
 
 
 
-{- svg -}
+---- SVG
 
 
 svg : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
@@ -132,7 +89,7 @@ svg callbacks updateState data state =
             [ newPoint data state
             , circle data state
             , line data state
-            , Just (svgUpdateMouse addPoint callbacks.updateCursorPosition data)
+            , Just (UpdateMouse.svg addPoint callbacks.updateCursorPosition data)
             ]
                 |> List.filterMap identity
                 |> Svg.g []
@@ -140,21 +97,11 @@ svg callbacks updateState data state =
         Nothing ->
             let
                 selectPoint =
-                    (\maybeId ->
-                        { state
-                            | selectedPoint =
-                                case maybeId of
-                                    Just id ->
-                                        Store.get id data.store
-                                            |> Maybe.map (\point -> ( id, point ))
-
-                                    Nothing ->
-                                        Nothing
-                        }
-                    )
+                    Maybe.map (\id -> PointMenu.selectPoint 0 id data state)
+                        >> Maybe.withDefault state
                         >> updateState
             in
-            [ svgSelectPoint callbacks.focusPoint selectPoint data ]
+            [ SelectPoint.svg callbacks.focusPoint selectPoint data ]
                 |> Svg.g []
 
 
@@ -176,12 +123,12 @@ newPoint data state =
                 |> Maybe.map
                     (\pointPosition ->
                         Svg.g []
-                            [ Svg.drawPoint Colors.red pointPosition
-                            , Svg.drawSelector Svg.Solid Colors.red pointPosition
-                            , Svg.drawArrow anchorPosition pointPosition
-                            , Svg.drawAngleArc Svg.defaultArcConfig anchorPosition pointPosition
-                            , Svg.label
-                                [ Svg.transform (Svg.translate (lerp 0.5 anchorPosition pointPosition))
+                            [ Extra.drawPoint Colors.red pointPosition
+                            , Extra.drawSelector Extra.Solid Colors.red pointPosition
+                            , Extra.drawArrow anchorPosition pointPosition
+                            , Extra.drawAngleArc Extra.defaultArcConfig anchorPosition pointPosition
+                            , Extra.label
+                                [ Svg.transform (Extra.translate (lerp 0.5 anchorPosition pointPosition))
                                 ]
                                 [ Svg.text (format (length (sub pointPosition anchorPosition)))
                                 ]
@@ -221,7 +168,7 @@ line : Data -> State -> Maybe (Svg msg)
 line data state =
     let
         draw anchorPosition angle =
-            Svg.drawArrow anchorPosition
+            Extra.drawArrow anchorPosition
                 (vec2 (cos angle) (sin angle)
                     |> scale 10000
                     |> add anchorPosition
@@ -238,30 +185,12 @@ line data state =
 
 
 
-{- view -}
+---- VIEW
 
 
-view : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
-view callbacks updateState data state =
+view : Callbacks msg -> Data -> State -> Html Msg
+view callbacks data state =
     let
-        updateDistance =
-            (\s -> { state | distance = parse s }) >> updateState
-
-        updateAngle =
-            (\s -> { state | angle = parse s }) >> updateState
-
-        updateAutoState autoMsg =
-            let
-                ( newDropdownState, newSelectedPoint ) =
-                    state.dropdownState
-                        |> Dropdown.update state.selectedPoint data autoMsg
-            in
-            updateState
-                { state
-                    | dropdownState = newDropdownState
-                    , selectedPoint = newSelectedPoint
-                }
-
         ( distancePlaceholder, anglePlaceholder ) =
             case ( data.cursorPosition, anchorPosition data state ) of
                 ( Just mousePosition, Just anchorPosition ) ->
@@ -271,7 +200,7 @@ view callbacks updateState data state =
 
                         w =
                             anchorPosition
-                                |> flip sub (toVec mousePosition)
+                                |> flip sub (Position.toVec mousePosition)
                     in
                     ( w
                         |> length
@@ -283,21 +212,67 @@ view callbacks updateState data state =
                 _ ->
                     ( "distance", "angle" )
     in
-    [ Dropdown.view state.selectedPoint data state.dropdownState
-        |> map updateAutoState
-    , exprInput_ True distancePlaceholder state.distance updateDistance
-    , exprInput anglePlaceholder state.angle updateAngle
+    [ PointMenu.view 0 state |> Html.map PointMenuMsg
+    , ExprInput.viewWithClear True distancePlaceholder state.distance UpdateDistance
+    , ExprInput.viewWithClear True anglePlaceholder state.angle UpdateAngle
     ]
-        |> Tools.view callbacks data state point
+        |> Tool.view callbacks data state point
 
 
 
-{- compute position -}
+---- COMPUTATIONS
+
+
+point : Data -> State -> Maybe Point
+point data state =
+    let
+        cursorPosition =
+            data.cursorPosition
+                |> Maybe.map (\{ x, y } -> vec2 (toFloat x) (toFloat y))
+
+        anchorId =
+            state
+                |> PointMenu.selectedPoint 0
+                |> Maybe.map Tuple.first
+
+        anchorPosition =
+            anchorId
+                |> Maybe.andThen (flip Store.get data.store)
+                |> Maybe.andThen (Point.position data.store data.variables)
+
+        deltaCursor =
+            Maybe.map2 sub cursorPosition anchorPosition
+
+        distanceCursor =
+            deltaCursor
+                |> Maybe.map length
+                |> Maybe.map Number
+
+        angleCursor =
+            deltaCursor
+                |> Maybe.map (\delta -> atan2 (getY delta) (getX delta))
+                |> Maybe.map snap
+                |> Maybe.map Number
+
+        snap angle =
+            if List.member Keyboard.Shift data.pressedKeys then
+                snapAngle 8 angle
+            else
+                angle
+
+        distance =
+            distanceCursor |> Maybe.or state.distance
+
+        angle =
+            angleCursor |> Maybe.or state.angle
+    in
+    Maybe.map3 Point.distance anchorId distance angle
 
 
 anchorPosition : Data -> State -> Maybe Vec2
 anchorPosition data state =
-    state.selectedPoint
+    state
+        |> PointMenu.selectedPoint 0
         |> Maybe.map Tuple.first
         |> Maybe.andThen (flip Store.get data.store)
         |> Maybe.andThen (Point.position data.store data.variables)

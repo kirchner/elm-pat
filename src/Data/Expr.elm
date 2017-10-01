@@ -1,4 +1,4 @@
-module Expr
+module Data.Expr
     exposing
         ( E(..)
         , compute

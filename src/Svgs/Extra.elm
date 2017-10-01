@@ -1,4 +1,4 @@
-module Svg.Extra
+module Svgs.Extra
     exposing
         ( ArcConfig
         , StrokeStyle(..)

@@ -1,142 +1,168 @@
 module Views.VariableTable exposing (view)
 
-import Dict exposing (..)
-import Editor exposing (Msg(..))
-import Expr exposing (..)
-import Html exposing (..)
-import Html.Attributes as Html
-import Html.Events exposing (..)
-import Styles.VariableTable
-    exposing
-        ( Class(..)
-        , class
-        , classList
-        )
-import Views.Common exposing (iconSmall)
-import Tools.Styles
+import Data.Expr as Expr exposing (E)
+import Dict exposing (Dict)
+import Html exposing (Html)
+import Html.Attributes as Attributes
+import Html.Events as Events
+import Views.Common as Common
 
 
-type alias Callbacks =
-    { setVariableName : String -> String -> Msg
-    , setVariableValue : String -> String -> Msg
+view :
+    { setName : String -> String -> msg
+    , setValue : String -> String -> msg
+    , setNewName : String -> msg
+    , setNewValue : String -> msg
+    , add : msg
     }
-
-
-view : Callbacks -> Dict String E -> Maybe String -> Maybe E -> Html Msg
-view callbacks variables newName newValue =
-    table
-        [ class [ Table ] ]
+    -> Dict String E
+    -> Maybe String
+    -> Maybe E
+    -> Html msg
+view { setName, setValue, setNewName, setNewValue, add } variables newName newValue =
+    Html.table
+        [ Attributes.class "variable-table__table" ]
         ((variables
             |> Dict.toList
-            |> List.map (viewVariable callbacks variables)
+            |> List.map
+                (viewVariable
+                    { setName = setName
+                    , setValue = setValue
+                    }
+                    variables
+                )
          )
-            ++ [ tr
+            ++ [ Html.tr
                     []
-                    [ th
-                        [ class [ CellName ] ]
-                        [ input
-                            [ onInput NameUpdated
-                            , Html.placeholder "name"
-                            , class [ Input ]
-                            , classList
-                                [ ( InputBad, newName == Nothing ) ]
+                    [ Html.th
+                        [ Attributes.class "variable-table__cell"
+                        , Attributes.class "variable-table__cell--name"
+                        ]
+                        [ Html.input
+                            [ Attributes.class "variable-table__input"
+                            , Attributes.classList
+                                [ ( "variable-table__input--bad", newName == Nothing ) ]
+                            , Events.onInput setNewName
+                            , Attributes.placeholder "name"
                             ]
                             []
                         ]
-                    , th
-                        [ class [ CellSign ] ]
-                        [ text "=" ]
-                    , th
-                        [ class [ CellFormula ] ]
-                        [ input
-                            [ onInput ValueUpdated
-                            , Html.placeholder "value"
-                            , class [ Input ]
-                            , classList
-                                [ ( InputBad, newValue == Nothing ) ]
+                    , Html.th
+                        [ Attributes.class "variable-table__cell"
+                        , Attributes.class "variable-table__cell--sign"
+                        ]
+                        [ Html.text "=" ]
+                    , Html.th
+                        [ Attributes.class "variable-table__cell"
+                        , Attributes.class "variable-table__cell--formular"
+                        ]
+                        [ Html.input
+                            [ Attributes.class "variable-table__input"
+                            , Attributes.classList
+                                [ ( "variable-table__input--bad", newName == Nothing ) ]
+                            , Events.onInput setNewValue
+                            , Attributes.placeholder "value"
                             ]
                             []
                         ]
-                    , th
-                        [ class [ CellSign ] ]
+                    , Html.th
+                        [ Attributes.class "variable-table__cell"
+                        , Attributes.class "variable-table__cell--sign"
+                        ]
                         []
-                    , th
-                        [ class [ CellValue ] ]
+                    , Html.th
+                        [ Attributes.class "variable-table__cell"
+                        , Attributes.class "variable-table__cell--value"
+                        ]
                         []
-                    , th
-                        [ class [ CellAction ] ]
-                        [ iconSmall "add" AddVariable ]
+                    , Html.th
+                        [ Attributes.class "variable-table__cell"
+                        , Attributes.class "variable-table__cell--action"
+                        ]
+                        [ Common.iconSmall "add" add ]
                     ]
                ]
         )
 
 
-viewVariable : Callbacks -> Dict String E -> ( String, E ) -> Html Msg
-viewVariable callbacks variables ( name, expr ) =
-    tr
+viewVariable :
+    { setName : String -> String -> msg
+    , setValue : String -> String -> msg
+    }
+    -> Dict String E
+    -> ( String, E )
+    -> Html msg
+viewVariable { setName, setValue } variables ( name, expr ) =
+    Html.tr
         []
-        [ td
-            [ class [ CellName ] ]
+        [ Html.td
+            [ Attributes.class "variable-table__cell"
+            , Attributes.class "variable-table__cell--name"
+            ]
             [ let
-                  deleteIcon =
-                    div
-                      [ Tools.Styles.class [ Tools.Styles.IconContainer ] ]
-                      [ iconSmall "delete" (callbacks.setVariableName name "") ]
+                deleteIcon =
+                    Html.div
+                        [ Attributes.class "tool__icon-container" ]
+                        [ Common.iconSmall "delete" (setName name "") ]
               in
               Html.div
-                  [ Tools.Styles.class [ Tools.Styles.ValueContainer ] ]
-                  ([ Html.input
-                      [ onInput (callbacks.setVariableName name)
-                      , Html.placeholder name
-                      , Html.value name -- TODO: broken
-                      , Tools.Styles.class [ Tools.Styles.Textfield ]
-                      ]
-                      []
-                   , deleteIcon
-                   ]
-                  )
+                [ Attributes.class "tool__icon-container" ]
+                [ Html.input
+                    [ Attributes.class "tool__textfield"
+                    , Events.onInput (setName name)
+                    , Attributes.placeholder name
+                    , Attributes.value name -- TODO: broken
+                    ]
+                    []
+                , deleteIcon
+                ]
             ]
-
-
         , cellSign "="
-        , td
-            [ class [ CellFormula ] ]
+        , Html.td
+            [ Attributes.class "variable-table__cell"
+            , Attributes.class "variable-table__cell--formula"
+            ]
             [ let
-                  deleteIcon =
-                    div
-                      [ Tools.Styles.class [ Tools.Styles.IconContainer ] ]
-                      [ iconSmall "delete" (callbacks.setVariableValue name "") ]
+                deleteIcon =
+                    Html.div
+                        [ Attributes.class "tool__icon-container" ]
+                        [ Common.iconSmall "delete" (setValue name "") ]
               in
               Html.div
-                  [ Tools.Styles.class [ Tools.Styles.ValueContainer ] ]
-                  ([ Html.input
-                      [ onInput (callbacks.setVariableValue name)
-                      , Html.placeholder (Expr.print expr)
-                      , Html.value (Expr.print expr) -- TODO: broken
-                      , Tools.Styles.class [ Tools.Styles.Textfield ]
-                      ]
-                      []
-                   , deleteIcon
-                   ]
-                  )
+                [ Attributes.class "tool__value-container" ]
+                [ Html.input
+                    [ Attributes.class "tool__textfield"
+                    , Events.onInput (setValue name)
+                    , Attributes.placeholder (Expr.print expr)
+                    , Attributes.value (Expr.print expr) -- TODO: broken
+                    ]
+                    []
+                , deleteIcon
+                ]
             ]
         , cellSign "="
-        , td
-            [ class [ CellValue ] ]
+        , Html.td
+            [ Attributes.class "variable-table__cell"
+            , Attributes.class "variable-table__cell--value"
+            ]
             [ expr
                 |> Expr.compute variables
                 |> Maybe.map toString
                 |> Maybe.withDefault ""
-                |> text
+                |> Html.text
             ]
-        , td
-            [ class [ CellAction ] ]
+        , Html.td
+            [ Attributes.class "variable-table__cell"
+            , Attributes.class "variable-table__cell--action"
+            ]
             []
         ]
 
 
 cellSign : String -> Html msg
 cellSign sign =
-    td
-        [ class [ CellSign ] ]
-        [ text sign ]
+    Html.td
+        [ Attributes.class "variable-table__cell"
+        , Attributes.class "variable-table__cell--sign"
+        ]
+        [ Html.text sign ]

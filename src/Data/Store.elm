@@ -1,4 +1,4 @@
-module Store
+module Data.Store
     exposing
         ( Id
         , Store

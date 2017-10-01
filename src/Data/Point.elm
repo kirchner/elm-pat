@@ -1,4 +1,4 @@
-module Point
+module Data.Point
     exposing
         ( Choice(..)
         , Handlers
@@ -18,12 +18,12 @@ module Point
         , setName
         )
 
+import Data.Expr as Expr exposing (E(..), compute)
+import Data.Store as Store exposing (Id, Store)
 import Dict exposing (Dict)
-import Expr exposing (E(..), compute)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
 import Math.Vector2 exposing (..)
-import Store exposing (Id, Store)
 
 
 {- point -}

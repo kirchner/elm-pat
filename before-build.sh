@@ -1,4 +1,5 @@
 #!/bin/bash
 
-elm-css --output gh-pages src/Stylesheets.elm
+mkdir -p ./gh-pages
+sass static/pat.scss > gh-pages/pat.css
 cp static/index.html gh-pages/index.html

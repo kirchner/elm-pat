@@ -1,10 +1,10 @@
 module FileBrowser exposing (..)
 
 import Html exposing (Html)
-import Html.Events as Html
-import Styles.FileBrowser exposing (Class(..), class, classList)
-import Views.Common exposing (iconBig)
+import Html.Attributes as Attributes
+import Html.Events as Events
 import UndoList exposing (UndoList)
+import Views.Common exposing (iconBig)
 
 
 type alias FileBrowser =
@@ -51,31 +51,25 @@ view callbacks undoList =
 
         fileLink url label =
             Html.a
-                [ class
-                    [ FileBrowserFileLink
-                    ]
-                , Html.onClick (loadRemoteFile url)
+                [ Attributes.class "file-browser__file-link"
+                , Events.onClick (loadRemoteFile url)
                 ]
                 [ Html.text label
                 ]
 
         historyLink file label =
             Html.a
-                [ class
-                    [ FileBrowserFileLink
-                    ]
-                , Html.onClick (restoreSession file)
+                [ Attributes.class "file-browser__file-link"
+                , Events.onClick (restoreSession file)
                 ]
                 [ Html.text label
                 ]
     in
     Html.div
-        [ class [ Styles.FileBrowser.FileBrowser ]
-        ]
+        [ Attributes.class "file-browser__browser" ]
         (List.concat
             [ [ Html.div
-                    [ class [ FileBrowserFileLinkWrapper ]
-                    ]
+                    [ Attributes.class "file-browser__file-link-wrapper" ]
                     [ fileLink (github "demo-demo.json") "demo-demo"
                     , fileLink (github "basic_bodice.json") "basic bodice"
                     , fileLink (github "sample_pattern.json") "sample pattern"
@@ -85,25 +79,25 @@ view callbacks undoList =
                     Maybe.withDefault (callbacks.lift NoOp) callbacks.clearSession
               ]
             , [ Html.div
-                    [ class [ FileBrowserFileLinkWrapper ]
-                    ]
-                    ( List.map (\(label, file) ->
-                        historyLink file label
-                      )
-                      ( List.concat
-                        [ List.indexedMap (\i r ->
-                              ("future " ++ toString i, r)
-                          )
-                          (List.reverse undoList.future)
-
-                        , [("current", undoList.present)]
-
-                        , List.indexedMap (\i r ->
-                              ("past " ++ toString i, r)
-                          )
-                          undoList.past
-                        ]
-                      )
+                    [ Attributes.class "file-browser__file-link-wrapper" ]
+                    (List.map
+                        (\( label, file ) ->
+                            historyLink file label
+                        )
+                        (List.concat
+                            [ List.indexedMap
+                                (\i r ->
+                                    ( "future " ++ toString i, r )
+                                )
+                                (List.reverse undoList.future)
+                            , [ ( "current", undoList.present ) ]
+                            , List.indexedMap
+                                (\i r ->
+                                    ( "past " ++ toString i, r )
+                                )
+                                undoList.past
+                            ]
+                        )
                     )
               ]
             , [ iconBig "undo" <|

@@ -1,28 +1,16 @@
-module Types
+module Data.ViewPort
     exposing
-        ( Position
-        , ViewPort
+        ( ViewPort
         , canvasToSvg
-        , equals
+        , default
+        , resize
+        , setZoom
         , svgToCanvas
-        , toVec
-        , vec
         , virtualHeight
         , virtualWidth
         )
 
-import Math.Vector2 exposing (..)
-
-
-type alias Position =
-    { x : Int
-    , y : Int
-    }
-
-
-toVec : Position -> Vec2
-toVec p =
-    vec2 (toFloat p.x) (toFloat p.y)
+import Data.Position exposing (Position)
 
 
 type alias ViewPort =
@@ -31,6 +19,29 @@ type alias ViewPort =
     , height : Int
     , zoom : Float
     }
+
+
+default : ViewPort
+default =
+    { offset =
+        { x = 0, y = 0 }
+    , width = 640
+    , height = 640
+    , zoom = 1
+    }
+
+
+resize : Int -> Int -> ViewPort -> ViewPort
+resize width height viewPort =
+    { viewPort
+        | width = width
+        , height = height
+    }
+
+
+setZoom : Float -> ViewPort -> ViewPort
+setZoom zoom viewPort =
+    { viewPort | zoom = zoom }
 
 
 virtualWidth : ViewPort -> Int
@@ -62,21 +73,3 @@ svgToCanvas viewPort p =
     { x = px + viewPort.offset.x - (virtualWidth viewPort // 2)
     , y = py + viewPort.offset.y - (virtualHeight viewPort // 2)
     }
-
-
-vec : Int -> Int -> Vec2
-vec x y =
-    vec2 (toFloat x) (toFloat y)
-
-
-equals : Maybe a -> a -> Bool
-equals maybe a =
-    case maybe of
-        Just b ->
-            if a == b then
-                True
-            else
-                False
-
-        _ ->
-            False

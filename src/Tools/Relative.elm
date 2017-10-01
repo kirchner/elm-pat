@@ -1,38 +1,36 @@
 module Tools.Relative
     exposing
-        ( State
+        ( Msg
+        , State
         , init
-        , initWith
         , svg
+        , update
         , view
         )
 
-import Expr exposing (..)
+import Array exposing (Array)
+import Data.Expr exposing (..)
+import Data.Point as Point exposing (Point)
+import Data.Store as Store exposing (Id, Store)
 import Html exposing (Html, map)
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
-import Point exposing (Point)
-import Store exposing (Id, Store)
 import Styles.Colors as Colors exposing (..)
 import Svg exposing (Svg)
-import Svg.Extra as Svg
-import Tools.Common as Tools
-    exposing
-        ( Callbacks
-        , Data
-        , exprInput
-        , svgSelectPoint
-        , svgUpdateMouse
-        )
-import Tools.Dropdown as Dropdown
+import Svgs.Extra as Extra
+import Svgs.SelectPoint as SelectPoint
+import Svgs.UpdateMouse as UpdateMouse
+import Tools.Callbacks exposing (Callbacks)
+import Tools.Data exposing (Data)
+import Tools.PointMenu as PointMenu
+import Views.ExprInput as ExprInput
+import Views.Tool as Tool
 
 
 type alias State =
     { x : Maybe E
     , y : Maybe E
-    , id : Maybe (Id Point)
-    , dropdownState : Dropdown.State
-    , selectedPoint : Maybe ( Id Point, Point )
+    , points : PointMenu.SelectablePoints
     }
 
 
@@ -40,38 +38,128 @@ init : Data -> State
 init data =
     { x = Nothing
     , y = Nothing
-    , id = Nothing
-    , dropdownState = Dropdown.init
-    , selectedPoint =
-        case List.head data.selectedPoints of
-            Just id ->
-                case Store.get id data.store of
-                    Just point ->
-                        Just ( id, point )
-
-                    Nothing ->
-                        Nothing
-
-            Nothing ->
-                Nothing
+    , points = PointMenu.init 1 data
     }
 
 
-initWith : Id Point -> Id Point -> E -> E -> State
-initWith id anchor x y =
-    { x = Just x
-    , y = Just y
-    , id = Just id
-    , dropdownState = Dropdown.init
-    , selectedPoint = Nothing
-    }
+
+---- UPDATE
+
+
+type Msg
+    = UpdateX String
+    | UpdateY String
+    | PointMenuMsg PointMenu.Msg
+
+
+update : Callbacks msg -> Msg -> State -> ( State, Cmd Msg, Maybe msg )
+update callbacks msg state =
+    case msg of
+        UpdateX string ->
+            ( { state | x = parse string }
+            , Cmd.none
+            , Nothing
+            )
+
+        UpdateY string ->
+            ( { state | y = parse string }
+            , Cmd.none
+            , Nothing
+            )
+
+        PointMenuMsg msg ->
+            PointMenu.update callbacks.selectPoint PointMenuMsg msg state
+
+
+
+---- SVG
+
+
+svg : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
+svg callbacks updateState data state =
+    case anchorPosition data state of
+        Just anchorPosition ->
+            let
+                addPoint =
+                    point data state |> Maybe.map callbacks.addPoint
+            in
+            [ newPoint data state
+            , horizontalLine data state anchorPosition
+            , verticalLine data state anchorPosition
+            , Just (UpdateMouse.svg addPoint callbacks.updateCursorPosition data)
+            ]
+                |> List.filterMap identity
+                |> Svg.g []
+
+        Nothing ->
+            let
+                selectPoint =
+                    Maybe.map (\id -> PointMenu.selectPoint 0 id data state)
+                        >> Maybe.withDefault state
+                        >> updateState
+            in
+            [ SelectPoint.svg callbacks.focusPoint selectPoint data ]
+                |> Svg.g []
+
+
+newPoint : Data -> State -> Maybe (Svg msg)
+newPoint data state =
+    let
+        draw anchorPosition =
+            pointPosition data state anchorPosition
+                |> Maybe.map
+                    (\pointPosition ->
+                        Svg.g []
+                            [ Extra.drawPoint Colors.red pointPosition
+                            , Extra.drawSelector Extra.Solid Colors.red pointPosition
+                            , Extra.drawRectArrow anchorPosition pointPosition
+                            ]
+                    )
+    in
+    anchorPosition data state
+        |> Maybe.andThen draw
+
+
+horizontalLine : Data -> State -> Vec2 -> Maybe (Svg msg)
+horizontalLine data state anchorPosition =
+    state.y
+        |> Maybe.andThen (compute data.variables)
+        |> Maybe.map
+            (\y -> Extra.drawHorizontalLine (y + getY anchorPosition))
+
+
+verticalLine : Data -> State -> Vec2 -> Maybe (Svg msg)
+verticalLine data state anchorPosition =
+    state.x
+        |> Maybe.andThen (compute data.variables)
+        |> Maybe.map
+            (\x -> Extra.drawVerticalLine (x + getX anchorPosition))
+
+
+
+---- VIEW
+
+
+view : Callbacks msg -> Data -> State -> Html Msg
+view callbacks data state =
+    [ PointMenu.view 0 state |> Html.map PointMenuMsg
+    , ExprInput.view "horizontal distance" state.x UpdateX
+    , ExprInput.view "vertical distance" state.y UpdateY
+    ]
+        |> Tool.view callbacks data state point
+
+
+
+---- COMPUTATIONS
 
 
 point : Data -> State -> Maybe Point
 point data state =
     let
         anchorId =
-            state.selectedPoint
+            state.points
+                |> Array.get 0
+                |> Maybe.andThen .selected
                 |> Maybe.map Tuple.first
 
         anchorPosition =
@@ -106,121 +194,11 @@ point data state =
     Maybe.map3 Point.relative anchorId xOffset yOffset
 
 
-
-{- svg -}
-
-
-svg : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
-svg callbacks updateState data state =
-    case anchorPosition data state of
-        Just anchorPosition ->
-            let
-                addPoint =
-                    point data state |> Maybe.map callbacks.addPoint
-            in
-            [ newPoint data state
-            , horizontalLine data state anchorPosition
-            , verticalLine data state anchorPosition
-            , Just (svgUpdateMouse addPoint callbacks.updateCursorPosition data)
-            ]
-                |> List.filterMap identity
-                |> Svg.g []
-
-        Nothing ->
-            let
-                selectPoint =
-                    (\maybeId ->
-                        { state
-                            | selectedPoint =
-                                case maybeId of
-                                    Just id ->
-                                        Store.get id data.store
-                                            |> Maybe.map (\point -> ( id, point ))
-
-                                    Nothing ->
-                                        Nothing
-                        }
-                    )
-                        >> updateState
-            in
-            [ svgSelectPoint callbacks.focusPoint selectPoint data ]
-                |> Svg.g []
-
-
-newPoint : Data -> State -> Maybe (Svg msg)
-newPoint data state =
-    let
-        draw anchorPosition =
-            pointPosition data state anchorPosition
-                |> Maybe.map
-                    (\pointPosition ->
-                        Svg.g []
-                            [ Svg.drawPoint Colors.red pointPosition
-                            , Svg.drawSelector Svg.Solid Colors.red pointPosition
-                            , Svg.drawRectArrow anchorPosition pointPosition
-                            ]
-                    )
-    in
-    anchorPosition data state
-        |> Maybe.andThen draw
-
-
-horizontalLine : Data -> State -> Vec2 -> Maybe (Svg msg)
-horizontalLine data state anchorPosition =
-    state.y
-        |> Maybe.andThen (compute data.variables)
-        |> Maybe.map
-            (\y -> Svg.drawHorizontalLine (y + getY anchorPosition))
-
-
-verticalLine : Data -> State -> Vec2 -> Maybe (Svg msg)
-verticalLine data state anchorPosition =
-    state.x
-        |> Maybe.andThen (compute data.variables)
-        |> Maybe.map
-            (\x -> Svg.drawVerticalLine (x + getX anchorPosition))
-
-
-
-{- view -}
-
-
-view : Callbacks msg -> (State -> msg) -> Data -> State -> Html msg
-view callbacks updateStateCallback data state =
-    let
-        updateX =
-            (\s -> { state | x = parse s }) >> updateStateCallback
-
-        updateY =
-            (\s -> { state | y = parse s }) >> updateStateCallback
-
-        updateAutoState autoMsg =
-            let
-                ( newDropdownState, newSelectedPoint ) =
-                    state.dropdownState
-                        |> Dropdown.update state.selectedPoint data autoMsg
-            in
-            updateStateCallback
-                { state
-                    | dropdownState = newDropdownState
-                    , selectedPoint = newSelectedPoint
-                }
-    in
-    [ Dropdown.view state.selectedPoint data state.dropdownState
-        |> map updateAutoState
-    , exprInput "horizontal distance" state.x updateX
-    , exprInput "vertical distance" state.y updateY
-    ]
-        |> Tools.view callbacks data state point
-
-
-
-{- compute position -}
-
-
 anchorPosition : Data -> State -> Maybe Vec2
 anchorPosition data state =
-    state.selectedPoint
+    state.points
+        |> Array.get 0
+        |> Maybe.andThen .selected
         |> Maybe.map Tuple.first
         |> Maybe.andThen (flip Store.get data.store)
         |> Maybe.andThen (Point.position data.store data.variables)

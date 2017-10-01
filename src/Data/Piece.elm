@@ -1,4 +1,4 @@
-module Piece
+module Data.Piece
     exposing
         ( Piece
         , decode
@@ -10,12 +10,12 @@ module Piece
         , toList
         )
 
+import Data.Expr exposing (..)
+import Data.Point as Point exposing (Point)
+import Data.Store as Store exposing (Id, Store)
 import Dict exposing (Dict)
-import Expr exposing (..)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
-import Point exposing (Point)
-import Store exposing (Id, Store)
 
 
 type Piece
