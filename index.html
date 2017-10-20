@@ -3,13 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title>elm-pat</title>
-    <link rel="stylesheet" href="tools.css">
-    <link rel="stylesheet" href="common.css">
-    <link rel="stylesheet" href="editor.css">
-    <link rel="stylesheet" href="tool_box.css">
-    <link rel="stylesheet" href="point_table.css">
-    <link rel="stylesheet" href="variable_table.css">
-    <link rel="stylesheet" href="file_browser.css">
+    <link rel="stylesheet" href="pat.css">
     <script type="text/javascript" src="elm.js"></script>
     <style type="text/css">
         input[type=number]::-webkit-inner-spin-button,
@@ -42,7 +36,7 @@
       var flags =
         { file0: file0
         };
-      var app = Elm.App.embed(document.getElementById("elm-landing-pad"), flags);
+      var app = Elm.Main.embed(document.getElementById("elm-landing-pad"), flags);
 
       app.ports.serialize.subscribe(function(file) {
           localStorage.setItem('file0', JSON.stringify(file));
