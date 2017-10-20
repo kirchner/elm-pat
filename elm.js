@@ -23198,10 +23198,7 @@ var _kirchner$elm_pat$Main$defaultModel = {
 			pieceStore: _kirchner$elm_pat$Data_Store$empty,
 			variables: _elm_lang$core$Dict$empty,
 			selectedPoints: {ctor: '[]'}
-		}),
-	pointTableOpen: false,
-	variableTableOpen: false,
-	fileBrowserOpen: false
+		})
 };
 var _kirchner$elm_pat$Main$load = function (file) {
 	return A2(_kirchner$elm_pat$Main$load_, file, _kirchner$elm_pat$Main$defaultModel);
@@ -23220,13 +23217,7 @@ var _kirchner$elm_pat$Main$Model = function (a) {
 											return function (l) {
 												return function (m) {
 													return function (n) {
-														return function (o) {
-															return function (p) {
-																return function (q) {
-																	return {store: a, pieceStore: b, variables: c, newName: d, newValue: e, tool: f, viewPort: g, drag: h, cursorPosition: i, focusedPoint: j, pressedKeys: k, selectedPoints: l, fileBrowser: m, undoList: n, pointTableOpen: o, variableTableOpen: p, fileBrowserOpen: q};
-																};
-															};
-														};
+														return {store: a, pieceStore: b, variables: c, newName: d, newValue: e, tool: f, viewPort: g, drag: h, cursorPosition: i, focusedPoint: j, pressedKeys: k, selectedPoints: l, fileBrowser: m, undoList: n};
 													};
 												};
 											};
@@ -23406,12 +23397,6 @@ var _kirchner$elm_pat$Main$FileBrowserMsg = function (a) {
 var _kirchner$elm_pat$Main$ViewPortMsg = function (a) {
 	return {ctor: 'ViewPortMsg', _0: a};
 };
-var _kirchner$elm_pat$Main$CloseFileBrowser = {ctor: 'CloseFileBrowser'};
-var _kirchner$elm_pat$Main$OpenFileBrowser = {ctor: 'OpenFileBrowser'};
-var _kirchner$elm_pat$Main$CloseVariableTable = {ctor: 'CloseVariableTable'};
-var _kirchner$elm_pat$Main$OpenVariableTable = {ctor: 'OpenVariableTable'};
-var _kirchner$elm_pat$Main$ClosePointTable = {ctor: 'ClosePointTable'};
-var _kirchner$elm_pat$Main$OpenPointTable = {ctor: 'OpenPointTable'};
 var _kirchner$elm_pat$Main$DumpFile0 = {ctor: 'DumpFile0'};
 var _kirchner$elm_pat$Main$ExtendPieceMsg = F3(
 	function (a, b, c) {
@@ -23849,54 +23834,6 @@ var _kirchner$elm_pat$Main$update = F2(
 						} else {
 							return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 						}
-					case 'OpenPointTable':
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{pointTableOpen: true}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
-					case 'ClosePointTable':
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{pointTableOpen: false}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
-					case 'OpenVariableTable':
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{variableTableOpen: true}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
-					case 'CloseVariableTable':
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{variableTableOpen: false}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
-					case 'OpenFileBrowser':
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{fileBrowserOpen: true}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
-					case 'CloseFileBrowser':
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{fileBrowserOpen: false}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
 					case 'DumpFile0':
 						return {
 							ctor: '_Tuple2',
@@ -24036,211 +23973,202 @@ var _kirchner$elm_pat$Main$view = function (model) {
 				_1: {ctor: '[]'}
 			}
 		},
-		A2(
-			_elm_lang$core$List$filterMap,
-			_elm_lang$core$Basics$identity,
-			{
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('editor__container'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('editor__container--top-right'),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_kirchner$elm_pat$Main$viewToolBox,
+						data,
+						!_elm_lang$core$Native_Utils.eq(model.tool, _elm_lang$core$Maybe$Nothing)),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
 				ctor: '::',
-				_0: _elm_lang$core$Maybe$Just(
-					A2(
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('editor__container'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('editor__container--bottom-right'),
+							_1: {ctor: '[]'}
+						}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_kirchner$elm_pat$FileBrowser$view,
+							{
+								lift: _kirchner$elm_pat$Main$FileBrowserMsg,
+								clearSession: _elm_lang$core$Maybe$Just(
+									_kirchner$elm_pat$Main$SessionsMsg(_kirchner$elm_pat$Main$Clear)),
+								loadRemoteFile: _elm_lang$core$Maybe$Just(
+									function (_p64) {
+										return _kirchner$elm_pat$Main$SessionsMsg(
+											_kirchner$elm_pat$Main$LoadRemoteFile(_p64));
+									}),
+								restoreSession: _elm_lang$core$Maybe$Just(
+									function (_p65) {
+										return _kirchner$elm_pat$Main$SessionsMsg(
+											_kirchner$elm_pat$Main$Restore(_p65));
+									}),
+								undo: _elm_lang$core$Maybe$Just(
+									_kirchner$elm_pat$Main$SessionsMsg(_kirchner$elm_pat$Main$Undo)),
+								redo: _elm_lang$core$Maybe$Just(
+									_kirchner$elm_pat$Main$SessionsMsg(_kirchner$elm_pat$Main$Redo)),
+								dumpFile0: _elm_lang$core$Maybe$Just(_kirchner$elm_pat$Main$DumpFile0)
+							},
+							model.undoList),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
 						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html_Attributes$class('editor__container'),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('editor__container--top-right'),
+								_0: _elm_lang$html$Html_Attributes$class('editor__container--bottom-left'),
 								_1: {ctor: '[]'}
 							}
 						},
 						{
 							ctor: '::',
 							_0: A2(
-								_kirchner$elm_pat$Main$viewToolBox,
-								data,
-								!_elm_lang$core$Native_Utils.eq(model.tool, _elm_lang$core$Maybe$Nothing)),
+								_kirchner$elm_pat$Views_PointTable$view,
+								{
+									setName: F2(
+										function (id, name) {
+											return _kirchner$elm_pat$Main$PointsMsg(
+												A2(_kirchner$elm_pat$Main$SetPointName, id, name));
+										}),
+									selectPoint: function (_p66) {
+										return _kirchner$elm_pat$Main$PointsMsg(
+											_kirchner$elm_pat$Main$Select(
+												_elm_lang$core$Maybe$Just(_p66)));
+									},
+									deletePoint: function (_p67) {
+										return _kirchner$elm_pat$Main$PointsMsg(
+											_kirchner$elm_pat$Main$Delete(_p67));
+									},
+									deselectPoint: function (_p68) {
+										return _kirchner$elm_pat$Main$PointsMsg(
+											_kirchner$elm_pat$Main$Deselect(
+												_elm_lang$core$Maybe$Just(_p68)));
+									}
+								},
+								data),
 							_1: {ctor: '[]'}
-						})),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$core$Maybe$Just(
-						A2(
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
 							_elm_lang$html$Html$div,
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html_Attributes$class('editor__container'),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('editor__container--bottom-right'),
-									_1: {
-										ctor: '::',
-										_0: model.fileBrowserOpen ? _elm_lang$html$Html_Attributes$class('editor__container--bottom-right-open') : _elm_lang$html$Html_Attributes$class('editor__container--bottom-right-closed'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onMouseEnter(_kirchner$elm_pat$Main$OpenFileBrowser),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onMouseLeave(_kirchner$elm_pat$Main$CloseFileBrowser),
-												_1: {ctor: '[]'}
-											}
-										}
-									}
+									_0: _elm_lang$html$Html_Attributes$class('editor__container--top-left'),
+									_1: {ctor: '[]'}
 								}
 							},
 							{
 								ctor: '::',
 								_0: A2(
-									_kirchner$elm_pat$FileBrowser$view,
-									{
-										lift: _kirchner$elm_pat$Main$FileBrowserMsg,
-										clearSession: _elm_lang$core$Maybe$Just(
-											_kirchner$elm_pat$Main$SessionsMsg(_kirchner$elm_pat$Main$Clear)),
-										loadRemoteFile: _elm_lang$core$Maybe$Just(
-											function (_p64) {
-												return _kirchner$elm_pat$Main$SessionsMsg(
-													_kirchner$elm_pat$Main$LoadRemoteFile(_p64));
-											}),
-										restoreSession: _elm_lang$core$Maybe$Just(
-											function (_p65) {
-												return _kirchner$elm_pat$Main$SessionsMsg(
-													_kirchner$elm_pat$Main$Restore(_p65));
-											}),
-										undo: _elm_lang$core$Maybe$Just(
-											_kirchner$elm_pat$Main$SessionsMsg(_kirchner$elm_pat$Main$Undo)),
-										redo: _elm_lang$core$Maybe$Just(
-											_kirchner$elm_pat$Main$SessionsMsg(_kirchner$elm_pat$Main$Redo)),
-										dumpFile0: _elm_lang$core$Maybe$Just(_kirchner$elm_pat$Main$DumpFile0)
-									},
-									model.undoList),
+									_elm_lang$html$Html$map,
+									_kirchner$elm_pat$Main$VariablesMsg,
+									A4(
+										_kirchner$elm_pat$Views_VariableTable$view,
+										{setName: _kirchner$elm_pat$Main$SetName, setValue: _kirchner$elm_pat$Main$SetValue, setNewName: _kirchner$elm_pat$Main$SetNewName, setNewValue: _kirchner$elm_pat$Main$SetNewValue, add: _kirchner$elm_pat$Main$Add},
+										model.variables,
+										model.newName,
+										model.newValue)),
 								_1: {ctor: '[]'}
-							})),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$core$Maybe$map,
-							function (toolInfo) {
-								return A2(
-									_elm_lang$html$Html$div,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('editor__container'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('editor__container--top-middle'),
-											_1: {ctor: '[]'}
-										}
-									},
-									{
-										ctor: '::',
-										_0: toolInfo,
-										_1: {ctor: '[]'}
-									});
-							},
-							A2(_kirchner$elm_pat$Main$viewToolInfo, data, model.tool)),
+							}),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$core$Maybe$Just(
-								A2(
-									_elm_lang$html$Html$div,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('editor__container'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('editor__container--bottom-left'),
-											_1: {
-												ctor: '::',
-												_0: model.pointTableOpen ? _elm_lang$html$Html_Attributes$class('editor__container--bottom-left-open') : _elm_lang$html$Html_Attributes$class('editor__container--bottom-left-closed'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onMouseEnter(_kirchner$elm_pat$Main$OpenPointTable),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onMouseLeave(_kirchner$elm_pat$Main$ClosePointTable),
-														_1: {ctor: '[]'}
-													}
-												}
-											}
-										}
-									},
-									{
-										ctor: '::',
-										_0: A2(
-											_kirchner$elm_pat$Views_PointTable$view,
-											{
-												setName: F2(
-													function (id, name) {
-														return _kirchner$elm_pat$Main$PointsMsg(
-															A2(_kirchner$elm_pat$Main$SetPointName, id, name));
-													}),
-												selectPoint: function (_p66) {
-													return _kirchner$elm_pat$Main$PointsMsg(
-														_kirchner$elm_pat$Main$Select(
-															_elm_lang$core$Maybe$Just(_p66)));
-												},
-												deletePoint: function (_p67) {
-													return _kirchner$elm_pat$Main$PointsMsg(
-														_kirchner$elm_pat$Main$Delete(_p67));
-												},
-												deselectPoint: function (_p68) {
-													return _kirchner$elm_pat$Main$PointsMsg(
-														_kirchner$elm_pat$Main$Deselect(
-															_elm_lang$core$Maybe$Just(_p68)));
-												}
-											},
-											data),
-										_1: {ctor: '[]'}
-									})),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$core$Maybe$Just(
-									A2(
+							_0: function () {
+								var _p69 = A2(_kirchner$elm_pat$Main$viewToolInfo, data, model.tool);
+								if (_p69.ctor === 'Just') {
+									return A2(
 										_elm_lang$html$Html$div,
 										{
 											ctor: '::',
 											_0: _elm_lang$html$Html_Attributes$class('editor__container'),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('editor__container--top-left'),
-												_1: {
-													ctor: '::',
-													_0: model.variableTableOpen ? _elm_lang$html$Html_Attributes$class('editor__container--top-left-open') : _elm_lang$html$Html_Attributes$class('editor__container--top-left-closed'),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onMouseEnter(_kirchner$elm_pat$Main$OpenVariableTable),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onMouseLeave(_kirchner$elm_pat$Main$CloseVariableTable),
-															_1: {ctor: '[]'}
-														}
-													}
-												}
+												_0: _elm_lang$html$Html_Attributes$class('editor__container--top-middle'),
+												_1: {ctor: '[]'}
 											}
 										},
 										{
 											ctor: '::',
 											_0: A2(
-												_elm_lang$html$Html$map,
-												_kirchner$elm_pat$Main$VariablesMsg,
-												A4(
-													_kirchner$elm_pat$Views_VariableTable$view,
-													{setName: _kirchner$elm_pat$Main$SetName, setValue: _kirchner$elm_pat$Main$SetValue, setNewName: _kirchner$elm_pat$Main$SetNewName, setNewValue: _kirchner$elm_pat$Main$SetNewValue, add: _kirchner$elm_pat$Main$Add},
-													model.variables,
-													model.newName,
-													model.newValue)),
+												_elm_lang$html$Html$div,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('tool__container'),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$div,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('tool__heading'),
+															_1: {ctor: '[]'}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text(
+																A2(
+																	_elm_lang$core$Maybe$withDefault,
+																	'',
+																	A2(_elm_lang$core$Maybe$map, _kirchner$elm_pat$Tools$name, model.tool))),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: _p69._0,
+														_1: {ctor: '[]'}
+													}
+												}),
 											_1: {ctor: '[]'}
-										})),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$core$Maybe$Just(
-										_kirchner$elm_pat$Main$viewCanvas(model)),
-									_1: {ctor: '[]'}
+										});
+								} else {
+									return A2(
+										_elm_lang$html$Html$div,
+										{ctor: '[]'},
+										{ctor: '[]'});
 								}
+							}(),
+							_1: {
+								ctor: '::',
+								_0: _kirchner$elm_pat$Main$viewCanvas(model),
+								_1: {ctor: '[]'}
 							}
 						}
 					}
 				}
-			}));
+			}
+		});
 };
 var _kirchner$elm_pat$Main$main = _elm_lang$html$Html$programWithFlags(
 	{init: _kirchner$elm_pat$Main$init, update: _kirchner$elm_pat$Main$update, subscriptions: _kirchner$elm_pat$Main$subscriptions, view: _kirchner$elm_pat$Main$view})(
