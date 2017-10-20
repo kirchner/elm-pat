@@ -30,13 +30,12 @@ view callbacks data =
                 [ Attributes.class "point-table__cell"
                 , Attributes.class "point-table__cell--id"
                 ]
-                [ Html.text "#" ]
+                []
             , Html.th
                 [ Attributes.class "point-table__cell"
                 , Attributes.class "point-table__cell--id"
                 ]
-                -- <- TODO
-                [ Html.text "o" ]
+                [ Html.text "#" ]
             , Html.th
                 [ Attributes.class "point-table__cell"
                 , Attributes.class "point-table__cell--name"
@@ -111,13 +110,7 @@ viewPointEntry callbacks data ( id, point ) =
             [ Attributes.class "point-table__cell"
             , Attributes.class "point-table__cell--id"
             ]
-            [ Html.text (id |> Store.toInt |> toString) ]
-        , Html.td
-            [ Attributes.class "point-table__cell"
-            , Attributes.class "point-table__cell--id"
-            ]
-            -- <- TODO
-            [ Html.a
+            [ Html.button
                 [ Events.onClick
                     ((if isSelected then
                         callbacks.deselectPoint
@@ -126,9 +119,15 @@ viewPointEntry callbacks data ( id, point ) =
                      )
                         id
                     )
+                , Attributes.class "icon-button"
+                , Attributes.class "icon-button--small"
                 ]
                 [ Html.i
-                    [ Attributes.class "material-icons"
+                    [ Attributes.class "icon"
+                    , Attributes.class "icon--small"
+                    , Attributes.class "material-icons"
+                    , Attributes.style
+                        [ ( "cursor", "pointer" ) ]
                     ]
                     [ Html.text <|
                         if isSelected then
@@ -140,12 +139,17 @@ viewPointEntry callbacks data ( id, point ) =
             ]
         , Html.td
             [ Attributes.class "point-table__cell"
+            , Attributes.class "point-table__cell--id"
+            ]
+            [ Html.text (id |> Store.toInt |> toString) ]
+        , Html.td
+            [ Attributes.class "point-table__cell"
             , Attributes.class "point-table__cell--name"
             ]
             [ let
                 deleteIcon =
                     Html.div
-                        [ Attributes.class "tool__icon-container" ]
+                        [ Attributes.class "tool__textfield-icon-container" ]
                         [ Common.iconSmall "delete" (callbacks.setName id "") ]
               in
               Html.div

@@ -38,14 +38,20 @@ view { setName, setValue, setNewName, setNewValue, add } variables newName newVa
                         [ Attributes.class "variable-table__cell"
                         , Attributes.class "variable-table__cell--name"
                         ]
-                        [ Html.input
-                            [ Attributes.class "variable-table__input"
+                        [ Html.div
+                            [ Attributes.class "tool__value-container"
                             , Attributes.classList
-                                [ ( "variable-table__input--bad", newName == Nothing ) ]
-                            , Events.onInput setNewName
-                            , Attributes.placeholder "name"
+                                [ ( "tool__value-container--bad", newName == Nothing ) ]
                             ]
-                            []
+                            [ Html.input
+                                [ Attributes.class "tool__textfield"
+                                , Attributes.classList
+                                    [ ( "tool__textfield--bad", newName == Nothing ) ]
+                                , Events.onInput setNewName
+                                , Attributes.placeholder "name"
+                                ]
+                                []
+                            ]
                         ]
                     , Html.th
                         [ Attributes.class "variable-table__cell"
@@ -56,14 +62,20 @@ view { setName, setValue, setNewName, setNewValue, add } variables newName newVa
                         [ Attributes.class "variable-table__cell"
                         , Attributes.class "variable-table__cell--formular"
                         ]
-                        [ Html.input
-                            [ Attributes.class "variable-table__input"
+                        [ Html.div
+                            [ Attributes.class "tool__value-container"
                             , Attributes.classList
-                                [ ( "variable-table__input--bad", newName == Nothing ) ]
-                            , Events.onInput setNewValue
-                            , Attributes.placeholder "value"
+                                [ ( "tool__value-container--bad", newName == Nothing ) ]
                             ]
-                            []
+                            [ Html.input
+                                [ Attributes.class "tool__textfield"
+                                , Attributes.classList
+                                    [ ( "tool__textfield--bad", newValue == Nothing ) ]
+                                , Events.onInput setNewValue
+                                , Attributes.placeholder "value"
+                                ]
+                                []
+                            ]
                         ]
                     , Html.th
                         [ Attributes.class "variable-table__cell"
@@ -102,11 +114,11 @@ viewVariable { setName, setValue } variables ( name, expr ) =
             [ let
                 deleteIcon =
                     Html.div
-                        [ Attributes.class "tool__icon-container" ]
+                        [ Attributes.class "tool__textfield-icon-container" ]
                         [ Common.iconSmall "delete" (setName name "") ]
               in
               Html.div
-                [ Attributes.class "tool__icon-container" ]
+                [ Attributes.class "tool__value-container" ]
                 [ Html.input
                     [ Attributes.class "tool__textfield"
                     , Events.onInput (setName name)

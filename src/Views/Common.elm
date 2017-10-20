@@ -11,7 +11,7 @@ import Html.Events as Events
 
 iconBig : String -> msg -> Html msg
 iconBig name callback =
-    Html.div
+    Html.button
         [ Attributes.class "icon-button"
         , Attributes.class "icon-button--big"
         ]
@@ -27,7 +27,7 @@ iconBig name callback =
 
 iconSmall : String -> msg -> Html msg
 iconSmall name callback =
-    Html.div
+    Html.button
         [ Attributes.class "icon-button"
         , Attributes.class "icon-button--small"
         ]

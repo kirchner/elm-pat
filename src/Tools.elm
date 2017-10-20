@@ -16,7 +16,6 @@ module Tools
         )
 
 import Html exposing (Html)
-import Html.Attributes as Attributes
 import Svg exposing (Svg)
 import Tools.Absolute as Absolute
 import Tools.Between as Between
@@ -63,22 +62,22 @@ description : Tool -> String
 description tool =
     case tool of
         Absolute _ ->
-            "add a point given by absolute coordinates"
+            "Add a point by providing absolute coordinates."
 
         Relative _ ->
-            "relative"
+            "Add a point relative to another point, providing distance and angle."
 
         Distance _ ->
-            "distance"
+            "Add a point relative to another point, providing x- and y-distance."
 
         Between _ ->
-            "between"
+            "Add a point at a given ration between two other points."
 
         CircleIntersection _ ->
-            "circle intersection"
+            "Add a point at the intersection of two circles."
 
         ExtendPiece _ ->
-            "extend piece"
+            "Extend a piece."
 
 
 all : Data -> List Tool
@@ -196,43 +195,23 @@ view : Callbacks msg -> Data -> Tool -> Html Msg
 view callbacks data tool =
     case tool of
         Absolute state ->
-            Html.div
-                [ Attributes.class "editor__container"
-                , Attributes.class "editor__container--top-left"
-                ]
-                [ Absolute.view callbacks data state ]
+            Absolute.view callbacks data state
                 |> Html.map AbsoluteMsg
 
         Relative state ->
-            Html.div
-                [ Attributes.class "editor__container"
-                , Attributes.class "editor__container--top-left"
-                ]
-                [ Relative.view callbacks data state ]
+            Relative.view callbacks data state
                 |> Html.map RelativeMsg
 
         Distance state ->
-            Html.div
-                [ Attributes.class "editor__container"
-                , Attributes.class "editor__container--top-left"
-                ]
-                [ Distance.view callbacks data state ]
+            Distance.view callbacks data state
                 |> Html.map DistanceMsg
 
         Between state ->
-            Html.div
-                [ Attributes.class "editor__container"
-                , Attributes.class "editor__container--top-left"
-                ]
-                [ Between.view callbacks data state ]
+            Between.view callbacks data state
                 |> Html.map BetweenMsg
 
         CircleIntersection state ->
-            Html.div
-                [ Attributes.class "editor__container"
-                , Attributes.class "editor__container--top-left"
-                ]
-                [ CircleIntersection.view callbacks data state ]
+            CircleIntersection.view callbacks data state
                 |> Html.map CircleIntersectionMsg
 
         ExtendPiece _ ->

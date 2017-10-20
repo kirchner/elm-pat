@@ -760,62 +760,77 @@ view model =
         data =
             dataFromModel model
     in
-    [ Just <|
-        Html.div
-            [ Attributes.class "editor__container"
-            , Attributes.class "editor__container--top-left-left"
-            ]
-            [ viewToolBox data ]
-    , Just <|
-        Html.div
-            [ Attributes.class "editor__container"
-            , Attributes.class "editor__container--top-right"
-            ]
-            [ FileBrowser.view
-                { lift = FileBrowserMsg
-                , clearSession = Just (SessionsMsg Clear)
-                , loadRemoteFile = Just (SessionsMsg << LoadRemoteFile)
-                , restoreSession = Just (SessionsMsg << Restore)
-                , undo = Just (SessionsMsg Undo)
-                , redo = Just (SessionsMsg Redo)
-                , dumpFile0 = Just DumpFile0
-                }
-                model.undoList
-            ]
-    , viewToolInfo data model.tool
-    , Just <|
-        Html.div
-            [ Attributes.class "editor__container"
-            , Attributes.class "editor__container--bottom-left"
-            ]
-            [ PointTable.view
-                { setName = \id name -> PointsMsg (SetPointName id name)
-                , selectPoint = PointsMsg << Select << Just
-                , deletePoint = PointsMsg << Delete
-                , deselectPoint = PointsMsg << Deselect << Just
-                }
-                data
-            ]
-    , Just <|
-        Html.div
-            [ Attributes.class "editor__container"
-            , Attributes.class "editor__container--bottom-right"
-            ]
-            [ VariableTable.view
-                { setName = SetName
-                , setValue = SetValue
-                , setNewName = SetNewName
-                , setNewValue = SetNewValue
-                , add = Add
-                }
-                model.variables
-                model.newName
-                model.newValue
-                |> Html.map VariablesMsg
-            ]
-    , Just <| viewCanvas model
+    [ Html.div
+        [ Attributes.class "editor__container"
+        , Attributes.class "editor__container--top-right"
+        ]
+        [ viewToolBox data (model.tool /= Nothing) ]
+    , Html.div
+        [ Attributes.class "editor__container"
+        , Attributes.class "editor__container--bottom-right"
+        ]
+        [ FileBrowser.view
+            { lift = FileBrowserMsg
+            , clearSession = Just (SessionsMsg Clear)
+            , loadRemoteFile = Just (SessionsMsg << LoadRemoteFile)
+            , restoreSession = Just (SessionsMsg << Restore)
+            , undo = Just (SessionsMsg Undo)
+            , redo = Just (SessionsMsg Redo)
+            , dumpFile0 = Just DumpFile0
+            }
+            model.undoList
+        ]
+    , Html.div
+        [ Attributes.class "editor__container"
+        , Attributes.class "editor__container--bottom-left"
+        ]
+        [ PointTable.view
+            { setName = \id name -> PointsMsg (SetPointName id name)
+            , selectPoint = PointsMsg << Select << Just
+            , deletePoint = PointsMsg << Delete
+            , deselectPoint = PointsMsg << Deselect << Just
+            }
+            data
+        ]
+    , Html.div
+        [ Attributes.class "editor__container"
+        , Attributes.class "editor__container--top-left"
+        ]
+        [ VariableTable.view
+            { setName = SetName
+            , setValue = SetValue
+            , setNewName = SetNewName
+            , setNewValue = SetNewValue
+            , add = Add
+            }
+            model.variables
+            model.newName
+            model.newValue
+            |> Html.map VariablesMsg
+        ]
+    , case viewToolInfo data model.tool of
+        Just toolInfo ->
+            Html.div
+                [ Attributes.class "editor__container"
+                , Attributes.class "editor__container--top-middle"
+                ]
+                [ Html.div
+                    [ Attributes.class "tool__container" ]
+                    [ Html.div
+                        [ Attributes.class "tool__heading" ]
+                        [ model.tool
+                            |> Maybe.map Tools.name
+                            |> Maybe.withDefault ""
+                            |> Html.text
+                        ]
+                    , toolInfo
+                    ]
+                ]
+
+        Nothing ->
+            Html.div [] []
+    , viewCanvas model
     ]
-        |> List.filterMap identity
         |> Html.div
             [ Attributes.class "editor__main"
             , Attributes.classList
@@ -827,11 +842,25 @@ view model =
 -- TOOL BOX
 
 
-viewToolBox : Data -> Html Msg
-viewToolBox data =
+viewToolBox : Data -> Bool -> Html Msg
+viewToolBox data toolActive =
     let
         button tool =
-            Common.iconBig "edit" (UpdateTool tool)
+            [ Just (Common.iconBig "edit" (UpdateTool tool))
+            , if toolActive then
+                Nothing
+              else
+                Just <|
+                    Html.div
+                        [ Attributes.class "tool__tool-button-info" ]
+                        [ tool
+                            |> Tools.description
+                            |> Html.text
+                        ]
+            ]
+                |> List.filterMap identity
+                |> Html.div
+                    [ Attributes.class "tool__tool-button-container" ]
     in
     Html.div
         [ Attributes.class "tool__tool-box" ]

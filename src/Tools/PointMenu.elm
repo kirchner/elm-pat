@@ -218,7 +218,7 @@ viewConfig =
             Selectize.autocomplete
                 { attrs =
                     \sthSelected open ->
-                        [ Attributes.class "tool__menu-textfield" ]
+                        [ Attributes.class "tool__textfield" ]
                 , toggleButton = Nothing
                 , clearButton = Nothing
                 , placeholder = "Select a point"
