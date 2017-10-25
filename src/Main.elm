@@ -19,7 +19,6 @@ import Keyboard.Extra as Keyboard exposing (Key)
 import Mouse
 import Ports
 import Svg exposing (Svg)
-import Svg.Lazy as Svg
 import Task
 import Time exposing (Time)
 import Tools exposing (Tool(..))
