@@ -6,6 +6,7 @@ import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events as Events
 import Views.Common as Common
+import Views.Textfields as Textfields
 
 
 view :
@@ -14,12 +15,14 @@ view :
     , setNewName : String -> msg
     , setNewValue : String -> msg
     , add : msg
+    , onFocus : msg
+    , onBlur : msg
     }
     -> Dict String E
     -> Maybe String
     -> Maybe E
     -> Html msg
-view { setName, setValue, setNewName, setNewValue, add } variables newName newValue =
+view { setName, setValue, setNewName, setNewValue, add, onFocus, onBlur } variables newName newValue =
     Html.table
         [ Attributes.class "variable-table__table" ]
         ((variables
@@ -28,6 +31,8 @@ view { setName, setValue, setNewName, setNewValue, add } variables newName newVa
                 (viewVariable
                     { setName = setName
                     , setValue = setValue
+                    , onFocus = onFocus
+                    , onBlur = onBlur
                     }
                     variables
                 )
@@ -100,57 +105,41 @@ view { setName, setValue, setNewName, setNewValue, add } variables newName newVa
 viewVariable :
     { setName : String -> String -> msg
     , setValue : String -> String -> msg
+    , onFocus : msg
+    , onBlur : msg
     }
     -> Dict String E
     -> ( String, E )
     -> Html msg
-viewVariable { setName, setValue } variables ( name, expr ) =
+viewVariable { setName, setValue, onFocus, onBlur } variables ( name, expr ) =
     Html.tr
         []
         [ Html.td
             [ Attributes.class "variable-table__cell"
             , Attributes.class "variable-table__cell--name"
             ]
-            [ let
-                deleteIcon =
-                    Html.div
-                        [ Attributes.class "tool__textfield-icon-container" ]
-                        [ Common.iconSmall "delete" (setName name "") ]
-              in
-              Html.div
-                [ Attributes.class "tool__value-container" ]
-                [ Html.input
-                    [ Attributes.class "tool__textfield"
-                    , Events.onInput (setName name)
-                    , Attributes.placeholder name
-                    , Attributes.value name -- TODO: broken
-                    ]
-                    []
-                , deleteIcon
-                ]
+            [ Textfields.input ("variable-table__name--" ++ name)
+                { onDelete = setName name ""
+                , onInput = setName name
+                , onFocus = Just onFocus
+                , onBlur = Just onBlur
+                }
+                (Just "name")
+                name
             ]
         , cellSign "="
         , Html.td
             [ Attributes.class "variable-table__cell"
             , Attributes.class "variable-table__cell--formula"
             ]
-            [ let
-                deleteIcon =
-                    Html.div
-                        [ Attributes.class "tool__icon-container" ]
-                        [ Common.iconSmall "delete" (setValue name "") ]
-              in
-              Html.div
-                [ Attributes.class "tool__value-container" ]
-                [ Html.input
-                    [ Attributes.class "tool__textfield"
-                    , Events.onInput (setValue name)
-                    , Attributes.placeholder (Expr.print expr)
-                    , Attributes.value (Expr.print expr) -- TODO: broken
-                    ]
-                    []
-                , deleteIcon
-                ]
+            [ Textfields.input ("variable-table__value--" ++ name)
+                { onDelete = setValue name ""
+                , onInput = setValue name
+                , onFocus = Just onFocus
+                , onBlur = Just onBlur
+                }
+                (Just "value")
+                (Expr.print expr)
             ]
         , cellSign "="
         , Html.td

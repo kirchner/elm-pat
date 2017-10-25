@@ -10,17 +10,20 @@ import Html.Events as Events
 import Math.Vector2 exposing (..)
 import Tools.Data exposing (Data)
 import Views.Common as Common
+import Views.Textfields as Textfields
 
 
-type alias Callbacks msg =
+view :
     { setName : Id Point -> String -> msg
+    , clearName : Id Point -> msg
     , selectPoint : Id Point -> msg
     , deselectPoint : Id Point -> msg
     , deletePoint : Id Point -> msg
+    , onFocus : msg
+    , onBlur : msg
     }
-
-
-view : Callbacks msg -> Data -> Html msg
+    -> Data
+    -> Html msg
 view callbacks data =
     Html.table
         [ Attributes.class "point-table__table" ]
@@ -68,12 +71,24 @@ view callbacks data =
             ]
             :: (data.store
                     |> Store.toList
+                    |> List.sortBy (Tuple.first >> Store.toInt)
                     |> List.map (viewPointEntry callbacks data)
                )
         )
 
 
-viewPointEntry : Callbacks msg -> Data -> ( Id Point, Point ) -> Html msg
+viewPointEntry :
+    { setName : Id Point -> String -> msg
+    , clearName : Id Point -> msg
+    , selectPoint : Id Point -> msg
+    , deselectPoint : Id Point -> msg
+    , deletePoint : Id Point -> msg
+    , onFocus : msg
+    , onBlur : msg
+    }
+    -> Data
+    -> ( Id Point, Point )
+    -> Html msg
 viewPointEntry callbacks data ( id, point ) =
     let
         v =
@@ -146,23 +161,14 @@ viewPointEntry callbacks data ( id, point ) =
             [ Attributes.class "point-table__cell"
             , Attributes.class "point-table__cell--name"
             ]
-            [ let
-                deleteIcon =
-                    Html.div
-                        [ Attributes.class "tool__textfield-icon-container" ]
-                        [ Common.iconSmall "delete" (callbacks.setName id "") ]
-              in
-              Html.div
-                [ Attributes.class "tool__value-container" ]
-                [ Html.input
-                    [ Attributes.class "tool__textfield"
-                    , Events.onInput (callbacks.setName id)
-                    , Attributes.placeholder (Point.name point)
-                    , Attributes.value (Point.name point) -- TODO: broken
-                    ]
-                    []
-                , deleteIcon
-                ]
+            [ Textfields.input ("point-table__name--" ++ Store.printId id)
+                { onDelete = callbacks.clearName id
+                , onInput = callbacks.setName id
+                , onFocus = Just callbacks.onFocus
+                , onBlur = Just callbacks.onBlur
+                }
+                (Just "name")
+                (Point.name point)
             ]
         , Html.td
             [ Attributes.class "point-table__cell"

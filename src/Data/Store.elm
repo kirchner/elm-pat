@@ -13,6 +13,7 @@ module Data.Store
         , insert
         , intKeys
         , keys
+        , printId
         , remove
         , toInt
         , toList
@@ -86,6 +87,11 @@ keys : Store a -> List (Id a)
 keys (Store store) =
     Dict.keys store.data
         |> List.map Id
+
+
+printId : Id a -> String
+printId (Id id) =
+    toString id
 
 
 intKeys : Store a -> List Int

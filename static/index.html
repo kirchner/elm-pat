@@ -54,6 +54,14 @@
           }
         });
       });
+
+      app.ports.clearInput.subscribe(function(id) {
+        var node = document.getElementById(id);
+
+        if (node != undefined) {
+          node.value = "";
+        }
+      });
     </script>
   </body>
 </html>

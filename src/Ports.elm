@@ -1,6 +1,7 @@
 port module Ports
     exposing
         ( autofocus
+        , clearInput
         , dumpFile0
         , serialize
         )
@@ -15,3 +16,6 @@ port serialize : Value -> Cmd msg
 
 
 port dumpFile0 : () -> Cmd msg
+
+
+port clearInput : String -> Cmd msg

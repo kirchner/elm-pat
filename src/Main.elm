@@ -7,6 +7,7 @@ import Data.Position as Position exposing (Position)
 import Data.Store as Store exposing (Id, Store)
 import Data.ViewPort as ViewPort exposing (ViewPort)
 import Dict exposing (Dict)
+import Dom
 import FileBrowser exposing (FileBrowser)
 import Html exposing (Html)
 import Html.Attributes as Attributes
@@ -59,6 +60,7 @@ type alias Model =
     , selectedPoints : List (Id Point)
     , fileBrowser : FileBrowser
     , undoList : UndoList File
+    , shortcutsEnabled : Bool
     }
 
 
@@ -92,6 +94,7 @@ defaultModel =
             , variables = Dict.empty
             , selectedPoints = []
             }
+    , shortcutsEnabled = True
     }
 
 
@@ -130,10 +133,12 @@ callbacks =
 
 
 type Msg
-    = UpdateTool Tool
+    = NoOp
+    | UpdateTool Tool
     | UpdateCursorPosition (Maybe Position)
     | KeyMsg Keyboard.Msg
     | KeyDown Keyboard.Key
+    | EnableShortcuts Bool
     | ExtendPieceMsg (Id Piece) (Id Point) (Maybe (Id Point))
     | DumpFile0
     | ViewPortMsg ViewPortMsg
@@ -170,6 +175,7 @@ type PointsMsg
     | Deselect (Maybe (Id Point))
     | ClearSelection
     | SetPointName (Id Point) String
+    | ClearPointName (Id Point)
 
 
 type VariablesMsg
@@ -221,6 +227,9 @@ update msg model =
         >> updateStorage ports model
     <|
         case msg of
+            NoOp ->
+                ( model, Cmd.none )
+
             UpdateCursorPosition position ->
                 ( { model
                     | cursorPosition =
@@ -292,6 +301,11 @@ update msg model =
 
                     _ ->
                         model
+                , Cmd.none
+                )
+
+            EnableShortcuts enabled ->
+                ( { model | shortcutsEnabled = enabled }
                 , Cmd.none
                 )
 
@@ -367,9 +381,7 @@ update msg model =
                 updateSessions SessionsMsg sessionsMsg model
 
             PointsMsg pointsMsg ->
-                ( updatePoints pointsMsg model
-                , Cmd.none
-                )
+                updatePoints pointsMsg model
 
             VariablesMsg variablesMsg ->
                 ( updateVariables variablesMsg model
@@ -514,16 +526,32 @@ type alias WithPoints r =
     }
 
 
-updatePoints : PointsMsg -> WithPoints r -> WithPoints r
+updatePoints : PointsMsg -> WithPoints r -> ( WithPoints r, Cmd Msg )
 updatePoints msg model =
     case msg of
         SetPointName id name ->
-            { model
+            ( { model
                 | store =
                     Store.update id
                         (Maybe.map (Point.setName name))
                         model.store
-            }
+              }
+            , Cmd.none
+            )
+
+        ClearPointName id ->
+            ( { model
+                | store =
+                    Store.update id
+                        (Maybe.map (Point.setName ""))
+                        model.store
+              }
+            , Cmd.batch
+                [ Ports.clearInput ("point-table__name--" ++ Store.printId id)
+                , Task.attempt (\_ -> NoOp) <|
+                    Dom.focus ("point-table__name--" ++ Store.printId id)
+                ]
+            )
 
         AddPoint point ->
             let
@@ -537,56 +565,76 @@ updatePoints msg model =
                     newStore
                         |> Store.update id (Maybe.map (Point.setName name))
             in
-            { model
+            ( { model
                 | store = storeWithNamedPoint
                 , tool = Nothing
                 , cursorPosition = Nothing
                 , focusedPoint = Nothing
                 , selectedPoints = [ id ]
-            }
+              }
+            , Cmd.none
+            )
 
         Set id point ->
-            { model
+            ( { model
                 | store = Store.update id (\_ -> Just point) model.store
                 , tool = Nothing
-            }
+              }
+            , Cmd.none
+            )
 
         Delete id ->
-            { model | store = Store.remove id model.store }
+            ( { model | store = Store.remove id model.store }
+            , Cmd.none
+            )
 
         Focus id ->
-            { model | focusedPoint = id }
+            ( { model | focusedPoint = id }
+            , Cmd.none
+            )
 
         Select maybeId ->
             case maybeId of
                 Just id ->
                     if List.member Keyboard.Shift model.pressedKeys then
-                        { model
+                        ( { model
                             | selectedPoints =
                                 if List.member id model.selectedPoints then
                                     List.filter ((/=) id) model.selectedPoints
                                 else
                                     id :: model.selectedPoints
-                        }
+                          }
+                        , Cmd.none
+                        )
                     else
-                        { model | selectedPoints = [ id ] }
+                        ( { model | selectedPoints = [ id ] }
+                        , Cmd.none
+                        )
 
                 Nothing ->
-                    model
+                    ( model
+                    , Cmd.none
+                    )
 
         Deselect maybeId ->
             case maybeId of
                 Just id ->
-                    { model
+                    ( { model
                         | selectedPoints =
                             List.filter ((/=) id) model.selectedPoints
-                    }
+                      }
+                    , Cmd.none
+                    )
 
                 Nothing ->
-                    model
+                    ( model
+                    , Cmd.none
+                    )
 
         ClearSelection ->
-            { model | selectedPoints = [] }
+            ( { model | selectedPoints = [] }
+            , Cmd.none
+            )
 
 
 type alias WithVariables r =
@@ -739,8 +787,10 @@ subscriptions model =
             |> Sub.map KeyMsg
         , case model.drag of
             Nothing ->
-                Sub.batch
-                    [ Keyboard.downs KeyDown ]
+                if model.shortcutsEnabled then
+                    Keyboard.downs KeyDown
+                else
+                    Sub.none
 
             Just _ ->
                 Sub.batch
@@ -786,9 +836,12 @@ view model =
         ]
         [ PointTable.view
             { setName = \id name -> PointsMsg (SetPointName id name)
+            , clearName = \id -> PointsMsg (ClearPointName id)
             , selectPoint = PointsMsg << Select << Just
             , deletePoint = PointsMsg << Delete
             , deselectPoint = PointsMsg << Deselect << Just
+            , onFocus = EnableShortcuts False
+            , onBlur = EnableShortcuts True
             }
             data
         ]
@@ -797,16 +850,17 @@ view model =
         , Attributes.class "editor__container--top-left"
         ]
         [ VariableTable.view
-            { setName = SetName
-            , setValue = SetValue
-            , setNewName = SetNewName
-            , setNewValue = SetNewValue
-            , add = Add
+            { setName = \name newName -> VariablesMsg (SetName name newName)
+            , setValue = \name value -> VariablesMsg (SetValue name value)
+            , setNewName = VariablesMsg << SetNewName
+            , setNewValue = VariablesMsg << SetNewValue
+            , add = VariablesMsg Add
+            , onFocus = EnableShortcuts False
+            , onBlur = EnableShortcuts True
             }
             model.variables
             model.newName
             model.newValue
-            |> Html.map VariablesMsg
         ]
     , case viewToolInfo data model.tool of
         Just toolInfo ->
