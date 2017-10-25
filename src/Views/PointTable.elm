@@ -136,6 +136,7 @@ viewPointEntry callbacks data ( id, point ) =
                     )
                 , Attributes.class "icon-button"
                 , Attributes.class "icon-button--small"
+                , Attributes.tabindex -1
                 ]
                 [ Html.i
                     [ Attributes.class "icon"

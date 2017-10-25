@@ -315,6 +315,7 @@ update msg model =
                             | tool = Nothing
                             , cursorPosition = Nothing
                             , framedCursorPosition = Nothing
+                            , shortcutsEnabled = True
                         }
 
                     _ ->
@@ -343,6 +344,7 @@ update msg model =
                             | pieceStore =
                                 Store.update pieceId updatePiece model.pieceStore
                             , tool = Nothing
+                            , shortcutsEnabled = True
                         }
 
                     Nothing ->
@@ -415,7 +417,10 @@ update msg model =
                 )
 
             UpdateTool tool ->
-                ( { model | tool = Just tool }
+                ( { model
+                    | tool = Just tool
+                    , shortcutsEnabled = False
+                  }
                 , Cmd.none
                 )
 
@@ -947,7 +952,14 @@ viewToolBox data toolActive =
 viewToolInfo : Data -> Maybe Tool -> Maybe (Html Msg)
 viewToolInfo data tool =
     tool
-        |> Maybe.map (Tools.view callbacks data)
+        |> Maybe.map
+            (\tool ->
+                Html.div
+                    [ Attributes.class "tool__tool-box" ]
+                    [ -- TODO: add button: "Add Point"
+                      Tools.view data tool
+                    ]
+            )
         |> Maybe.map (Html.map ToolMsg)
 
 

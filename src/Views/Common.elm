@@ -14,6 +14,7 @@ iconBig name callback =
     Html.button
         [ Attributes.class "icon-button"
         , Attributes.class "icon-button--big"
+        , Attributes.tabindex -1
         ]
         [ Html.i
             [ Attributes.class "icon"
@@ -30,6 +31,7 @@ iconSmall name callback =
     Html.button
         [ Attributes.class "icon-button"
         , Attributes.class "icon-button--small"
+        , Attributes.tabindex -1
         ]
         [ Html.i
             [ Attributes.class "icon"

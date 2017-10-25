@@ -24,7 +24,6 @@ import Tools.Data exposing (Data)
 import Tools.PointMenu as PointMenu
 import Views.ExprInput as ExprInput
 import Views.Switch as Switch
-import Views.Tool as Tool
 
 
 type alias State =
@@ -201,8 +200,8 @@ drawCircle center radius =
 ---- VIEW
 
 
-view : Callbacks msg -> Data -> State -> Html Msg
-view callbacks data state =
+view : State -> Html Msg
+view state =
     let
         choices =
             [ "a", "b" ]
@@ -215,13 +214,13 @@ view callbacks data state =
                 RightMost ->
                     1
     in
-    [ PointMenu.view 0 state |> Html.map PointMenuMsg
-    , ExprInput.view "first radius" state.firstRadius UpdateFirstRadius
-    , PointMenu.view 1 state |> Html.map PointMenuMsg
-    , ExprInput.view "last radius" state.lastRadius UpdateLastRadius
-    , Switch.view choices switchState UpdateChoice
-    ]
-        |> Tool.view callbacks data state point
+    Html.div []
+        [ PointMenu.view 0 state |> Html.map PointMenuMsg
+        , ExprInput.view "first radius" state.firstRadius UpdateFirstRadius
+        , PointMenu.view 1 state |> Html.map PointMenuMsg
+        , ExprInput.view "last radius" state.lastRadius UpdateLastRadius
+        , Switch.view choices switchState UpdateChoice
+        ]
 
 
 

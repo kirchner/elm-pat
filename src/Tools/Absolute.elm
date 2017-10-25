@@ -23,7 +23,6 @@ import Svgs.UpdateMouse as UpdateMouse
 import Tools.Callbacks exposing (Callbacks)
 import Tools.Data exposing (Data)
 import Views.ExprInput as ExprInput
-import Views.Tool as Tool
 
 
 type alias State =
@@ -134,12 +133,12 @@ verticalLine variables state =
 ---- VIEW
 
 
-view : Callbacks msg -> Data -> State -> Html Msg
-view callbacks data state =
-    [ ExprInput.view "x-coordinate" state.x UpdateX
-    , ExprInput.view "y-coordinate" state.y UpdateY
-    ]
-        |> Tool.view callbacks data state point
+view : State -> Html Msg
+view state =
+    Html.div []
+        [ ExprInput.view "x-coordinate" state.x UpdateX
+        , ExprInput.view "y-coordinate" state.y UpdateY
+        ]
 
 
 

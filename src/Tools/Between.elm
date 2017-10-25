@@ -25,7 +25,6 @@ import Tools.Callbacks exposing (Callbacks)
 import Tools.Data exposing (Data)
 import Tools.PointMenu as PointMenu
 import Views.ExprInput as ExprInput
-import Views.Tool as Tool
 
 
 type alias State =
@@ -154,13 +153,13 @@ newPoint data state firstPosition lastPosition =
 ---- VIEW
 
 
-view : Callbacks msg -> Data -> State -> Html Msg
-view callbacks data state =
-    [ PointMenu.view 0 state |> Html.map PointMenuMsg
-    , PointMenu.view 1 state |> Html.map PointMenuMsg
-    , ExprInput.view "ratio" state.ratio UpdateRatio
-    ]
-        |> Tool.view callbacks data state point
+view : State -> Html Msg
+view state =
+    Html.div []
+        [ PointMenu.view 0 state |> Html.map PointMenuMsg
+        , PointMenu.view 1 state |> Html.map PointMenuMsg
+        , ExprInput.view "ratio" state.ratio UpdateRatio
+        ]
 
 
 

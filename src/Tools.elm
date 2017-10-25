@@ -191,27 +191,27 @@ update callbacks msg tool =
 ---- VIEW
 
 
-view : Callbacks msg -> Data -> Tool -> Html Msg
-view callbacks data tool =
+view : Data -> Tool -> Html Msg
+view data tool =
     case tool of
         Absolute state ->
-            Absolute.view callbacks data state
+            Absolute.view state
                 |> Html.map AbsoluteMsg
 
         Relative state ->
-            Relative.view callbacks data state
+            Relative.view state
                 |> Html.map RelativeMsg
 
         Distance state ->
-            Distance.view callbacks data state
+            Distance.view data state
                 |> Html.map DistanceMsg
 
         Between state ->
-            Between.view callbacks data state
+            Between.view state
                 |> Html.map BetweenMsg
 
         CircleIntersection state ->
-            CircleIntersection.view callbacks data state
+            CircleIntersection.view state
                 |> Html.map CircleIntersectionMsg
 
         ExtendPiece _ ->

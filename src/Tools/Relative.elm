@@ -24,7 +24,6 @@ import Tools.Callbacks exposing (Callbacks)
 import Tools.Data exposing (Data)
 import Tools.PointMenu as PointMenu
 import Views.ExprInput as ExprInput
-import Views.Tool as Tool
 
 
 type alias State =
@@ -140,13 +139,13 @@ verticalLine data state anchorPosition =
 ---- VIEW
 
 
-view : Callbacks msg -> Data -> State -> Html Msg
-view callbacks data state =
-    [ PointMenu.view 0 state |> Html.map PointMenuMsg
-    , ExprInput.view "horizontal distance" state.x UpdateX
-    , ExprInput.view "vertical distance" state.y UpdateY
-    ]
-        |> Tool.view callbacks data state point
+view : State -> Html Msg
+view state =
+    Html.div []
+        [ PointMenu.view 0 state |> Html.map PointMenuMsg
+        , ExprInput.view "horizontal distance" state.x UpdateX
+        , ExprInput.view "vertical distance" state.y UpdateY
+        ]
 
 
 

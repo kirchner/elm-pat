@@ -27,7 +27,6 @@ import Tools.Callbacks exposing (Callbacks)
 import Tools.Data exposing (Data)
 import Tools.PointMenu as PointMenu
 import Views.ExprInput as ExprInput
-import Views.Tool as Tool
 
 
 type alias State =
@@ -188,8 +187,8 @@ line data state =
 ---- VIEW
 
 
-view : Callbacks msg -> Data -> State -> Html Msg
-view callbacks data state =
+view : Data -> State -> Html Msg
+view data state =
     let
         ( distancePlaceholder, anglePlaceholder ) =
             case ( data.cursorPosition, anchorPosition data state ) of
@@ -212,11 +211,11 @@ view callbacks data state =
                 _ ->
                     ( "distance", "angle" )
     in
-    [ PointMenu.view 0 state |> Html.map PointMenuMsg
-    , ExprInput.viewWithClear True distancePlaceholder state.distance UpdateDistance
-    , ExprInput.viewWithClear True anglePlaceholder state.angle UpdateAngle
-    ]
-        |> Tool.view callbacks data state point
+    Html.div []
+        [ PointMenu.view 0 state |> Html.map PointMenuMsg
+        , ExprInput.viewWithClear True distancePlaceholder state.distance UpdateDistance
+        , ExprInput.viewWithClear True anglePlaceholder state.angle UpdateAngle
+        ]
 
 
 
