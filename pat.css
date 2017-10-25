@@ -211,16 +211,9 @@ body {
 .tool__value-container {
   position: relative;
   display: flex;
-  padding-left: 0.3rem;
-  padding-right: 0.3rem;
+  padding: 0;
   margin: 1px;
   border: 0; }
-  .tool__value-container:hover {
-    margin: 0;
-    border: 1px solid #839496; }
-  .tool__value-container--bad {
-    margin: 0;
-    border: 1px solid #dc322f; }
 .tool__icon-container {
   position: absolute;
   right: 0.3rem;
@@ -247,12 +240,21 @@ body {
   color: #839496;
   background-color: transparent;
   border: 0;
-  margin: 0;
-  padding: 0; }
+  margin: 1px;
+  padding-left: 5px;
+  padding-right: 5px; }
+  .tool__textfield:hover {
+    margin: 0;
+    border: 1px solid #839496; }
   .tool__textfield--bad {
-    color: #dc322f; }
+    margin: 0;
+    color: #dc322f;
+    border: 1px solid #dc322f; }
   .tool__textfield:focus {
-    outline: none; }
+    outline: none;
+    background-color: #fdf6e3;
+    margin: 0;
+    border: 1px solid #839496; }
   .tool__textfield::webkit-input-placeholder {
     font-family: monospace;
     font-size: 12px;
@@ -305,12 +307,12 @@ body {
 .tool__menu-container {
   position: absolute;
   z-index: 20;
-  left: -5px;
   top: 100%;
-  max-height: 6rem;
-  width: calc(100% + 9px);
+  max-height: 8rem;
+  width: calc(100% - 2px);
   margin: 0;
   border: 1px solid #839496;
+  border-top: 0;
   overflow-y: scroll; }
 .tool__menu-textfield {
   border-color: transparent;
