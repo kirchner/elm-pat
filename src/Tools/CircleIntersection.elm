@@ -113,7 +113,7 @@ svg callbacks updateState data state =
                 , Extra.drawLine firstPosition lastPosition
                 , UpdateMouse.svg addPoint
                     callbacks.updateCursorPosition
-                    data
+                    data.viewPort
                 ]
 
         _ ->

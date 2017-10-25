@@ -33,7 +33,7 @@ init piece segment =
 svg : Callbacks msg -> Data -> State -> Svg msg
 svg callbacks data state =
     [ lineSegments data state
-    , Just (UpdateMouse.svg Nothing callbacks.updateCursorPosition data)
+    , Just (UpdateMouse.svg Nothing callbacks.updateCursorPosition data.viewPort)
     , Just <|
         SelectPoint.svg callbacks.focusPoint
             (callbacks.extendPiece state.piece state.segment)

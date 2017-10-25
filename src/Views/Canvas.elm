@@ -1,10 +1,12 @@
 module Views.Canvas exposing (view)
 
+import Data.Expr exposing (E)
 import Data.Piece as Piece exposing (..)
 import Data.Point as Point exposing (Point)
 import Data.Position as Position exposing (Position)
 import Data.Store as Store exposing (Id, Store)
 import Data.ViewPort as ViewPort exposing (ViewPort)
+import Dict exposing (Dict)
 import Events
 import Html exposing (Html)
 import Html.Attributes as Html
@@ -13,6 +15,7 @@ import Math.Vector2 exposing (..)
 import Styles.Colors as Colors
 import Svg exposing (Svg, path)
 import Svg.Attributes as Svg
+import Svg.Lazy as Svg
 import Svgs.Extra as Extra
 import Svgs.SelectPoint as SelectPoint
 import Tools.Data exposing (Data)
@@ -61,12 +64,12 @@ view { startDrag, focusPoint, selectPoint, extendPiece, updateZoom } pieceStore 
             ]
         , Events.onWheel updateZoom
         ]
-        [ grid defaultGridConfig data.viewPort
+        [ Svg.lazy2 grid defaultGridConfig data.viewPort
         , origin
-        , Svg.g [] (points data)
-        , viewSelectedPoints data
+        , Svg.lazy2 points data.store data.variables
+        , Svg.lazy3 viewSelectedPoints data.store data.variables data.selectedPoints
         , dragArea startDrag data.viewPort
-        , Svg.g [] (pieces extendPiece data)
+        , pieces extendPiece data.store data.variables data.pieceStore
         , SelectPoint.svg focusPoint selectPoint data
         , tool
         ]
@@ -219,8 +222,8 @@ dragArea startDrag viewPort =
         []
 
 
-viewSelectedPoints : Data -> Svg msg
-viewSelectedPoints data =
+viewSelectedPoints : Store Point -> Dict String E -> List (Id Point) -> Svg msg
+viewSelectedPoints store variables selectedPoints =
     let
         tail list =
             case List.tail list of
@@ -230,23 +233,23 @@ viewSelectedPoints data =
                 Nothing ->
                     []
     in
-    (List.head data.selectedPoints
-        |> Maybe.andThen (viewSelectedPoint data True)
+    (List.head selectedPoints
+        |> Maybe.andThen (viewSelectedPoint store variables True)
     )
-        :: (data.selectedPoints
+        :: (selectedPoints
                 |> tail
-                |> List.map (viewSelectedPoint data False)
+                |> List.map (viewSelectedPoint store variables False)
            )
         |> List.filterMap identity
         |> Svg.g []
 
 
-viewSelectedPoint : Data -> Bool -> Id Point -> Maybe (Svg msg)
-viewSelectedPoint data first id =
+viewSelectedPoint : Store Point -> Dict String E -> Bool -> Id Point -> Maybe (Svg msg)
+viewSelectedPoint store variables first id =
     let
         position =
-            Store.get id data.store
-                |> Maybe.andThen (Point.position data.store data.variables)
+            Store.get id store
+                |> Maybe.andThen (Point.position store variables)
     in
     case position of
         Just position ->
@@ -290,19 +293,20 @@ origin =
         ]
 
 
-points : Data -> List (Svg msg)
-points data =
-    Store.values data.store
-        |> List.filterMap (point data)
+points : Store Point -> Dict String E -> Svg msg
+points store variables =
+    Store.values store
+        |> List.filterMap (point store variables)
+        |> Svg.g []
 
 
-point : Data -> Point -> Maybe (Svg msg)
-point data point =
+point : Store Point -> Dict String E -> Point -> Maybe (Svg msg)
+point store variables point =
     let
         handlers =
             { withAbsolute =
                 \point _ _ ->
-                    Point.position data.store data.variables point
+                    Point.position store variables point
                         |> Maybe.map (Extra.drawPoint Colors.base0)
             , withRelative =
                 \point anchorId _ _ ->
@@ -315,8 +319,8 @@ point data point =
                     in
                     Maybe.map2
                         draw
-                        (Point.positionById data.store data.variables anchorId)
-                        (Point.position data.store data.variables point)
+                        (Point.positionById store variables anchorId)
+                        (Point.position store variables point)
             , withDistance =
                 \point anchorId _ _ ->
                     let
@@ -328,8 +332,8 @@ point data point =
                     in
                     Maybe.map2
                         draw
-                        (Point.positionById data.store data.variables anchorId)
-                        (Point.position data.store data.variables point)
+                        (Point.positionById store variables anchorId)
+                        (Point.position store variables point)
             , withBetween =
                 \point firstId lastId _ ->
                     let
@@ -341,9 +345,9 @@ point data point =
                     in
                     Maybe.map3
                         draw
-                        (Point.position data.store data.variables point)
-                        (Point.positionById data.store data.variables firstId)
-                        (Point.positionById data.store data.variables lastId)
+                        (Point.position store variables point)
+                        (Point.positionById store variables firstId)
+                        (Point.positionById store variables lastId)
             , withCircleIntersection =
                 \point firstId _ lastId _ _ ->
                     let
@@ -356,31 +360,38 @@ point data point =
                     in
                     Maybe.map3
                         draw
-                        (Point.position data.store data.variables point)
-                        (Point.positionById data.store data.variables firstId)
-                        (Point.positionById data.store data.variables lastId)
+                        (Point.position store variables point)
+                        (Point.positionById store variables firstId)
+                        (Point.positionById store variables lastId)
             }
     in
     Point.dispatch handlers point
 
 
-pieces : (Id Piece -> Id Point -> msg) -> Data -> List (Svg msg)
-pieces extendPiece data =
-    Store.toList data.pieceStore
-        |> List.map (piece extendPiece data)
+pieces :
+    (Id Piece -> Id Point -> msg)
+    -> Store Point
+    -> Dict String E
+    -> Store Piece
+    -> Svg msg
+pieces extendPiece store variables pieceStore =
+    Store.toList pieceStore
+        |> List.map (piece extendPiece store variables)
         |> List.map (Svg.g [])
+        |> Svg.g []
 
 
 piece :
     (Id Piece -> Id Point -> msg)
-    -> Data
+    -> Store Point
+    -> Dict String E
     -> ( Id Piece, Piece )
     -> List (Svg msg)
-piece extendPiece data ( id, piece ) =
+piece extendPiece store variables ( id, piece ) =
     let
         segments =
             Piece.toList piece
-                |> List.filterMap (Point.positionById data.store data.variables)
+                |> List.filterMap (Point.positionById store variables)
                 |> List.zip (Piece.toList piece)
     in
     case segments of

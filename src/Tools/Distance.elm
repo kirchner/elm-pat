@@ -89,7 +89,7 @@ svg callbacks updateState data state =
             [ newPoint data state
             , circle data state
             , line data state
-            , Just (UpdateMouse.svg addPoint callbacks.updateCursorPosition data)
+            , Just (UpdateMouse.svg addPoint callbacks.updateCursorPosition data.viewPort)
             ]
                 |> List.filterMap identity
                 |> Svg.g []

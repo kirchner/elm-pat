@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import AnimationFrame
 import Data.Expr as Expr exposing (E)
 import Data.Piece as Piece exposing (Piece)
 import Data.Point as Point exposing (Point)
@@ -18,7 +19,9 @@ import Keyboard.Extra as Keyboard exposing (Key)
 import Mouse
 import Ports
 import Svg exposing (Svg)
+import Svg.Lazy as Svg
 import Task
+import Time exposing (Time)
 import Tools exposing (Tool(..))
 import Tools.Callbacks exposing (Callbacks)
 import Tools.Data exposing (Data)
@@ -55,6 +58,7 @@ type alias Model =
     , viewPort : ViewPort
     , drag : Maybe Drag
     , cursorPosition : Maybe Position
+    , framedCursorPosition : Maybe Position
     , focusedPoint : Maybe (Id Point)
     , pressedKeys : List Key
     , selectedPoints : List (Id Point)
@@ -83,6 +87,7 @@ defaultModel =
     , viewPort = ViewPort.default
     , drag = Nothing
     , cursorPosition = Nothing
+    , framedCursorPosition = Nothing
     , focusedPoint = Nothing
     , pressedKeys = []
     , selectedPoints = []
@@ -110,7 +115,7 @@ dataFromModel model =
     , pieceStore = model.pieceStore
     , variables = model.variables
     , viewPort = getViewPort model.viewPort model.drag
-    , cursorPosition = model.cursorPosition
+    , cursorPosition = model.framedCursorPosition
     , focusedPoint = model.focusedPoint
     , pressedKeys = model.pressedKeys
     , selectedPoints = model.selectedPoints
@@ -134,6 +139,7 @@ callbacks =
 
 type Msg
     = NoOp
+    | FrameTick Time
     | UpdateTool Tool
     | UpdateCursorPosition (Maybe Position)
     | KeyMsg Keyboard.Msg
@@ -230,6 +236,17 @@ update msg model =
             NoOp ->
                 ( model, Cmd.none )
 
+            FrameTick _ ->
+                ( { model
+                    | framedCursorPosition =
+                        if model.cursorPosition /= model.framedCursorPosition then
+                            model.cursorPosition
+                        else
+                            model.framedCursorPosition
+                  }
+                , Cmd.none
+                )
+
             UpdateCursorPosition position ->
                 ( { model
                     | cursorPosition =
@@ -297,6 +314,7 @@ update msg model =
                         { model
                             | tool = Nothing
                             , cursorPosition = Nothing
+                            , framedCursorPosition = Nothing
                         }
 
                     _ ->
@@ -521,7 +539,7 @@ type alias WithPoints r =
         , focusedPoint : Maybe (Id Point)
         , selectedPoints : List (Id Point)
         , tool : Maybe Tool
-        , cursorPosition : Maybe Position
+        , framedCursorPosition : Maybe Position
         , pressedKeys : List Key
     }
 
@@ -568,7 +586,7 @@ updatePoints msg model =
             ( { model
                 | store = storeWithNamedPoint
                 , tool = Nothing
-                , cursorPosition = Nothing
+                , framedCursorPosition = Nothing
                 , focusedPoint = Nothing
                 , selectedPoints = [ id ]
               }
@@ -797,6 +815,7 @@ subscriptions model =
                     [ Mouse.moves (ViewPortMsg << DragAt)
                     , Mouse.ups (ViewPortMsg << DragStop)
                     ]
+        , AnimationFrame.times FrameTick
         ]
 
 

@@ -10,11 +10,14 @@ module Tools.Absolute
 
 import Data.Expr exposing (..)
 import Data.Point as Point exposing (Point)
+import Data.Position exposing (Position)
+import Dict exposing (Dict)
 import Html exposing (Html)
 import Math.Vector2 exposing (..)
 import Maybe.Extra as Maybe
 import Styles.Colors as Colors exposing (..)
 import Svg exposing (Svg)
+import Svg.Lazy as Svg
 import Svgs.Extra as Extra
 import Svgs.UpdateMouse as UpdateMouse
 import Tools.Callbacks exposing (Callbacks)
@@ -65,17 +68,24 @@ svg callbacks updateState data state =
         addPoint =
             point data state |> Maybe.map callbacks.addPoint
     in
-    [ newPoint data state
-    , horizontalLine data state
-    , verticalLine data state
-    , Just (UpdateMouse.svg addPoint callbacks.updateCursorPosition data)
+    [ Svg.lazy3 draw data.variables data.cursorPosition state
+    , UpdateMouse.svg addPoint callbacks.updateCursorPosition data.viewPort
+    ]
+        |> Svg.g []
+
+
+draw : Dict String E -> Maybe Position -> State -> Svg msg
+draw variables cursorPosition state =
+    [ newPoint variables cursorPosition state
+    , horizontalLine variables state
+    , verticalLine variables state
     ]
         |> List.filterMap identity
         |> Svg.g []
 
 
-newPoint : Data -> State -> Maybe (Svg msg)
-newPoint data state =
+newPoint : Dict String E -> Maybe Position -> State -> Maybe (Svg msg)
+newPoint variables cursorPosition state =
     let
         draw x y =
             Svg.g []
@@ -84,17 +94,17 @@ newPoint data state =
                 ]
 
         xState =
-            state.x |> Maybe.andThen (compute data.variables)
+            state.x |> Maybe.andThen (compute variables)
 
         yState =
-            state.y |> Maybe.andThen (compute data.variables)
+            state.y |> Maybe.andThen (compute variables)
 
         xCursor =
-            data.cursorPosition
+            cursorPosition
                 |> Maybe.map (\{ x, y } -> toFloat x)
 
         yCursor =
-            data.cursorPosition
+            cursorPosition
                 |> Maybe.map (\{ x, y } -> toFloat y)
 
         x =
@@ -106,17 +116,17 @@ newPoint data state =
     Maybe.map2 draw x y
 
 
-horizontalLine : Data -> State -> Maybe (Svg msg)
-horizontalLine data state =
+horizontalLine : Dict String E -> State -> Maybe (Svg msg)
+horizontalLine variables state =
     state.y
-        |> Maybe.andThen (compute data.variables)
+        |> Maybe.andThen (compute variables)
         |> Maybe.map Extra.drawHorizontalLine
 
 
-verticalLine : Data -> State -> Maybe (Svg msg)
-verticalLine data state =
+verticalLine : Dict String E -> State -> Maybe (Svg msg)
+verticalLine variables state =
     state.x
-        |> Maybe.andThen (compute data.variables)
+        |> Maybe.andThen (compute variables)
         |> Maybe.map Extra.drawVerticalLine
 
 
