@@ -24,6 +24,7 @@ import Dict exposing (Dict)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
 import Math.Vector2 exposing (..)
+import Math.Vector2.Extra exposing (..)
 
 
 {- point -}
@@ -202,60 +203,12 @@ position store variables (Point { name, data }) =
                 (lookUp idB)
 
         CircleIntersection idA rA idB rB choice ->
-            let
-                maybeDelta =
-                    Maybe.map2
-                        (\a b -> b |> flip sub a)
-                        maybeA
-                        (lookUp idB)
-
-                maybeA =
-                    lookUp idA
-            in
-            case
-                ( maybeA
-                , maybeDelta
-                , compute variables rA
-                , compute variables rB
-                )
-            of
-                ( Just a, Just delta, Just rA, Just rB ) ->
-                    let
-                        distSquared =
-                            delta |> lengthSquared
-
-                        dist =
-                            delta |> length
-
-                        z =
-                            (rB ^ 2 - rA ^ 2 - distSquared)
-                                / (-2 * dist)
-
-                        h =
-                            factor * sqrt (rA ^ 2 - z)
-
-                        factor =
-                            case choice of
-                                LeftMost ->
-                                    -1
-
-                                RightMost ->
-                                    1
-
-                        deltaPerp =
-                            vec2 (getY delta) (-1 * getX delta)
-                                |> normalize
-
-                        position =
-                            deltaPerp
-                                |> scale h
-                                |> add (delta |> normalize |> scale z)
-                                |> add a
-                    in
-                    Just position
-
-                _ ->
-                    Nothing
+            Maybe.map4 (intersectCircleCircle (choice == LeftMost))
+                (lookUp idA)
+                (compute variables rA)
+                (lookUp idB)
+                (compute variables rB)
+                |> Maybe.withDefault Nothing
 
 
 

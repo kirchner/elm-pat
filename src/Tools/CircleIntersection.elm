@@ -17,6 +17,7 @@ import Styles.Colors as Colors
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 import Svgs.Extra as Extra
+import Svgs.SelectPoint as SelectPoint
 import Svgs.UpdateMouse as UpdateMouse
 import Tools.Callbacks exposing (Callbacks)
 import Tools.Data exposing (Data)
@@ -93,30 +94,92 @@ update callbacks msg state =
 
 svg : Callbacks msg -> (State -> msg) -> Data -> State -> Svg msg
 svg callbacks updateState data state =
-    case
-        ( firstPosition data state
-        , state.firstRadius |> Maybe.andThen (Expr.compute data.variables)
-        , lastPosition data state
-        , state.lastRadius |> Maybe.andThen (Expr.compute data.variables)
-        )
-    of
-        ( Just firstPosition, Just firstRadius, Just lastPosition, Just lastRadius ) ->
+    let
+        firstPos =
+            firstPosition data state
+
+        firstRadius =
+            state.firstRadius |> Maybe.andThen (Expr.compute data.variables)
+
+        lastPos =
+            lastPosition data state
+
+        lastRadius =
+            state.lastRadius |> Maybe.andThen (Expr.compute data.variables)
+
+        addPoint =
+            point data state |> Maybe.map callbacks.addPoint
+    in
+    [ firstPos |> Maybe.map (Extra.drawSelector Extra.Solid Colors.red)
+    , Maybe.map2 drawCircle firstPos firstRadius
+    , lastPos |> Maybe.map (Extra.drawSelector Extra.Solid Colors.red)
+    , Maybe.map2 drawCircle lastPos lastRadius
+    , case ( firstPos, lastPos ) of
+        ( Nothing, Nothing ) ->
             let
-                addPoint =
-                    point data state |> Maybe.map callbacks.addPoint
+                selectPoint =
+                    Maybe.map (\id -> PointMenu.selectPoint 0 id data state)
+                        >> Maybe.withDefault state
+                        >> updateState
             in
-            Svg.g []
-                [ Extra.drawSelector Extra.Solid Colors.red firstPosition
-                , drawCircle firstPosition firstRadius
-                , Extra.drawSelector Extra.Solid Colors.red lastPosition
-                , drawCircle lastPosition lastRadius
-                , Extra.drawLine firstPosition lastPosition
-                , UpdateMouse.svg addPoint
-                    callbacks.updateCursorPosition
-                    data.viewPort
-                ]
+            Just (SelectPoint.svg callbacks.focusPoint selectPoint data)
+
+        ( Just _, Nothing ) ->
+            let
+                selectPoint =
+                    Maybe.map (\id -> PointMenu.selectPoint 1 id data state)
+                        >> Maybe.withDefault state
+                        >> updateState
+            in
+            Just (SelectPoint.svg callbacks.focusPoint selectPoint data)
+
+        ( Nothing, Just _ ) ->
+            let
+                selectPoint =
+                    Maybe.map (\id -> PointMenu.selectPoint 0 id data state)
+                        >> Maybe.withDefault state
+                        >> updateState
+            in
+            Just (SelectPoint.svg callbacks.focusPoint selectPoint data)
+
+        ( Just _, Just _ ) ->
+            Nothing
+    , case
+        ( state |> PointMenu.selectedPoint 0 |> Maybe.map Tuple.first
+        , state.firstRadius
+        , state |> PointMenu.selectedPoint 1 |> Maybe.map Tuple.first
+        , state.lastRadius
+        )
+      of
+        ( Just first, Just firstRadius, Just last, Just lastRadius ) ->
+            [ newPoint data state first firstRadius last lastRadius
+            , UpdateMouse.svg addPoint callbacks.updateCursorPosition data.viewPort
+            ]
+                |> Svg.g []
+                |> Just
 
         _ ->
+            Nothing
+    ]
+        |> List.filterMap identity
+        |> Svg.g []
+
+
+newPoint : Data -> State -> Id Point -> E -> Id Point -> E -> Svg msg
+newPoint data state firstPos firstRadius lastPos lastRadius =
+    let
+        pointPosition =
+            Point.circleIntersection firstPos firstRadius lastPos lastRadius state.choice
+                |> Point.position data.store data.variables
+    in
+    case pointPosition of
+        Just position ->
+            Svg.g []
+                [ Extra.drawPoint Colors.red position
+                , Extra.drawSelector Extra.Solid Colors.red position
+                ]
+
+        Nothing ->
             Svg.g [] []
 
 
