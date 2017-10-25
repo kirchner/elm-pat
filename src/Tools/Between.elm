@@ -14,6 +14,7 @@ import Data.Position as Position exposing (Position)
 import Data.Store as Store exposing (Id, Store)
 import Html exposing (Html, map)
 import Math.Vector2 exposing (..)
+import Math.Vector2.Extra exposing (..)
 import Maybe.Extra as Maybe
 import Styles.Colors as Colors
 import Svg exposing (Svg)
@@ -204,9 +205,6 @@ ratio data state firstPosition lastPosition cursorPosition =
         deltaCursor =
             Position.toVec cursorPosition |> flip sub firstPosition
 
-        project v w =
-            w |> scale (dot v w / lengthSquared w)
-
         projection =
             project deltaCursor deltaAnchors
 
@@ -218,7 +216,7 @@ ratio data state firstPosition lastPosition cursorPosition =
             (pointPosition |> flip sub firstPosition |> length)
                 / (lastPosition |> flip sub firstPosition |> length)
     in
-    if dot projection deltaAnchors > 0 then
+    if haveSameDirection projection deltaAnchors then
         ratio
     else
         -1 * ratio
