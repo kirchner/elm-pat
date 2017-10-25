@@ -207,15 +207,21 @@ ratio data state firstPosition lastPosition cursorPosition =
         project v w =
             w |> scale (dot v w / lengthSquared w)
 
-        pointPosition =
+        projection =
             project deltaCursor deltaAnchors
+
+        pointPosition =
+            projection
                 |> add firstPosition
 
         ratio =
             (pointPosition |> flip sub firstPosition |> length)
                 / (lastPosition |> flip sub firstPosition |> length)
     in
-    ratio
+    if dot projection deltaAnchors > 0 then
+        ratio
+    else
+        -1 * ratio
 
 
 firstPosition : Data -> State -> Maybe Vec2
