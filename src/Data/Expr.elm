@@ -86,11 +86,13 @@ print expr =
     let
         apply operator e1 e2 =
             String.concat
-                [ print e1
+                [ "("
+                , print e1
                 , " "
                 , operator
                 , " "
                 , print e2
+                , ")"
                 ]
     in
     case expr of

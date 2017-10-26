@@ -117,11 +117,46 @@ suite =
                                 )
                             )
             ]
+        , fuzz fuzzE "print and then parse" <|
+            \expr ->
+                expr
+                    |> Expr.print
+                    |> Expr.parse
+                    |> Expect.equal (Just expr)
         ]
 
 
 
 ---- HELPER
+
+
+fuzzE : Fuzzer E
+fuzzE =
+    Fuzz.oneOf
+        [ fuzzNumber
+        , Fuzz.constant (Symbol "some_symbol")
+        , Fuzz.map2 Sum fuzzE2 fuzzE2
+        , Fuzz.map2 Difference fuzzE2 fuzzE2
+        , Fuzz.map2 Product fuzzE2 fuzzE2
+        , Fuzz.map2 Quotient fuzzE2 fuzzE2
+        ]
+
+
+fuzzE2 : Fuzzer E
+fuzzE2 =
+    Fuzz.oneOf
+        [ fuzzNumber
+        , Fuzz.constant (Symbol "some_other_symbol")
+        , Fuzz.map2 Sum fuzzNumber fuzzNumber
+        , Fuzz.map2 Difference fuzzNumber fuzzNumber
+        , Fuzz.map2 Product fuzzNumber fuzzNumber
+        , Fuzz.map2 Quotient fuzzNumber fuzzNumber
+        ]
+
+
+fuzzNumber : Fuzzer E
+fuzzNumber =
+    Fuzz.float |> Fuzz.map Number
 
 
 fuzzNonZeroFloat : Fuzzer Float
