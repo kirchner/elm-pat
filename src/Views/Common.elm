@@ -15,12 +15,12 @@ iconBig name callback =
         [ Attributes.class "icon-button"
         , Attributes.class "icon-button--big"
         , Attributes.tabindex -1
+        , Events.onClick callback
         ]
         [ Html.i
             [ Attributes.class "icon"
             , Attributes.class "icon--big"
             , Attributes.class "material-icons"
-            , Events.onClick callback
             ]
             [ Html.text name ]
         ]

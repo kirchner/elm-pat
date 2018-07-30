@@ -1,6 +1,6 @@
 all:
-	elm-make --output=gh-pages/elm.js src/App.elm
-	elm-css --output gh-pages src/Stylesheets.elm
+	elm-make --output=gh-pages/elm.js src/Main.elm
+	sass static/pat.scss gh-pages/pat.css
 	cp static/index.html gh-pages/index.html
 
 clean:
