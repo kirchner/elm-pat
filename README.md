@@ -7,6 +7,11 @@ Note, that this is in a very early development state.  Nevertheless,
 I appreciate any questions or feedback. :) The remaining part of this document
 tries to explain some parts the architecture and how to extend it.
 
+This project got a lot of inspiration and knowledge from
+[Seamly2D](https://github.com/FashionFreedom/Seamly2D) and
+[TauMeta](https://github.com/slspencer/TauMeta), so you should definitely check
+these out, too!
+
 
 ## What is this all about?
 
